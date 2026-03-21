@@ -776,7 +776,257 @@ textarea.form-input{resize:vertical;min-height:72px}
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ─── SUPABASE 接続 ───
+const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// セッションID（いいね重複防止用）
+function getSessionId() {
+  let sid = localStorage.getItem('mgmb_sid');
+  if (!sid) { sid = 'sid_' + Math.random().toString(36).slice(2) + Date.now(); localStorage.setItem('mgmb_sid', sid); }
+  return sid;
+}
+const SESSION_ID = getSessionId();
+
+// ─── DB投稿一覧取得 ───
+async function loadPostsFromDB() {
+  const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+  if (error) { console.error('投稿取得エラー:', error); return; }
+  if (data && data.length > 0) renderDBPosts(data);
+}
+
+function timeAgo(ts) {
+  const diff = Math.floor((Date.now() - new Date(ts)) / 1000);
+  if (diff < 60) return 'たった今';
+  if (diff < 3600) return Math.floor(diff/60) + '分前';
+  if (diff < 86400) return Math.floor(diff/3600) + '時間前';
+  return Math.floor(diff/86400) + '日前';
+}
+
+function renderDBPosts(posts) {
+  const grid = document.getElementById('db-posts-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  posts.forEach(p => {
+    const initial = (p.username || '匿')[0].toUpperCase();
+    const gearList = Array.isArray(p.gear_list) ? p.gear_list : [];
+    const tags = gearList.slice(0,3).map(g => `<span class="ptag">${g.name||g}</span>`).join('');
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="iw" style="background:var(--sf2);display:flex;align-items:center;justify-content:center;">
+        ${p.image_urls && p.image_urls[0]
+          ? `<img src="${p.image_urls[0]}" style="width:100%;height:100%;object-fit:cover;">`
+          : `<div style="font-size:40px;opacity:.3">🎸</div>`}
+        <div class="iw-ov"></div>
+        ${p.genre ? `<div class="bdg">${p.genre}</div>` : ''}
+      </div>
+      <div class="body">
+        <div class="cu">
+          <div class="av" style="background:linear-gradient(135deg,#e85c2f,#b03020)">${initial}</div>
+          <div class="av-name">${p.username || '匿名ユーザー'}</div>
+          <div class="av-time">${timeAgo(p.created_at)}</div>
+        </div>
+        <div class="ct">${p.title}</div>
+        <div class="ptags">${tags}</div>
+        <div class="cf">
+          <div class="st db-like-btn" data-id="${p.id}" onclick="toggleDBLike(event,'${p.id}',this)">
+            ❤️ <span>${p.likes||0}</span>
+          </div>
+          <div class="st" onclick="event.stopPropagation()">💬 <span>0</span></div>
+        </div>
+      </div>`;
+    card.onclick = () => openDBModal(p);
+    grid.appendChild(card);
+  });
+}
+
+// ─── DBモーダル ───
+async function openDBModal(p) {
+  currentDBPost = p;
+  document.getElementById('m-title').textContent = p.title;
+  document.getElementById('m-meta').textContent = timeAgo(p.created_at) + (p.genre ? ' · ' + p.genre : '');
+  const initial = (p.username || '匿')[0].toUpperCase();
+  document.getElementById('m-av').style.background = 'linear-gradient(135deg,#e85c2f,#b03020)';
+  document.getElementById('m-av').textContent = initial;
+  document.getElementById('m-like-cnt').textContent = p.likes || 0;
+
+  // 画像
+  const imgEl = document.getElementById('modal-img');
+  if (p.image_urls && p.image_urls[0]) {
+    imgEl.innerHTML = `<img src="${p.image_urls[0]}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`;
+  } else {
+    imgEl.innerHTML = getModalSVG('feat');
+  }
+
+  // 機材リスト
+  const gearList = Array.isArray(p.gear_list) ? p.gear_list : [];
+  const pl = document.getElementById('m-pedals');
+  if (gearList.length) {
+    pl.innerHTML = gearList.map(g => {
+      const name = g.name || g;
+      const link = `https://www.soundhouse.co.jp/search/index/?s_searchwd=${encodeURIComponent(name)}`;
+      return `<div class="pli" onclick="window.open('${link}','_blank')">
+        <div class="pld"></div>
+        <div class="pln">${name}</div>
+        <div class="plk">サウンドハウスで購入 →</div>
+      </div>`;
+    }).join('');
+  } else {
+    pl.innerHTML = '<div style="color:var(--td);font-size:12px;">機材情報なし</div>';
+  }
+
+  // コメント取得
+  await loadDBComments(p.id);
+
+  document.getElementById('modal-bd').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+let currentDBPost = null;
+
+async function loadDBComments(postId) {
+  const { data, error } = await sb.from('comments').select('*').eq('post_id', postId).order('created_at', { ascending: true });
+  if (error) return;
+  const cms = document.getElementById('m-comments');
+  const top = (data || []).filter(c => !c.parent_id);
+  const replies = (data || []).filter(c => c.parent_id);
+  document.getElementById('m-comment-count').textContent = data && data.length ? `(${data.length})` : '';
+  if (!top.length) {
+    cms.innerHTML = '<div style="font-size:11px;color:var(--td);padding:10px 0;font-family:\'JetBrains Mono\',monospace;">まだコメントはありません。最初のコメントを書いてみましょう！</div>';
+    return;
+  }
+  cms.innerHTML = top.map(c => {
+    const reps = replies.filter(r => r.parent_id === c.id);
+    const initial = (c.username||'匿')[0].toUpperCase();
+    return `<div class="cm" id="cm-${c.id}">
+      <div class="cm-main">
+        <div class="cmav" style="background:linear-gradient(135deg,#555,#333)">${initial}</div>
+        <div class="cm-content">
+          <div class="cmu">${c.username||'匿名'} &nbsp;·&nbsp; ${timeAgo(c.created_at)}</div>
+          <div class="cmt">${c.content}</div>
+          <div class="cm-actions">
+            <button class="cm-act" onclick="toggleReplyInput('${c.id}')">↩ 返信する</button>
+          </div>
+        </div>
+      </div>
+      ${reps.length ? `<div class="cm-replies">${reps.map(r=>{
+        const ri=(r.username||'匿')[0].toUpperCase();
+        return `<div class="cm-reply"><div class="cmav-sm" style="background:linear-gradient(135deg,#446,#224)">${ri}</div>
+          <div class="cm-content"><div class="cmu">${r.username||'匿名'} &nbsp;·&nbsp; ${timeAgo(r.created_at)}</div>
+          <div class="cmt">${r.content}</div></div></div>`;
+      }).join('')}</div>` : ''}
+      <div class="reply-input-wrap" id="reply-wrap-${c.id}">
+        <div style="flex:1">
+          <div class="reply-header">↩ ${c.username||'匿名'} に返信</div>
+          <div class="ci-w">
+            <input class="ci" id="reply-name-${c.id}" type="text" placeholder="名前（任意）" style="max-width:120px;flex:none;font-size:11px;padding:6px 9px">
+            <input class="ci" id="reply-text-${c.id}" type="text" placeholder="返信を書く..." style="font-size:11px;padding:6px 9px">
+            <button class="cs" style="font-size:12px;padding:0 10px" onclick="postDBReply('${c.id}')">➤</button>
+            <button class="cs" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tm);font-size:11px;padding:0 8px" onclick="toggleReplyInput('${c.id}')">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function postDBComment() {
+  if (!currentDBPost) return;
+  const ci = document.getElementById('ci');
+  const ciName = document.getElementById('ci-name');
+  const text = ci.value.trim();
+  if (!text) return;
+  const { error } = await sb.from('comments').insert({
+    post_id: currentDBPost.id,
+    username: ciName.value.trim() || '匿名',
+    content: text
+  });
+  if (error) { showToast('❌ コメント失敗'); return; }
+  ci.value = ''; ciName.value = '';
+  showToast('💬 コメントを投稿しました');
+  await loadDBComments(currentDBPost.id);
+}
+
+async function postDBReply(parentId) {
+  if (!currentDBPost) return;
+  const nameEl = document.getElementById(`reply-name-${parentId}`);
+  const textEl = document.getElementById(`reply-text-${parentId}`);
+  const text = textEl.value.trim();
+  if (!text) return;
+  const { error } = await sb.from('comments').insert({
+    post_id: currentDBPost.id,
+    parent_id: parentId,
+    username: nameEl.value.trim() || '匿名',
+    content: text
+  });
+  if (error) { showToast('❌ 返信失敗'); return; }
+  showToast('↩ 返信しました');
+  await loadDBComments(currentDBPost.id);
+}
+
+// ─── DB いいね ───
+async function toggleDBLike(e, postId, el) {
+  e.stopPropagation();
+  const cnt = el.querySelector('span');
+  const { data: existing } = await sb.from('likes').select('id').eq('post_id', postId).eq('session_id', SESSION_ID);
+  if (existing && existing.length > 0) {
+    await sb.from('likes').delete().eq('post_id', postId).eq('session_id', SESSION_ID);
+    await sb.from('posts').update({ likes: (parseInt(cnt.textContent)||1) - 1 }).eq('id', postId);
+    cnt.textContent = Math.max(0, (parseInt(cnt.textContent)||1) - 1);
+    el.classList.remove('liked');
+    showToast('❤️ いいねを取り消しました');
+  } else {
+    await sb.from('likes').insert({ post_id: postId, session_id: SESSION_ID });
+    await sb.from('posts').update({ likes: (parseInt(cnt.textContent)||0) + 1 }).eq('id', postId);
+    cnt.textContent = (parseInt(cnt.textContent)||0) + 1;
+    el.classList.add('liked');
+    showToast('❤️ いいねしました');
+  }
+}
+
+// ─── DB投稿送信 ───
+async function submitPostToDB() {
+  const name = document.getElementById('post-username').value.trim();
+  const title = document.getElementById('post-title').value.trim();
+  const desc = document.getElementById('post-desc').value.trim();
+  const genre = document.querySelector('.genre-select .tag.on')?.textContent || '';
+  const pin = ['pd1','pd2','pd3','pd4'].map(id=>document.getElementById(id).value).join('');
+
+  if (!title) { showToast('❌ タイトルを入力してください'); return; }
+  if (pin.length < 4) { showToast('❌ 4桁パスワードを設定してください'); return; }
+
+  // 機材リスト
+  const gearRows = document.querySelectorAll('.gear-row');
+  const gear_list = [];
+  gearRows.forEach(row => {
+    const n = row.querySelector('.gear-name')?.value.trim();
+    if (n) gear_list.push({ name: n });
+  });
+
+  // 画像はbase64でimage_urlsに（簡易実装）
+  const image_urls = uploadedPhotos.map(p => p.url || p);
+
+  const { error } = await sb.from('posts').insert({
+    username: name || '匿名ユーザー',
+    title,
+    description: desc,
+    genre,
+    gear_list,
+    image_urls,
+    pin_hash: pin,
+    likes: 0
+  });
+
+  if (error) { showToast('❌ 投稿に失敗しました'); console.error(error); return; }
+  closeModal('post-bd');
+  showToast(`✅ ${name ? name + 'さんの' : '匿名で'}投稿しました！`);
+  await loadPostsFromDB();
+}
+
 // ─── DATA ───
 const posts = {
   feat: {
@@ -1046,9 +1296,7 @@ function openPost() {
   document.body.style.overflow = 'hidden';
 }
 function submitPost() {
-  const name = document.getElementById('post-username').value.trim();
-  closeModal('post-bd');
-  showToast(`✅ ${name ? name + 'さんの' : '匿名で'}投稿しました！`);
+  submitPostToDB();
 }
 
 // ─── TOAST ───
@@ -1197,6 +1445,30 @@ function removePhoto(i) {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+// ─── DB投稿グリッドをフィードに追加 ───
+(function addDBGrid() {
+  const feed = document.querySelector('.feed');
+  if (!feed) return;
+  const div = document.createElement('div');
+  div.className = 'grid';
+  div.id = 'db-posts-grid';
+  div.style.marginTop = '20px';
+  const h = document.createElement('div');
+  h.style.cssText = 'font-family:\'Bebas Neue\',sans-serif;font-size:14px;letter-spacing:2px;color:var(--ac);margin-top:24px;margin-bottom:8px;padding-top:16px;border-top:1px solid var(--bd)';
+  h.textContent = '▸ みんなの投稿';
+  feed.appendChild(h);
+  feed.appendChild(div);
+})();
+
+// コメント送信をDB版に差し替え
+document.addEventListener('DOMContentLoaded', () => {
+  const csBtn = document.querySelector('.cs[onclick*="postComment"]');
+  if (csBtn) csBtn.onclick = () => postDBComment();
+  const ciInput = document.getElementById('ci');
+  if (ciInput) ciInput.addEventListener('keydown', e => { if (e.key === 'Enter') postDBComment(); });
+  loadPostsFromDB();
+});
 
 // ─── MODAL SVG (big version) ───
 function getModalSVG(id) {
