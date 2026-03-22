@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My gear My board</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -314,15 +322,27 @@ textarea.form-input{resize:vertical;min-height:72px}
   <div style="margin-bottom:20px">
     <div class="sl-lbl">ジャンル</div>
     <div class="tags">
-      <div class="tag on" onclick="filterTag(this)">ALL</div>
-      <div class="tag" onclick="filterTag(this)">ROCK</div>
-      <div class="tag" onclick="filterTag(this)">BLUES</div>
-      <div class="tag" onclick="filterTag(this)">JAZZ</div>
-      <div class="tag" onclick="filterTag(this)">METAL</div>
-      <div class="tag" onclick="filterTag(this)">FUNK</div>
-      <div class="tag" onclick="filterTag(this)">AMBIENT</div>
-      <div class="tag" onclick="filterTag(this)">POP</div>
-      <div class="tag" onclick="filterTag(this)">OTHERS</div>
+      <div class="tag on" onclick="filterTag(this,'ALL')">ALL</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:10px">定番</div>
+    <div class="tags">
+      <div class="tag" onclick="filterTag(this,'ROCK')">ROCK</div>
+      <div class="tag" onclick="filterTag(this,'BLUES')">BLUES</div>
+      <div class="tag" onclick="filterTag(this,'JAZZ')">JAZZ</div>
+      <div class="tag" onclick="filterTag(this,'METAL')">METAL</div>
+      <div class="tag" onclick="filterTag(this,'FUNK')">FUNK</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:10px">空間系</div>
+    <div class="tags">
+      <div class="tag" onclick="filterTag(this,'AMBIENT')">AMBIENT</div>
+      <div class="tag" onclick="filterTag(this,'SHOEGAZE')">SHOEGAZE</div>
+      <div class="tag" onclick="filterTag(this,'POST ROCK')">POST ROCK</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:10px">オルタナ系</div>
+    <div class="tags">
+      <div class="tag" onclick="filterTag(this,'INDIE')">INDIE</div>
+      <div class="tag" onclick="filterTag(this,'ALTERNATIVE')">ALTERNATIVE</div>
+      <div class="tag" onclick="filterTag(this,'PUNK')">PUNK</div>
     </div>
   </div>
   <div class="sl-div"></div>
@@ -587,20 +607,12 @@ textarea.form-input{resize:vertical;min-height:72px}
 
   <div class="widget">
     <div class="wt">🔥 今週の人気ボード</div>
-    <div class="ri"><div class="rn hi">1</div><div class="ri-i"><div class="ri-t">2025年夏ボード〜Rock仕様〜</div><div class="ri-u">匿名ユーザー</div></div><div class="ri-s">❤️248</div></div>
-    <div class="ri"><div class="rn hi">2</div><div class="ri-i"><div class="ri-t">ハイゲイン＆ノイズ対策万全</div><div class="ri-u">匿名ユーザー</div></div><div class="ri-s">❤️203</div></div>
-    <div class="ri"><div class="rn">3</div><div class="ri-i"><div class="ri-t">スラップ＆シンベミニボード</div><div class="ri-u">匿名ユーザー</div></div><div class="ri-s">❤️127</div></div>
-    <div class="ri"><div class="rn">4</div><div class="ri-i"><div class="ri-t">Free The Tone ジャズ構成</div><div class="ri-u">匿名ユーザー</div></div><div class="ri-s">❤️89</div></div>
-    <div class="ri"><div class="rn">5</div><div class="ri-i"><div class="ri-t">シューゲイザー轟音ボード</div><div class="ri-u">匿名ユーザー</div></div><div class="ri-s">❤️76</div></div>
+    <div id="ranking-widget"><div style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace;">読み込み中...</div></div>
   </div>
 
   <div class="widget">
     <div class="wt">🎛 よく使われている機材</div>
-    <div class="gr"><div class="gr-i"><div class="gr-n">Boss DS-1</div><div class="gr-b">BOSS</div></div><div class="bar-bg"><div class="bar-fill" style="width:92%"></div></div></div>
-    <div class="gr"><div class="gr-i"><div class="gr-n">Strymon BigSky</div><div class="gr-b">STRYMON</div></div><div class="bar-bg"><div class="bar-fill" style="width:78%"></div></div></div>
-    <div class="gr"><div class="gr-i"><div class="gr-n">MXR Phase 90</div><div class="gr-b">MXR</div></div><div class="bar-bg"><div class="bar-fill" style="width:65%"></div></div></div>
-    <div class="gr"><div class="gr-i"><div class="gr-n">TC Flashback</div><div class="gr-b">TC ELECTRONIC</div></div><div class="bar-bg"><div class="bar-fill" style="width:54%"></div></div></div>
-    <div class="gr"><div class="gr-i"><div class="gr-n">EHX Holy Grail</div><div class="gr-b">ELECTRO-HARMONIX</div></div><div class="bar-bg"><div class="bar-fill" style="width:41%"></div></div></div>
+    <div id="gear-widget"><div style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace;">読み込み中...</div></div>
   </div>
 
   <div class="widget">
@@ -678,14 +690,20 @@ textarea.form-input{resize:vertical;min-height:72px}
     <div class="form-row">
       <div class="form-lbl">ジャンル</div>
       <div class="genre-select" id="post-genre-select">
+        <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:4px;">定番</div>
         <div class="gs" onclick="selectGenre(this)">ROCK</div>
         <div class="gs" onclick="selectGenre(this)">BLUES</div>
         <div class="gs" onclick="selectGenre(this)">JAZZ</div>
         <div class="gs" onclick="selectGenre(this)">METAL</div>
         <div class="gs" onclick="selectGenre(this)">FUNK</div>
+        <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:4px;margin-top:8px;">空間系</div>
         <div class="gs" onclick="selectGenre(this)">AMBIENT</div>
-        <div class="gs" onclick="selectGenre(this)">POP</div>
-        <div class="gs" onclick="selectGenre(this)">OTHERS</div>
+        <div class="gs" onclick="selectGenre(this)">SHOEGAZE</div>
+        <div class="gs" onclick="selectGenre(this)">POST ROCK</div>
+        <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:4px;margin-top:8px;">オルタナ系</div>
+        <div class="gs" onclick="selectGenre(this)">INDIE</div>
+        <div class="gs" onclick="selectGenre(this)">ALTERNATIVE</div>
+        <div class="gs" onclick="selectGenre(this)">PUNK</div>
       </div>
     </div>
 
@@ -783,6 +801,9 @@ const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ─── マスターキー（管理者用）───
+const MASTER_KEY = 'mgmb-admin-2025-XkP9';
+
 // セッションID（いいね重複防止用）
 function getSessionId() {
   let sid = localStorage.getItem('mgmb_sid');
@@ -791,11 +812,18 @@ function getSessionId() {
 }
 const SESSION_ID = getSessionId();
 
+// ─── 現在のフィルター状態 ───
+let currentGenreFilter = 'ALL';
+let allDBPosts = [];
+
 // ─── DB投稿一覧取得 ───
 async function loadPostsFromDB() {
   const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
   if (error) { console.error('投稿取得エラー:', error); return; }
-  if (data && data.length > 0) renderDBPosts(data);
+  allDBPosts = data || [];
+  applyFilter();
+  renderRankingWidget(allDBPosts);
+  renderGearWidget(allDBPosts);
 }
 
 function timeAgo(ts) {
@@ -988,8 +1016,25 @@ async function toggleDBLike(e, postId, el) {
   }
 }
 
+// ─── 画像をSupabase Storageへアップロード ───
+async function uploadPhoto(base64DataUrl, index) {
+  try {
+    const res = await fetch(base64DataUrl);
+    const blob = await res.blob();
+    const ext = blob.type.includes('png') ? 'png' : 'jpg';
+    const fileName = `posts/${Date.now()}_${index}.${ext}`;
+    const { error } = await sb.storage.from('post-images').upload(fileName, blob, { contentType: blob.type });
+    if (error) { console.error('画像アップロードエラー:', error); return null; }
+    const { data: urlData } = sb.storage.from('post-images').getPublicUrl(fileName);
+    return urlData.publicUrl;
+  } catch(e) { console.error('画像変換エラー:', e); return null; }
+}
+
 // ─── DB投稿送信 ───
 async function submitPostToDB() {
+  const submitBtn = document.querySelector('#post-bd .submit-btn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '投稿中...'; }
+
   const name = document.getElementById('post-username').value.trim();
   const title = document.getElementById('post-title')?.value.trim();
   const desc = document.getElementById('post-desc')?.value.trim() || '';
@@ -997,36 +1042,34 @@ async function submitPostToDB() {
   const genre = genreEl ? genreEl.textContent.trim() : '';
   const pin = ['pd1','pd2','pd3','pd4'].map(id=>document.getElementById(id).value).join('');
 
-  if (!title) { showToast('❌ タイトルを入力してください'); return; }
-  if (pin.length < 4) { showToast('❌ 4桁パスワードを設定してください'); return; }
+  if (!title) { showToast('❌ タイトルを入力してください'); if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='投稿する';} return; }
+  if (pin.length < 4) { showToast('❌ 4桁パスワードを設定してください'); if(submitBtn){submitBtn.disabled=false;submitBtn.textContent='投稿する';} return; }
 
-  // 機材リスト（カンマ区切りテキストから生成）
   const gearText = document.getElementById('post-gear')?.value.trim() || '';
-  const gear_list = gearText ? gearText.split(',').map(s => ({ name: s.trim() })).filter(g => g.name) : [];
+  const gear_list = gearText ? gearText.split(',').map(s=>({name:s.trim()})).filter(g=>g.name) : [];
 
-  // 画像はbase64でimage_urlsに
-  const image_urls = uploadedPhotos.map(p => p.url || p);
+  let image_urls = [];
+  if (uploadedPhotos.length > 0) {
+    showToast('📤 画像をアップロード中...');
+    const results = await Promise.all(uploadedPhotos.map((p,i)=>uploadPhoto(p,i)));
+    image_urls = results.filter(u=>u!==null);
+  }
 
   const { error } = await sb.from('posts').insert({
-    username: name || '匿名ユーザー',
-    title,
-    description: desc,
-    genre,
-    gear_list,
-    image_urls,
-    pin_hash: pin,
-    likes: 0
+    username: name || '匿名ユーザー', title, description: desc, genre,
+    gear_list, image_urls, pin_hash: pin, likes: 0
   });
 
+  if (submitBtn) { submitBtn.disabled=false; submitBtn.textContent='投稿する'; }
   if (error) { showToast('❌ 投稿に失敗しました'); console.error(error); return; }
+
   closeModal('post-bd');
-  // フォームリセット
-  ['post-username','post-title','post-gear','post-desc'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
-  ['pd1','pd2','pd3','pd4'].forEach(id => { document.getElementById(id).value=''; });
-  document.querySelectorAll('#post-genre-select .gs.on').forEach(el => el.classList.remove('on'));
+  ['post-username','post-title','post-gear','post-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
+  document.querySelectorAll('#post-genre-select .gs.on').forEach(el=>el.classList.remove('on'));
   uploadedPhotos = [];
   renderPhotoPreviews();
-  showToast(`✅ ${name ? name + 'さんの' : '匿名で'}投稿しました！`);
+  showToast(`✅ ${name?name+'さんの':'匿名で'}投稿しました！`);
   await loadPostsFromDB();
 }
 
@@ -1315,11 +1358,59 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2400);
 }
 
+// ─── フィルター適用 ───
+function applyFilter() {
+  const filtered = currentGenreFilter === 'ALL'
+    ? allDBPosts
+    : allDBPosts.filter(p => p.genre === currentGenreFilter);
+  renderDBPosts(filtered);
+}
+
+// ─── ランキングウィジェット自動集計 ───
+function renderRankingWidget(posts) {
+  const el = document.getElementById('ranking-widget');
+  if (!el) return;
+  const sorted = [...posts].sort((a,b) => (b.likes||0) - (a.likes||0)).slice(0,5);
+  if (!sorted.length) { el.innerHTML = '<div style="font-size:10px;color:var(--td);font-family:\'JetBrains Mono\',monospace;">まだ投稿がありません</div>'; return; }
+  el.innerHTML = sorted.map((p,i) => `
+    <div class="ri" onclick="openDBModal(allDBPosts.find(x=>x.id==='${p.id}'))">
+      <div class="rn ${i<2?'hi':''}">${i+1}</div>
+      <div class="ri-i">
+        <div class="ri-t">${p.title}</div>
+        <div class="ri-u">${p.username||'匿名ユーザー'}</div>
+      </div>
+      <div class="ri-s">❤️${p.likes||0}</div>
+    </div>`).join('');
+}
+
+// ─── 人気機材ウィジェット自動集計 ───
+function renderGearWidget(posts) {
+  const el = document.getElementById('gear-widget');
+  if (!el) return;
+  const count = {};
+  posts.forEach(p => {
+    const gear = Array.isArray(p.gear_list) ? p.gear_list : [];
+    gear.forEach(g => {
+      const name = (g.name||g||'').trim();
+      if (name) count[name] = (count[name]||0) + 1;
+    });
+  });
+  const sorted = Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  if (!sorted.length) { el.innerHTML = '<div style="font-size:10px;color:var(--td);font-family:\'JetBrains Mono\',monospace;">データなし</div>'; return; }
+  const max = sorted[0][1];
+  el.innerHTML = sorted.map(([name, cnt]) => `
+    <div class="gr">
+      <div class="gr-i"><div class="gr-n">${name}</div><div class="gr-b">${cnt}件の投稿</div></div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${Math.round(cnt/max*100)}%"></div></div>
+    </div>`).join('');
+}
+
 // ─── FILTER / SORT ───
-function filterTag(el) {
+function filterTag(el, genre) {
   document.querySelectorAll('.tag').forEach(t => t.classList.remove('on'));
   el.classList.add('on');
-  showToast(`🔍 「${el.textContent}」で絞り込み`);
+  currentGenreFilter = genre || 'ALL';
+  applyFilter();
 }
 function setSort(el) {
   document.querySelectorAll('.sort-b').forEach(b => b.classList.remove('on'));
@@ -1363,43 +1454,89 @@ function openEditModal(){
 
 function verifyPin(){
   const entered = ['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('');
-  if(entered.length < 4){
-    document.getElementById('pin-err').textContent='4桁すべて入力してください';
+  if(entered.length < 4){ document.getElementById('pin-err').textContent='4桁すべて入力してください'; return; }
+
+  // マスターキー確認
+  const isMaster = entered === MASTER_KEY.slice(-4) || entered === 'MSTR';
+
+  // DB投稿の場合
+  if (currentDBPost) {
+    if (isMaster || entered === currentDBPost.pin_hash) {
+      document.getElementById('pin-err').textContent='';
+      document.getElementById('edit-step1').style.display='none';
+      document.getElementById('edit-title').value = currentDBPost.title || '';
+      document.getElementById('edit-pedals').value = (Array.isArray(currentDBPost.gear_list)?currentDBPost.gear_list:[]).map(g=>g.name||g).join(', ');
+      document.getElementById('edit-desc').value = currentDBPost.description || '';
+      document.getElementById('edit-step2').style.display='block';
+      if (isMaster) showToast('🔑 管理者としてログインしました');
+    } else {
+      document.getElementById('pin-err').textContent='❌ パスワードが違います';
+      ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
+      document.getElementById('pin1').focus();
+    }
     return;
   }
-  // デモ用：正解は "1234"。実装時はサーバー側で照合します
+
+  // デモ投稿の場合（静的データ）
   const correct = '1234';
-  if(entered === correct){
+  if(entered === correct || isMaster){
     document.getElementById('pin-err').textContent='';
     document.getElementById('edit-step1').style.display='none';
-    // 現在の投稿内容をフォームに埋める
     const p = posts[currentPost];
-    document.getElementById('edit-title').value = p.title;
-    document.getElementById('edit-pedals').value = p.pedals.map(x=>x.name).join(', ');
-    document.getElementById('edit-desc').value = '';
+    if(p){ document.getElementById('edit-title').value=p.title; document.getElementById('edit-pedals').value=p.pedals.map(x=>x.name).join(', '); document.getElementById('edit-desc').value=''; }
     document.getElementById('edit-step2').style.display='block';
   } else {
     document.getElementById('pin-err').textContent='❌ パスワードが違います';
-    ['pin1','pin2','pin3','pin4'].forEach(id=>{ document.getElementById(id).value=''; });
+    ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
     document.getElementById('pin1').focus();
   }
 }
 
-function saveEdit(){
+async function saveEdit(){
   const t = document.getElementById('edit-title').value.trim();
   if(!t){ showToast('タイトルを入力してください'); return; }
+
+  // DB投稿の場合
+  if (currentDBPost) {
+    const gearsText = document.getElementById('edit-pedals').value.trim();
+    const gear_list = gearsText ? gearsText.split(',').map(s=>({name:s.trim()})).filter(g=>g.name) : [];
+    const description = document.getElementById('edit-desc').value.trim();
+    const { error } = await sb.from('posts').update({ title:t, gear_list, description }).eq('id', currentDBPost.id);
+    if(error){ showToast('❌ 更新に失敗しました'); return; }
+    currentDBPost.title = t;
+    currentDBPost.gear_list = gear_list;
+    currentDBPost.description = description;
+    document.getElementById('m-title').textContent = t;
+    closeModal('edit-bd');
+    showToast('✅ 投稿を更新しました');
+    await loadPostsFromDB();
+    return;
+  }
+
+  // デモ投稿
   posts[currentPost].title = t;
   document.getElementById('m-title').textContent = t;
   closeModal('edit-bd');
   showToast('✅ 記事を更新しました');
 }
 
-function confirmDelete(){
-  if(confirm('本当にこの投稿を削除しますか？\nこの操作は取り消せません。')){
+async function confirmDelete(){
+  if(!confirm('本当にこの投稿を削除しますか？\nこの操作は取り消せません。')) return;
+
+  // DB投稿の場合
+  if (currentDBPost) {
+    const { error } = await sb.from('posts').delete().eq('id', currentDBPost.id);
+    if(error){ showToast('❌ 削除に失敗しました'); return; }
     closeModal('edit-bd');
     closeModal('modal-bd');
     showToast('🗑 投稿を削除しました');
+    await loadPostsFromDB();
+    return;
   }
+
+  closeModal('edit-bd');
+  closeModal('modal-bd');
+  showToast('🗑 投稿を削除しました');
 }
 // ─── BRAND ACCORDION ───
 function toggleBrands() {
