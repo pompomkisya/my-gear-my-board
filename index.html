@@ -348,8 +348,6 @@ textarea.form-input{resize:vertical;min-height:72px}
   <div class="sl-div"></div>
   <div>
     <div class="sl-lbl">ブランドで絞る</div>
-
-    <!-- 主要ブランド（常時表示） -->
     <div class="tags" id="brands-main">
       <div class="tag" onclick="filterTag(this)">Boss</div>
       <div class="tag" onclick="filterTag(this)">DigiTech</div>
@@ -362,13 +360,9 @@ textarea.form-input{resize:vertical;min-height:72px}
       <div class="tag" onclick="filterTag(this)">Strymon</div>
       <div class="tag" onclick="filterTag(this)">TC Electronic</div>
     </div>
-
-    <!-- もっと見るボタン -->
     <div class="brand-more-btn" id="brand-toggle" onclick="toggleBrands()">
       <span id="brand-toggle-label">▼ もっと見る（A–Z）</span>
     </div>
-
-    <!-- 追加ブランド A–Z順 -->
     <div class="brands-extra" id="brands-extra">
       <div class="tags">
         <div class="tag" onclick="filterTag(this)">Aguilar</div>
@@ -445,17 +439,11 @@ textarea.form-input{resize:vertical;min-height:72px}
           <rect width="380" height="300" fill="url(#bg1)"/>
           <rect x="18" y="20" width="344" height="6" rx="2" fill="#2a2a2a"/>
           <rect x="18" y="274" width="344" height="6" rx="2" fill="#2a2a2a"/>
-          <!-- DS-1 -->
           <g transform="translate(34,44)"><rect width="74" height="88" rx="5" fill="#c8a000" stroke="#a07800" stroke-width="1.5"/><rect x="6" y="6" width="62" height="46" rx="3" fill="rgba(0,0,0,.25)"/><text x="37" y="29" text-anchor="middle" fill="#fff" font-size="10" font-family="monospace" font-weight="bold">DS-1</text><text x="37" y="42" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="7" font-family="monospace">DISTORTION</text><circle cx="20" cy="70" r="8" fill="#222" stroke="#555" stroke-width="1.2"/><circle cx="37" cy="70" r="8" fill="#222" stroke="#555" stroke-width="1.2"/><circle cx="54" cy="70" r="8" fill="#222" stroke="#555" stroke-width="1.2"/><line x1="20" y1="62" x2="20" y2="67" stroke="#aaa" stroke-width="1.5"/><line x1="37" y1="62" x2="37" y2="67" stroke="#aaa" stroke-width="1.5"/><line x1="54" y1="62" x2="54" y2="67" stroke="#aaa" stroke-width="1.5"/></g>
-          <!-- Phase90 -->
           <g transform="translate(124,38)"><rect width="70" height="80" rx="4" fill="#d4580c" stroke="#b04000" stroke-width="1.5"/><rect x="5" y="5" width="60" height="44" rx="3" fill="rgba(0,0,0,.2)"/><text x="35" y="22" text-anchor="middle" fill="#fff" font-size="8" font-family="monospace" font-weight="bold">MXR</text><text x="35" y="35" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace" font-weight="bold">PHASE 90</text><circle cx="35" cy="64" r="10" fill="#222" stroke="#666" stroke-width="1.5"/><line x1="35" y1="54" x2="35" y2="60" stroke="#bbb" stroke-width="2"/></g>
-          <!-- BigSky -->
           <g transform="translate(210,33)"><rect width="96" height="104" rx="6" fill="#2a4a8a" stroke="#1a3a7a" stroke-width="1.5"/><rect x="7" y="7" width="82" height="56" rx="4" fill="rgba(0,0,0,.3)"/><rect x="10" y="10" width="76" height="38" rx="3" fill="#0a1a3a" stroke="#1a3a6a" stroke-width="1"/><text x="48" y="28" text-anchor="middle" fill="#4af" font-size="9" font-family="monospace">BIGSKY</text><text x="48" y="40" text-anchor="middle" fill="#2a8a4a" font-size="7" font-family="monospace">REVERB</text><circle cx="24" cy="82" r="9" fill="#1a1a2a" stroke="#3a5aaa" stroke-width="1.5"/><circle cx="48" cy="82" r="9" fill="#1a1a2a" stroke="#3a5aaa" stroke-width="1.5"/><circle cx="72" cy="82" r="9" fill="#1a1a2a" stroke="#3a5aaa" stroke-width="1.5"/><line x1="24" y1="73" x2="24" y2="79" stroke="#6af" stroke-width="1.5"/><line x1="48" y1="73" x2="48" y2="79" stroke="#6af" stroke-width="1.5"/><line x1="72" y1="73" x2="72" y2="79" stroke="#6af" stroke-width="1.5"/></g>
-          <!-- Flashback -->
           <g transform="translate(40,157)"><rect width="76" height="86" rx="5" fill="#c02020" stroke="#901010" stroke-width="1.5"/><rect x="5" y="5" width="66" height="50" rx="3" fill="rgba(0,0,0,.25)"/><text x="38" y="20" text-anchor="middle" fill="#fff" font-size="6" font-family="monospace">TC ELECTRONIC</text><text x="38" y="34" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace" font-weight="bold">FLASHBACK</text><text x="38" y="45" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="6" font-family="monospace">DELAY</text><circle cx="20" cy="71" r="8" fill="#222" stroke="#555" stroke-width="1.2"/><circle cx="38" cy="71" r="8" fill="#222" stroke="#555" stroke-width="1.2"/><circle cx="56" cy="71" r="8" fill="#222" stroke="#555" stroke-width="1.2"/></g>
-          <!-- TU-3 -->
           <g transform="translate(134,152)"><rect width="76" height="86" rx="5" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/><rect x="6" y="6" width="64" height="46" rx="3" fill="#0a0a12"/><rect x="9" y="9" width="58" height="32" rx="2" fill="#001a00" stroke="#004400" stroke-width="1"/><text x="38" y="30" text-anchor="middle" fill="#0f0" font-size="13" font-family="monospace" font-weight="bold">A 440</text><text x="38" y="63" text-anchor="middle" fill="#666" font-size="7" font-family="monospace">TU-3 TUNER</text><rect x="16" y="72" width="44" height="7" rx="2" fill="#2a2a2a"/></g>
-          <!-- Holy Grail -->
           <g transform="translate(226,154)"><rect width="70" height="88" rx="5" fill="#2a6a2a" stroke="#1a4a1a" stroke-width="1.5"/><rect x="5" y="5" width="60" height="52" rx="3" fill="rgba(0,0,0,.2)"/><text x="35" y="18" text-anchor="middle" fill="#aefa" font-size="5.5" font-family="monospace">ELECTRO-HARMONIX</text><text x="35" y="31" text-anchor="middle" fill="#fff" font-size="8" font-family="monospace" font-weight="bold">HOLY GRAIL</text><text x="35" y="43" text-anchor="middle" fill="rgba(255,255,255,.55)" font-size="6" font-family="monospace">NANO REVERB</text><circle cx="35" cy="72" r="11" fill="#1a3a1a" stroke="#4a8a4a" stroke-width="1.5"/><line x1="35" y1="61" x2="35" y2="68" stroke="#8fa" stroke-width="2"/></g>
           <pattern id="vf" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r=".8" fill="rgba(255,255,255,.03)"/></pattern>
           <rect width="380" height="300" fill="url(#vf)"/>
@@ -517,8 +505,6 @@ textarea.form-input{resize:vertical;min-height:72px}
 
     <!-- AD SLOT (フィード内) -->
     <div class="ad-slot ad-slot-feed">
-      <!-- 実際にはここに Google AdSense のコードを1行貼るだけ -->
-      <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script> -->
       <div class="ad-label">広告</div>
       <div style="font-size:11px;color:var(--tm);">Google AdSense &nbsp;—&nbsp; 728×90</div>
       <div style="font-size:9px;margin-top:2px;font-family:'JetBrains Mono',monospace;color:var(--td);">AdSense 審査通過後にここに自動表示されます</div>
@@ -598,7 +584,6 @@ textarea.form-input{resize:vertical;min-height:72px}
 <!-- SIDEBAR R -->
 <aside class="sr">
 
-  <!-- AdSense サイドバー枠 -->
   <div class="ad-slot ad-side">
     <div class="ad-label">広告</div>
     <div style="font-size:10px;color:var(--tm);">Google AdSense</div>
@@ -650,14 +635,13 @@ textarea.form-input{resize:vertical;min-height:72px}
         <div class="mlbl">コメント <span id="m-comment-count" style="color:var(--tm)"></span></div>
         <div id="m-comments"></div>
       </div>
-      <!-- 新規コメント入力 -->
       <div style="border-top:1px solid var(--bd);padding-top:10px">
         <div class="ci-w" style="margin-bottom:6px">
           <input class="ci" id="ci-name" type="text" placeholder="名前（任意・空欄で匿名）" style="max-width:160px;flex:none">
         </div>
         <div class="ci-w">
           <input class="ci" id="ci" type="text" placeholder="コメントを書く...">
-          <button class="cs" onclick="postComment(null)">➤</button>
+          <button class="cs" onclick="postDBComment()">➤</button>
         </div>
       </div>
     </div>
@@ -739,7 +723,6 @@ textarea.form-input{resize:vertical;min-height:72px}
       </div>
     </div>
 
-    <!-- ★ 編集パスワード -->
     <button class="submit-btn" onclick="submitPost()">投稿する</button>
     <div class="anon-note">※ 登録不要・名前は任意です。空欄なら匿名で投稿されます</div>
   </div>
@@ -750,7 +733,6 @@ textarea.form-input{resize:vertical;min-height:72px}
   <div class="eform">
     <div class="eform-close" onclick="closeModal('edit-bd')">✕</div>
 
-    <!-- STEP 1: PIN入力 -->
     <div id="edit-step1">
       <div class="eform-title">記事を編集・削除</div>
       <div class="eform-sub">投稿時に設定した4桁パスワードを入力してください</div>
@@ -765,7 +747,6 @@ textarea.form-input{resize:vertical;min-height:72px}
       <div class="anon-note" style="margin-top:10px">パスワードを忘れた場合はお問い合わせください</div>
     </div>
 
-    <!-- STEP 2: 編集フォーム（PIN認証後に表示） -->
     <div id="edit-step2" style="display:none">
       <div class="eform-title">記事を編集</div>
       <div class="eform-sub" style="color:var(--green)">✅ パスワード認証が完了しました</div>
@@ -801,10 +782,8 @@ const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ─── マスターキー（管理者用）───
 const MASTER_KEY = 'mgmb-admin-2025-XkP9';
 
-// セッションID（いいね重複防止用）
 function getSessionId() {
   let sid = localStorage.getItem('mgmb_sid');
   if (!sid) { sid = 'sid_' + Math.random().toString(36).slice(2) + Date.now(); localStorage.setItem('mgmb_sid', sid); }
@@ -812,15 +791,36 @@ function getSessionId() {
 }
 const SESSION_ID = getSessionId();
 
-// ─── 現在のフィルター状態 ───
 let currentGenreFilter = 'ALL';
 let allDBPosts = [];
 
-// ─── DB投稿一覧取得 ───
+// ─── ★修正：DB投稿一覧＋コメント数を同時取得 ───
 async function loadPostsFromDB() {
-  const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
-  if (error) { console.error('投稿取得エラー:', error); return; }
-  allDBPosts = data || [];
+  const { data: postsData, error: postsError } = await sb
+    .from('posts')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (postsError) { console.error('投稿取得エラー:', postsError); return; }
+
+  // コメント数を一括取得（post_idでグループ集計）
+  const { data: commentCounts, error: commentError } = await sb
+    .from('comments')
+    .select('post_id');
+
+  // post_idごとにコメント数をカウント
+  const countMap = {};
+  if (!commentError && commentCounts) {
+    commentCounts.forEach(c => {
+      countMap[c.post_id] = (countMap[c.post_id] || 0) + 1;
+    });
+  }
+
+  // postsにcomment_countを付与
+  allDBPosts = (postsData || []).map(p => ({
+    ...p,
+    comment_count: countMap[p.id] || 0
+  }));
+
   applyFilter();
   renderRankingWidget(allDBPosts);
   renderGearWidget(allDBPosts);
@@ -834,6 +834,7 @@ function timeAgo(ts) {
   return Math.floor(diff/86400) + '日前';
 }
 
+// ─── ★修正：コメント数をDBから表示 ───
 function renderDBPosts(posts) {
   const grid = document.getElementById('db-posts-grid');
   if (!grid) return;
@@ -842,6 +843,7 @@ function renderDBPosts(posts) {
     const initial = (p.username || '匿')[0].toUpperCase();
     const gearList = Array.isArray(p.gear_list) ? p.gear_list : [];
     const tags = gearList.slice(0,3).map(g => `<span class="ptag">${g.name||g}</span>`).join('');
+    const commentCount = p.comment_count || 0;
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -864,7 +866,7 @@ function renderDBPosts(posts) {
           <div class="st db-like-btn" data-id="${p.id}" onclick="toggleDBLike(event,'${p.id}',this)">
             ❤️ <span>${p.likes||0}</span>
           </div>
-          <div class="st" onclick="event.stopPropagation()">💬 <span>0</span></div>
+          <div class="st" onclick="event.stopPropagation()">💬 <span>${commentCount}</span></div>
         </div>
       </div>`;
     card.onclick = () => openDBModal(p);
@@ -882,7 +884,6 @@ async function openDBModal(p) {
   document.getElementById('m-av').textContent = initial;
   document.getElementById('m-like-cnt').textContent = p.likes || 0;
 
-  // 画像
   const imgEl = document.getElementById('modal-img');
   if (p.image_urls && p.image_urls[0]) {
     imgEl.innerHTML = `<img src="${p.image_urls[0]}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`;
@@ -890,7 +891,6 @@ async function openDBModal(p) {
     imgEl.innerHTML = getModalSVG('feat');
   }
 
-  // 機材リスト
   const gearList = Array.isArray(p.gear_list) ? p.gear_list : [];
   const pl = document.getElementById('m-pedals');
   if (gearList.length) {
@@ -907,7 +907,6 @@ async function openDBModal(p) {
     pl.innerHTML = '<div style="color:var(--td);font-size:12px;">機材情報なし</div>';
   }
 
-  // コメント取得
   await loadDBComments(p.id);
 
   document.getElementById('modal-bd').classList.add('open');
@@ -922,7 +921,21 @@ async function loadDBComments(postId) {
   const cms = document.getElementById('m-comments');
   const top = (data || []).filter(c => !c.parent_id);
   const replies = (data || []).filter(c => c.parent_id);
-  document.getElementById('m-comment-count').textContent = data && data.length ? `(${data.length})` : '';
+  const totalCount = data ? data.length : 0;
+  document.getElementById('m-comment-count').textContent = totalCount ? `(${totalCount})` : '';
+
+  // ★カードのコメント数も更新
+  if (currentDBPost) {
+    const cardCommentEl = document.querySelector(`.db-like-btn[data-id="${postId}"]`);
+    if (cardCommentEl) {
+      const sibling = cardCommentEl.nextElementSibling;
+      if (sibling) sibling.querySelector('span').textContent = totalCount;
+    }
+    // allDBPostsのキャッシュも更新
+    const cached = allDBPosts.find(p => p.id === postId);
+    if (cached) cached.comment_count = totalCount;
+  }
+
   if (!top.length) {
     cms.innerHTML = '<div style="font-size:11px;color:var(--td);padding:10px 0;font-family:\'JetBrains Mono\',monospace;">まだコメントはありません。最初のコメントを書いてみましょう！</div>';
     return;
@@ -1016,7 +1029,6 @@ async function toggleDBLike(e, postId, el) {
   }
 }
 
-// ─── 画像をSupabase Storageへアップロード ───
 async function uploadPhoto(base64DataUrl, index) {
   try {
     const res = await fetch(base64DataUrl);
@@ -1030,7 +1042,6 @@ async function uploadPhoto(base64DataUrl, index) {
   } catch(e) { console.error('画像変換エラー:', e); return null; }
 }
 
-// ─── DB投稿送信 ───
 async function submitPostToDB() {
   const submitBtn = document.querySelector('#post-bd .submit-btn');
   if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '投稿中...'; }
@@ -1078,7 +1089,7 @@ function selectGenre(el) {
   el.classList.add('on');
 }
 
-// ─── DATA ───
+// ─── DATA（デモ用静的データ）───
 const posts = {
   feat: {
     title:'2025年夏のメインボード〜Rock & Blues仕様〜',
@@ -1086,12 +1097,12 @@ const posts = {
     likes:248,
     avColor:'linear-gradient(135deg,#e85c2f,#b03020)',
     pedals:[
-      {name:'Boss DS-1 Distortion',link:'https://www.soundhouse.co.jp/search/index/?s_maker_cd=&s_category_cd=&s_discontinue=0&s_searchwd=boss+ds-1'},
-      {name:'MXR Phase 90',link:'https://www.soundhouse.co.jp/search/index/?s_maker_cd=&s_category_cd=&s_discontinue=0&s_searchwd=mxr+phase+90'},
-      {name:'Strymon BigSky Reverb',link:'https://www.soundhouse.co.jp/search/index/?s_maker_cd=&s_category_cd=&s_discontinue=0&s_searchwd=strymon+bigsky'},
-      {name:'TC Electronic Flashback Delay',link:'https://www.soundhouse.co.jp/search/index/?s_maker_cd=&s_category_cd=&s_discontinue=0&s_searchwd=tc+flashback'},
-      {name:'Boss TU-3 Chromatic Tuner',link:'https://www.soundhouse.co.jp/search/index/?s_maker_cd=&s_category_cd=&s_discontinue=0&s_searchwd=boss+tu-3'},
-      {name:'EHX Holy Grail Nano Reverb',link:'https://www.soundhouse.co.jp/search/index/?s_maker_cd=&s_category_cd=&s_discontinue=0&s_searchwd=ehx+holy+grail'},
+      {name:'Boss DS-1 Distortion',link:'https://www.soundhouse.co.jp/search/index/?s_searchwd=boss+ds-1'},
+      {name:'MXR Phase 90',link:'https://www.soundhouse.co.jp/search/index/?s_searchwd=mxr+phase+90'},
+      {name:'Strymon BigSky Reverb',link:'https://www.soundhouse.co.jp/search/index/?s_searchwd=strymon+bigsky'},
+      {name:'TC Electronic Flashback Delay',link:'https://www.soundhouse.co.jp/search/index/?s_searchwd=tc+flashback'},
+      {name:'Boss TU-3 Chromatic Tuner',link:'https://www.soundhouse.co.jp/search/index/?s_searchwd=boss+tu-3'},
+      {name:'EHX Holy Grail Nano Reverb',link:'https://www.soundhouse.co.jp/search/index/?s_searchwd=ehx+holy+grail'},
     ],
     comments:[
       {id:'c1',av:'K',color:'linear-gradient(135deg,#1a3a5a,#0a2a4a)',user:'Kenji',time:'1時間前',text:'BigSkyとHoly Grailの2台リバーブ構成、空間系の使い分けはどうしてますか？',likes:4,replies:[
@@ -1151,9 +1162,9 @@ const posts = {
 let currentPost = null;
 let modalLiked = false;
 
-// ─── MODAL OPEN ───
 function openModal(id) {
   currentPost = id;
+  currentDBPost = null;
   modalLiked = false;
   const p = posts[id];
   document.getElementById('m-title').textContent = p.title;
@@ -1162,7 +1173,6 @@ function openModal(id) {
   document.getElementById('m-like-cnt').textContent = p.likes;
   document.getElementById('m-like-btn').classList.remove('liked-state');
 
-  // pedals
   const pl = document.getElementById('m-pedals');
   pl.innerHTML = p.pedals.map(pd =>
     `<div class="pli" onclick="window.open('${pd.link}','_blank')">
@@ -1172,18 +1182,14 @@ function openModal(id) {
     </div>`
   ).join('');
 
-  // comments
   const cms = document.getElementById('m-comments');
   renderComments(id, cms);
 
-  // image
   document.getElementById('modal-img').innerHTML = getModalSVG(id);
 
   document.getElementById('modal-bd').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
-
-let replyTargetId = null;
 
 function renderComments(id, el) {
   const p = posts[id];
@@ -1239,7 +1245,6 @@ function renderComments(id, el) {
 }
 
 function toggleReplyInput(cid) {
-  // 他の返信入力を閉じる
   document.querySelectorAll('.reply-input-wrap.open').forEach(el=>{
     if(el.id !== `reply-wrap-${cid}`) el.classList.remove('open');
   });
@@ -1316,7 +1321,6 @@ function modalLike() {
   showToast(modalLiked ? '❤️ いいねしました' : '❤️ いいねを取り消しました');
 }
 
-// ─── LIKE (CARD) ───
 function toggleLike(e, el) {
   e.stopPropagation();
   const cnt = el.querySelector('span');
@@ -1329,7 +1333,6 @@ function toggleLike(e, el) {
   }
 }
 
-// ─── CLOSE ───
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
   document.body.style.overflow = '';
@@ -1341,7 +1344,6 @@ function closeAll() {
   ['modal-bd','post-bd','edit-bd'].forEach(closeModal);
 }
 
-// ─── POST FORM ───
 function openPost() {
   document.getElementById('post-bd').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -1350,7 +1352,6 @@ function submitPost() {
   submitPostToDB();
 }
 
-// ─── TOAST ───
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1358,7 +1359,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-// ─── フィルター適用 ───
 function applyFilter() {
   const filtered = currentGenreFilter === 'ALL'
     ? allDBPosts
@@ -1366,7 +1366,6 @@ function applyFilter() {
   renderDBPosts(filtered);
 }
 
-// ─── ランキングウィジェット自動集計 ───
 function renderRankingWidget(posts) {
   const el = document.getElementById('ranking-widget');
   if (!el) return;
@@ -1383,7 +1382,6 @@ function renderRankingWidget(posts) {
     </div>`).join('');
 }
 
-// ─── 人気機材ウィジェット自動集計 ───
 function renderGearWidget(posts) {
   const el = document.getElementById('gear-widget');
   if (!el) return;
@@ -1405,7 +1403,6 @@ function renderGearWidget(posts) {
     </div>`).join('');
 }
 
-// ─── FILTER / SORT ───
 function filterTag(el, genre) {
   document.querySelectorAll('.tag').forEach(t => t.classList.remove('on'));
   el.classList.add('on');
@@ -1417,7 +1414,6 @@ function setSort(el) {
   el.classList.add('on');
 }
 
-// ─── PIN AUTO-FOCUS (投稿フォーム) ───
 ['pd1','pd2','pd3','pd4'].forEach((id,i,arr)=>{
   const el = document.getElementById(id);
   el.addEventListener('input',()=>{
@@ -1428,7 +1424,6 @@ function setSort(el) {
   });
 });
 
-// ─── PIN AUTO-FOCUS (編集モーダル) ───
 ['pin1','pin2','pin3','pin4'].forEach((id,i,arr)=>{
   const el = document.getElementById(id);
   el.addEventListener('input',()=>{
@@ -1440,9 +1435,7 @@ function setSort(el) {
   });
 });
 
-// ─── EDIT MODAL ───
 function openEditModal(){
-  // step1をリセット
   ['pin1','pin2','pin3','pin4'].forEach(id=>{ document.getElementById(id).value=''; });
   document.getElementById('pin-err').textContent='';
   document.getElementById('edit-step1').style.display='block';
@@ -1456,10 +1449,8 @@ function verifyPin(){
   const entered = ['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('');
   if(entered.length < 4){ document.getElementById('pin-err').textContent='4桁すべて入力してください'; return; }
 
-  // マスターキー確認
   const isMaster = entered === MASTER_KEY.slice(-4) || entered === 'MSTR';
 
-  // DB投稿の場合
   if (currentDBPost) {
     if (isMaster || entered === currentDBPost.pin_hash) {
       document.getElementById('pin-err').textContent='';
@@ -1477,7 +1468,6 @@ function verifyPin(){
     return;
   }
 
-  // デモ投稿の場合（静的データ）
   const correct = '1234';
   if(entered === correct || isMaster){
     document.getElementById('pin-err').textContent='';
@@ -1496,7 +1486,6 @@ async function saveEdit(){
   const t = document.getElementById('edit-title').value.trim();
   if(!t){ showToast('タイトルを入力してください'); return; }
 
-  // DB投稿の場合
   if (currentDBPost) {
     const gearsText = document.getElementById('edit-pedals').value.trim();
     const gear_list = gearsText ? gearsText.split(',').map(s=>({name:s.trim()})).filter(g=>g.name) : [];
@@ -1513,7 +1502,6 @@ async function saveEdit(){
     return;
   }
 
-  // デモ投稿
   posts[currentPost].title = t;
   document.getElementById('m-title').textContent = t;
   closeModal('edit-bd');
@@ -1523,7 +1511,6 @@ async function saveEdit(){
 async function confirmDelete(){
   if(!confirm('本当にこの投稿を削除しますか？\nこの操作は取り消せません。')) return;
 
-  // DB投稿の場合
   if (currentDBPost) {
     const { error } = await sb.from('posts').delete().eq('id', currentDBPost.id);
     if(error){ showToast('❌ 削除に失敗しました'); return; }
@@ -1538,7 +1525,7 @@ async function confirmDelete(){
   closeModal('modal-bd');
   showToast('🗑 投稿を削除しました');
 }
-// ─── BRAND ACCORDION ───
+
 function toggleBrands() {
   const extra = document.getElementById('brands-extra');
   const lbl   = document.getElementById('brand-toggle-label');
@@ -1546,7 +1533,6 @@ function toggleBrands() {
   lbl.textContent = isOpen ? '▲ 閉じる' : '▼ もっと見る';
 }
 
-// ─── PHOTO UPLOAD ───
 let uploadedPhotos = [];
 const MAX_PHOTOS = 3;
 
@@ -1606,16 +1592,13 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); 
   feed.appendChild(div);
 })();
 
-// コメント送信をDB版に差し替え
 document.addEventListener('DOMContentLoaded', () => {
-  const csBtn = document.querySelector('.cs[onclick*="postComment"]');
-  if (csBtn) csBtn.onclick = () => postDBComment();
   const ciInput = document.getElementById('ci');
   if (ciInput) ciInput.addEventListener('keydown', e => { if (e.key === 'Enter') postDBComment(); });
   loadPostsFromDB();
 });
 
-// ─── MODAL SVG (big version) ───
+// ─── MODAL SVG ───
 function getModalSVG(id) {
   const svgs = {
     feat:`<svg viewBox="0 0 390 390" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><defs><linearGradient id="mbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a1a2e"/><stop offset="100%" stop-color="#0d0d14"/></linearGradient></defs><rect width="390" height="390" fill="url(#mbg)"/><rect x="18" y="22" width="354" height="7" rx="3" fill="#2a2a2a"/><rect x="18" y="361" width="354" height="7" rx="3" fill="#2a2a2a"/><g transform="translate(34,50)"><rect width="88" height="104" rx="6" fill="#c8a000" stroke="#a07800" stroke-width="2"/><rect x="7" y="7" width="74" height="56" rx="4" fill="rgba(0,0,0,.25)"/><text x="44" y="33" text-anchor="middle" fill="#fff" font-size="12" font-family="monospace" font-weight="bold">DS-1</text><text x="44" y="49" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="7.5" font-family="monospace">DISTORTION</text><circle cx="24" cy="85" r="10" fill="#222" stroke="#555" stroke-width="1.5"/><circle cx="44" cy="85" r="10" fill="#222" stroke="#555" stroke-width="1.5"/><circle cx="64" cy="85" r="10" fill="#222" stroke="#555" stroke-width="1.5"/></g><g transform="translate(140,44)"><rect width="82" height="96" rx="5" fill="#d4580c" stroke="#b04000" stroke-width="2"/><rect x="6" y="6" width="70" height="52" rx="4" fill="rgba(0,0,0,.2)"/><text x="41" y="28" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace" font-weight="bold">MXR</text><text x="41" y="43" text-anchor="middle" fill="#fff" font-size="10" font-family="monospace" font-weight="bold">PHASE 90</text><circle cx="41" cy="78" r="13" fill="#222" stroke="#666" stroke-width="2"/><line x1="41" y1="65" x2="41" y2="73" stroke="#bbb" stroke-width="2"/></g><g transform="translate(240,36)"><rect width="116" height="118" rx="7" fill="#2a4a8a" stroke="#1a3a7a" stroke-width="2"/><rect x="8" y="8" width="100" height="68" rx="5" fill="rgba(0,0,0,.3)"/><rect x="12" y="12" width="92" height="44" rx="4" fill="#0a1a3a" stroke="#1a3a6a" stroke-width="1.5"/><text x="58" y="32" text-anchor="middle" fill="#4af" font-size="10" font-family="monospace">BIGSKY</text><text x="58" y="47" text-anchor="middle" fill="#2a8a4a" font-size="8" font-family="monospace">REVERB</text><circle cx="30" cy="97" r="11" fill="#1a1a2a" stroke="#3a5aaa" stroke-width="2"/><circle cx="58" cy="97" r="11" fill="#1a1a2a" stroke="#3a5aaa" stroke-width="2"/><circle cx="86" cy="97" r="11" fill="#1a1a2a" stroke="#3a5aaa" stroke-width="2"/></g><g transform="translate(34,178)"><rect width="90" height="100" rx="6" fill="#c02020" stroke="#901010" stroke-width="2"/><rect x="7" y="7" width="76" height="58" rx="4" fill="rgba(0,0,0,.25)"/><text x="45" y="24" text-anchor="middle" fill="#fff" font-size="7" font-family="monospace">TC ELECTRONIC</text><text x="45" y="40" text-anchor="middle" fill="#fff" font-size="10" font-family="monospace" font-weight="bold">FLASHBACK</text><text x="45" y="54" text-anchor="middle" fill="rgba(255,255,255,.6)" font-size="7" font-family="monospace">DELAY</text><circle cx="24" cy="83" r="9" fill="#222" stroke="#555" stroke-width="1.5"/><circle cx="45" cy="83" r="9" fill="#222" stroke="#555" stroke-width="1.5"/><circle cx="66" cy="83" r="9" fill="#222" stroke="#555" stroke-width="1.5"/></g><g transform="translate(142,172)"><rect width="90" height="100" rx="6" fill="#1a1a1a" stroke="#3a3a3a" stroke-width="2"/><rect x="7" y="7" width="76" height="52" rx="4" fill="#0a0a12"/><rect x="10" y="10" width="70" height="38" rx="3" fill="#001a00" stroke="#004400" stroke-width="1.5"/><text x="45" y="34" text-anchor="middle" fill="#00ff44" font-size="14" font-family="monospace" font-weight="bold">A 440</text><text x="45" y="70" text-anchor="middle" fill="#777" font-size="7.5" font-family="monospace">TU-3 CHROMATIC</text></g><g transform="translate(250,175)"><rect width="86" height="100" rx="6" fill="#2a6a2a" stroke="#1a4a1a" stroke-width="2"/><rect x="7" y="7" width="72" height="64" rx="4" fill="rgba(0,0,0,.2)"/><text x="43" y="22" text-anchor="middle" fill="#aefa" font-size="6" font-family="monospace">ELECTRO-HARMONIX</text><text x="43" y="37" text-anchor="middle" fill="#fff" font-size="9" font-family="monospace" font-weight="bold">HOLY GRAIL</text><circle cx="43" cy="86" r="12" fill="#1a3a1a" stroke="#4a8a4a" stroke-width="2"/></g><pattern id="vm" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r=".9" fill="rgba(255,255,255,.035)"/></pattern><rect width="390" height="390" fill="url(#vm)"/></svg>`,
