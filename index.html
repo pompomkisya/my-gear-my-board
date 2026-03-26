@@ -1016,7 +1016,7 @@ async function submitPostToDB(){
     image_urls,pin_hash:pin,likes:0,post_type:currentPostType
   });
   if(btn){btn.disabled=false;btn.textContent=t('submit');}
-  if(error){showToast('❌ 投稿に失敗しました');console.error(error);return;}
+  if(error){showToast('❌ '+JSON.stringify(error));console.error(error);return;}
   closeModal('post-bd');
   selectedGears=[];uploadedPhotos=[];
   ['post-username','post-title','post-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
