@@ -231,28 +231,43 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 
 /* ─── RESPONSIVE: スマホ（スワイプ式3パネル） ─── */
 @media(max-width:680px){
-  /* PC用サイドバー・右パネルを非表示 */
   .wrap{display:block}
   .sl{display:none}
   .sr{display:none}
   .feed{padding:0;border:none}
 
-  /* ヘッダー */
+  /* ヘッダー・ティッカーはそのままstickyで常時表示 */
   header{padding:0 14px;height:52px}
   .logo-main{font-size:17px;letter-spacing:2px}
   .logo-sub{font-size:6.5px;letter-spacing:2px}
   .h-btn{padding:7px 12px;font-size:9px;letter-spacing:1px}
 
-  /* スワイプコンテナ */
-  .swipe-container{display:flex;width:300vw;transform:translateX(-100vw);transition:transform .32s cubic-bezier(.4,0,.2,1);will-change:transform}
-  .swipe-panel{width:100vw;min-height:calc(100vh - 86px);overflow-y:auto;-webkit-overflow-scrolling:touch;flex-shrink:0}
+  /* スワイプUI全体 */
+  #swipe-ui{overflow:hidden;width:100%}
 
-  /* パネルインジケーター（ドット3つ） */
-  .swipe-indicator{display:flex;justify-content:center;gap:7px;padding:8px 0 4px;position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:1px solid var(--bd)}
-  .swipe-dot{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:all .2s;cursor:pointer}
-  .swipe-dot.on{background:var(--ac);transform:scale(1.25)}
+  /* インジケーター：常時表示・スクロールに追従しない */
+  .swipe-indicator{display:flex;justify-content:center;gap:8px;padding:9px 0 7px;background:var(--bg);border-bottom:1px solid var(--bd);position:sticky;top:52px;z-index:50}
+  .swipe-dot{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0}
+  .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
 
-  /* 左パネル：ジャンル・ブランド */
+  /* スワイプコンテナ：幅300%・translateXでパネル切替 */
+  .swipe-container{
+    display:flex;
+    width:300%;
+    transition:transform .3s cubic-bezier(.25,.46,.45,.94);
+    will-change:transform;
+    align-items:flex-start;
+  }
+
+  /* 各パネル：幅は親の1/3（=画面幅） */
+  .swipe-panel{
+    width:33.333%;
+    flex-shrink:0;
+    min-height:calc(100vh - 86px);
+    overflow-y:visible;
+  }
+
+  /* 左パネル */
   .mob-left-panel{padding:16px 14px}
   .mob-panel-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:14px;color:var(--tx);display:flex;align-items:center;gap:8px}
   .mob-panel-title::after{content:'';flex:1;height:1px;background:var(--bd)}
@@ -266,10 +281,9 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   .card .ct{font-size:12px}
   .feed-tabs .feed-tab{font-size:8px;padding:6px 4px;letter-spacing:.5px}
 
-  /* 右パネル：ランキング・ウィジェット */
+  /* 右パネル */
   .mob-right-panel{padding:16px 14px}
   .mob-right-panel .widget{margin-bottom:14px}
-  .mob-right-panel .ad-slot{height:120px;margin-bottom:14px}
 
   footer{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:10px}
   .footer-links{gap:12px}
@@ -1072,40 +1086,76 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
   el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
 });
 // ─── スワイプUI ───
-let currentPanel=1; // 0=左 1=中央 2=右
-let swipeStartX=0,swipeStartY=0,isSwiping=false;
+let currentPanel=1;
+let swipeStartX=0,swipeStartY=0,swipeCurX=0;
+let isHorizSwipe=false,swipeDecided=false;
+const SWIPE_THRESHOLD=60;  // 感度：px（大きいほど鈍感）
+const ANGLE_LOCK=0.6;      // 縦スクロール判定の厳しさ
 
 function goPanel(n){
   currentPanel=Math.max(0,Math.min(2,n));
   const c=document.getElementById('swipe-container');
-  if(c)c.style.transform='translateX('+(-currentPanel*100)+'vw)';
+  if(!c)return;
+  const w=window.innerWidth;
+  c.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';
+  c.style.transform='translateX('+(-currentPanel*w)+'px)';
   document.querySelectorAll('.swipe-dot').forEach((d,i)=>d.classList.toggle('on',i===currentPanel));
 }
 
 function initSwipe(){
   const c=document.getElementById('swipe-container');
   if(!c)return;
+
+  // 初期位置をpxで設定
+  c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';
+
   c.addEventListener('touchstart',e=>{
     swipeStartX=e.touches[0].clientX;
     swipeStartY=e.touches[0].clientY;
-    isSwiping=true;
+    swipeCurX=swipeStartX;
+    isHorizSwipe=false;
+    swipeDecided=false;
+    c.style.transition='none'; // ドラッグ中はアニメなし
   },{passive:true});
+
   c.addEventListener('touchmove',e=>{
-    if(!isSwiping)return;
     const dx=e.touches[0].clientX-swipeStartX;
     const dy=e.touches[0].clientY-swipeStartY;
-    // 縦スクロールを優先
-    if(Math.abs(dy)>Math.abs(dx)){isSwiping=false;return;}
+    swipeCurX=e.touches[0].clientX;
+
+    // 方向を一度だけ判定
+    if(!swipeDecided&&(Math.abs(dx)>8||Math.abs(dy)>8)){
+      swipeDecided=true;
+      isHorizSwipe=Math.abs(dx)>Math.abs(dy)*( 1/ANGLE_LOCK);
+    }
+    if(!isHorizSwipe)return;
+
+    // 端のパネルでは引っ張り感を出す（抵抗）
+    let offset=-currentPanel*window.innerWidth+dx;
+    if((currentPanel===0&&dx>0)||(currentPanel===2&&dx<0)){
+      offset=-currentPanel*window.innerWidth+dx*0.25;
+    }
+    c.style.transform='translateX('+offset+'px)';
   },{passive:true});
+
   c.addEventListener('touchend',e=>{
-    if(!isSwiping)return;
-    isSwiping=false;
+    if(!isHorizSwipe){
+      // 縦スクロールだった場合は元の位置に戻す
+      goPanel(currentPanel);
+      return;
+    }
     const dx=e.changedTouches[0].clientX-swipeStartX;
-    const dy=e.changedTouches[0].clientY-swipeStartY;
-    if(Math.abs(dx)<40||Math.abs(dy)>Math.abs(dx)*0.8)return;
-    if(dx<-40)goPanel(currentPanel+1); // 左スワイプ → 右パネルへ
-    else if(dx>40)goPanel(currentPanel-1); // 右スワイプ → 左パネルへ
+    if(dx<-SWIPE_THRESHOLD)goPanel(currentPanel+1);
+    else if(dx>SWIPE_THRESHOLD)goPanel(currentPanel-1);
+    else goPanel(currentPanel); // しきい値未満は元に戻す
   },{passive:true});
+
+  // リサイズ時に位置を再計算
+  window.addEventListener('resize',()=>{
+    const w=window.innerWidth;
+    c.style.transition='none';
+    c.style.transform='translateX('+(-currentPanel*w)+'px)';
+  });
 }
 
 // スマホ/PC切り替え
@@ -1138,15 +1188,6 @@ function filterBrandMob(el,brand){
   setTimeout(()=>goPanel(1),180); // フィードへ
 }
 
-// スマホ用カードグリッドにも描画
-function renderDBPosts(posts){
-  const grid=document.getElementById('card-grid');
-  const gridMob=document.getElementById('card-grid-mob');
-  const html=buildCardsHTML(posts);
-  if(grid)grid.innerHTML=html;
-  if(gridMob)gridMob.innerHTML=html;
-}
-
 // スマホ用ウィジェット描画
 function renderRankingWidgetMob(posts){
   const el=document.getElementById('ranking-widget-mob');if(!el)return;
@@ -1166,16 +1207,6 @@ function renderGearWidgetMob(posts){
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
-// スワイプUI初期化＆PC/スマホ判定＆データ読み込み
-function checkMobile(){
-  const isMob=window.innerWidth<=680;
-  const swipeUI=document.getElementById('swipe-ui');
-  const pcWrap=document.querySelector('.wrap');
-  const footer=document.querySelector('footer');
-  if(swipeUI)swipeUI.style.display=isMob?'block':'none';
-  if(pcWrap)pcWrap.style.display=isMob?'none':'grid';
-  if(footer)footer.style.display=isMob?'none':'flex';
-}
 document.addEventListener('DOMContentLoaded',()=>{
   applyLang();
   checkMobile();
