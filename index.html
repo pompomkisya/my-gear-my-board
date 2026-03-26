@@ -245,12 +245,10 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   /* スワイプUI全体 */
   #swipe-ui{overflow:hidden;width:100%}
 
-  /* インジケーター：ヘッダー(52px)+ティッカー(28px)の下に固定 */
-  .swipe-indicator{display:flex;justify-content:center;gap:8px;padding:8px 0;background:var(--bg);border-bottom:1px solid var(--bd);position:sticky;top:80px;z-index:50}
-  .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0}
+  /* インジケーター：スワイプコンテナの上に独立配置・stickyなし */
+  .swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
+  .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block}
   .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
-
-  /* パネル上部にインジケーター分の余白不要（stickyで独立しているため） */
 
   /* スワイプコンテナ：幅300%・translateXでパネル切替 */
   .swipe-container{
@@ -326,11 +324,11 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 </div>
 <!-- ═══ スマホ用スワイプUI（PCでは非表示） ═══ -->
 <div id="swipe-ui" style="display:none">
-  <!-- インジケーター -->
+  <!-- インジケーター：コンテナの外に独立 -->
   <div class="swipe-indicator">
-    <div class="swipe-dot" onclick="goPanel(0)" title="ジャンル・ブランド"></div>
-    <div class="swipe-dot on" onclick="goPanel(1)" title="フィード"></div>
-    <div class="swipe-dot" onclick="goPanel(2)" title="ランキング"></div>
+    <div class="swipe-dot" onclick="goPanel(0)"></div>
+    <div class="swipe-dot on" onclick="goPanel(1)"></div>
+    <div class="swipe-dot" onclick="goPanel(2)"></div>
   </div>
   <!-- スワイプコンテナ -->
   <div class="swipe-container" id="swipe-container">
