@@ -190,7 +190,7 @@ textarea.form-input{resize:vertical;min-height:90px;font-size:16px}
 .photo-thumb img{width:100%;height:100%;object-fit:cover}
 .photo-remove{position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,.75);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;color:#fff;border:none}
 .photo-remove:hover{background:var(--ac)}
-.photo-edit-btn{position:absolute;bottom:3px;left:3px;right:3px;background:rgba(0,0,0,.75);border:none;border-radius:3px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.5px;padding:2px 4px;cursor:pointer;text-align:center;transition:background .15s}
+.photo-edit-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(232,85,45,.85);border:none;color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.5px;padding:4px 4px;cursor:pointer;text-align:center;transition:background .15s}
 .photo-edit-btn:hover{background:var(--ac)}
 .photo-add-btn{width:90px;height:90px;border:1.5px dashed var(--bd);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--td);font-size:22px;transition:all .15s;flex-shrink:0;background:transparent}
 .photo-add-btn:hover{border-color:var(--ac);color:var(--ac)}
@@ -425,7 +425,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
           </div>
         </div>
         <div class="feed-top">
-          <div class="feed-h">PEDALBOARDS</div>
+          <div class="feed-h" id="feed-heading-mob">PEDALBOARDS</div>
           <div class="sort">
             <div class="sort-b on" onclick="setSort(this,'new')" data-i="sort_new">新着</div>
             <div class="sort-b" onclick="setSort(this,'likes')" data-i="sort_pop">人気</div>
@@ -434,7 +434,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
         <div class="feed-tabs">
           <div class="feed-tab on" onclick="setTab(this,'all')" data-i="tab_all">すべて</div>
           <div class="feed-tab" onclick="setTab(this,'board')" data-i="tab_board">ボード</div>
-          <div class="feed-tab" onclick="setTab(this,'gear')" data-i="tab_gear">MY GEAR</div>
+          <div class="feed-tab" onclick="setTab(this,'gear')" data-i="tab_gear">機材</div>
         </div>
         <div class="grid" id="card-grid-mob">
           <div style="grid-column:1/-1;text-align:center;padding:40px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">読み込み中...</div>
@@ -558,7 +558,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
     </div>
   </div>
   <div class="feed-top">
-    <div class="feed-h">PEDALBOARDS</div>
+    <div class="feed-h" id="feed-heading">PEDALBOARDS</div>
     <div class="sort">
       <div class="sort-b on" onclick="setSort(this,'new')" data-i="sort_new">新着</div>
       <div class="sort-b" onclick="setSort(this,'likes')" data-i="sort_pop">人気</div>
@@ -567,7 +567,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   <div class="feed-tabs">
     <div class="feed-tab on" onclick="setTab(this,'all')" data-i="tab_all">すべて</div>
     <div class="feed-tab" onclick="setTab(this,'board')" data-i="tab_board">エフェクターボード</div>
-    <div class="feed-tab" onclick="setTab(this,'gear')" data-i="tab_gear">MY GEAR</div>
+    <div class="feed-tab" onclick="setTab(this,'gear')" data-i="tab_gear">機材</div>
   </div>
   <div class="grid" id="card-grid">
     <div style="grid-column:1/-1;text-align:center;padding:40px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">読み込み中...</div>
@@ -579,7 +579,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
     <div style="font-size:10px;color:var(--tm)">Google AdSense</div>
   </div>
   <div class="widget">
-    <div class="wt">🔥 <span data-i="widget_ranking">今週の人気ボード</span></div>
+    <div class="wt">🔥 <span data-i="widget_ranking">今月の人気ボード</span></div>
     <div id="ranking-widget"><div style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">読み込み中...</div></div>
   </div>
   <div class="widget">
@@ -655,6 +655,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
     </div>
     <!-- Step3: 機材 -->
     <div class="step-panel" id="step-3">
+      <div id="step3-photo-preview" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
       <div class="form-row">
         <label class="form-lbl" data-i="lbl_gear">使用機材（画像に写っている機材名を記入）</label>
         <div class="gear-input-wrap">
@@ -817,9 +818,9 @@ function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+M
 const SESSION_ID=getSessionId();
 
 const i18n={
-ja:{post_btn:'投稿する',post_board_short:'ボードを投稿',post_gear_short:'機材を投稿',menu:'メニュー',home:'ホーム',ranking:'人気ランキング',newest:'新着順',genre:'ジャンル',by_brand:'ブランドで絞る',g_standard:'定番',g_ambient:'空間系',g_alt:'オルタナ系',banner_title:'あなたのボードや機材を投稿しよう！',banner_sub:'登録不要・匿名OK。写真1枚から投稿できます。',post_board:'エフェクターボードを投稿',post_gear:'機材を投稿',tab_all:'すべて',tab_board:'エフェクターボード',tab_gear:'MY GEAR',sort_new:'新着',sort_pop:'人気',widget_ranking:'今週の人気ボード',widget_gear:'よく使われている機材',widget_news:'機材NEWS',step1_lbl:'写真（最大3枚・任意）',step1_click:'クリックして写真を選択',step1_note:'最大3枚 · 1枚目がサムネイル',skip:'スキップ（写真なしで続ける）',lbl_username:'ユーザー名（任意）',lbl_gear:'使用機材（画像に写っている機材名を記入）',gear_note:'候補が出ない場合はEnterで追加できます',lbl_genre:'ジャンル（複数選択OK）',lbl_desc:'コメント・説明（任意）',pin_title:'🔑 編集用4桁パスワードを設定',pin_warn:'投稿後に編集・削除するときに必要です。忘れると変更できません。',submit:'投稿する',anon_note:'※ 登録不要・名前は任意です',done_title:'投稿完了！',done_close:'閉じる',privacy:'プライバシーポリシー',contact:'お問い合わせ',logo_sub:'ペダルボードSNS · Japan',done_board_sub:'あなたのボードが公開されました！',done_gear_sub:'あなたの機材が公開されました！',title_ph_board:'例：ライブ用最強ボード',title_ph_gear:'例：My New Gear',tag_takuroku:'宅録',tag_beginner:'初心者相談',
+ja:{post_btn:'投稿する',post_board_short:'ボードを投稿',post_gear_short:'機材を投稿',menu:'メニュー',home:'ホーム',ranking:'人気ランキング',newest:'新着順',genre:'ジャンル',by_brand:'ブランドで絞る',g_standard:'定番',g_ambient:'空間系',g_alt:'オルタナ系',banner_title:'あなたのボードや機材を投稿しよう！',banner_sub:'登録不要・匿名OK。写真1枚から投稿できます。',post_board:'エフェクターボードを投稿',post_gear:'機材を投稿',tab_all:'すべて',tab_board:'エフェクターボード',tab_gear:'機材',sort_new:'新着',sort_pop:'人気',widget_ranking:'今月の人気ボード',widget_gear:'よく使われている機材',widget_news:'機材NEWS',step1_lbl:'写真（最大3枚・任意）',step1_click:'クリックして写真を選択',step1_note:'最大3枚 · 1枚目がサムネイル',skip:'スキップ（写真なしで続ける）',lbl_username:'ユーザー名（任意）',lbl_gear:'使用機材（画像に写っている機材名を記入）',gear_note:'候補が出ない場合はEnterで追加できます',lbl_genre:'ジャンル（複数選択OK）',lbl_desc:'コメント・説明（任意）',pin_title:'🔑 編集用4桁パスワードを設定',pin_warn:'投稿後に編集・削除するときに必要です。忘れると変更できません。',submit:'投稿する',anon_note:'※ 登録不要・名前は任意です',done_title:'投稿完了！',done_close:'閉じる',privacy:'プライバシーポリシー',contact:'お問い合わせ',logo_sub:'ペダルボードSNS · Japan',done_board_sub:'あなたのボードが公開されました！',done_gear_sub:'あなたの機材が公開されました！',title_ph_board:'例：ライブ用最強ボード',title_ph_gear:'例：My New Gear',tag_takuroku:'宅録',tag_beginner:'初心者相談',
 empty_msg:'まだ投稿がありません',empty_promo_genre:'このジャンルで最初に投稿してみましょう！',empty_promo_brand:'このブランドの機材を投稿してみましょう！',empty_back:'← フィルターを解除'},
-en:{post_btn:'Post',post_board_short:'Post Board',post_gear_short:'Post Gear',menu:'Menu',home:'Home',ranking:'Popular',newest:'Newest',genre:'Genre',by_brand:'Filter by Brand',g_standard:'Standard',g_ambient:'Ambient',g_alt:'Alternative',banner_title:'Share your board or gear!',banner_sub:'No registration needed. Post with just one photo.',post_board:'Post Pedalboard',post_gear:'Post My Gear',tab_all:'All',tab_board:'Pedalboards',tab_gear:'MY GEAR',sort_new:'New',sort_pop:'Popular',widget_ranking:'Top Boards This Week',widget_gear:'Popular Gear',widget_news:'Gear NEWS',step1_lbl:'Photos (up to 3, optional)',step1_click:'Click to select photos',step1_note:'Up to 3 · First is thumbnail',skip:'Skip (no photo)',lbl_username:'Username (optional)',lbl_gear:'Gear (type the names of gear in the photo)',gear_note:'Press Enter to add if no results',lbl_genre:'Genre (multiple OK)',lbl_desc:'Comment / Description (optional)',pin_title:'🔑 Set 4-digit edit PIN',pin_warn:'Required to edit or delete your post later. Do not forget it.',submit:'Post',anon_note:'* No registration needed',done_title:'Posted!',done_close:'Close',privacy:'Privacy Policy',contact:'Contact',logo_sub:'Pedalboard SNS · Japan',done_board_sub:'Your pedalboard is now live!',done_gear_sub:'Your gear is now live!',title_ph_board:'e.g. My Live Rig',title_ph_gear:'e.g. My New Gear',tag_takuroku:'Home Recording',tag_beginner:'Beginner Q&A',
+en:{post_btn:'Post',post_board_short:'Post Board',post_gear_short:'Post Gear',menu:'Menu',home:'Home',ranking:'Popular',newest:'Newest',genre:'Genre',by_brand:'Filter by Brand',g_standard:'Standard',g_ambient:'Ambient',g_alt:'Alternative',banner_title:'Share your board or gear!',banner_sub:'No registration needed. Post with just one photo.',post_board:'Post Pedalboard',post_gear:'Post My Gear',tab_all:'All',tab_board:'Pedalboards',tab_gear:'Gear',sort_new:'New',sort_pop:'Popular',widget_ranking:'Top Boards This Month',widget_gear:'Popular Gear',widget_news:'Gear NEWS',step1_lbl:'Photos (up to 3, optional)',step1_click:'Click to select photos',step1_note:'Up to 3 · First is thumbnail',skip:'Skip (no photo)',lbl_username:'Username (optional)',lbl_gear:'Gear (type the names of gear in the photo)',gear_note:'Press Enter to add if no results',lbl_genre:'Genre (multiple OK)',lbl_desc:'Comment / Description (optional)',pin_title:'🔑 Set 4-digit edit PIN',pin_warn:'Required to edit or delete your post later. Do not forget it.',submit:'Post',anon_note:'* No registration needed',done_title:'Posted!',done_close:'Close',privacy:'Privacy Policy',contact:'Contact',logo_sub:'Pedalboard SNS · Japan',done_board_sub:'Your pedalboard is now live!',done_gear_sub:'Your gear is now live!',title_ph_board:'e.g. My Live Rig',title_ph_gear:'e.g. My New Gear',tag_takuroku:'Home Recording',tag_beginner:'Beginner Q&A',
 empty_msg:'No posts yet',empty_promo_genre:'Be the first to post in this genre!',empty_promo_brand:'Be the first to post with this brand!',empty_back:'← Clear filter'}
 };
 let lang='ja';
@@ -931,7 +932,7 @@ function renderDBPosts(posts){
     const destUrl='/post?id='+p.id+(lang==='en'?'&lang=en':'');
     return '<div class="card" onclick="location.href=\''+destUrl+'\'" style="animation-delay:'+(i*.05)+'s">'
       +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy">':'<div style="font-size:40px;opacity:.2">'+(isGear?'🎸':'🎛')+'</div>')
-      +'<div class="iw-ov"></div>'+(isGear?'<div class="bdg gear-bdg">MY GEAR</div>':(glabel?'<div class="bdg">'+glabel+'</div>':''))+'</div>'
+      +'<div class="iw-ov"></div>'+(isGear?'<div class="bdg gear-bdg">機材</div>':(glabel?'<div class="bdg">'+glabel+'</div>':''))+'</div>'
       +'<div class="body"><div class="cu"><div class="av">'+init+'</div>'
       +'<div class="av-name">'+(p.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div>'
       +'<div class="av-time">'+timeAgo(p.created_at)+'</div></div>'
@@ -966,29 +967,85 @@ function filterBrand(el,brand){
   document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));
   el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';applyFilter();
 }
-function setTab(el,tab){document.querySelectorAll('.feed-tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');currentTab=tab;applyFilter();}
+function setTab(el,tab){
+  document.querySelectorAll('.feed-tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');currentTab=tab;
+  const fh=document.getElementById('feed-heading');if(fh)fh.textContent=tab==='gear'?'GEAR':'PEDALBOARDS';
+  const fhm=document.getElementById('feed-heading-mob');if(fhm)fhm.textContent=tab==='gear'?'GEAR':'PEDALBOARDS';
+  applyFilter();
+}
 function setSort(el,sort){document.querySelectorAll('.sort-b').forEach(b=>b.classList.remove('on'));el.classList.add('on');currentSort=sort;applyFilter();}
 
 function renderRankingWidget(posts){
   const el=document.getElementById('ranking-widget');if(!el)return;
   const bp=posts.filter(p=>!p.post_type||p.post_type==='board');
-  const sorted=[...bp].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
+  // 月間集計（過去30日）
+  const monthAgo=Date.now()-30*24*60*60*1000;
+  const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);
+  const target=monthly.length>=3?monthly:bp;
+  const sorted=[...target].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:JetBrains Mono,monospace">'+(lang==='en'?'No posts yet':'まだ投稿がありません')+'</div>';return;}
-  el.innerHTML=sorted.map((p,i)=>'<div class="ri" onclick="location.href=\'/post?id='+p.id+'\'"><div class="rn '+(i<2?'hi':'')+'">'+( i+1)+'</div><div class="ri-i"><div class="ri-t">'+p.title+'</div><div class="ri-u">'+(p.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div></div><div class="ri-s">❤️'+(p.likes||0)+'</div></div>').join('');
+  el.innerHTML=sorted.map((p,i)=>{
+    const crown=i===0?'<span style="margin-right:4px">👑</span>':'';
+    return '<div class="ri" onclick="location.href=\'/post?id='+p.id+'\'">'
+      +'<div class="rn '+(i<2?'hi':'')+'">'+crown+(i+1)+'</div>'
+      +'<div class="ri-i"><div class="ri-t">'+p.title+'</div>'
+      +'<div class="ri-u">'+(p.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div></div>'
+      +'<div class="ri-s">❤️'+(p.likes||0)+'</div></div>';
+  }).join('');
 }
+function soundhouseUrl(name){return'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(name);}
 function renderGearWidget(posts){
   const el=document.getElementById('gear-widget');if(!el)return;
   const count={};
   posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
   const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:JetBrains Mono,monospace">'+(lang==='en'?'No data':'データなし')+'</div>';return;}
-  const max=sorted[0][1];
-  el.innerHTML=sorted.map(([n,c])=>'<div class="gr"><div class="gr-i"><div class="gr-n">'+n+'</div><div class="gr-b">'+c+(lang==='en'?' posts':'件の投稿')+'</div></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(c/max*100)+'%"></div></div></div>').join('');
+  el.innerHTML=sorted.map(([n,c])=>'<div class="gr" style="cursor:pointer" onclick="filterByGearName(\''+n.replace(/'/g,"\\'")+'\')">'
+    +'<div class="gr-i"><div class="gr-n">'+n+'</div><div class="gr-b">'+c+(lang==='en'?' posts':'件の投稿')+'</div></div>'
+    +'<a href="'+soundhouseUrl(n)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" '
+    +'title="サウンドハウスで見る" '
+    +'style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:13px;transition:all .15s" '
+    +'onmouseover="this.title=\'サウンドハウスで見る\';this.style.borderColor=\'var(--ac)\'" onmouseout="this.style.borderColor=\'var(--bd)\'">🔍</a>'
+    +'</div>').join('');
 }
 
 // ── ジャンル選択（安定版）
 function toggleGenre(el){
   el.classList.toggle('on');
+}
+
+// 機材名で投稿を絞り込む
+function filterByGearName(name){
+  currentBrandFilter=null;currentGenreFilter='ALL';
+  const posts=allDBPosts.filter(p=>{
+    const g=Array.isArray(p.gear_list)?p.gear_list:[];
+    return g.some(x=>(x.name||x||'').toLowerCase()===name.toLowerCase());
+  });
+  const grid=document.getElementById('card-grid');
+  const gridMob=document.getElementById('card-grid-mob');
+  const html=posts.length?posts.map((p,i)=>{
+    const init=(p.username||'匿')[0].toUpperCase();
+    const gear=Array.isArray(p.gear_list)?p.gear_list:[];
+    const tags=gear.slice(0,3).map(g=>'<span class="ptag">'+(g.name||g)+'</span>').join('');
+    const isGear=p.post_type==='gear';
+    const genres=Array.isArray(p.genre)?p.genre:(p.genre?[p.genre]:[]);
+    const glabel=genres.slice(0,2).join(' · ');
+    const destUrl='/post?id='+p.id+(lang==='en'?'&lang=en':'');
+    return '<div class="card" onclick="location.href=\''+destUrl+'\'" style="animation-delay:'+(i*.05)+'s">'
+      +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy">':'<div style="font-size:40px;opacity:.2">'+(isGear?'🎸':'🎛')+'</div>')
+      +'<div class="iw-ov"></div>'+(isGear?'<div class="bdg gear-bdg">機材</div>':(glabel?'<div class="bdg">'+glabel+'</div>':''))+'</div>'
+      +'<div class="body"><div class="cu"><div class="av">'+init+'</div>'
+      +'<div class="av-name">'+(p.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div>'
+      +'<div class="av-time">'+timeAgo(p.created_at)+'</div></div>'
+      +'<div class="ct">'+p.title+'</div><div class="ptags">'+tags+'</div>'
+      +'<div class="cf"><div class="st" onclick="toggleDBLike(event,\''+p.id+'\',this)">❤️ <span>'+(p.likes||0)+'</span></div>'
+      +'<div class="st">💬 <span>'+(p.comment_count||0)+'</span></div></div></div></div>';
+  }).join(''):'<div class="empty-filter"><div class="empty-filter-msg">「'+name+'」を使った投稿はまだありません</div><div class="empty-filter-promo">最初に投稿してみましょう！</div><div class="empty-filter-btn" onclick="clearFilter()">← 戻る</div></div>';
+  if(grid)grid.innerHTML=html;
+  if(gridMob)gridMob.innerHTML=html;
+  // スマホならフィードパネルへ
+  if(window.innerWidth<=680)setTimeout(()=>goPanel(1),180);
 }
 
 // ── GEAR AUTOCOMPLETE（前方一致）
@@ -1063,6 +1120,16 @@ function goStep(n){
   if(n===3&&currentStep===2){if(!document.getElementById('post-title').value.trim()){showToast('❌ タイトルを入力してください');return;}}
   if(n===5)renderConfirm();
   currentStep=n;updateStepUI();
+  if(n===3)renderStep3PhotoPreview();
+}
+function renderStep3PhotoPreview(){
+  const wrap=document.getElementById('step3-photo-preview');if(!wrap)return;
+  if(!uploadedPhotos.length){wrap.style.display='none';return;}
+  wrap.style.display='flex';
+  wrap.innerHTML=uploadedPhotos.map((src,i)=>{
+    const disp=editedPhotos[i]||src;
+    return '<img src="'+disp+'" style="width:72px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--bd);cursor:pointer" onclick="openImgEditor('+i+')" title="タップして編集">';
+  }).join('');
 }
 function updateStepUI(){
   document.querySelectorAll('.step-panel').forEach((el,i)=>el.classList.toggle('on',i+1===currentStep));
@@ -1178,31 +1245,25 @@ function openImgEditor(idx){
   editorPhotoIndex=idx;
   editorNumbers=[];
   editorMode='none';
-  cropStart=null;cropRect=null;isCropping=false;
+  cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropDragging=false;cropHandleDrag=null;
   const bd=document.getElementById('img-editor-bd');
   bd.classList.add('open');
   document.body.style.overflow='hidden';
-
-  // タブ生成
   const tabBar=document.getElementById('img-tab-bar');
   tabBar.innerHTML=uploadedPhotos.map((_,i)=>'<div class="img-tab'+(i===idx?' on':'')+'" onclick="switchEditorPhoto('+i+')">写真'+(i+1)+'</div>').join('');
-
-  // 初回ヒント
   if(!editorIntroShown){
     document.getElementById('editor-intro').style.display='flex';
   }
-
   loadEditorImage(editedPhotos[idx]||uploadedPhotos[idx]);
   updateToolUI();
 }
 
 function switchEditorPhoto(idx){
-  // 現在の編集を保存
   saveCurrentEditorState();
   editorPhotoIndex=idx;
   editorNumbers=[];
   editorMode='none';
-  cropStart=null;cropRect=null;
+  cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;
   document.querySelectorAll('.img-tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
   loadEditorImage(editedPhotos[idx]||uploadedPhotos[idx]);
   updateToolUI();
@@ -1261,7 +1322,11 @@ function drawEditor(){
 function setTool(mode){
   if(editorMode===mode){editorMode='none';}else{editorMode=mode;}
   updateToolUI();
-  const hints={crop:'画像をタップ＆ドラッグしてトリミング範囲を選択',number:'画像をタップして番号を配置',none:'ツールを選択してください'};
+  const hints={
+    crop:'画像をドラッグしてトリミング範囲を選択。ハンドルで調整できます',
+    number:'画像をタップして番号を配置。タップで削除・ドラッグで移動',
+    none:'ツールを選択してください'
+  };
   document.getElementById('editor-hint').textContent=hints[editorMode]||hints.none;
   drawEditor();
 }
@@ -1274,7 +1339,7 @@ function updateToolUI(){
 }
 
 function resetEdits(){
-  editorNumbers=[];cropRect=null;cropStart=null;
+  editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropStart=null;
   loadEditorImage(uploadedPhotos[editorPhotoIndex]);
   showToast('↩️ リセットしました');
 }
@@ -1286,28 +1351,37 @@ function dismissIntro(){
 
 function saveCurrentEditorState(){
   if(!editorCanvas||!editorImage)return;
-  // 現在のcanvas状態をeditedPhotosに保存
-  const c=document.createElement('canvas');
-  c.width=editorImage.naturalWidth;c.height=editorImage.naturalHeight;
-  const ctx=c.getContext('2d');
-  if(cropRect){
-    ctx.drawImage(editorImage,cropRect.sx,cropRect.sy,cropRect.sw,cropRect.sh,0,0,c.width,c.height);
-  }else{
-    ctx.drawImage(editorImage,0,0,c.width,c.height);
+  const c=editorCanvas;
+  let sx=0,sy=0,sw=editorImage.naturalWidth,sh=editorImage.naturalHeight;
+  if(cropActive&&cropBox.w>10&&cropBox.h>10){
+    // canvas座標→実寸変換
+    const scaleX=editorImage.naturalWidth/c.width;
+    const scaleY=editorImage.naturalHeight/c.height;
+    sx=cropBox.x*scaleX;sy=cropBox.y*scaleY;
+    sw=cropBox.w*scaleX;sh=cropBox.h*scaleY;
   }
-  // 番号ステッカーを実寸で描画
-  const scaleX=c.width/editorCanvas.width;
-  const scaleY=c.height/editorCanvas.height;
+  const out=document.createElement('canvas');
+  out.width=Math.round(sw);out.height=Math.round(sh);
+  const ctx=out.getContext('2d');
+  ctx.drawImage(editorImage,sx,sy,sw,sh,0,0,out.width,out.height);
+  // 番号ステッカーをcanvas表示座標→実寸座標に変換
+  const dispScaleX=c.width/editorImage.naturalWidth;
+  const dispScaleY=c.height/editorImage.naturalHeight;
+  const r=Math.round(22/Math.min(dispScaleX,dispScaleY)*0.5);
   editorNumbers.forEach(n=>{
-    const r=24;const nx=n.x*scaleX;const ny=n.y*scaleY;
-    ctx.beginPath();ctx.arc(nx,ny,r,0,Math.PI*2);
-    ctx.fillStyle='#fff';ctx.fill();
-    ctx.strokeStyle='#e8552d';ctx.lineWidth=3;ctx.stroke();
-    ctx.fillStyle='#111';ctx.font='bold 18px JetBrains Mono,monospace';
+    // n.x, n.y はcanvas表示座標
+    const realX=(n.x/c.width*editorImage.naturalWidth-sx);
+    const realY=(n.y/c.height*editorImage.naturalHeight-sy);
+    if(realX<0||realY<0||realX>sw||realY>sh)return;
+    const fontSize=Math.max(14,Math.round(r*0.7));
+    ctx.beginPath();ctx.arc(realX,realY,r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();
+    ctx.strokeStyle='#e8552d';ctx.lineWidth=Math.max(2,Math.round(r*0.1));ctx.stroke();
+    ctx.fillStyle='#111';ctx.font='bold '+fontSize+'px JetBrains Mono,monospace';
     ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(n.num,nx,ny);
+    ctx.fillText(n.num,realX,realY);
   });
-  editedPhotos[editorPhotoIndex]=c.toDataURL('image/jpeg',0.92);
+  editedPhotos[editorPhotoIndex]=out.toDataURL('image/jpeg',0.92);
 }
 
 function finishEdit(){
@@ -1319,22 +1393,100 @@ function finishEdit(){
 }
 
 // Canvas タッチ・マウスイベント
+let cropDragging=false,cropHandleDrag=null;
+let cropBox={x:0,y:0,w:0,h:0};
+let cropActive=false;
+
 function getCanvasPos(e){
   const rect=editorCanvas.getBoundingClientRect();
   const touch=e.touches?e.touches[0]:e;
-  return{x:touch.clientX-rect.left,y:touch.clientY-rect.top};
+  const scaleX=editorCanvas.width/rect.width;
+  const scaleY=editorCanvas.height/rect.height;
+  return{x:(touch.clientX-rect.left)*scaleX,y:(touch.clientY-rect.top)*scaleY};
+}
+
+function getCropHandle(pos){
+  if(!cropActive)return null;
+  const handles=[
+    {id:'tl',x:cropBox.x,y:cropBox.y},
+    {id:'tr',x:cropBox.x+cropBox.w,y:cropBox.y},
+    {id:'bl',x:cropBox.x,y:cropBox.y+cropBox.h},
+    {id:'br',x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h},
+  ];
+  return handles.find(h=>Math.hypot(h.x-pos.x,h.y-pos.y)<20)||null;
+}
+
+function drawEditor(){
+  if(!editorCtx||!editorImage)return;
+  const c=editorCanvas,ctx=editorCtx;
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.drawImage(editorImage,0,0,c.width,c.height);
+
+  // トリミングオーバーレイ
+  if(editorMode==='crop'&&cropActive){
+    ctx.fillStyle='rgba(0,0,0,.45)';
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.clearRect(cropBox.x,cropBox.y,cropBox.w,cropBox.h);
+    ctx.drawImage(editorImage,
+      cropBox.x/c.width*editorImage.naturalWidth,
+      cropBox.y/c.height*editorImage.naturalHeight,
+      cropBox.w/c.width*editorImage.naturalWidth,
+      cropBox.h/c.height*editorImage.naturalHeight,
+      cropBox.x,cropBox.y,cropBox.w,cropBox.h);
+    // 枠線
+    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([]);
+    ctx.strokeRect(cropBox.x,cropBox.y,cropBox.w,cropBox.h);
+    // ハンドル
+    const hs=[
+      {x:cropBox.x,y:cropBox.y},{x:cropBox.x+cropBox.w,y:cropBox.y},
+      {x:cropBox.x,y:cropBox.y+cropBox.h},{x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h}
+    ];
+    hs.forEach(h=>{
+      ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(h.x,h.y,8,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='var(--ac)';ctx.lineWidth=2;ctx.stroke();
+    });
+    // 三分割線
+    ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    for(let i=1;i<3;i++){
+      ctx.beginPath();ctx.moveTo(cropBox.x+cropBox.w*i/3,cropBox.y);ctx.lineTo(cropBox.x+cropBox.w*i/3,cropBox.y+cropBox.h);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(cropBox.x,cropBox.y+cropBox.h*i/3);ctx.lineTo(cropBox.x+cropBox.w,cropBox.y+cropBox.h*i/3);ctx.stroke();
+    }
+    ctx.setLineDash([]);
+  }else if(editorMode==='crop'&&!cropActive){
+    ctx.strokeStyle='rgba(232,85,45,.6)';ctx.lineWidth=1.5;ctx.setLineDash([6,3]);
+    ctx.strokeRect(1,1,c.width-2,c.height-2);ctx.setLineDash([]);
+  }
+
+  // 番号ステッカー
+  editorNumbers.forEach((n)=>{
+    const r=18;
+    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();
+    ctx.strokeStyle='#e8552d';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.fillStyle='#111';ctx.font='bold 13px JetBrains Mono,monospace';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n.num,n.x,n.y);
+  });
 }
 
 function canvasPointerDown(e){
   e.preventDefault();
   const pos=getCanvasPos(e);
   if(editorMode==='number'){
-    // 既存番号のドラッグ判定
     const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<22);
     if(hit>=0){isDraggingNum=true;dragNumIdx=hit;dragOffX=pos.x-editorNumbers[hit].x;dragOffY=pos.y-editorNumbers[hit].y;}
     else{isDraggingNum=false;}
   }else if(editorMode==='crop'){
-    cropStart=pos;isCropping=true;
+    const handle=getCropHandle(pos);
+    if(handle){cropHandleDrag=handle;cropDragging=true;}
+    else if(cropActive&&pos.x>=cropBox.x&&pos.x<=cropBox.x+cropBox.w&&pos.y>=cropBox.y&&pos.y<=cropBox.y+cropBox.h){
+      // ボックス内ドラッグ（移動）
+      cropHandleDrag={id:'move'};cropDragging=true;
+      dragOffX=pos.x-cropBox.x;dragOffY=pos.y-cropBox.y;
+    }else{
+      // 新規クロップ開始
+      cropStart=pos;cropDragging=true;cropHandleDrag=null;cropActive=false;
+    }
   }
 }
 
@@ -1342,9 +1494,32 @@ function canvasPointerMove(e){
   e.preventDefault();
   if(!editorCanvas)return;
   const pos=getCanvasPos(e);
+  const c=editorCanvas;
   if(editorMode==='number'&&isDraggingNum&&dragNumIdx>=0){
     editorNumbers[dragNumIdx].x=pos.x-dragOffX;
     editorNumbers[dragNumIdx].y=pos.y-dragOffY;
+    drawEditor();
+  }else if(editorMode==='crop'&&cropDragging){
+    if(cropHandleDrag){
+      const id=cropHandleDrag.id;
+      if(id==='move'){
+        cropBox.x=Math.max(0,Math.min(c.width-cropBox.w,pos.x-dragOffX));
+        cropBox.y=Math.max(0,Math.min(c.height-cropBox.h,pos.y-dragOffY));
+      }else{
+        let{x,y,w,h}=cropBox;
+        if(id==='tl'){const nx=Math.min(pos.x,x+w-20);const ny=Math.min(pos.y,y+h-20);w=x+w-nx;h=y+h-ny;x=nx;y=ny;}
+        else if(id==='tr'){w=Math.max(20,pos.x-x);const ny=Math.min(pos.y,y+h-20);h=y+h-ny;y=ny;}
+        else if(id==='bl'){const nx=Math.min(pos.x,x+w-20);w=x+w-nx;x=nx;h=Math.max(20,pos.y-y);}
+        else if(id==='br'){w=Math.max(20,pos.x-x);h=Math.max(20,pos.y-y);}
+        cropBox={x:Math.max(0,x),y:Math.max(0,y),w:Math.min(c.width-x,w),h:Math.min(c.height-y,h)};
+      }
+    }else if(cropStart){
+      // 新規クロップ描画
+      const x=Math.min(cropStart.x,pos.x);const y=Math.min(cropStart.y,pos.y);
+      const w=Math.abs(pos.x-cropStart.x);const h=Math.abs(pos.y-cropStart.y);
+      cropBox={x:Math.max(0,x),y:Math.max(0,y),w:Math.min(c.width-x,w),h:Math.min(c.height-y,h)};
+      cropActive=true;
+    }
     drawEditor();
   }
 }
@@ -1354,31 +1529,18 @@ function canvasPointerUp(e){
   const pos=getCanvasPos(e);
   if(editorMode==='number'){
     if(isDraggingNum){isDraggingNum=false;dragNumIdx=-1;return;}
-    // 番号を削除（既存の番号をタップ）
     const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<22);
-    if(hit>=0){editorNumbers.splice(hit,1);// 番号を振り直し
-      editorNumbers.forEach((n,i)=>n.num=i+1);drawEditor();showToast('番号を削除しました');return;}
-    // 新しい番号を追加
+    if(hit>=0){editorNumbers.splice(hit,1);editorNumbers.forEach((n,i)=>n.num=i+1);drawEditor();showToast('番号を削除しました');return;}
     editorNumbers.push({x:pos.x,y:pos.y,num:editorNumbers.length+1});
     drawEditor();
-  }else if(editorMode==='crop'&&isCropping&&cropStart){
-    isCropping=false;
-    const dx=pos.x-cropStart.x;const dy=pos.y-cropStart.y;
-    if(Math.abs(dx)<10||Math.abs(dy)<10){cropStart=null;return;}
-    // canvas座標 → 画像座標に変換
-    const scaleX=editorImage.naturalWidth/editorCanvas.width;
-    const scaleY=editorImage.naturalHeight/editorCanvas.height;
-    const x0=Math.min(cropStart.x,pos.x);const y0=Math.min(cropStart.y,pos.y);
-    const w=Math.abs(dx);const h=Math.abs(dy);
-    cropRect={sx:x0*scaleX,sy:y0*scaleY,sw:w*scaleX,sh:h*scaleY};
-    // canvasリサイズ
-    const asp=w/h;
-    const maxW=editorCanvas.parentElement.clientWidth;
-    editorCanvas.width=Math.min(maxW,400);
-    editorCanvas.height=editorCanvas.width/asp;
-    editorMode='none';updateToolUI();
-    document.getElementById('editor-hint').textContent='トリミング完了！番号ツールで番号を追加できます';
-    drawEditor();showToast('✂️ トリミングしました');
+  }else if(editorMode==='crop'){
+    cropDragging=false;
+    if(cropBox.w>10&&cropBox.h>10){
+      cropActive=true;
+      document.getElementById('editor-hint').textContent='ハンドルをドラッグして調整・完了ボタンで確定';
+    }else{cropActive=false;}
+    cropHandleDrag=null;cropStart=null;
+    drawEditor();
   }
 }
 
@@ -1544,9 +1706,19 @@ function filterBrandMob(el,brand){
 function renderRankingWidgetMob(posts){
   const el=document.getElementById('ranking-widget-mob');if(!el)return;
   const bp=posts.filter(p=>!p.post_type||p.post_type==='board');
-  const sorted=[...bp].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
+  const monthAgo=Date.now()-30*24*60*60*1000;
+  const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);
+  const target=monthly.length>=3?monthly:bp;
+  const sorted=[...target].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:JetBrains Mono,monospace">まだ投稿がありません</div>';return;}
-  el.innerHTML=sorted.map((p,i)=>'<div class="ri" onclick="location.href=\'/post?id='+p.id+'\'"><div class="rn '+(i<2?'hi':'')+'">'+( i+1)+'</div><div class="ri-i"><div class="ri-t">'+p.title+'</div><div class="ri-u">'+(p.username||'匿名ユーザー')+'</div></div><div class="ri-s">❤️'+(p.likes||0)+'</div></div>').join('');
+  el.innerHTML=sorted.map((p,i)=>{
+    const crown=i===0?'<span style="margin-right:4px">👑</span>':'';
+    return '<div class="ri" onclick="location.href=\'/post?id='+p.id+'\'">'
+      +'<div class="rn '+(i<2?'hi':'')+'">'+crown+(i+1)+'</div>'
+      +'<div class="ri-i"><div class="ri-t">'+p.title+'</div>'
+      +'<div class="ri-u">'+(p.username||'匿名ユーザー')+'</div></div>'
+      +'<div class="ri-s">❤️'+(p.likes||0)+'</div></div>';
+  }).join('');
 }
 function renderGearWidgetMob(posts){
   const el=document.getElementById('gear-widget-mob');if(!el)return;
@@ -1554,8 +1726,12 @@ function renderGearWidgetMob(posts){
   posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
   const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:JetBrains Mono,monospace">データなし</div>';return;}
-  const max=sorted[0][1];
-  el.innerHTML=sorted.map(([n,c])=>'<div class="gr"><div class="gr-i"><div class="gr-n">'+n+'</div><div class="gr-b">'+c+'件の投稿</div></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(c/max*100)+'%"></div></div></div>').join('');
+  el.innerHTML=sorted.map(([n,c])=>'<div class="gr" style="cursor:pointer" onclick="filterByGearName(\''+n.replace(/'/g,"\\'")+'\')">'
+    +'<div class="gr-i"><div class="gr-n">'+n+'</div><div class="gr-b">'+c+'件の投稿</div></div>'
+    +'<a href="'+soundhouseUrl(n)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" '
+    +'title="サウンドハウスで見る" '
+    +'style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:13px;transition:all .15s">🔍</a>'
+    +'</div>').join('');
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
