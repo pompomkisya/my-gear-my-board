@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Gear My Board</title>
 <meta name="description" content="エフェクターボード＆機材を投稿・共有するSNS">
-  <meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--ac2:#f0a500;--tx:#eae8e2;--tm:#78766f;--td:#3e3c3a}
@@ -19,15 +19,23 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .logo-main{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:4px}
 .logo-sub{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-top:2px}
 .h-right{display:flex;align-items:center;gap:10px}
-.h-btn{display:flex;align-items:center;gap:6px;background:var(--ac);border:none;border-radius:4px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .18s}
+.h-btn{display:flex;align-items:center;gap:6px;background:var(--ac);border:none;border-radius:4px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .18s;position:relative}
 .h-btn:hover{background:#cf4c26;transform:translateY(-1px)}
 .h-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-size:14px;cursor:pointer;transition:all .15s;color:var(--tm)}
 .h-icon:hover{border-color:var(--ac);color:var(--ac)}
+
+/* 投稿ボタンドロップダウン */
+.post-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:var(--sf);border:1px solid var(--bd);border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:400;min-width:180px;display:none}
+.post-dropdown.open{display:block}
+.post-dropdown-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tx);cursor:pointer;transition:background .15s;border-bottom:1px solid var(--bd)}
+.post-dropdown-item:last-child{border-bottom:none}
+.post-dropdown-item:hover{background:rgba(232,85,45,.1);color:var(--ac)}
+
 .ticker{height:28px;background:var(--ac);display:flex;align-items:center;overflow:hidden}
 .ticker-lbl{background:#bf4224;height:100%;display:flex;align-items:center;padding:0 12px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:#fff;flex-shrink:0}
 .ticker-wrap{overflow:hidden;flex:1}
-.ticker-inner{display:flex;animation:tick 32s linear infinite;white-space:nowrap}
-.ti{padding:0 24px;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:600;color:rgba(255,255,255,.9);display:inline-flex;align-items:center}
+.ticker-inner{display:flex;animation:tick 40s linear infinite;white-space:nowrap}
+.ti{padding:0 24px;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:600;color:rgba(255,255,255,.9);display:inline-flex;align-items:center;cursor:pointer}
 .ti+.ti::before{content:'▸';margin-right:20px;opacity:.55}
 @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .wrap{display:grid;grid-template-columns:200px 1fr 260px;max-width:1280px;margin:0 auto}
@@ -60,7 +68,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .pb-btn{display:flex;align-items:center;justify-content:center;padding:9px 0;width:180px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s;border:none}
 .pb-btn.board{background:var(--ac);color:#fff}
 .pb-btn.board:hover{background:#cf4c26;transform:translateY(-1px)}
-.pb-btn.gear-b{background:#c0432000;background-color:rgba(232,85,45,.45);color:#fff;border:none}
+.pb-btn.gear-b{background-color:rgba(232,85,45,.45);color:#fff;border:none}
 .pb-btn.gear-b:hover{background-color:rgba(232,85,45,.6);transform:translateY(-1px)}
 .feed-tabs{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden;margin-bottom:14px}
 .feed-tab{flex:1;padding:7px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--td);cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;text-align:center}
@@ -113,13 +121,24 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .nth{width:44px;height:44px;border-radius:3px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .nr-t{font-size:10.5px;font-weight:500;line-height:1.4}
 .nr-d{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--td);margin-top:2px}
+.news-link{text-decoration:none;color:inherit;display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:color .15s}
+.news-link:last-child{border-bottom:none}
+.news-link:hover .nr-t{color:var(--ac)}
+
+/* 0件フィルター */
+.empty-filter{grid-column:1/-1;text-align:center;padding:40px 20px}
+.empty-filter-msg{font-size:13px;color:var(--tm);margin-bottom:8px;line-height:1.6}
+.empty-filter-promo{font-size:12px;color:var(--ac);margin-bottom:16px;font-weight:500}
+.empty-filter-btn{display:inline-block;padding:8px 20px;border:1px solid var(--ac);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ac);cursor:pointer;transition:all .15s;background:transparent}
+.empty-filter-btn:hover{background:rgba(232,85,45,.1)}
+
 .gear-input-wrap{position:relative}
 .gear-tags{display:flex;flex-wrap:wrap;gap:5px;min-height:36px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:6px 8px;cursor:text;transition:border-color .15s}
 .gear-tags:focus-within{border-color:var(--ac)}
 .gear-tag{display:flex;align-items:center;gap:4px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:2px;padding:2px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);white-space:nowrap}
 .gear-tag-x{cursor:pointer;font-size:12px;color:var(--ac);opacity:.7;background:none;border:none;padding:0}
 .gear-tag-x:hover{opacity:1}
-.gear-text-input{background:transparent;border:none;outline:none;font-size:12px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;min-width:140px;flex:1;padding:1px 2px}
+.gear-text-input{background:transparent;border:none;outline:none;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;min-width:140px;flex:1;padding:1px 2px}
 .gear-text-input::placeholder{color:var(--td)}
 .ac-dropdown{position:absolute;top:calc(100%+3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:200;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .ac-dropdown.open{display:block}
@@ -155,13 +174,14 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .skip-btn:hover{border-color:var(--tm);color:var(--tm)}
 .form-row{margin-bottom:14px}
 .form-lbl{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:#9a9890;margin-bottom:6px;display:block}
-.form-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 12px;font-size:13px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
+.form-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
 .form-input:focus{border-color:var(--ac)}
 .form-input::placeholder{color:var(--td)}
-textarea.form-input{resize:vertical;min-height:90px}
+textarea.form-input{resize:vertical;min-height:90px;font-size:16px}
 .genre-select{display:flex;flex-wrap:wrap;gap:5px}
-.gs{padding:4px 10px;border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--tm);cursor:pointer;transition:all .15s}
-.gs.on,.gs:hover{border-color:var(--ac);color:var(--ac);background:rgba(232,85,45,.08)}
+.gs{padding:4px 10px;border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--tm);cursor:pointer;transition:all .15s;user-select:none}
+.gs.on{border-color:var(--ac);color:var(--ac);background:rgba(232,85,45,.08)}
+.gs:hover:not(.on){border-color:var(--tm);color:var(--tx)}
 .upload-area{border:1.5px dashed var(--bd);border-radius:4px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .15s;color:var(--td);font-size:13px}
 .upload-area:hover{border-color:var(--ac);color:var(--ac)}
 .upload-icon{font-size:34px;margin-bottom:8px;display:block}
@@ -170,6 +190,8 @@ textarea.form-input{resize:vertical;min-height:90px}
 .photo-thumb img{width:100%;height:100%;object-fit:cover}
 .photo-remove{position:absolute;top:3px;right:3px;width:18px;height:18px;background:rgba(0,0,0,.75);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;color:#fff;border:none}
 .photo-remove:hover{background:var(--ac)}
+.photo-edit-btn{position:absolute;bottom:3px;left:3px;right:3px;background:rgba(0,0,0,.75);border:none;border-radius:3px;color:#fff;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.5px;padding:2px 4px;cursor:pointer;text-align:center;transition:background .15s}
+.photo-edit-btn:hover{background:var(--ac)}
 .photo-add-btn{width:90px;height:90px;border:1.5px dashed var(--bd);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--td);font-size:22px;transition:all .15s;flex-shrink:0;background:transparent}
 .photo-add-btn:hover{border-color:var(--ac);color:var(--ac)}
 .photo-add-label{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.3px}
@@ -224,58 +246,58 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 .footer-copy{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 
-/* ─── RESPONSIVE: タブレット ─── */
+/* ── 画像編集モーダル ── */
+.img-editor-bd{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:800;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s}
+.img-editor-bd.open{opacity:1;pointer-events:all}
+.img-editor-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.img-editor-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.img-editor-subtitle{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-top:2px}
+.img-editor-done{background:var(--ac);border:none;border-radius:4px;padding:8px 18px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer}
+.img-editor-done:hover{background:#cf4c26}
+.img-editor-canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;background:#000}
+#editor-canvas{max-width:100%;max-height:100%;display:block}
+.img-editor-toolbar{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-top:1px solid var(--bd);flex-shrink:0;flex-wrap:wrap}
+.editor-tool-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 14px;border-radius:4px;border:1px solid var(--bd);background:var(--sf);color:var(--tm);font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;min-width:60px}
+.editor-tool-btn:hover{border-color:var(--ac);color:var(--ac)}
+.editor-tool-btn.active{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
+.editor-tool-icon{font-size:18px}
+.img-editor-hint{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);text-align:center;padding:6px;flex-shrink:0}
+
+/* 初回ヒントバナー */
+.editor-intro{position:absolute;inset:0;background:rgba(0,0,0,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:10;padding:24px;text-align:center}
+.editor-intro h3{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--ac)}
+.editor-intro p{font-size:13px;color:var(--tm);line-height:1.6;max-width:280px}
+.editor-intro-btn{background:var(--ac);border:none;border-radius:4px;padding:10px 24px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;margin-top:4px}
+.editor-intro-skip{background:transparent;border:1px solid var(--bd);border-radius:4px;padding:8px 20px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--td);cursor:pointer}
+
+/* タブ：画像枚数ナビ */
+.img-tab-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.img-tab{padding:4px 12px;border-radius:3px;border:1px solid var(--bd);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s}
+.img-tab.on{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
+
+/* ─── RESPONSIVE ─── */
 @media(max-width:1024px){
   .wrap{grid-template-columns:180px 1fr}
   .sr{display:none}
 }
-
-/* ─── RESPONSIVE: スマホ（スワイプ式3パネル） ─── */
 @media(max-width:680px){
   .wrap{display:block}
   .sl{display:none}
   .sr{display:none}
   .feed{padding:0;border:none}
-
-  /* ヘッダー・ティッカーはそのままstickyで常時表示 */
   header{padding:0 14px;height:52px}
   .logo-main{font-size:17px;letter-spacing:2px}
   .logo-sub{font-size:6.5px;letter-spacing:2px}
   .h-btn{padding:7px 12px;font-size:9px;letter-spacing:1px}
-
-  /* スワイプUI全体 */
   #swipe-ui{overflow:hidden;width:100%}
-
-  /* インジケーター：スワイプコンテナの上に独立配置・stickyなし */
   .swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
   .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block}
   .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
-
-  /* スワイプコンテナ：幅300%・translateXでパネル切替 */
-  .swipe-container{
-    display:flex;
-    width:300%;
-    transition:transform .3s cubic-bezier(.25,.46,.45,.94);
-    will-change:transform;
-    align-items:flex-start;
-  }
-
-  /* 各パネル：幅は親の1/3（=画面幅） */
-  .swipe-panel{
-    width:33.333%;
-    flex-shrink:0;
-    min-height:calc(100vh - 108px);
-    overflow-y:auto;
-    overflow-x:hidden;
-    -webkit-overflow-scrolling:touch;
-  }
-
-  /* 左パネル */
+  .swipe-container{display:flex;width:300%;transition:transform .3s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start}
+  .swipe-panel{width:33.333%;flex-shrink:0;min-height:calc(100vh - 108px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
   .mob-left-panel{padding:16px 14px}
   .mob-panel-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:14px;color:var(--tx);display:flex;align-items:center;gap:8px}
   .mob-panel-title::after{content:'';flex:1;height:1px;background:var(--bd)}
-
-  /* 中央パネル：フィード */
   .mob-feed-inner{padding:12px 14px}
   .post-banner{padding:12px 14px;flex-direction:column;align-items:flex-start;gap:10px}
   .post-banner-btns{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -283,14 +305,13 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   .grid{grid-template-columns:1fr 1fr;gap:10px}
   .card .ct{font-size:12px}
   .feed-tabs .feed-tab{font-size:8px;padding:6px 4px;letter-spacing:.5px}
-
-  /* 右パネル */
   .mob-right-panel{padding:16px 14px}
   .mob-right-panel .widget{margin-bottom:14px}
-
   footer{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:10px}
   .footer-links{gap:12px}
   .pform{padding:20px 16px;margin:8px auto}
+  .img-editor-toolbar{gap:6px;padding:8px}
+  .editor-tool-btn{padding:6px 10px;min-width:52px}
 }
 </style>
 </head>
@@ -305,35 +326,30 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   </div>
   <div class="h-right">
     <div class="h-icon" onclick="toggleLang()" title="EN / JA">🌐</div>
-    <button class="h-btn" onclick="openPost('board')">＋ &nbsp;<span data-i="post_btn">投稿する</span></button>
+    <div style="position:relative">
+      <button class="h-btn" onclick="togglePostDropdown(event)">＋ &nbsp;<span data-i="post_btn">投稿する</span> ▾</button>
+      <div class="post-dropdown" id="post-dropdown">
+        <div class="post-dropdown-item" onclick="closeDropdownAndPost('board')">🎛 &nbsp;<span data-i="post_board_short">ボードを投稿</span></div>
+        <div class="post-dropdown-item" onclick="closeDropdownAndPost('gear')">🎸 &nbsp;<span data-i="post_gear_short">機材を投稿</span></div>
+      </div>
+    </div>
   </div>
 </header>
 <div class="ticker">
   <div class="ticker-lbl">NEW</div>
-  <div class="ticker-wrap"><div class="ticker-inner">
-    <span class="ti">新着 ▸ @anon_guitar「2025年夏ボード完成しました」</span>
-    <span class="ti">人気急上昇 ▸ Boss DS-1 使用者多数</span>
-    <span class="ti">MY NEW GEAR ▸ Strymon BigSky 入手！</span>
-    <span class="ti">今週1位 ▸ Ambientボードが話題</span>
-    <span class="ti">新着 ▸ @bass_lover「スラップ用ミニボード」</span>
-    <span class="ti">新着 ▸ @anon_guitar「2025年夏ボード完成しました」</span>
-    <span class="ti">人気急上昇 ▸ Boss DS-1 使用者多数</span>
-    <span class="ti">MY NEW GEAR ▸ Strymon BigSky 入手！</span>
-    <span class="ti">今週1位 ▸ Ambientボードが話題</span>
-    <span class="ti">新着 ▸ @bass_lover「スラップ用ミニボード」</span>
+  <div class="ticker-wrap"><div class="ticker-inner" id="ticker-inner">
+    <span class="ti">読み込み中...</span>
   </div></div>
 </div>
-<!-- ═══ スマホ用スワイプUI（PCでは非表示） ═══ -->
+
+<!-- スマホ用スワイプUI -->
 <div id="swipe-ui" style="display:none">
-  <!-- インジケーター：コンテナの外に独立 -->
   <div class="swipe-indicator">
     <div class="swipe-dot" onclick="goPanel(0)"></div>
     <div class="swipe-dot on" onclick="goPanel(1)"></div>
     <div class="swipe-dot" onclick="goPanel(2)"></div>
   </div>
-  <!-- スワイプコンテナ -->
   <div class="swipe-container" id="swipe-container">
-
     <!-- 左パネル：ジャンル・ブランド -->
     <div class="swipe-panel mob-left-panel">
       <div class="mob-panel-title">ジャンル</div>
@@ -426,7 +442,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
       </div>
     </div>
 
-    <!-- 右パネル：ランキング・ウィジェット -->
+    <!-- 右パネル -->
     <div class="swipe-panel mob-right-panel">
       <div class="mob-panel-title">今週の人気ボード</div>
       <div class="widget">
@@ -442,9 +458,8 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
       </div>
       <div style="height:40px"></div>
     </div>
-
-  </div><!-- /swipe-container -->
-</div><!-- /swipe-ui -->
+  </div>
+</div>
 
 <div class="wrap">
 <aside class="sl">
@@ -501,7 +516,6 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
     </div>
     <div class="brands-extra" id="brands-extra">
       <div class="tags">
-        <div class="tag" onclick="filterBrand(this,'Aguilar')">Aguilar</div>
         <div class="tag" onclick="filterBrand(this,'Animals Pedal')">Animals Pedal</div>
         <div class="tag" onclick="filterBrand(this,'Behringer')">Behringer</div>
         <div class="tag" onclick="filterBrand(this,'Chase Bliss Audio')">Chase Bliss</div>
@@ -533,23 +547,6 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   </div>
 </aside>
 <main class="feed">
-  <!-- スマホ用ジャンルバー（PCでは非表示） -->
-  <div class="mobile-genre-bar" id="mobile-genre-bar" style="display:none">
-    <div class="tag on" onclick="filterGenre(this,'ALL')">ALL</div>
-    <div class="tag" onclick="filterGenre(this,'ROCK')">ROCK</div>
-    <div class="tag" onclick="filterGenre(this,'BLUES')">BLUES</div>
-    <div class="tag" onclick="filterGenre(this,'JAZZ')">JAZZ</div>
-    <div class="tag" onclick="filterGenre(this,'METAL')">METAL</div>
-    <div class="tag" onclick="filterGenre(this,'FUNK')">FUNK</div>
-    <div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')">宅録</div>
-    <div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')">初心者相談</div>
-    <div class="tag" onclick="filterGenre(this,'AMBIENT')">AMBIENT</div>
-    <div class="tag" onclick="filterGenre(this,'SHOEGAZE')">SHOEGAZE</div>
-    <div class="tag" onclick="filterGenre(this,'POST ROCK')">POST ROCK</div>
-    <div class="tag" onclick="filterGenre(this,'INDIE')">INDIE</div>
-    <div class="tag" onclick="filterGenre(this,'ALTERNATIVE')">ALTERNATIVE</div>
-    <div class="tag" onclick="filterGenre(this,'PUNK')">PUNK</div>
-  </div>
   <div class="post-banner">
     <div class="post-banner-text">
       <strong data-i="banner_title">🎸 あなたのボードや機材を投稿しよう！</strong><br>
@@ -580,7 +577,6 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   <div class="ad-slot ad-side">
     <div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace">広告</div>
     <div style="font-size:10px;color:var(--tm)">Google AdSense</div>
-    <div style="font-size:8px;margin-top:3px;font-family:'JetBrains Mono',monospace;color:var(--td)">300×250</div>
   </div>
   <div class="widget">
     <div class="wt">🔥 <span data-i="widget_ranking">今週の人気ボード</span></div>
@@ -591,10 +587,18 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
     <div id="gear-widget"><div style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">読み込み中...</div></div>
   </div>
   <div class="widget">
-    <div class="wt">📰 <span data-i="widget_news">新製品ニュース</span></div>
-    <div class="nr"><div class="nth">🎛</div><div><div class="nr-t">Strymon Iridium Mk.II 国内発売</div><div class="nr-d">2025-03-20</div></div></div>
-    <div class="nr"><div class="nth">🔊</div><div><div class="nr-t">Boss GT-1000 CORE ファームv2.0</div><div class="nr-d">2025-03-18</div></div></div>
-    <div class="nr"><div class="nth">🎸</div><div><div class="nr-t">MXR Carbon Copy Deluxe 限定カラー</div><div class="nr-d">2025-03-15</div></div></div>
+    <div class="wt">📰 <span data-i="widget_news">機材NEWS</span></div>
+    <div id="news-widget">
+      <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=outlet" target="_blank" rel="noopener">
+        <div class="nth">💰</div><div><div class="nr-t">サウンドハウス アウトレット</div><div class="nr-d">お買い得品をチェック</div></div>
+      </a>
+      <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=sale" target="_blank" rel="noopener">
+        <div class="nth">🏷</div><div><div class="nr-t">サウンドハウス セール情報</div><div class="nr-d">期間限定セール中</div></div>
+      </a>
+      <a class="news-link" href="https://www.soundhouse.co.jp/categories/detail/218" target="_blank" rel="noopener">
+        <div class="nth">🎛</div><div><div class="nr-t">エフェクター新着</div><div class="nr-d">Soundhouse最新入荷</div></div>
+      </a>
+    </div>
   </div>
 </aside>
 </div>
@@ -609,6 +613,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   </div>
   <div class="footer-copy">© 2025 My Gear My Board. All rights reserved.</div>
 </footer>
+
 <!-- POST FORM -->
 <div class="pbd" id="post-bd" onclick="closeOnBd(event,'post-bd')">
   <div class="pform">
@@ -618,6 +623,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
       <div class="step-sub" id="step-sub">Step 1 / 5</div>
       <div class="step-dots" id="step-dots"></div>
     </div>
+    <!-- Step1: 写真 -->
     <div class="step-panel on" id="step-1">
       <label class="form-lbl" data-i="step1_lbl">写真（最大3枚・任意）</label>
       <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
@@ -631,6 +637,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
       <div class="step-nav"><button class="step-btn next" onclick="goStep(2)">次へ →</button></div>
       <button class="skip-btn" onclick="goStep(2)" data-i="skip">スキップ（写真なしで続ける）</button>
     </div>
+    <!-- Step2: ユーザー名・タイトル -->
     <div class="step-panel" id="step-2">
       <div class="form-row">
         <label class="form-lbl" data-i="lbl_username">ユーザー名（任意）</label>
@@ -646,6 +653,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
         <button class="step-btn next" onclick="goStep(3)">次へ →</button>
       </div>
     </div>
+    <!-- Step3: 機材 -->
     <div class="step-panel" id="step-3">
       <div class="form-row">
         <label class="form-lbl" data-i="lbl_gear">使用機材（画像に写っている機材名を記入）</label>
@@ -664,26 +672,27 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
       </div>
       <button class="skip-btn" onclick="goStep(4)" data-i="skip">スキップ</button>
     </div>
+    <!-- Step4: ジャンル・説明 -->
     <div class="step-panel" id="step-4">
       <div class="form-row">
         <label class="form-lbl" data-i="lbl_genre">ジャンル（複数選択OK）</label>
         <div class="genre-select" id="post-genre-select">
           <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:4px">定番</div>
-          <div class="gs" onclick="this.classList.toggle('on')">ROCK</div>
-          <div class="gs" onclick="this.classList.toggle('on')">BLUES</div>
-          <div class="gs" onclick="this.classList.toggle('on')">JAZZ</div>
-          <div class="gs" onclick="this.classList.toggle('on')">METAL</div>
-          <div class="gs" onclick="this.classList.toggle('on')">FUNK</div>
-          <div class="gs" onclick="this.classList.toggle('on')">宅録</div>
-          <div class="gs" onclick="this.classList.toggle('on')">初心者相談</div>
+          <div class="gs" data-val="ROCK" onclick="toggleGenre(this)">ROCK</div>
+          <div class="gs" data-val="BLUES" onclick="toggleGenre(this)">BLUES</div>
+          <div class="gs" data-val="JAZZ" onclick="toggleGenre(this)">JAZZ</div>
+          <div class="gs" data-val="METAL" onclick="toggleGenre(this)">METAL</div>
+          <div class="gs" data-val="FUNK" onclick="toggleGenre(this)">FUNK</div>
+          <div class="gs" data-val="宅録" onclick="toggleGenre(this)">宅録</div>
+          <div class="gs" data-val="初心者相談" onclick="toggleGenre(this)">初心者相談</div>
           <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:8px 0 4px">空間系</div>
-          <div class="gs" onclick="this.classList.toggle('on')">AMBIENT</div>
-          <div class="gs" onclick="this.classList.toggle('on')">SHOEGAZE</div>
-          <div class="gs" onclick="this.classList.toggle('on')">POST ROCK</div>
+          <div class="gs" data-val="AMBIENT" onclick="toggleGenre(this)">AMBIENT</div>
+          <div class="gs" data-val="SHOEGAZE" onclick="toggleGenre(this)">SHOEGAZE</div>
+          <div class="gs" data-val="POST ROCK" onclick="toggleGenre(this)">POST ROCK</div>
           <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:8px 0 4px">オルタナ系</div>
-          <div class="gs" onclick="this.classList.toggle('on')">INDIE</div>
-          <div class="gs" onclick="this.classList.toggle('on')">ALTERNATIVE</div>
-          <div class="gs" onclick="this.classList.toggle('on')">PUNK</div>
+          <div class="gs" data-val="INDIE" onclick="toggleGenre(this)">INDIE</div>
+          <div class="gs" data-val="ALTERNATIVE" onclick="toggleGenre(this)">ALTERNATIVE</div>
+          <div class="gs" data-val="PUNK" onclick="toggleGenre(this)">PUNK</div>
         </div>
       </div>
       <div class="form-row">
@@ -695,6 +704,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
         <button class="step-btn next" onclick="goStep(5)">次へ →</button>
       </div>
     </div>
+    <!-- Step5: 確認・PIN -->
     <div class="step-panel" id="step-5">
       <div class="confirm-box" id="confirm-content"></div>
       <div class="pass-box">
@@ -715,6 +725,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
     </div>
   </div>
 </div>
+
 <!-- EDIT MODAL -->
 <div class="ebd" id="edit-bd" onclick="closeOnBd(event,'edit-bd')">
   <div class="eform">
@@ -751,6 +762,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
     </div>
   </div>
 </div>
+
 <!-- 投稿完了モーダル -->
 <div class="done-bd" id="done-bd">
   <div class="done-box">
@@ -761,6 +773,40 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
+<!-- 画像編集モーダル -->
+<div class="img-editor-bd" id="img-editor-bd">
+  <div class="img-editor-header">
+    <div>
+      <div class="img-editor-title">画像編集</div>
+      <div class="img-editor-subtitle">トリミング・番号ステッカーを追加できます（任意）</div>
+    </div>
+    <button class="img-editor-done" onclick="finishEdit()">完了</button>
+  </div>
+  <div class="img-tab-bar" id="img-tab-bar"></div>
+  <div class="img-editor-canvas-wrap" id="canvas-wrap">
+    <canvas id="editor-canvas"></canvas>
+    <div class="editor-intro" id="editor-intro" style="display:none">
+      <h3>画像を編集</h3>
+      <p>番号ステッカーを追加して<br>ボード構成を見やすくできます。<br>スキップして直接投稿することもできます。</p>
+      <button class="editor-intro-btn" onclick="dismissIntro()">始める</button>
+      <button class="editor-intro-skip" onclick="finishEdit()">スキップして投稿</button>
+    </div>
+  </div>
+  <div class="img-editor-hint" id="editor-hint">ツールを選択してください</div>
+  <div class="img-editor-toolbar">
+    <button class="editor-tool-btn" id="tool-crop" onclick="setTool('crop')">
+      <span class="editor-tool-icon">✂️</span>トリミング
+    </button>
+    <button class="editor-tool-btn" id="tool-number" onclick="setTool('number')">
+      <span class="editor-tool-icon">🔢</span>番号追加
+    </button>
+    <button class="editor-tool-btn" id="tool-reset" onclick="resetEdits()">
+      <span class="editor-tool-icon">↩️</span>リセット
+    </button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
@@ -771,8 +817,10 @@ function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+M
 const SESSION_ID=getSessionId();
 
 const i18n={
-ja:{post_btn:'投稿する',menu:'メニュー',home:'ホーム',ranking:'人気ランキング',newest:'新着順',genre:'ジャンル',by_brand:'ブランドで絞る',g_standard:'定番',g_ambient:'空間系',g_alt:'オルタナ系',banner_title:'あなたのボードや機材を投稿しよう！',banner_sub:'登録不要・匿名OK。写真1枚から投稿できます。',post_board:'エフェクターボードを投稿',post_gear:'機材を投稿',tab_all:'すべて',tab_board:'エフェクターボード',tab_gear:'MY GEAR',sort_new:'新着',sort_pop:'人気',widget_ranking:'今週の人気ボード',widget_gear:'よく使われている機材',widget_news:'新製品ニュース',step1_lbl:'写真（最大3枚・任意）',step1_click:'クリックして写真を選択',step1_note:'最大3枚 · 1枚目がサムネイル',skip:'スキップ（写真なしで続ける）',lbl_username:'ユーザー名（任意）',lbl_gear:'使用機材（画像に写っている機材名を記入）',gear_note:'候補が出ない場合はEnterで追加できます',lbl_genre:'ジャンル（複数選択OK）',lbl_desc:'コメント・説明（任意）',pin_title:'🔑 編集用4桁パスワードを設定',pin_warn:'投稿後に編集・削除するときに必要です。忘れると変更できません。',submit:'投稿する',anon_note:'※ 登録不要・名前は任意です',done_title:'投稿完了！',done_close:'閉じる',privacy:'プライバシーポリシー',contact:'お問い合わせ',logo_sub:'ペダルボードSNS · Japan',done_board_sub:'あなたのボードが公開されました！',done_gear_sub:'あなたの機材が公開されました！',title_ph_board:'例：ライブ用最強ボード',title_ph_gear:'例：My New Gear',tag_takuroku:'宅録',tag_beginner:'初心者相談'},
-en:{post_btn:'Post',menu:'Menu',home:'Home',ranking:'Popular',newest:'Newest',genre:'Genre',by_brand:'Filter by Brand',g_standard:'Standard',g_ambient:'Ambient',g_alt:'Alternative',banner_title:'Share your board or gear!',banner_sub:'No registration needed. Post with just one photo.',post_board:'Post Pedalboard',post_gear:'Post My Gear',tab_all:'All',tab_board:'Pedalboards',tab_gear:'MY GEAR',sort_new:'New',sort_pop:'Popular',widget_ranking:'Top Boards This Week',widget_gear:'Popular Gear',widget_news:'New Products',step1_lbl:'Photos (up to 3, optional)',step1_click:'Click to select photos',step1_note:'Up to 3 · First is thumbnail',skip:'Skip (no photo)',lbl_username:'Username (optional)',lbl_gear:'Gear (type the names of gear in the photo)',gear_note:'Press Enter to add if no results',lbl_genre:'Genre (multiple OK)',lbl_desc:'Comment / Description (optional)',pin_title:'🔑 Set 4-digit edit PIN',pin_warn:'Required to edit or delete your post later. Do not forget it.',submit:'Post',anon_note:'* No registration needed',done_title:'Posted!',done_close:'Close',privacy:'Privacy Policy',contact:'Contact',logo_sub:'Pedalboard SNS · Japan',done_board_sub:'Your pedalboard is now live!',done_gear_sub:'Your gear is now live!',title_ph_board:'e.g. My Live Rig',title_ph_gear:'e.g. My New Gear',tag_takuroku:'Home Recording',tag_beginner:'Beginner Q&A'}
+ja:{post_btn:'投稿する',post_board_short:'ボードを投稿',post_gear_short:'機材を投稿',menu:'メニュー',home:'ホーム',ranking:'人気ランキング',newest:'新着順',genre:'ジャンル',by_brand:'ブランドで絞る',g_standard:'定番',g_ambient:'空間系',g_alt:'オルタナ系',banner_title:'あなたのボードや機材を投稿しよう！',banner_sub:'登録不要・匿名OK。写真1枚から投稿できます。',post_board:'エフェクターボードを投稿',post_gear:'機材を投稿',tab_all:'すべて',tab_board:'エフェクターボード',tab_gear:'MY GEAR',sort_new:'新着',sort_pop:'人気',widget_ranking:'今週の人気ボード',widget_gear:'よく使われている機材',widget_news:'機材NEWS',step1_lbl:'写真（最大3枚・任意）',step1_click:'クリックして写真を選択',step1_note:'最大3枚 · 1枚目がサムネイル',skip:'スキップ（写真なしで続ける）',lbl_username:'ユーザー名（任意）',lbl_gear:'使用機材（画像に写っている機材名を記入）',gear_note:'候補が出ない場合はEnterで追加できます',lbl_genre:'ジャンル（複数選択OK）',lbl_desc:'コメント・説明（任意）',pin_title:'🔑 編集用4桁パスワードを設定',pin_warn:'投稿後に編集・削除するときに必要です。忘れると変更できません。',submit:'投稿する',anon_note:'※ 登録不要・名前は任意です',done_title:'投稿完了！',done_close:'閉じる',privacy:'プライバシーポリシー',contact:'お問い合わせ',logo_sub:'ペダルボードSNS · Japan',done_board_sub:'あなたのボードが公開されました！',done_gear_sub:'あなたの機材が公開されました！',title_ph_board:'例：ライブ用最強ボード',title_ph_gear:'例：My New Gear',tag_takuroku:'宅録',tag_beginner:'初心者相談',
+empty_msg:'まだ投稿がありません',empty_promo_genre:'このジャンルで最初に投稿してみましょう！',empty_promo_brand:'このブランドの機材を投稿してみましょう！',empty_back:'← フィルターを解除'},
+en:{post_btn:'Post',post_board_short:'Post Board',post_gear_short:'Post Gear',menu:'Menu',home:'Home',ranking:'Popular',newest:'Newest',genre:'Genre',by_brand:'Filter by Brand',g_standard:'Standard',g_ambient:'Ambient',g_alt:'Alternative',banner_title:'Share your board or gear!',banner_sub:'No registration needed. Post with just one photo.',post_board:'Post Pedalboard',post_gear:'Post My Gear',tab_all:'All',tab_board:'Pedalboards',tab_gear:'MY GEAR',sort_new:'New',sort_pop:'Popular',widget_ranking:'Top Boards This Week',widget_gear:'Popular Gear',widget_news:'Gear NEWS',step1_lbl:'Photos (up to 3, optional)',step1_click:'Click to select photos',step1_note:'Up to 3 · First is thumbnail',skip:'Skip (no photo)',lbl_username:'Username (optional)',lbl_gear:'Gear (type the names of gear in the photo)',gear_note:'Press Enter to add if no results',lbl_genre:'Genre (multiple OK)',lbl_desc:'Comment / Description (optional)',pin_title:'🔑 Set 4-digit edit PIN',pin_warn:'Required to edit or delete your post later. Do not forget it.',submit:'Post',anon_note:'* No registration needed',done_title:'Posted!',done_close:'Close',privacy:'Privacy Policy',contact:'Contact',logo_sub:'Pedalboard SNS · Japan',done_board_sub:'Your pedalboard is now live!',done_gear_sub:'Your gear is now live!',title_ph_board:'e.g. My Live Rig',title_ph_gear:'e.g. My New Gear',tag_takuroku:'Home Recording',tag_beginner:'Beginner Q&A',
+empty_msg:'No posts yet',empty_promo_genre:'Be the first to post in this genre!',empty_promo_brand:'Be the first to post with this brand!',empty_back:'← Clear filter'}
 };
 let lang='ja';
 function t(k){return(i18n[lang]&&i18n[lang][k])||i18n.ja[k]||k;}
@@ -783,24 +831,47 @@ function applyLang(){
     else el.textContent=t(k);
   });
   const ls=document.getElementById('logo-sub');if(ls)ls.textContent=t('logo_sub');
-  // 宅録・初心者相談タグを翻訳
   document.querySelectorAll('.tag[data-genre="宅録"]').forEach(el=>el.textContent=t('tag_takuroku'));
   document.querySelectorAll('.tag[data-genre="初心者相談"]').forEach(el=>el.textContent=t('tag_beginner'));
-  // タイトルプレースホルダーを投稿タイプに合わせて更新
   const titleInput=document.getElementById('post-title');
   if(titleInput)titleInput.placeholder=t(currentPostType==='gear'?'title_ph_gear':'title_ph_board');
 }
 function toggleLang(){lang=lang==='ja'?'en':'ja';applyLang();if(allDBPosts.length)applyFilter();}
 
+// 投稿ドロップダウン
+function togglePostDropdown(e){
+  e.stopPropagation();
+  document.getElementById('post-dropdown').classList.toggle('open');
+}
+function closeDropdownAndPost(type){
+  document.getElementById('post-dropdown').classList.remove('open');
+  openPost(type);
+}
+document.addEventListener('click',()=>document.getElementById('post-dropdown').classList.remove('open'));
+
 let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentTab='all',currentSort='new',currentDBPost=null;
+
+// ティッカー生成
+function buildTicker(posts){
+  const inner=document.getElementById('ticker-inner');if(!inner)return;
+  const items=[];
+  const top=[...posts].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,3);
+  top.forEach(p=>items.push({text:(lang==='en'?'Popular ▸ ':'人気急上昇 ▸ ')+(p.title),id:p.id}));
+  const recent=[...posts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
+  recent.forEach(p=>items.push({text:(lang==='en'?'New ▸ @':'新着 ▸ @')+(p.username||'anon')+' 「'+p.title+'」',id:p.id}));
+  if(!items.length){inner.innerHTML='<span class="ti">My Gear My Board — エフェクターボードSNS</span><span class="ti">My Gear My Board — エフェクターボードSNS</span>';return;}
+  const doubled=[...items,...items];
+  inner.innerHTML=doubled.map(x=>'<span class="ti" onclick="location.href=\'/post?id='+x.id+'\'">'+x.text+'</span>').join('');
+}
 
 async function loadPostsFromDB(){
   const{data:posts,error}=await sb.from('posts').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);const g=document.getElementById('card-grid');if(g)g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">読み込みに失敗しました</div>';return;}
+  if(error){console.error(error);return;}
   const{data:cc}=await sb.from('comments').select('post_id');
   const cm={};if(cc)cc.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
   allDBPosts=(posts||[]).map(p=>({...p,comment_count:cm[p.id]||0}));
   applyFilter();
+  buildTicker(allDBPosts);
   renderRankingWidget(allDBPosts);renderGearWidget(allDBPosts);
   renderRankingWidgetMob(allDBPosts);renderGearWidgetMob(allDBPosts);
 }
@@ -817,6 +888,27 @@ function applyFilter(){
   }
   if(currentSort==='likes')posts.sort((a,b)=>(b.likes||0)-(a.likes||0));
   renderDBPosts(posts);
+}
+
+function getEmptyHTML(){
+  const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter!==null;
+  if(!isFiltered){
+    return '<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--td)">'+(lang==='en'?'No posts yet':'投稿がありません')+'</div>';
+  }
+  const label=currentBrandFilter||currentGenreFilter;
+  const promo=currentBrandFilter?t('empty_promo_brand'):t('empty_promo_genre');
+  return '<div class="empty-filter">'
+    +'<div class="empty-filter-msg">'+(lang==='en'?'No posts for':'「')+label+(lang==='en'?'':' 」の投稿はまだありません')+'</div>'
+    +'<div class="empty-filter-promo">'+promo+'</div>'
+    +'<div class="empty-filter-btn" onclick="clearFilter()">'+t('empty_back')+'</div>'
+    +'</div>';
+}
+
+function clearFilter(){
+  currentGenreFilter='ALL';currentBrandFilter=null;
+  document.querySelectorAll('.tag').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.tag').forEach(t=>{if(t.textContent==='ALL')t.classList.add('on');});
+  applyFilter();
 }
 
 function timeAgo(ts){
@@ -846,7 +938,7 @@ function renderDBPosts(posts){
       +'<div class="ct">'+p.title+'</div><div class="ptags">'+tags+'</div>'
       +'<div class="cf"><div class="st" onclick="toggleDBLike(event,\''+p.id+'\',this)">❤️ <span>'+(p.likes||0)+'</span></div>'
       +'<div class="st">💬 <span>'+(p.comment_count||0)+'</span></div></div></div></div>';
-  }).join(''):'<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">'+(lang==='en'?'No posts yet':'投稿がありません')+'</div>';
+  }).join(''):getEmptyHTML();
   if(grid)grid.innerHTML=html;
   if(gridMob)gridMob.innerHTML=html;
 }
@@ -866,8 +958,14 @@ async function toggleDBLike(e,postId,el){
   }
 }
 
-function filterGenre(el,genre){document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;applyFilter();}
-function filterBrand(el,brand){document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';applyFilter();}
+function filterGenre(el,genre){
+  document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;applyFilter();
+}
+function filterBrand(el,brand){
+  document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';applyFilter();
+}
 function setTab(el,tab){document.querySelectorAll('.feed-tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');currentTab=tab;applyFilter();}
 function setSort(el,sort){document.querySelectorAll('.sort-b').forEach(b=>b.classList.remove('on'));el.classList.add('on');currentSort=sort;applyFilter();}
 
@@ -888,15 +986,33 @@ function renderGearWidget(posts){
   el.innerHTML=sorted.map(([n,c])=>'<div class="gr"><div class="gr-i"><div class="gr-n">'+n+'</div><div class="gr-b">'+c+(lang==='en'?' posts':'件の投稿')+'</div></div><div class="bar-bg"><div class="bar-fill" style="width:'+Math.round(c/max*100)+'%"></div></div></div>').join('');
 }
 
-// GEAR AUTOCOMPLETE
+// ── ジャンル選択（安定版）
+function toggleGenre(el){
+  el.classList.toggle('on');
+}
+
+// ── GEAR AUTOCOMPLETE（前方一致）
 let selectedGears=[],acResults=[],acFocusIdx=-1;
 async function searchGear(val){
   const q=val.trim();closeAC();if(!q)return;
-  const{data}=await sb.from('pedals').select('brand,model,full_name').ilike('full_name','%'+q+'%').limit(10);
-  if(!data)return;acResults=data;acFocusIdx=-1;
+  // 単語の先頭一致：各単語がqで始まるものを優先
+  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name')
+    .or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%')
+    .limit(10);
+  let results=prefixData||[];
+  // 不足分を部分一致で補完
+  if(results.length<5){
+    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name')
+      .ilike('full_name','%'+q+'%').limit(10);
+    if(fuzzy){
+      fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
+    }
+  }
+  results=results.slice(0,10);
+  acResults=results;acFocusIdx=-1;
   const dd=document.getElementById('ac-dropdown');
-  if(!data.length){dd.innerHTML='<div class="ac-empty">「'+q+'」— 候補なし　Enterで追加</div>';dd.classList.add('open');return;}
-  dd.innerHTML=data.map((x,i)=>'<div class="ac-item" onmousedown="selectGear('+i+')" onmouseover="setACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>').join('');
+  if(!results.length){dd.innerHTML='<div class="ac-empty">「'+q+'」— 候補なし　Enterで追加</div>';dd.classList.add('open');return;}
+  dd.innerHTML=results.map((x,i)=>'<div class="ac-item" onmousedown="selectGear('+i+')" onmouseover="setACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>').join('');
   dd.classList.add('open');
 }
 function setACFocus(i){acFocusIdx=i;document.querySelectorAll('.ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
@@ -930,11 +1046,11 @@ function gearKeyDown(e){
 }
 function closeAC(){document.getElementById('ac-dropdown').classList.remove('open');}
 
-// ステップフォーム
+// ── ステップフォーム
 let currentStep=1,currentPostType='board';
 const TOTAL_STEPS=5;
 function openPost(type){
-  currentPostType=type||'board';currentStep=1;selectedGears=[];uploadedPhotos=[];
+  currentPostType=type||'board';currentStep=1;selectedGears=[];uploadedPhotos=[];editedPhotos=[];
   document.querySelectorAll('#post-genre-select .gs').forEach(g=>g.classList.remove('on'));
   ['post-username','post-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   const titleEl=document.getElementById('post-title');
@@ -959,43 +1075,59 @@ function renderConfirm(){
   const username=document.getElementById('post-username').value.trim()||(lang==='en'?'Anonymous':'匿名ユーザー');
   const title=document.getElementById('post-title').value.trim();
   const desc=document.getElementById('post-desc').value.trim();
-  const genres=[...document.querySelectorAll('#post-genre-select .gs.on')].map(el=>el.textContent.trim());
+  const genres=[...document.querySelectorAll('#post-genre-select .gs.on')].map(el=>el.getAttribute('data-val')||el.textContent.trim());
   document.getElementById('confirm-content').innerHTML=[
     ['タイプ',currentPostType==='board'?'エフェクターボード':'MY GEAR'],
     ['ユーザー名',username],['タイトル',title||'(未入力)'],
     ['機材',selectedGears.map(g=>g.name).join(', ')||'(未入力)'],
     ['ジャンル',genres.join(', ')||'(未選択)'],
     ['説明',desc?desc.slice(0,60)+(desc.length>60?'...':''):'(なし)'],
-    ['写真',uploadedPhotos.length+'枚'],
+    ['写真',(editedPhotos.filter(x=>x).length||uploadedPhotos.length)+'枚'],
   ].map(([l,v])=>'<div class="confirm-row"><div class="confirm-lbl">'+l+'</div><div class="confirm-val">'+v+'</div></div>').join('');
 }
 
-// 写真
-let uploadedPhotos=[];const MAX_PHOTOS=3;
+// ── 写真
+let uploadedPhotos=[];
+let editedPhotos=[];
+const MAX_PHOTOS=3;
 function handlePhotos(e){
   const files=Array.from(e.target.files);const rem=MAX_PHOTOS-uploadedPhotos.length;
-  files.slice(0,rem).forEach(f=>{const r=new FileReader();r.onload=ev=>{uploadedPhotos.push(ev.target.result);renderPhotoPreviews();};r.readAsDataURL(f);});
+  files.slice(0,rem).forEach(f=>{const r=new FileReader();r.onload=ev=>{uploadedPhotos.push(ev.target.result);editedPhotos.push(null);renderPhotoPreviews();};r.readAsDataURL(f);});
   if(files.length>rem)showToast('⚠️ 最大'+MAX_PHOTOS+'枚まで');e.target.value='';
 }
 function renderPhotoPreviews(){
   const wrap=document.getElementById('photo-previews');if(!wrap)return;
   const inp=document.getElementById('gear-search');
-  const thumbs=uploadedPhotos.map((src,i)=>'<div class="photo-thumb"><img src="'+src+'"><button class="photo-remove" onclick="removePhoto('+i+')">✕</button></div>').join('');
+  const thumbs=uploadedPhotos.map((src,i)=>{
+    const displaySrc=editedPhotos[i]||src;
+    return '<div class="photo-thumb"><img src="'+displaySrc+'">'
+      +'<button class="photo-remove" onclick="removePhoto('+i+')">✕</button>'
+      +'<button class="photo-edit-btn" onclick="openImgEditor('+i+')">✏️ 編集</button>'
+      +'</div>';
+  }).join('');
   const add=uploadedPhotos.length<MAX_PHOTOS?'<div class="photo-add-btn" onclick="document.getElementById(\'photo-input\').click()"><span>＋</span><span class="photo-add-label">追加</span></div>':'';
   wrap.innerHTML=thumbs+add;
   const cnt=document.getElementById('photo-count');if(cnt)cnt.textContent=uploadedPhotos.length+' / '+MAX_PHOTOS+'枚';
   const ua=document.getElementById('upload-area-main');if(ua)ua.style.display=uploadedPhotos.length>0?'none':'block';
 }
-function removePhoto(i){uploadedPhotos.splice(i,1);renderPhotoPreviews();}
+function removePhoto(i){uploadedPhotos.splice(i,1);editedPhotos.splice(i,1);renderPhotoPreviews();}
+
+function getFinalPhoto(i){return editedPhotos[i]||uploadedPhotos[i]||null;}
+
 async function uploadPhoto(b64,idx){
   try{
-    const res=await fetch(b64);const blob=await res.blob();
-    const ext=blob.type.includes('png')?'png':'jpg';
+    const byteStr=atob(b64.split(',')[1]);
+    const mime=b64.split(',')[0].split(':')[1].split(';')[0];
+    const ab=new ArrayBuffer(byteStr.length);
+    const ia=new Uint8Array(ab);
+    for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+    const blob=new Blob([ab],{type:mime});
+    const ext=mime.includes('png')?'png':'jpg';
     const fn='posts/'+Date.now()+'_'+idx+'.'+ext;
-    const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:blob.type});
+    const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime});
     if(error)return null;
     const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);return u.publicUrl;
-  }catch(e){return null;}
+  }catch(e){console.error(e);return null;}
 }
 
 async function submitPostToDB(){
@@ -1003,12 +1135,17 @@ async function submitPostToDB(){
   if(btn){btn.disabled=true;btn.textContent=lang==='en'?'Posting...':'投稿中...';}
   const title=document.getElementById('post-title').value.trim();
   const desc=document.getElementById('post-desc').value.trim();
-  const genres=[...document.querySelectorAll('#post-genre-select .gs.on')].map(el=>el.textContent.trim());
+  const genres=[...document.querySelectorAll('#post-genre-select .gs.on')].map(el=>el.getAttribute('data-val')||el.textContent.trim());
   const pin=['pd1','pd2','pd3','pd4'].map(id=>document.getElementById(id).value).join('');
   if(!title){showToast('❌ タイトルを入力してください');if(btn){btn.disabled=false;btn.textContent=t('submit');}return;}
   if(pin.length<4){showToast('❌ 4桁パスワードを設定してください');if(btn){btn.disabled=false;btn.textContent=t('submit');}return;}
   let image_urls=[];
-  if(uploadedPhotos.length>0){showToast('📤 画像をアップロード中...');const res=await Promise.all(uploadedPhotos.map((p,i)=>uploadPhoto(p,i)));image_urls=res.filter(u=>u!==null);}
+  if(uploadedPhotos.length>0){
+    showToast('📤 画像をアップロード中...');
+    const finals=uploadedPhotos.map((_,i)=>getFinalPhoto(i));
+    const res=await Promise.all(finals.map((p,i)=>p?uploadPhoto(p,i):null));
+    image_urls=res.filter(u=>u!==null);
+  }
   const{error}=await sb.from('posts').insert({
     username:document.getElementById('post-username').value.trim()||(lang==='en'?'Anonymous':'匿名ユーザー'),
     title,description:desc,genre:genres,
@@ -1016,9 +1153,9 @@ async function submitPostToDB(){
     image_urls,pin_hash:pin,likes:0,post_type:currentPostType
   });
   if(btn){btn.disabled=false;btn.textContent=t('submit');}
-  if(error){showToast('❌ '+JSON.stringify(error));console.error(error);return;}
+  if(error){showToast('❌ 投稿に失敗しました');console.error(error);return;}
   closeModal('post-bd');
-  selectedGears=[];uploadedPhotos=[];
+  selectedGears=[];uploadedPhotos=[];editedPhotos=[];
   ['post-username','post-title','post-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
   document.querySelectorAll('#post-genre-select .gs.on').forEach(el=>el.classList.remove('on'));
@@ -1026,6 +1163,237 @@ async function submitPostToDB(){
   document.getElementById('done-bd').classList.add('open');
   await loadPostsFromDB();
 }
+
+// ── 画像編集
+let editorPhotoIndex=0;
+let editorCanvas=null,editorCtx=null;
+let editorImage=null;
+let editorNumbers=[];
+let editorMode='none'; // 'crop' | 'number' | 'none'
+let cropStart=null,cropRect=null,isCropping=false;
+let isDraggingNum=false,dragNumIdx=-1,dragOffX=0,dragOffY=0;
+let editorIntroShown=false;
+
+function openImgEditor(idx){
+  editorPhotoIndex=idx;
+  editorNumbers=[];
+  editorMode='none';
+  cropStart=null;cropRect=null;isCropping=false;
+  const bd=document.getElementById('img-editor-bd');
+  bd.classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // タブ生成
+  const tabBar=document.getElementById('img-tab-bar');
+  tabBar.innerHTML=uploadedPhotos.map((_,i)=>'<div class="img-tab'+(i===idx?' on':'')+'" onclick="switchEditorPhoto('+i+')">写真'+(i+1)+'</div>').join('');
+
+  // 初回ヒント
+  if(!editorIntroShown){
+    document.getElementById('editor-intro').style.display='flex';
+  }
+
+  loadEditorImage(editedPhotos[idx]||uploadedPhotos[idx]);
+  updateToolUI();
+}
+
+function switchEditorPhoto(idx){
+  // 現在の編集を保存
+  saveCurrentEditorState();
+  editorPhotoIndex=idx;
+  editorNumbers=[];
+  editorMode='none';
+  cropStart=null;cropRect=null;
+  document.querySelectorAll('.img-tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  loadEditorImage(editedPhotos[idx]||uploadedPhotos[idx]);
+  updateToolUI();
+}
+
+function loadEditorImage(src){
+  const canvas=document.getElementById('editor-canvas');
+  const wrap=document.getElementById('canvas-wrap');
+  editorCanvas=canvas;editorCtx=canvas.getContext('2d');
+  const img=new Image();
+  img.onload=()=>{
+    editorImage=img;
+    const maxW=wrap.clientWidth||360;
+    const maxH=wrap.clientHeight||400;
+    const scale=Math.min(maxW/img.width,maxH/img.height,1);
+    canvas.width=Math.round(img.width*scale);
+    canvas.height=Math.round(img.height*scale);
+    drawEditor();
+  };
+  img.src=src;
+}
+
+function drawEditor(){
+  if(!editorCtx||!editorImage)return;
+  const c=editorCanvas,ctx=editorCtx;
+  ctx.clearRect(0,0,c.width,c.height);
+
+  if(cropRect){
+    // トリミングプレビュー
+    ctx.drawImage(editorImage,cropRect.sx,cropRect.sy,cropRect.sw,cropRect.sh,0,0,c.width,c.height);
+  }else{
+    ctx.drawImage(editorImage,0,0,c.width,c.height);
+  }
+
+  if(editorMode==='crop'&&cropStart&&!cropRect){
+    // クロップ矩形描画中
+  }
+
+  // 番号ステッカー
+  editorNumbers.forEach((n,i)=>{
+    const r=18;
+    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.fillStyle='#fff';ctx.fill();
+    ctx.strokeStyle='#e8552d';ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle='#111';ctx.font='bold 14px JetBrains Mono,monospace';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n.num,n.x,n.y);
+  });
+
+  if(editorMode==='crop'){
+    ctx.strokeStyle='rgba(232,85,45,.8)';ctx.lineWidth=1.5;ctx.setLineDash([6,3]);
+    ctx.strokeRect(0,0,c.width,c.height);ctx.setLineDash([]);
+  }
+}
+
+function setTool(mode){
+  if(editorMode===mode){editorMode='none';}else{editorMode=mode;}
+  updateToolUI();
+  const hints={crop:'画像をタップ＆ドラッグしてトリミング範囲を選択',number:'画像をタップして番号を配置',none:'ツールを選択してください'};
+  document.getElementById('editor-hint').textContent=hints[editorMode]||hints.none;
+  drawEditor();
+}
+
+function updateToolUI(){
+  ['crop','number'].forEach(id=>{
+    const btn=document.getElementById('tool-'+id);
+    if(btn)btn.classList.toggle('active',editorMode===id);
+  });
+}
+
+function resetEdits(){
+  editorNumbers=[];cropRect=null;cropStart=null;
+  loadEditorImage(uploadedPhotos[editorPhotoIndex]);
+  showToast('↩️ リセットしました');
+}
+
+function dismissIntro(){
+  document.getElementById('editor-intro').style.display='none';
+  editorIntroShown=true;
+}
+
+function saveCurrentEditorState(){
+  if(!editorCanvas||!editorImage)return;
+  // 現在のcanvas状態をeditedPhotosに保存
+  const c=document.createElement('canvas');
+  c.width=editorImage.naturalWidth;c.height=editorImage.naturalHeight;
+  const ctx=c.getContext('2d');
+  if(cropRect){
+    ctx.drawImage(editorImage,cropRect.sx,cropRect.sy,cropRect.sw,cropRect.sh,0,0,c.width,c.height);
+  }else{
+    ctx.drawImage(editorImage,0,0,c.width,c.height);
+  }
+  // 番号ステッカーを実寸で描画
+  const scaleX=c.width/editorCanvas.width;
+  const scaleY=c.height/editorCanvas.height;
+  editorNumbers.forEach(n=>{
+    const r=24;const nx=n.x*scaleX;const ny=n.y*scaleY;
+    ctx.beginPath();ctx.arc(nx,ny,r,0,Math.PI*2);
+    ctx.fillStyle='#fff';ctx.fill();
+    ctx.strokeStyle='#e8552d';ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle='#111';ctx.font='bold 18px JetBrains Mono,monospace';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(n.num,nx,ny);
+  });
+  editedPhotos[editorPhotoIndex]=c.toDataURL('image/jpeg',0.92);
+}
+
+function finishEdit(){
+  saveCurrentEditorState();
+  document.getElementById('img-editor-bd').classList.remove('open');
+  document.body.style.overflow='hidden'; // post formは引き続きopen
+  renderPhotoPreviews();
+  showToast('✅ 編集を保存しました');
+}
+
+// Canvas タッチ・マウスイベント
+function getCanvasPos(e){
+  const rect=editorCanvas.getBoundingClientRect();
+  const touch=e.touches?e.touches[0]:e;
+  return{x:touch.clientX-rect.left,y:touch.clientY-rect.top};
+}
+
+function canvasPointerDown(e){
+  e.preventDefault();
+  const pos=getCanvasPos(e);
+  if(editorMode==='number'){
+    // 既存番号のドラッグ判定
+    const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<22);
+    if(hit>=0){isDraggingNum=true;dragNumIdx=hit;dragOffX=pos.x-editorNumbers[hit].x;dragOffY=pos.y-editorNumbers[hit].y;}
+    else{isDraggingNum=false;}
+  }else if(editorMode==='crop'){
+    cropStart=pos;isCropping=true;
+  }
+}
+
+function canvasPointerMove(e){
+  e.preventDefault();
+  if(!editorCanvas)return;
+  const pos=getCanvasPos(e);
+  if(editorMode==='number'&&isDraggingNum&&dragNumIdx>=0){
+    editorNumbers[dragNumIdx].x=pos.x-dragOffX;
+    editorNumbers[dragNumIdx].y=pos.y-dragOffY;
+    drawEditor();
+  }
+}
+
+function canvasPointerUp(e){
+  e.preventDefault();
+  const pos=getCanvasPos(e);
+  if(editorMode==='number'){
+    if(isDraggingNum){isDraggingNum=false;dragNumIdx=-1;return;}
+    // 番号を削除（既存の番号をタップ）
+    const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<22);
+    if(hit>=0){editorNumbers.splice(hit,1);// 番号を振り直し
+      editorNumbers.forEach((n,i)=>n.num=i+1);drawEditor();showToast('番号を削除しました');return;}
+    // 新しい番号を追加
+    editorNumbers.push({x:pos.x,y:pos.y,num:editorNumbers.length+1});
+    drawEditor();
+  }else if(editorMode==='crop'&&isCropping&&cropStart){
+    isCropping=false;
+    const dx=pos.x-cropStart.x;const dy=pos.y-cropStart.y;
+    if(Math.abs(dx)<10||Math.abs(dy)<10){cropStart=null;return;}
+    // canvas座標 → 画像座標に変換
+    const scaleX=editorImage.naturalWidth/editorCanvas.width;
+    const scaleY=editorImage.naturalHeight/editorCanvas.height;
+    const x0=Math.min(cropStart.x,pos.x);const y0=Math.min(cropStart.y,pos.y);
+    const w=Math.abs(dx);const h=Math.abs(dy);
+    cropRect={sx:x0*scaleX,sy:y0*scaleY,sw:w*scaleX,sh:h*scaleY};
+    // canvasリサイズ
+    const asp=w/h;
+    const maxW=editorCanvas.parentElement.clientWidth;
+    editorCanvas.width=Math.min(maxW,400);
+    editorCanvas.height=editorCanvas.width/asp;
+    editorMode='none';updateToolUI();
+    document.getElementById('editor-hint').textContent='トリミング完了！番号ツールで番号を追加できます';
+    drawEditor();showToast('✂️ トリミングしました');
+  }
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    const c=document.getElementById('editor-canvas');
+    if(!c)return;
+    c.addEventListener('mousedown',canvasPointerDown);
+    c.addEventListener('mousemove',canvasPointerMove);
+    c.addEventListener('mouseup',canvasPointerUp);
+    c.addEventListener('touchstart',canvasPointerDown,{passive:false});
+    c.addEventListener('touchmove',canvasPointerMove,{passive:false});
+    c.addEventListener('touchend',canvasPointerUp,{passive:false});
+  },500);
+});
 
 function openEditModal(){
   if(!currentDBPost)return;
@@ -1088,17 +1456,17 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
   el.addEventListener('input',()=>{if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();if(el.value&&i===arr.length-1)verifyPin();});
   el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
 });
-// ─── スワイプUI ───
+
+// ── スワイプUI
 let currentPanel=1;
-let swipeStartX=0,swipeStartY=0,swipeCurX=0;
+let swipeStartX=0,swipeStartY=0;
 let isHorizSwipe=false,swipeDecided=false;
-const SWIPE_THRESHOLD=90;  // ①しきい値：90px（大きいほど鈍感・バネ感強め）
-const ANGLE_LOCK=0.4;      // ②縦スクロール判定：小さいほど厳しい（横成分がより明確に必要）
+const SWIPE_THRESHOLD=90;
+const ANGLE_LOCK=0.4;
 
 function goPanel(n){
   currentPanel=Math.max(0,Math.min(2,n));
-  const c=document.getElementById('swipe-container');
-  if(!c)return;
+  const c=document.getElementById('swipe-container');if(!c)return;
   const w=window.innerWidth;
   c.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';
   c.style.transform='translateX('+(-currentPanel*w)+'px)';
@@ -1106,81 +1474,52 @@ function goPanel(n){
 }
 
 function initSwipe(){
-  const c=document.getElementById('swipe-container');
-  if(!c)return;
-
-  // 初期位置をpxで設定
+  const c=document.getElementById('swipe-container');if(!c)return;
   c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';
-
-  // ③スクロールバー用スタイルをheadに追加
   const sbStyle=document.createElement('style');
-  sbStyle.textContent=`
-    .swipe-panel::-webkit-scrollbar{width:3px}
-    .swipe-panel::-webkit-scrollbar-track{background:transparent}
-    .swipe-panel::-webkit-scrollbar-thumb{background:transparent;border-radius:2px;transition:background .3s}
-    .swipe-panel.scrolling::-webkit-scrollbar-thumb{background:rgba(232,85,45,.5)}
-  `;
+  sbStyle.textContent=`.swipe-panel::-webkit-scrollbar{width:3px}.swipe-panel::-webkit-scrollbar-track{background:transparent}.swipe-panel::-webkit-scrollbar-thumb{background:transparent;border-radius:2px;transition:background .3s}.swipe-panel.scrolling::-webkit-scrollbar-thumb{background:rgba(232,85,45,.5)}`;
   document.head.appendChild(sbStyle);
 
   c.addEventListener('touchstart',e=>{
     swipeStartX=e.touches[0].clientX;
     swipeStartY=e.touches[0].clientY;
-    swipeCurX=swipeStartX;
-    isHorizSwipe=false;
-    swipeDecided=false;
+    isHorizSwipe=false;swipeDecided=false;
     c.style.transition='none';
   },{passive:true});
 
   c.addEventListener('touchmove',e=>{
     const dx=e.touches[0].clientX-swipeStartX;
     const dy=e.touches[0].clientY-swipeStartY;
-    swipeCurX=e.touches[0].clientX;
-
-    // ②方向判定：横成分がより明確な場合のみ横スワイプと判定
-    if(!swipeDecided&&(Math.abs(dx)>10||Math.abs(dy)>10)){
+    if(!swipeDecided&&(Math.abs(dx)>8||Math.abs(dy)>8)){
       swipeDecided=true;
       isHorizSwipe=Math.abs(dx)>Math.abs(dy)*(1/ANGLE_LOCK);
     }
-
     if(!isHorizSwipe){
-      // ③縦スクロール中はスクロールバーを一時表示
-      const panels=document.querySelectorAll('.swipe-panel');
-      panels.forEach(p=>p.classList.add('scrolling'));
+      document.querySelectorAll('.swipe-panel').forEach(p=>p.classList.add('scrolling'));
       return;
     }
-
-    // 端のパネルでは引っ張り感（抵抗）
+    // 横スワイプ中は縦スクロールをブロック
+    e.preventDefault&&e.cancelable&&e.preventDefault();
     let offset=-currentPanel*window.innerWidth+dx;
-    if((currentPanel===0&&dx>0)||(currentPanel===2&&dx<0)){
-      offset=-currentPanel*window.innerWidth+dx*0.25;
-    }
+    if((currentPanel===0&&dx>0)||(currentPanel===2&&dx<0))offset=-currentPanel*window.innerWidth+dx*0.25;
     c.style.transform='translateX('+offset+'px)';
-  },{passive:true});
+  },{passive:false});
 
   c.addEventListener('touchend',e=>{
-    // スクロールバーを非表示に戻す
-    document.querySelectorAll('.swipe-panel').forEach(p=>{
-      p.classList.remove('scrolling');
-    });
-
-    if(!isHorizSwipe){
-      goPanel(currentPanel);
-      return;
-    }
+    document.querySelectorAll('.swipe-panel').forEach(p=>p.classList.remove('scrolling'));
+    if(!isHorizSwipe){goPanel(currentPanel);return;}
     const dx=e.changedTouches[0].clientX-swipeStartX;
     if(dx<-SWIPE_THRESHOLD)goPanel(currentPanel+1);
     else if(dx>SWIPE_THRESHOLD)goPanel(currentPanel-1);
     else goPanel(currentPanel);
   },{passive:true});
 
-  // リサイズ時に位置を再計算
   window.addEventListener('resize',()=>{
     c.style.transition='none';
     c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';
   });
 }
 
-// スマホ/PC切り替え
 function checkMobile(){
   const isMob=window.innerWidth<=680;
   const swipeUI=document.getElementById('swipe-ui');
@@ -1192,25 +1531,16 @@ function checkMobile(){
 }
 window.addEventListener('resize',checkMobile);
 
-// モバイル用フィルター（ジャンル選択後→フィードパネルに自動移動）
 function filterGenreMob(el,genre){
   document.querySelectorAll('#swipe-ui .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');
-  currentGenreFilter=genre||'ALL';
-  currentBrandFilter=null;
-  applyFilter();
-  setTimeout(()=>goPanel(1),180); // フィードへ
+  el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;
+  applyFilter();setTimeout(()=>goPanel(1),180);
 }
 function filterBrandMob(el,brand){
   document.querySelectorAll('#swipe-ui .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');
-  currentBrandFilter=brand;
-  currentGenreFilter='ALL';
-  applyFilter();
-  setTimeout(()=>goPanel(1),180); // フィードへ
+  el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';
+  applyFilter();setTimeout(()=>goPanel(1),180);
 }
-
-// スマホ用ウィジェット描画
 function renderRankingWidgetMob(posts){
   const el=document.getElementById('ranking-widget-mob');if(!el)return;
   const bp=posts.filter(p=>!p.post_type||p.post_type==='board');
