@@ -183,7 +183,18 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div id="edit-step2" style="display:none">
       <div class="eform-title">記事を編集</div>
       <div class="eform-sub" style="color:#4caf50">✅ パスワード認証が完了しました</div>
+      <!-- 画像編集セクション -->
       <div class="form-row" style="margin-top:16px">
+        <label class="form-lbl">画像を編集・差し替え</label>
+        <div id="edit-photo-previews" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
+        <input type="file" id="edit-photo-input" accept="image/*" multiple style="display:none" onchange="handleEditPhotos(event)">
+        <button type="button" onclick="document.getElementById('edit-photo-input').click()"
+          style="width:100%;padding:8px;border:1.5px dashed var(--bd);border-radius:4px;background:transparent;color:var(--td);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;cursor:pointer;touch-action:manipulation">
+          ＋ 写真を追加・変更（最大3枚）
+        </button>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:4px">※ 既存の写真はサムネイルをタップして削除できます</div>
+      </div>
+      <div class="form-row">
         <label class="form-lbl">タイトル</label>
         <input class="form-input" id="edit-title" type="text">
       </div>
@@ -501,10 +512,13 @@ function verifyPin(){
     const gear=Array.isArray(currentPost.gear_list)?currentPost.gear_list:[];
     document.getElementById('edit-pedals').value=gear.map(g=>g.name||g).join(', ');
     document.getElementById('edit-desc').value=currentPost.description||'';
-    // YouTubeのURLだけ抽出
     const ytRaw=currentPost.youtube_url||'';
     const ytMatch=ytRaw.match(/(https?:\/\/[^\s]+)/);
     document.getElementById('edit-youtube').value=ytMatch?ytMatch[1]:'';
+    // 既存画像プレビュー
+    editPhotoUrls=[...(currentPost.image_urls||[])];
+    editNewPhotos=[];
+    renderEditPhotoPreviews();
     document.getElementById('edit-step2').style.display='block';
     if(isMaster)showToast('🔑 管理者としてログインしました');
   }else{
@@ -513,6 +527,74 @@ function verifyPin(){
     document.getElementById('pin1').focus();
   }
 }
+
+// 編集フォームの画像管理
+let editPhotoUrls=[];
+let editNewPhotos=[];
+
+function renderEditPhotoPreviews(){
+  const wrap=document.getElementById('edit-photo-previews');if(!wrap)return;
+  wrap.innerHTML='';
+  editPhotoUrls.forEach((url,i)=>{
+    const div=document.createElement('div');
+    div.style.cssText='position:relative;width:80px;height:80px;border-radius:4px;overflow:hidden;border:1px solid var(--bd);flex-shrink:0';
+    div.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:cover">'
+      +'<button onclick="removeEditUrlPhoto('+i+')" style="position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.75);border-radius:50%;border:none;color:#fff;font-size:10px;cursor:pointer;touch-action:manipulation">✕</button>';
+    wrap.appendChild(div);
+  });
+  editNewPhotos.forEach((src,i)=>{
+    const div=document.createElement('div');
+    div.style.cssText='position:relative;width:80px;height:80px;border-radius:4px;overflow:hidden;border:1px solid rgba(232,85,45,.5);flex-shrink:0';
+    div.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:cover">'
+      +'<button onclick="removeEditNewPhoto('+i+')" style="position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.75);border-radius:50%;border:none;color:#fff;font-size:10px;cursor:pointer;touch-action:manipulation">✕</button>'
+      +'<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(232,85,45,.8);font-family:JetBrains Mono,monospace;font-size:7px;text-align:center;color:#fff;padding:2px">新規</div>';
+    wrap.appendChild(div);
+  });
+}
+function removeEditUrlPhoto(i){editPhotoUrls.splice(i,1);renderEditPhotoPreviews();}
+function removeEditNewPhoto(i){editNewPhotos.splice(i,1);renderEditPhotoPreviews();}
+
+async function handleEditPhotos(e){
+  const files=Array.from(e.target.files);
+  const max=3-(editPhotoUrls.length+editNewPhotos.length);
+  if(max<=0){showToast('⚠️ 最大3枚まで');e.target.value='';return;}
+  for(const f of files.slice(0,max)){
+    const compressed=await compressEditImage(f);
+    editNewPhotos.push(compressed);
+    renderEditPhotoPreviews();
+  }
+  e.target.value='';
+}
+
+function compressEditImage(file){
+  return new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        let{width,height}=img;const MAX=1280;
+        if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}
+        const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        resolve(canvas.toDataURL('image/jpeg',0.82));
+      };img.src=ev.target.result;
+    };r.readAsDataURL(file);
+  });
+}
+
+async function uploadEditPhoto(b64){
+  const byteStr=atob(b64.split(',')[1]);
+  const mime=b64.split(',')[0].split(':')[1].split(';')[0];
+  const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);
+  for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+  const blob=new Blob([ab],{type:mime});
+  const fn='posts/'+Date.now()+'_edit.'+( mime.includes('png')?'png':'jpg');
+  const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime});
+  if(error)return null;
+  const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);
+  return u.publicUrl;
+}
+
 async function saveEdit(){
   const title=document.getElementById('edit-title').value.trim();
   if(!title){showToast('タイトルを入力してください');return;}
@@ -520,7 +602,14 @@ async function saveEdit(){
   const gear_list=gt?gt.split(',').map(s=>({name:s.trim()})).filter(g=>g.name):[];
   const description=document.getElementById('edit-desc').value.trim();
   const youtube_url=document.getElementById('edit-youtube').value.trim()||null;
-  const{error}=await sb.from('posts').update({title,gear_list,description,youtube_url}).eq('id',POST_ID);
+  // 新規画像をアップロード
+  let newUrls=[];
+  if(editNewPhotos.length>0){
+    showToast('📤 画像をアップロード中...');
+    for(const b64 of editNewPhotos){const url=await uploadEditPhoto(b64);if(url)newUrls.push(url);}
+  }
+  const image_urls=[...editPhotoUrls,...newUrls];
+  const{error}=await sb.from('posts').update({title,gear_list,description,youtube_url,image_urls}).eq('id',POST_ID);
   if(error){showToast('❌ 更新に失敗しました');return;}
   closeModal('edit-bd');showToast('✅ 投稿を更新しました');await loadPost();
 }
