@@ -107,10 +107,11 @@ function timeAgo(ts){
 }
 
 function getEmptyHTML(){
-  const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter!==null;
+  const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter!==null||currentFxFilter!==null;
   if(!isFiltered)return '<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--td)">投稿がありません</div>';
-  const label=currentBrandFilter||currentGenreFilter;
-  return '<div class="empty-filter"><div class="empty-filter-msg">「'+label+'」の投稿はまだありません</div><div class="empty-filter-promo">このジャンルで最初に投稿してみましょう！</div><div class="empty-filter-btn" onclick="clearFilter()">← フィルターを解除</div></div>';
+  const label=currentFxFilter||currentBrandFilter||currentGenreFilter;
+  const promo=currentFxFilter?'このエフェクタータイプを使った投稿がまだありません':currentBrandFilter?'このブランドの機材を投稿してみましょう！':'このジャンルで最初に投稿してみましょう！';
+  return '<div class="empty-filter"><div class="empty-filter-msg">「'+label+'」の投稿はまだありません</div><div class="empty-filter-promo">'+promo+'</div><div class="empty-filter-btn" onclick="clearFilter()">← フィルターを解除</div></div>';
 }
 
 function clearFilter(){
@@ -634,6 +635,25 @@ function updateToolUI(){
 }
 function resetEdits(){editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropStart=null;loadEditorImage(uploadedPhotos[editorPhotoIndex]);showToast('↩️ リセットしました');}
 
+// 画像を90度右回転
+function rotateImage(){
+  if(!editorImage)return;
+  const canvas=document.createElement('canvas');
+  canvas.width=editorImage.naturalHeight;
+  canvas.height=editorImage.naturalWidth;
+  const ctx=canvas.getContext('2d');
+  ctx.translate(canvas.width/2,canvas.height/2);
+  ctx.rotate(Math.PI/2);
+  ctx.drawImage(editorImage,-editorImage.naturalWidth/2,-editorImage.naturalHeight/2);
+  const rotated=canvas.toDataURL('image/jpeg',0.92);
+  // 回転後の画像をベースとして更新
+  uploadedPhotos[editorPhotoIndex]=rotated;
+  editedPhotos[editorPhotoIndex]=null;
+  editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;
+  loadEditorImage(rotated);
+  showToast('🔄 90度回転しました');
+}
+
 function saveCurrentEditorState(){
   if(!editorCanvas||!editorImage)return;
   const c=editorCanvas;let sx=0,sy=0,sw=editorImage.naturalWidth,sh=editorImage.naturalHeight;
@@ -763,6 +783,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 function toggleBrands(){const ex=document.getElementById('brands-extra');const lbl=document.getElementById('brand-toggle-label');const o=ex.classList.toggle('open');lbl.textContent=o?'▲ 閉じる':'▼ もっと見る（A–Z）';}
+function toggleBrandsMob(){const ex=document.getElementById('mob-brands-extra');const lbl=document.getElementById('mob-brand-toggle-label');const o=ex.classList.toggle('open');lbl.textContent=o?'▲ 閉じる':'▼ もっと見る（A–Z）';}
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 function closeOnBd(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 function closeAll(){['post-bd','edit-bd'].forEach(closeModal);document.getElementById('done-bd').classList.remove('open');}
@@ -814,10 +835,9 @@ function checkMobile(){
   const isMob=window.innerWidth<=680;
   const swipeUI=document.getElementById('swipe-ui');
   const pcWrap=document.querySelector('.wrap');
-  const footer=document.querySelector('footer');
   if(swipeUI)swipeUI.style.display=isMob?'block':'none';
   if(pcWrap)pcWrap.style.display=isMob?'none':'grid';
-  if(footer)footer.style.display=isMob?'none':'flex';
+  // フッターはPC・スマホ両方表示
 }
 window.addEventListener('resize',checkMobile);
 
