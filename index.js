@@ -64,14 +64,16 @@ function applyFilter(){
   // フリーワード検索
   if(currentSearchQuery){
     posts=posts.filter(p=>searchMatches(p,currentSearchQuery));
+    const badgeText='「'+currentSearchQuery+'」の検索結果：'+posts.length+'件';
     const badge=document.getElementById('search-badge');
-    if(badge){
-      badge.textContent='「'+currentSearchQuery+'」の検索結果：'+posts.length+'件';
-      badge.classList.add('show');
-    }
+    if(badge){badge.textContent=badgeText;badge.classList.add('show');}
+    const mobBadge=document.getElementById('mob-search-badge');
+    if(mobBadge){mobBadge.textContent=badgeText;mobBadge.classList.add('show');}
   }else{
     const badge=document.getElementById('search-badge');
     if(badge)badge.classList.remove('show');
+    const mobBadge=document.getElementById('mob-search-badge');
+    if(mobBadge)mobBadge.classList.remove('show');
   }
   if(currentSort==='likes')posts.sort((a,b)=>(b.likes||0)-(a.likes||0));
   renderDBPosts(posts);
@@ -196,7 +198,7 @@ function filterByGearName(name){
   if(window.innerWidth<=680)setTimeout(()=>goPanel(1),180);
 }
 
-// ── フリーワード検索
+// ── フリーワード検索（PC用）
 let currentSearchQuery='';
 
 function handleSearch(val){
@@ -213,6 +215,25 @@ function clearSearch(){
   const clearBtn=document.getElementById('h-search-clear');
   if(clearBtn)clearBtn.classList.remove('show');
   const badge=document.getElementById('search-badge');
+  if(badge)badge.classList.remove('show');
+  applyFilter();
+}
+
+// スマホ用検索
+function handleSearchMob(val){
+  currentSearchQuery=val.trim();
+  const clearBtn=document.getElementById('mob-search-clear');
+  if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);
+  applyFilter();
+}
+
+function clearSearchMob(){
+  currentSearchQuery='';
+  const input=document.getElementById('mob-search');
+  if(input)input.value='';
+  const clearBtn=document.getElementById('mob-search-clear');
+  if(clearBtn)clearBtn.classList.remove('show');
+  const badge=document.getElementById('mob-search-badge');
   if(badge)badge.classList.remove('show');
   applyFilter();
 }
