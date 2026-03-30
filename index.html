@@ -256,19 +256,24 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 .img-editor-bd{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:800;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s}
 .img-editor-bd.open{opacity:1;pointer-events:all}
-.img-editor-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.img-editor-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .img-editor-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
 .img-editor-subtitle{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-top:2px}
-.img-editor-done{background:var(--ac);border:none;border-radius:4px;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;min-height:44px;touch-action:manipulation}
 .img-editor-canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;background:#000}
 #editor-canvas{max-width:100%;max-height:100%;display:block;touch-action:none}
-.img-editor-toolbar{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-top:1px solid var(--bd);flex-shrink:0;flex-wrap:wrap}
-.editor-tool-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 16px;border-radius:4px;border:1px solid var(--bd);background:var(--sf);color:var(--tm);font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;min-width:64px;min-height:54px;touch-action:manipulation}
-.editor-tool-btn.active{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
-.editor-tool-icon{font-size:20px}
-.img-editor-hint{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);text-align:center;padding:6px;flex-shrink:0}
-.img-tab-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
-.img-tab{padding:6px 14px;border-radius:3px;border:1px solid var(--bd);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--tm);cursor:pointer;min-height:36px;touch-action:manipulation}
+/* ツールバー：下部に完了ボタン込み */
+.img-editor-toolbar{display:flex;align-items:center;gap:6px;padding:10px 12px;border-top:1px solid var(--bd);flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;background:var(--sf)}
+.editor-tool-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--sf2);color:var(--tm);font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;flex-shrink:0;min-width:58px;min-height:52px;touch-action:manipulation;transition:all .15s}
+.editor-tool-btn:hover{border-color:var(--ac);color:var(--ac)}
+.editor-tool-btn.active{background:rgba(232,85,45,.2);border-color:var(--ac);color:var(--ac)}
+.editor-tool-icon{font-size:18px;line-height:1}
+/* 完了ボタンをツールバー右端に */
+.editor-done-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 14px;border-radius:6px;border:none;background:var(--ac);color:#fff;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;flex-shrink:0;min-width:58px;min-height:52px;touch-action:manipulation;margin-left:auto}
+.editor-done-btn:hover{background:#cf4c26}
+.editor-done-icon{font-size:18px;line-height:1}
+.img-editor-hint{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);text-align:center;padding:5px;flex-shrink:0;background:var(--bg)}
+.img-tab-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--bg)}
+.img-tab{padding:5px 12px;border-radius:3px;border:1px solid var(--bd);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--tm);cursor:pointer;min-height:32px;touch-action:manipulation}
 .img-tab.on{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
 @media(max-width:1024px){.wrap{grid-template-columns:180px 1fr}.sr{display:none}}
 @media(max-width:680px){
@@ -373,7 +378,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </div>
       <div class="mob-panel-title" style="margin-top:4px">ブランド</div>
       <div class="tags" style="margin-bottom:6px">
-        <div class="tag" onclick="filterBrandMob(this,'Boss')">Boss</div>
+        <div class="tag" onclick="filterBrandMob(this,'BOSS')">BOSS</div>
         <div class="tag" onclick="filterBrandMob(this,'DigiTech')">DigiTech</div>
         <div class="tag" onclick="filterBrandMob(this,'Electro-Harmonix')">EHX</div>
         <div class="tag" onclick="filterBrandMob(this,'Free The Tone')">Free The Tone</div>
@@ -387,37 +392,147 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <div class="brand-more-btn" id="mob-brand-toggle" onclick="toggleBrandsMob()"><span id="mob-brand-toggle-label">▼ もっと見る（A–Z）</span></div>
       <div class="brands-extra" id="mob-brands-extra">
         <div class="tags" style="margin-bottom:6px">
+          <div class="tag" onclick="filterBrandMob(this,'Aguilar')">Aguilar</div>
+          <div class="tag" onclick="filterBrandMob(this,'Alexander Pedals')">Alexander</div>
+          <div class="tag" onclick="filterBrandMob(this,'Ammoon')">Ammoon</div>
+          <div class="tag" onclick="filterBrandMob(this,'Analogman')">Analogman</div>
+          <div class="tag" onclick="filterBrandMob(this,'Anasounds')">Anasounds</div>
           <div class="tag" onclick="filterBrandMob(this,'Animals Pedal')">Animals Pedal</div>
+          <div class="tag" onclick="filterBrandMob(this,'Arc Effects')">Arc Effects</div>
+          <div class="tag" onclick="filterBrandMob(this,'Arion')">Arion</div>
+          <div class="tag" onclick="filterBrandMob(this,'Atomic')">Atomic</div>
+          <div class="tag" onclick="filterBrandMob(this,'Azor')">Azor</div>
+          <div class="tag" onclick="filterBrandMob(this,'Bananana Effects')">Bananana</div>
+          <div class="tag" onclick="filterBrandMob(this,'Beetronics')">Beetronics</div>
           <div class="tag" onclick="filterBrandMob(this,'Behringer')">Behringer</div>
+          <div class="tag" onclick="filterBrandMob(this,'Benson')">Benson</div>
+          <div class="tag" onclick="filterBrandMob(this,'BJFE')">BJFE</div>
+          <div class="tag" onclick="filterBrandMob(this,'Black Mass Electronics')">Black Mass</div>
+          <div class="tag" onclick="filterBrandMob(this,'Bogner')">Bogner</div>
+          <div class="tag" onclick="filterBrandMob(this,'Caline')">Caline</div>
+          <div class="tag" onclick="filterBrandMob(this,'Carl Martin')">Carl Martin</div>
+          <div class="tag" onclick="filterBrandMob(this,'Caroline Guitar Co.')">Caroline</div>
+          <div class="tag" onclick="filterBrandMob(this,'Catalinbread')">Catalinbread</div>
+          <div class="tag" onclick="filterBrandMob(this,'Champion Leccy')">Champion Leccy</div>
           <div class="tag" onclick="filterBrandMob(this,'Chase Bliss Audio')">Chase Bliss</div>
+          <div class="tag" onclick="filterBrandMob(this,'Chase Tone')">Chase Tone</div>
+          <div class="tag" onclick="filterBrandMob(this,'Cioks')">Cioks</div>
+          <div class="tag" onclick="filterBrandMob(this,'Circuitous FX')">Circuitous FX</div>
+          <div class="tag" onclick="filterBrandMob(this,'Cooper FX')">Cooper FX</div>
+          <div class="tag" onclick="filterBrandMob(this,'Cornerstone')">Cornerstone</div>
+          <div class="tag" onclick="filterBrandMob(this,'Crazy Tube Circuits')">Crazy Tube</div>
+          <div class="tag" onclick="filterBrandMob(this,'Critter & Guitari')">Critter</div>
+          <div class="tag" onclick="filterBrandMob(this,'D\'Addario')">D'Addario</div>
           <div class="tag" onclick="filterBrandMob(this,'Darkglass Electronics')">Darkglass</div>
           <div class="tag" onclick="filterBrandMob(this,'Death By Audio')">Death By Audio</div>
+          <div class="tag" onclick="filterBrandMob(this,'Diezel')">Diezel</div>
+          <div class="tag" onclick="filterBrandMob(this,'Disaster Area')">Disaster Area</div>
           <div class="tag" onclick="filterBrandMob(this,'DOD')">DOD</div>
+          <div class="tag" onclick="filterBrandMob(this,'Donner')">Donner</div>
+          <div class="tag" onclick="filterBrandMob(this,'Dr Scientist')">Dr Scientist</div>
+          <div class="tag" onclick="filterBrandMob(this,'DSM & Humboldt')">DSM</div>
+          <div class="tag" onclick="filterBrandMob(this,'Dwarfcraft Devices')">Dwarfcraft</div>
           <div class="tag" onclick="filterBrandMob(this,'EarthQuaker Devices')">EarthQuaker</div>
+          <div class="tag" onclick="filterBrandMob(this,'Effects Bakery')">Effects Bakery</div>
+          <div class="tag" onclick="filterBrandMob(this,'Electro-Harmonix')">EHX</div>
           <div class="tag" onclick="filterBrandMob(this,'Empress Effects')">Empress</div>
+          <div class="tag" onclick="filterBrandMob(this,'ENO')">ENO</div>
           <div class="tag" onclick="filterBrandMob(this,'Eventide')">Eventide</div>
+          <div class="tag" onclick="filterBrandMob(this,'Fairfield Circuitry')">Fairfield</div>
           <div class="tag" onclick="filterBrandMob(this,'Fender')">Fender</div>
+          <div class="tag" onclick="filterBrandMob(this,'Finegear')">Finegear</div>
+          <div class="tag" onclick="filterBrandMob(this,'Fjord Fuzz')">Fjord Fuzz</div>
+          <div class="tag" onclick="filterBrandMob(this,'FLAMMA')">FLAMMA</div>
+          <div class="tag" onclick="filterBrandMob(this,'Foxpedal')">Foxpedal</div>
+          <div class="tag" onclick="filterBrandMob(this,'Fractal Audio')">Fractal</div>
+          <div class="tag" onclick="filterBrandMob(this,'Free The Tone')">Free The Tone</div>
+          <div class="tag" onclick="filterBrandMob(this,'Friedman')">Friedman</div>
           <div class="tag" onclick="filterBrandMob(this,'Fulltone')">Fulltone</div>
+          <div class="tag" onclick="filterBrandMob(this,'Gamechanger Audio')">Gamechanger</div>
+          <div class="tag" onclick="filterBrandMob(this,'GFI System')">GFI System</div>
+          <div class="tag" onclick="filterBrandMob(this,'GigRig')">GigRig</div>
+          <div class="tag" onclick="filterBrandMob(this,'Headrush')">Headrush</div>
+          <div class="tag" onclick="filterBrandMob(this,'Hologram Electronics')">Hologram</div>
+          <div class="tag" onclick="filterBrandMob(this,'Hotone')">Hotone</div>
+          <div class="tag" onclick="filterBrandMob(this,'Hudson Electronics')">Hudson</div>
+          <div class="tag" onclick="filterBrandMob(this,'IK Multimedia')">IK Multimedia</div>
+          <div class="tag" onclick="filterBrandMob(this,'Industrialectric')">Industrialectric</div>
+          <div class="tag" onclick="filterBrandMob(this,'J. Rockett')">J. Rockett</div>
+          <div class="tag" onclick="filterBrandMob(this,'JAM Pedals')">JAM Pedals</div>
           <div class="tag" onclick="filterBrandMob(this,'JHS Pedals')">JHS</div>
           <div class="tag" onclick="filterBrandMob(this,'Joyo')">Joyo</div>
-          <div class="tag" onclick="filterBrandMob(this,'Keeley Electronics')">Keeley</div>
+          <div class="tag" onclick="filterBrandMob(this,'KarDiaN')">KarDiaN</div>
+          <div class="tag" onclick="filterBrandMob(this,'Keeley')">Keeley</div>
+          <div class="tag" onclick="filterBrandMob(this,'Kemper')">Kemper</div>
+          <div class="tag" onclick="filterBrandMob(this,'KLIQ')">KLIQ</div>
+          <div class="tag" onclick="filterBrandMob(this,'Klon')">Klon</div>
+          <div class="tag" onclick="filterBrandMob(this,'KMA Machines')">KMA</div>
+          <div class="tag" onclick="filterBrandMob(this,'Kmise')">Kmise</div>
           <div class="tag" onclick="filterBrandMob(this,'Korg')">Korg</div>
+          <div class="tag" onclick="filterBrandMob(this,'Leqtique')">Leqtique</div>
+          <div class="tag" onclick="filterBrandMob(this,'Limetone Audio')">Limetone</div>
           <div class="tag" onclick="filterBrandMob(this,'Line 6')">Line 6</div>
           <div class="tag" onclick="filterBrandMob(this,'Mad Professor')">Mad Professor</div>
+          <div class="tag" onclick="filterBrandMob(this,'Malekko Heavy Industry')">Malekko</div>
+          <div class="tag" onclick="filterBrandMob(this,'MASF Pedals')">MASF</div>
+          <div class="tag" onclick="filterBrandMob(this,'Mastro Valvola')">Mastro Valvola</div>
           <div class="tag" onclick="filterBrandMob(this,'Meris')">Meris</div>
+          <div class="tag" onclick="filterBrandMob(this,'Minimichine')">Minimichine</div>
+          <div class="tag" onclick="filterBrandMob(this,'Mission Engineering')">Mission</div>
+          <div class="tag" onclick="filterBrandMob(this,'Montreal Assembly')">Montreal</div>
           <div class="tag" onclick="filterBrandMob(this,'Mooer')">Mooer</div>
+          <div class="tag" onclick="filterBrandMob(this,'Morningstar')">Morningstar</div>
+          <div class="tag" onclick="filterBrandMob(this,'Mosky')">Mosky</div>
+          <div class="tag" onclick="filterBrandMob(this,'Neural DSP')">Neural DSP</div>
+          <div class="tag" onclick="filterBrandMob(this,'Neunaber')">Neunaber</div>
           <div class="tag" onclick="filterBrandMob(this,'NUX')">NUX</div>
+          <div class="tag" onclick="filterBrandMob(this,'Old Blood Noise Endeavors')">OBNE</div>
           <div class="tag" onclick="filterBrandMob(this,'One Control')">One Control</div>
+          <div class="tag" onclick="filterBrandMob(this,'Organic Sounds')">Organic Sounds</div>
           <div class="tag" onclick="filterBrandMob(this,'Origin Effects')">Origin Effects</div>
+          <div class="tag" onclick="filterBrandMob(this,'Pedaltrain')">Pedaltrain</div>
+          <div class="tag" onclick="filterBrandMob(this,'Peterson')">Peterson</div>
           <div class="tag" onclick="filterBrandMob(this,'Pigtronix')">Pigtronix</div>
+          <div class="tag" onclick="filterBrandMob(this,'Pladask Elektrisk')">Pladask</div>
           <div class="tag" onclick="filterBrandMob(this,'Providence')">Providence</div>
+          <div class="tag" onclick="filterBrandMob(this,'ProCo')">ProCo</div>
+          <div class="tag" onclick="filterBrandMob(this,'Rainger FX')">Rainger FX</div>
+          <div class="tag" onclick="filterBrandMob(this,'Red Panda')">Red Panda</div>
+          <div class="tag" onclick="filterBrandMob(this,'Revv')">Revv</div>
+          <div class="tag" onclick="filterBrandMob(this,'RJM')">RJM</div>
+          <div class="tag" onclick="filterBrandMob(this,'Rockboard')">Rockboard</div>
+          <div class="tag" onclick="filterBrandMob(this,'Rocktron')">Rocktron</div>
+          <div class="tag" onclick="filterBrandMob(this,'RoShi Pedals')">RoShi</div>
+          <div class="tag" onclick="filterBrandMob(this,'Rowin')">Rowin</div>
+          <div class="tag" onclick="filterBrandMob(this,'Seymour Duncan')">Seymour Duncan</div>
+          <div class="tag" onclick="filterBrandMob(this,'Shin\'s Music')">Shin's Music</div>
+          <div class="tag" onclick="filterBrandMob(this,'Sketchy Sounds')">Sketchy Sounds</div>
+          <div class="tag" onclick="filterBrandMob(this,'Sonic Research')">Sonic Research</div>
           <div class="tag" onclick="filterBrandMob(this,'Source Audio')">Source Audio</div>
+          <div class="tag" onclick="filterBrandMob(this,'Spaceman')">Spaceman</div>
+          <div class="tag" onclick="filterBrandMob(this,'Stellar Pedals')">Stellar</div>
+          <div class="tag" onclick="filterBrandMob(this,'Stone Deaf FX')">Stone Deaf</div>
+          <div class="tag" onclick="filterBrandMob(this,'Subdecay')">Subdecay</div>
           <div class="tag" onclick="filterBrandMob(this,'Suhr')">Suhr</div>
-          <div class="tag" onclick="filterBrandMob(this,'Tone City')">Tone City</div>
+          <div class="tag" onclick="filterBrandMob(this,'Tech 21')">Tech 21</div>
+          <div class="tag" onclick="filterBrandMob(this,'ThorpyFX')">ThorpyFX</div>
+          <div class="tag" onclick="filterBrandMob(this,'Truetone')">Truetone</div>
+          <div class="tag" onclick="filterBrandMob(this,'Two Notes')">Two Notes</div>
+          <div class="tag" onclick="filterBrandMob(this,'Umbrella Company')">Umbrella Co.</div>
+          <div class="tag" onclick="filterBrandMob(this,'Valeton')">Valeton</div>
+          <div class="tag" onclick="filterBrandMob(this,'Vemuram')">Vemuram</div>
+          <div class="tag" onclick="filterBrandMob(this,'Victory')">Victory</div>
+          <div class="tag" onclick="filterBrandMob(this,'Vital Audio')">Vital Audio</div>
+          <div class="tag" onclick="filterBrandMob(this,'Vivie')">Vivie</div>
+          <div class="tag" onclick="filterBrandMob(this,'Voodoo Lab')">Voodoo Lab</div>
+          <div class="tag" onclick="filterBrandMob(this,'Vox')">Vox</div>
           <div class="tag" onclick="filterBrandMob(this,'Walrus Audio')">Walrus Audio</div>
-          <div class="tag" onclick="filterBrandMob(this,'Wampler Pedals')">Wampler</div>
-          <div class="tag" onclick="filterBrandMob(this,'Xotic Effects')">Xotic</div>
+          <div class="tag" onclick="filterBrandMob(this,'Wampler')">Wampler</div>
+          <div class="tag" onclick="filterBrandMob(this,'Way Huge')">Way Huge</div>
+          <div class="tag" onclick="filterBrandMob(this,'WMD')">WMD</div>
+          <div class="tag" onclick="filterBrandMob(this,'Xotic')">Xotic</div>
           <div class="tag" onclick="filterBrandMob(this,'Zoom')">Zoom</div>
+          <div class="tag" onclick="filterBrandMob(this,'ZVEX')">ZVEX</div>
           <div class="tag" onclick="filterBrandMob(this,'Others')">Others</div>
         </div>
       </div>
@@ -538,7 +653,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <div>
     <div class="sl-lbl">ブランドで絞る</div>
     <div class="tags">
-      <div class="tag" onclick="filterBrand(this,'Boss')">Boss</div>
+      <div class="tag" onclick="filterBrand(this,'BOSS')">BOSS</div>
       <div class="tag" onclick="filterBrand(this,'DigiTech')">DigiTech</div>
       <div class="tag" onclick="filterBrand(this,'Electro-Harmonix')">EHX</div>
       <div class="tag" onclick="filterBrand(this,'Free The Tone')">Free The Tone</div>
@@ -552,37 +667,147 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="brand-more-btn" id="brand-toggle" onclick="toggleBrands()"><span id="brand-toggle-label">▼ もっと見る（A–Z）</span></div>
     <div class="brands-extra" id="brands-extra">
       <div class="tags">
+        <div class="tag" onclick="filterBrand(this,'Aguilar')">Aguilar</div>
+        <div class="tag" onclick="filterBrand(this,'Alexander Pedals')">Alexander</div>
+        <div class="tag" onclick="filterBrand(this,'Ammoon')">Ammoon</div>
+        <div class="tag" onclick="filterBrand(this,'Analogman')">Analogman</div>
+        <div class="tag" onclick="filterBrand(this,'Anasounds')">Anasounds</div>
         <div class="tag" onclick="filterBrand(this,'Animals Pedal')">Animals Pedal</div>
+        <div class="tag" onclick="filterBrand(this,'Arc Effects')">Arc Effects</div>
+        <div class="tag" onclick="filterBrand(this,'Arion')">Arion</div>
+        <div class="tag" onclick="filterBrand(this,'Atomic')">Atomic</div>
+        <div class="tag" onclick="filterBrand(this,'Azor')">Azor</div>
+        <div class="tag" onclick="filterBrand(this,'Bananana Effects')">Bananana</div>
+        <div class="tag" onclick="filterBrand(this,'Beetronics')">Beetronics</div>
         <div class="tag" onclick="filterBrand(this,'Behringer')">Behringer</div>
+        <div class="tag" onclick="filterBrand(this,'Benson')">Benson</div>
+        <div class="tag" onclick="filterBrand(this,'BJFE')">BJFE</div>
+        <div class="tag" onclick="filterBrand(this,'Black Mass Electronics')">Black Mass</div>
+        <div class="tag" onclick="filterBrand(this,'Bogner')">Bogner</div>
+        <div class="tag" onclick="filterBrand(this,'Caline')">Caline</div>
+        <div class="tag" onclick="filterBrand(this,'Carl Martin')">Carl Martin</div>
+        <div class="tag" onclick="filterBrand(this,'Caroline Guitar Co.')">Caroline</div>
+        <div class="tag" onclick="filterBrand(this,'Catalinbread')">Catalinbread</div>
+        <div class="tag" onclick="filterBrand(this,'Champion Leccy')">Champion Leccy</div>
         <div class="tag" onclick="filterBrand(this,'Chase Bliss Audio')">Chase Bliss</div>
+        <div class="tag" onclick="filterBrand(this,'Chase Tone')">Chase Tone</div>
+        <div class="tag" onclick="filterBrand(this,'Cioks')">Cioks</div>
+        <div class="tag" onclick="filterBrand(this,'Circuitous FX')">Circuitous FX</div>
+        <div class="tag" onclick="filterBrand(this,'Cooper FX')">Cooper FX</div>
+        <div class="tag" onclick="filterBrand(this,'Cornerstone')">Cornerstone</div>
+        <div class="tag" onclick="filterBrand(this,'Crazy Tube Circuits')">Crazy Tube</div>
+        <div class="tag" onclick="filterBrand(this,'Critter & Guitari')">Critter</div>
+        <div class="tag" onclick="filterBrand(this,'D\'Addario')">D'Addario</div>
         <div class="tag" onclick="filterBrand(this,'Darkglass Electronics')">Darkglass</div>
         <div class="tag" onclick="filterBrand(this,'Death By Audio')">Death By Audio</div>
+        <div class="tag" onclick="filterBrand(this,'Diezel')">Diezel</div>
+        <div class="tag" onclick="filterBrand(this,'Disaster Area')">Disaster Area</div>
         <div class="tag" onclick="filterBrand(this,'DOD')">DOD</div>
+        <div class="tag" onclick="filterBrand(this,'Donner')">Donner</div>
+        <div class="tag" onclick="filterBrand(this,'Dr Scientist')">Dr Scientist</div>
+        <div class="tag" onclick="filterBrand(this,'DSM & Humboldt')">DSM</div>
+        <div class="tag" onclick="filterBrand(this,'Dwarfcraft Devices')">Dwarfcraft</div>
         <div class="tag" onclick="filterBrand(this,'EarthQuaker Devices')">EarthQuaker</div>
+        <div class="tag" onclick="filterBrand(this,'Effects Bakery')">Effects Bakery</div>
+        <div class="tag" onclick="filterBrand(this,'Electro-Harmonix')">EHX</div>
         <div class="tag" onclick="filterBrand(this,'Empress Effects')">Empress</div>
+        <div class="tag" onclick="filterBrand(this,'ENO')">ENO</div>
         <div class="tag" onclick="filterBrand(this,'Eventide')">Eventide</div>
+        <div class="tag" onclick="filterBrand(this,'Fairfield Circuitry')">Fairfield</div>
         <div class="tag" onclick="filterBrand(this,'Fender')">Fender</div>
+        <div class="tag" onclick="filterBrand(this,'Finegear')">Finegear</div>
+        <div class="tag" onclick="filterBrand(this,'Fjord Fuzz')">Fjord Fuzz</div>
+        <div class="tag" onclick="filterBrand(this,'FLAMMA')">FLAMMA</div>
+        <div class="tag" onclick="filterBrand(this,'Foxpedal')">Foxpedal</div>
+        <div class="tag" onclick="filterBrand(this,'Fractal Audio')">Fractal</div>
+        <div class="tag" onclick="filterBrand(this,'Free The Tone')">Free The Tone</div>
+        <div class="tag" onclick="filterBrand(this,'Friedman')">Friedman</div>
         <div class="tag" onclick="filterBrand(this,'Fulltone')">Fulltone</div>
+        <div class="tag" onclick="filterBrand(this,'Gamechanger Audio')">Gamechanger</div>
+        <div class="tag" onclick="filterBrand(this,'GFI System')">GFI System</div>
+        <div class="tag" onclick="filterBrand(this,'GigRig')">GigRig</div>
+        <div class="tag" onclick="filterBrand(this,'Headrush')">Headrush</div>
+        <div class="tag" onclick="filterBrand(this,'Hologram Electronics')">Hologram</div>
+        <div class="tag" onclick="filterBrand(this,'Hotone')">Hotone</div>
+        <div class="tag" onclick="filterBrand(this,'Hudson Electronics')">Hudson</div>
+        <div class="tag" onclick="filterBrand(this,'IK Multimedia')">IK Multimedia</div>
+        <div class="tag" onclick="filterBrand(this,'Industrialectric')">Industrialectric</div>
+        <div class="tag" onclick="filterBrand(this,'J. Rockett')">J. Rockett</div>
+        <div class="tag" onclick="filterBrand(this,'JAM Pedals')">JAM Pedals</div>
         <div class="tag" onclick="filterBrand(this,'JHS Pedals')">JHS</div>
         <div class="tag" onclick="filterBrand(this,'Joyo')">Joyo</div>
-        <div class="tag" onclick="filterBrand(this,'Keeley Electronics')">Keeley</div>
+        <div class="tag" onclick="filterBrand(this,'KarDiaN')">KarDiaN</div>
+        <div class="tag" onclick="filterBrand(this,'Keeley')">Keeley</div>
+        <div class="tag" onclick="filterBrand(this,'Kemper')">Kemper</div>
+        <div class="tag" onclick="filterBrand(this,'KLIQ')">KLIQ</div>
+        <div class="tag" onclick="filterBrand(this,'Klon')">Klon</div>
+        <div class="tag" onclick="filterBrand(this,'KMA Machines')">KMA</div>
+        <div class="tag" onclick="filterBrand(this,'Kmise')">Kmise</div>
         <div class="tag" onclick="filterBrand(this,'Korg')">Korg</div>
+        <div class="tag" onclick="filterBrand(this,'Leqtique')">Leqtique</div>
+        <div class="tag" onclick="filterBrand(this,'Limetone Audio')">Limetone</div>
         <div class="tag" onclick="filterBrand(this,'Line 6')">Line 6</div>
         <div class="tag" onclick="filterBrand(this,'Mad Professor')">Mad Professor</div>
+        <div class="tag" onclick="filterBrand(this,'Malekko Heavy Industry')">Malekko</div>
+        <div class="tag" onclick="filterBrand(this,'MASF Pedals')">MASF</div>
+        <div class="tag" onclick="filterBrand(this,'Mastro Valvola')">Mastro Valvola</div>
         <div class="tag" onclick="filterBrand(this,'Meris')">Meris</div>
+        <div class="tag" onclick="filterBrand(this,'Minimichine')">Minimichine</div>
+        <div class="tag" onclick="filterBrand(this,'Mission Engineering')">Mission</div>
+        <div class="tag" onclick="filterBrand(this,'Montreal Assembly')">Montreal</div>
         <div class="tag" onclick="filterBrand(this,'Mooer')">Mooer</div>
+        <div class="tag" onclick="filterBrand(this,'Morningstar')">Morningstar</div>
+        <div class="tag" onclick="filterBrand(this,'Mosky')">Mosky</div>
+        <div class="tag" onclick="filterBrand(this,'Neural DSP')">Neural DSP</div>
+        <div class="tag" onclick="filterBrand(this,'Neunaber')">Neunaber</div>
         <div class="tag" onclick="filterBrand(this,'NUX')">NUX</div>
+        <div class="tag" onclick="filterBrand(this,'Old Blood Noise Endeavors')">OBNE</div>
         <div class="tag" onclick="filterBrand(this,'One Control')">One Control</div>
+        <div class="tag" onclick="filterBrand(this,'Organic Sounds')">Organic Sounds</div>
         <div class="tag" onclick="filterBrand(this,'Origin Effects')">Origin Effects</div>
+        <div class="tag" onclick="filterBrand(this,'Pedaltrain')">Pedaltrain</div>
+        <div class="tag" onclick="filterBrand(this,'Peterson')">Peterson</div>
         <div class="tag" onclick="filterBrand(this,'Pigtronix')">Pigtronix</div>
+        <div class="tag" onclick="filterBrand(this,'Pladask Elektrisk')">Pladask</div>
         <div class="tag" onclick="filterBrand(this,'Providence')">Providence</div>
+        <div class="tag" onclick="filterBrand(this,'ProCo')">ProCo</div>
+        <div class="tag" onclick="filterBrand(this,'Rainger FX')">Rainger FX</div>
+        <div class="tag" onclick="filterBrand(this,'Red Panda')">Red Panda</div>
+        <div class="tag" onclick="filterBrand(this,'Revv')">Revv</div>
+        <div class="tag" onclick="filterBrand(this,'RJM')">RJM</div>
+        <div class="tag" onclick="filterBrand(this,'Rockboard')">Rockboard</div>
+        <div class="tag" onclick="filterBrand(this,'Rocktron')">Rocktron</div>
+        <div class="tag" onclick="filterBrand(this,'RoShi Pedals')">RoShi</div>
+        <div class="tag" onclick="filterBrand(this,'Rowin')">Rowin</div>
+        <div class="tag" onclick="filterBrand(this,'Seymour Duncan')">Seymour Duncan</div>
+        <div class="tag" onclick="filterBrand(this,'Shin\'s Music')">Shin's Music</div>
+        <div class="tag" onclick="filterBrand(this,'Sketchy Sounds')">Sketchy Sounds</div>
+        <div class="tag" onclick="filterBrand(this,'Sonic Research')">Sonic Research</div>
         <div class="tag" onclick="filterBrand(this,'Source Audio')">Source Audio</div>
+        <div class="tag" onclick="filterBrand(this,'Spaceman')">Spaceman</div>
+        <div class="tag" onclick="filterBrand(this,'Stellar Pedals')">Stellar</div>
+        <div class="tag" onclick="filterBrand(this,'Stone Deaf FX')">Stone Deaf</div>
+        <div class="tag" onclick="filterBrand(this,'Subdecay')">Subdecay</div>
         <div class="tag" onclick="filterBrand(this,'Suhr')">Suhr</div>
-        <div class="tag" onclick="filterBrand(this,'Tone City')">Tone City</div>
+        <div class="tag" onclick="filterBrand(this,'Tech 21')">Tech 21</div>
+        <div class="tag" onclick="filterBrand(this,'ThorpyFX')">ThorpyFX</div>
+        <div class="tag" onclick="filterBrand(this,'Truetone')">Truetone</div>
+        <div class="tag" onclick="filterBrand(this,'Two Notes')">Two Notes</div>
+        <div class="tag" onclick="filterBrand(this,'Umbrella Company')">Umbrella Co.</div>
+        <div class="tag" onclick="filterBrand(this,'Valeton')">Valeton</div>
+        <div class="tag" onclick="filterBrand(this,'Vemuram')">Vemuram</div>
+        <div class="tag" onclick="filterBrand(this,'Victory')">Victory</div>
+        <div class="tag" onclick="filterBrand(this,'Vital Audio')">Vital Audio</div>
+        <div class="tag" onclick="filterBrand(this,'Vivie')">Vivie</div>
+        <div class="tag" onclick="filterBrand(this,'Voodoo Lab')">Voodoo Lab</div>
+        <div class="tag" onclick="filterBrand(this,'Vox')">Vox</div>
         <div class="tag" onclick="filterBrand(this,'Walrus Audio')">Walrus Audio</div>
-        <div class="tag" onclick="filterBrand(this,'Wampler Pedals')">Wampler</div>
-        <div class="tag" onclick="filterBrand(this,'Xotic Effects')">Xotic</div>
+        <div class="tag" onclick="filterBrand(this,'Wampler')">Wampler</div>
+        <div class="tag" onclick="filterBrand(this,'Way Huge')">Way Huge</div>
+        <div class="tag" onclick="filterBrand(this,'WMD')">WMD</div>
+        <div class="tag" onclick="filterBrand(this,'Xotic')">Xotic</div>
         <div class="tag" onclick="filterBrand(this,'Zoom')">Zoom</div>
+        <div class="tag" onclick="filterBrand(this,'ZVEX')">ZVEX</div>
         <div class="tag" onclick="filterBrand(this,'Others')">Others</div>
       </div>
     </div>
@@ -842,18 +1067,18 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 <!-- 画像編集 -->
 <div class="img-editor-bd" id="img-editor-bd">
   <div class="img-editor-header">
-    <div><div class="img-editor-title">画像編集</div><div class="img-editor-subtitle">番号ステッカー・トリミング（任意）</div></div>
-    <button class="img-editor-done" onclick="finishEdit()">完了</button>
+    <div><div class="img-editor-title">画像編集</div><div class="img-editor-subtitle">ステッカー・トリミング・回転（任意）</div></div>
   </div>
   <div class="img-tab-bar" id="img-tab-bar"></div>
   <div class="img-editor-canvas-wrap" id="canvas-wrap"><canvas id="editor-canvas"></canvas></div>
-  <div class="img-editor-hint" id="editor-hint">「番号追加」で追加・「移動・削除」でタップ削除/ドラッグ移動/ピンチでサイズ変更</div>
+  <div class="img-editor-hint" id="editor-hint">ツールを選んで編集してください</div>
   <div class="img-editor-toolbar">
     <button class="editor-tool-btn" id="tool-crop" onclick="setTool('crop')"><span class="editor-tool-icon">✂️</span>トリミング</button>
     <button class="editor-tool-btn" onclick="rotateImage()"><span class="editor-tool-icon">🔄</span>回転</button>
     <button class="editor-tool-btn" onclick="addNumberSticker()"><span class="editor-tool-icon">➕</span>番号追加</button>
-    <button class="editor-tool-btn" id="tool-move" onclick="setTool('move')"><span class="editor-tool-icon">✋</span>移動・削除</button>
+    <button class="editor-tool-btn" id="tool-move" onclick="setTool('move')"><span class="editor-tool-icon">✋</span>番号を<br>移動・削除</button>
     <button class="editor-tool-btn" onclick="resetEdits()"><span class="editor-tool-icon">↩️</span>リセット</button>
+    <button class="editor-done-btn" onclick="finishEdit()"><span class="editor-done-icon">✅</span>完了</button>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
