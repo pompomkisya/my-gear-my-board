@@ -29,11 +29,9 @@ async function loadPostsFromDB(){
   if(error){console.error(error);return;}
   const{data:cc}=await sb.from('comments').select('post_id');
   const cm={};if(cc)cc.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  // pedalsのtypes情報を取得してキャッシュ
   const{data:pedals}=await sb.from('pedals').select('full_name,types');
   const pedalTypesMap={};
   if(pedals)pedals.forEach(p=>{pedalTypesMap[p.full_name]=(p.types||[]);});
-  // 各投稿のgear_listにtypesを付加
   allDBPosts=(posts||[]).map(p=>({
     ...p,
     comment_count:cm[p.id]||0,
@@ -55,7 +53,6 @@ function parseGenre(genre){
   return[];
 }
 
-// ジャンルフィルター（大文字小文字・配列対応）
 function genreMatches(post,filter){
   if(filter==='ALL')return true;
   const genres=parseGenre(post.genre);
@@ -73,7 +70,6 @@ function applyFilter(){
       return g.some(x=>(x.brand||x.name||x||'').toLowerCase().includes(currentBrandFilter.toLowerCase()));
     });
   }
-  // エフェクタータイプフィルター（pedalsテーブルのtypesと照合）
   if(currentFxFilter){
     posts=posts.filter(p=>{
       const g=Array.isArray(p.gear_list)?p.gear_list:[];
@@ -83,7 +79,6 @@ function applyFilter(){
       });
     });
   }
-  // フリーワード検索
   if(currentSearchQuery){
     posts=posts.filter(p=>searchMatches(p,currentSearchQuery));
     const badgeText='「'+currentSearchQuery+'」の検索結果：'+posts.length+'件';
@@ -92,10 +87,8 @@ function applyFilter(){
     const mobBadge=document.getElementById('mob-search-badge');
     if(mobBadge){mobBadge.textContent=badgeText;mobBadge.classList.add('show');}
   }else{
-    const badge=document.getElementById('search-badge');
-    if(badge)badge.classList.remove('show');
-    const mobBadge=document.getElementById('mob-search-badge');
-    if(mobBadge)mobBadge.classList.remove('show');
+    const badge=document.getElementById('search-badge');if(badge)badge.classList.remove('show');
+    const mobBadge=document.getElementById('mob-search-badge');if(mobBadge)mobBadge.classList.remove('show');
   }
   if(currentSort==='likes')posts.sort((a,b)=>(b.likes||0)-(a.likes||0));
   renderDBPosts(posts);
@@ -225,7 +218,6 @@ function filterByGearName(name){
   if(window.innerWidth<=680)setTimeout(()=>goPanel(1),180);
 }
 
-// ── フリーワード検索（PC用）
 let currentSearchQuery='';
 
 function handleSearch(val){
@@ -234,37 +226,26 @@ function handleSearch(val){
   if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);
   applyFilter();
 }
-
 function clearSearch(){
   currentSearchQuery='';
-  const input=document.getElementById('h-search');
-  if(input)input.value='';
-  const clearBtn=document.getElementById('h-search-clear');
-  if(clearBtn)clearBtn.classList.remove('show');
-  const badge=document.getElementById('search-badge');
-  if(badge)badge.classList.remove('show');
+  const input=document.getElementById('h-search');if(input)input.value='';
+  const clearBtn=document.getElementById('h-search-clear');if(clearBtn)clearBtn.classList.remove('show');
+  const badge=document.getElementById('search-badge');if(badge)badge.classList.remove('show');
   applyFilter();
 }
-
-// スマホ用検索
 function handleSearchMob(val){
   currentSearchQuery=val.trim();
   const clearBtn=document.getElementById('mob-search-clear');
   if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);
   applyFilter();
 }
-
 function clearSearchMob(){
   currentSearchQuery='';
-  const input=document.getElementById('mob-search');
-  if(input)input.value='';
-  const clearBtn=document.getElementById('mob-search-clear');
-  if(clearBtn)clearBtn.classList.remove('show');
-  const badge=document.getElementById('mob-search-badge');
-  if(badge)badge.classList.remove('show');
+  const input=document.getElementById('mob-search');if(input)input.value='';
+  const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.remove('show');
+  const badge=document.getElementById('mob-search-badge');if(badge)badge.classList.remove('show');
   applyFilter();
 }
-
 function searchMatches(post,query){
   if(!query)return true;
   const q=query.toLowerCase();
@@ -276,7 +257,10 @@ function searchMatches(post,query){
   const genres=parseGenre(post.genre).join(' ').toLowerCase();
   return title.includes(q)||username.includes(q)||desc.includes(q)||gearStr.includes(q)||genres.includes(q);
 }
+
+// ── 機材サジェスト
 let selectedGears=[],acResults=[],acFocusIdx=-1;
+
 async function searchGear(val){
   const q=val.trim();closeAC();if(!q)return;
   const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name')
@@ -298,8 +282,9 @@ function addGearTag(g){
   if(selectedGears.find(x=>x.name===g.name))return;
   if(selectedGears.length>=20){showToast('⚠️ 最大20件まで');return;}
   selectedGears.push(g);renderGearTags();document.getElementById('gear-search').value='';
+  updateGearFeedback();
 }
-function removeGearTag(i){selectedGears.splice(i,1);renderGearTags();}
+function removeGearTag(i){selectedGears.splice(i,1);renderGearTags();updateGearFeedback();}
 function renderGearTags(){
   const wrap=document.getElementById('gear-tags');if(!wrap)return;
   const inp=document.getElementById('gear-search');
@@ -309,6 +294,20 @@ function renderGearTags(){
     tag.innerHTML=g.name+'<button class="gear-tag-x" onmousedown="event.preventDefault();removeGearTag('+i+')">✕</button>';
     wrap.insertBefore(tag,inp);
   });
+}
+function updateGearFeedback(){
+  const fb=document.getElementById('gear-feedback');
+  const btn=document.getElementById('gear-next-btn');
+  if(!fb||!btn)return;
+  const n=selectedGears.length;
+  if(n>0){
+    fb.style.display='block';
+    fb.textContent='✅ '+n+'件追加されました';
+    btn.textContent='次へ（'+n+'件追加済み）';
+  }else{
+    fb.style.display='none';
+    btn.textContent='次へ';
+  }
 }
 function gearKeyDown(e){
   const dd=document.getElementById('ac-dropdown');const open=dd.classList.contains('open');
@@ -324,7 +323,7 @@ function gearKeyDown(e){
 function closeAC(){document.getElementById('ac-dropdown').classList.remove('open');}
 function toggleGenre(el){el.classList.toggle('on');}
 
-// ステップフォーム
+// ── ステップフォーム
 let currentStep=1,currentPostType='board';
 const TOTAL_STEPS=5;
 function openPost(type){
@@ -332,6 +331,7 @@ function openPost(type){
   document.querySelectorAll('#post-genre-select .gs').forEach(g=>g.classList.remove('on'));
   ['post-username','post-desc','post-youtube','post-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
+  updateGearFeedback();
   renderGearTags();renderPhotoPreviews();updateStepUI();
   document.getElementById('post-bd').classList.add('open');document.body.style.overflow='hidden';
 }
@@ -339,7 +339,7 @@ function goStep(n){
   if(n===3&&currentStep===2){if(!document.getElementById('post-title').value.trim()){showToast('❌ タイトルを入力してください');return;}}
   if(n===5)renderConfirm();
   currentStep=n;updateStepUI();
-  if(n===3)renderStep3PhotoPreview();
+  if(n===3){renderStep3PhotoPreview();updateGearFeedback();}
 }
 function renderStep3PhotoPreview(){
   const wrap=document.getElementById('step3-photo-preview');if(!wrap)return;
@@ -373,7 +373,7 @@ function renderConfirm(){
   ].map(([l,v])=>'<div class="confirm-row"><div class="confirm-lbl">'+l+'</div><div class="confirm-val">'+v+'</div></div>').join('');
 }
 
-// 写真
+// ── 写真
 let uploadedPhotos=[],editedPhotos=[];
 const MAX_PHOTOS=3,MAX_DIM=1280,JPEG_QUALITY=0.82;
 function compressImage(dataUrl){
@@ -442,7 +442,23 @@ async function uploadPhoto(b64,idx,total){
   }catch(e){console.error(e);return null;}
 }
 
+// ── 0件リマインド制御
+let _skipGearRemind=false;
+function closeGearRemind(){
+  const r=document.getElementById('gear-remind-bd');if(r)r.style.display='none';
+}
+async function doSubmitPost(){
+  closeGearRemind();_skipGearRemind=true;await submitPostToDB();
+}
+
 async function submitPostToDB(){
+  // 機材0件チェック（スキップフラグが立っていない場合のみリマインド表示）
+  if(selectedGears.length===0&&!_skipGearRemind){
+    const remind=document.getElementById('gear-remind-bd');
+    if(remind){remind.style.display='flex';return;}
+  }
+  _skipGearRemind=false;
+
   const btn=document.getElementById('submit-btn');
   if(btn){btn.disabled=true;btn.textContent='投稿中...';}
   const title=document.getElementById('post-title').value.trim();
@@ -480,7 +496,7 @@ async function submitPostToDB(){
   await loadPostsFromDB();
 }
 
-// 編集モーダル
+// ── 編集モーダル（index.html用 シンプル版）
 function openEditModal(){
   if(!currentDBPost)return;
   ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
@@ -531,7 +547,7 @@ async function confirmDelete(){
   closeModal('edit-bd');showToast('🗑 投稿を削除しました');await loadPostsFromDB();
 }
 
-// ── 画像編集（ステッカー配置順修正・タップ削除修正・ピンチズーム）
+// ── 画像エディター（投稿フォーム用）
 let editorPhotoIndex=0,editorCanvas=null,editorCtx=null,editorImage=null;
 let editorNumbers=[],editorMode='none';
 let cropStart=null,cropBox={x:0,y:0,w:0,h:0},cropActive=false,cropDragging=false,cropHandleDrag=null;
@@ -539,21 +555,11 @@ let isDraggingNum=false,dragNumIdx=-1,dragOffX=0,dragOffY=0,dragMoved=false;
 let pinchActive=false,pinchStartDist=0,pinchNumIdx=-1,pinchStartSize=20;
 const DEFAULT_STICKER_SIZE=20;
 
-// 右上→左の順でステッカーを配置
 function getStickerPosition(num,canvasW,canvasH){
-  const cols=6;
-  const idx=num-1;
-  const row=Math.floor(idx/cols);
-  const colInRow=idx%cols;
-  const col=(cols-1)-colInRow; // 右から左
-  const cellW=canvasW/cols;
-  const totalRows=Math.ceil(24/cols); // 最大24個想定
-  const cellH=canvasH/Math.max(totalRows,4);
-  const margin=DEFAULT_STICKER_SIZE+4;
-  return{
-    x:Math.min(canvasW-margin,Math.max(margin,cellW*(col+0.5))),
-    y:Math.min(canvasH-margin,Math.max(margin,cellH*(row+0.5)))
-  };
+  const cols=6;const idx=num-1;const row=Math.floor(idx/cols);const colInRow=idx%cols;
+  const col=(cols-1)-colInRow;const cellW=canvasW/cols;const totalRows=Math.ceil(24/cols);
+  const cellH=canvasH/Math.max(totalRows,4);const margin=DEFAULT_STICKER_SIZE+4;
+  return{x:Math.min(canvasW-margin,Math.max(margin,cellW*(col+0.5))),y:Math.min(canvasH-margin,Math.max(margin,cellH*(row+0.5)))};
 }
 
 function openImgEditor(idx){
@@ -600,8 +606,7 @@ function drawEditor(){
     [{x:cropBox.x,y:cropBox.y},{x:cropBox.x+cropBox.w,y:cropBox.y},{x:cropBox.x,y:cropBox.y+cropBox.h},{x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h}].forEach(h=>{
       ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(h.x,h.y,8,0,Math.PI*2);ctx.fill();
       ctx.strokeStyle='#e8552d';ctx.lineWidth=2;ctx.stroke();
-    });
-    ctx.setLineDash([]);
+    });ctx.setLineDash([]);
   }
   editorNumbers.forEach(n=>{
     const r=n.size||DEFAULT_STICKER_SIZE;
@@ -611,15 +616,13 @@ function drawEditor(){
     ctx.fillStyle='#111';
     const fs=Math.max(10,Math.round(r*0.65));
     ctx.font='bold '+fs+'px JetBrains Mono,monospace';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(n.num,n.x,n.y);
+    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.num,n.x,n.y);
   });
 }
 function setTool(mode){
   editorMode=editorMode===mode?'none':mode;updateToolUI();
   const hints={crop:'ドラッグしてトリミング範囲を選択',move:'タップで削除・ドラッグで移動・ピンチでサイズ変更',none:'「番号追加」ボタンで番号を追加'};
-  document.getElementById('editor-hint').textContent=hints[editorMode]||hints.none;
-  drawEditor();
+  document.getElementById('editor-hint').textContent=hints[editorMode]||hints.none;drawEditor();
 }
 function addNumberSticker(){
   if(!editorCanvas)return;
@@ -634,26 +637,18 @@ function updateToolUI(){
   ['crop','move'].forEach(id=>{const btn=document.getElementById('tool-'+id);if(btn)btn.classList.toggle('active',editorMode===id);});
 }
 function resetEdits(){editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropStart=null;loadEditorImage(uploadedPhotos[editorPhotoIndex]);showToast('↩️ リセットしました');}
-
-// 画像を90度右回転
 function rotateImage(){
   if(!editorImage)return;
   const canvas=document.createElement('canvas');
-  canvas.width=editorImage.naturalHeight;
-  canvas.height=editorImage.naturalWidth;
+  canvas.width=editorImage.naturalHeight;canvas.height=editorImage.naturalWidth;
   const ctx=canvas.getContext('2d');
-  ctx.translate(canvas.width/2,canvas.height/2);
-  ctx.rotate(Math.PI/2);
+  ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(Math.PI/2);
   ctx.drawImage(editorImage,-editorImage.naturalWidth/2,-editorImage.naturalHeight/2);
   const rotated=canvas.toDataURL('image/jpeg',0.92);
-  // 回転後の画像をベースとして更新
-  uploadedPhotos[editorPhotoIndex]=rotated;
-  editedPhotos[editorPhotoIndex]=null;
+  uploadedPhotos[editorPhotoIndex]=rotated;editedPhotos[editorPhotoIndex]=null;
   editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;
-  loadEditorImage(rotated);
-  showToast('🔄 90度回転しました');
+  loadEditorImage(rotated);showToast('🔄 90度回転しました');
 }
-
 function saveCurrentEditorState(){
   if(!editorCanvas||!editorImage)return;
   const c=editorCanvas;let sx=0,sy=0,sw=editorImage.naturalWidth,sh=editorImage.naturalHeight;
@@ -690,24 +685,16 @@ function getCropHandle(pos){
   const handles=[{id:'tl',x:cropBox.x,y:cropBox.y},{id:'tr',x:cropBox.x+cropBox.w,y:cropBox.y},{id:'bl',x:cropBox.x,y:cropBox.y+cropBox.h},{id:'br',x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h}];
   return handles.find(h=>Math.hypot(h.x-pos.x,h.y-pos.y)<20)||null;
 }
-
 function canvasPointerDown(e){
   e.preventDefault();
   if(e.touches&&e.touches.length===2){
     pinchActive=true;pinchStartDist=getTouchDist(e.touches[0],e.touches[1]);
-    const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
-    const midY=(e.touches[0].clientY+e.touches[1].clientY)/2;
+    const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;const midY=(e.touches[0].clientY+e.touches[1].clientY)/2;
     const mid=getCanvasPos({clientX:midX,clientY:midY});
-    let minD=Infinity;
-    editorNumbers.forEach((n,i)=>{const d=Math.hypot(n.x-mid.x,n.y-mid.y);if(d<minD){minD=d;pinchNumIdx=i;}});
-    if(minD>100)pinchNumIdx=-1;
-    pinchStartSize=pinchNumIdx>=0?(editorNumbers[pinchNumIdx].size||DEFAULT_STICKER_SIZE):DEFAULT_STICKER_SIZE;
-    return;
+    let minD=Infinity;editorNumbers.forEach((n,i)=>{const d=Math.hypot(n.x-mid.x,n.y-mid.y);if(d<minD){minD=d;pinchNumIdx=i;}});
+    if(minD>100)pinchNumIdx=-1;pinchStartSize=pinchNumIdx>=0?(editorNumbers[pinchNumIdx].size||DEFAULT_STICKER_SIZE):DEFAULT_STICKER_SIZE;return;
   }
-  pinchActive=false;
-  const touch=e.touches?e.touches[0]:e;
-  const pos=getCanvasPos(touch);
-  dragMoved=false;
+  pinchActive=false;const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);dragMoved=false;
   if(editorMode==='move'){
     const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<(n.size||DEFAULT_STICKER_SIZE)+8);
     if(hit>=0){isDraggingNum=true;dragNumIdx=hit;dragOffX=pos.x-editorNumbers[hit].x;dragOffY=pos.y-editorNumbers[hit].y;}
@@ -715,21 +702,17 @@ function canvasPointerDown(e){
   }else if(editorMode==='crop'){
     const handle=getCropHandle(pos);
     if(handle){cropHandleDrag=handle;cropDragging=true;}
-    else if(cropActive&&pos.x>=cropBox.x&&pos.x<=cropBox.x+cropBox.w&&pos.y>=cropBox.y&&pos.y<=cropBox.y+cropBox.h){
-      cropHandleDrag={id:'move'};cropDragging=true;dragOffX=pos.x-cropBox.x;dragOffY=pos.y-cropBox.y;
-    }else{cropStart=pos;cropDragging=true;cropHandleDrag=null;cropActive=false;}
+    else if(cropActive&&pos.x>=cropBox.x&&pos.x<=cropBox.x+cropBox.w&&pos.y>=cropBox.y&&pos.y<=cropBox.y+cropBox.h){cropHandleDrag={id:'move'};cropDragging=true;dragOffX=pos.x-cropBox.x;dragOffY=pos.y-cropBox.y;}
+    else{cropStart=pos;cropDragging=true;cropHandleDrag=null;cropActive=false;}
   }
 }
 function canvasPointerMove(e){
   e.preventDefault();if(!editorCanvas)return;
   if(e.touches&&e.touches.length===2&&pinchActive){
-    const dist=getTouchDist(e.touches[0],e.touches[1]);
-    const ratio=dist/pinchStartDist;
-    if(pinchNumIdx>=0){editorNumbers[pinchNumIdx].size=Math.max(10,Math.min(60,Math.round(pinchStartSize*ratio)));drawEditor();}
-    return;
+    const dist=getTouchDist(e.touches[0],e.touches[1]);const ratio=dist/pinchStartDist;
+    if(pinchNumIdx>=0){editorNumbers[pinchNumIdx].size=Math.max(10,Math.min(60,Math.round(pinchStartSize*ratio)));drawEditor();}return;
   }
-  const touch=e.touches?e.touches[0]:e;
-  const pos=getCanvasPos(touch);const c=editorCanvas;
+  const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);const c=editorCanvas;
   if(editorMode==='move'&&isDraggingNum&&dragNumIdx>=0){
     editorNumbers[dragNumIdx].x=Math.max(10,Math.min(c.width-10,pos.x-dragOffX));
     editorNumbers[dragNumIdx].y=Math.max(10,Math.min(c.height-10,pos.y-dragOffY));
@@ -755,17 +738,11 @@ function canvasPointerMove(e){
 function canvasPointerUp(e){
   e.preventDefault();
   if(pinchActive&&e.touches&&e.touches.length<2){pinchActive=false;return;}
-  const touch=e.changedTouches?e.changedTouches[0]:e;
   if(editorMode==='move'){
-    if(isDraggingNum&&!dragMoved&&dragNumIdx>=0){
-      editorNumbers.splice(dragNumIdx,1);
-      editorNumbers.forEach((n,i)=>n.num=i+1);
-      showToast('番号を削除しました');drawEditor();
-    }
+    if(isDraggingNum&&!dragMoved&&dragNumIdx>=0){editorNumbers.splice(dragNumIdx,1);editorNumbers.forEach((n,i)=>n.num=i+1);showToast('番号を削除しました');drawEditor();}
     isDraggingNum=false;dragNumIdx=-1;dragMoved=false;
   }else if(editorMode==='crop'){
-    cropDragging=false;
-    if(cropBox.w>10&&cropBox.h>10)cropActive=true;else cropActive=false;
+    cropDragging=false;if(cropBox.w>10&&cropBox.h>10)cropActive=true;else cropActive=false;
     cropHandleDrag=null;cropStart=null;drawEditor();
   }
 }
@@ -773,12 +750,8 @@ function canvasPointerUp(e){
 document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
     const c=document.getElementById('editor-canvas');if(!c)return;
-    c.addEventListener('mousedown',canvasPointerDown);
-    c.addEventListener('mousemove',canvasPointerMove);
-    c.addEventListener('mouseup',canvasPointerUp);
-    c.addEventListener('touchstart',canvasPointerDown,{passive:false});
-    c.addEventListener('touchmove',canvasPointerMove,{passive:false});
-    c.addEventListener('touchend',canvasPointerUp,{passive:false});
+    c.addEventListener('mousedown',canvasPointerDown);c.addEventListener('mousemove',canvasPointerMove);c.addEventListener('mouseup',canvasPointerUp);
+    c.addEventListener('touchstart',canvasPointerDown,{passive:false});c.addEventListener('touchmove',canvasPointerMove,{passive:false});c.addEventListener('touchend',canvasPointerUp,{passive:false});
   },500);
 });
 
@@ -800,7 +773,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
   el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
 });
 
-// スワイプUI
+// ── スワイプUI
 let currentPanel=1;
 let swipeStartX=0,swipeStartY=0,isHorizSwipe=false,swipeDecided=false;
 const SWIPE_THRESHOLD=90,ANGLE_LOCK=0.4;
@@ -837,7 +810,6 @@ function checkMobile(){
   const pcWrap=document.querySelector('.wrap');
   if(swipeUI)swipeUI.style.display=isMob?'block':'none';
   if(pcWrap)pcWrap.style.display=isMob?'none':'grid';
-  // フッターはPC・スマホ両方表示
 }
 window.addEventListener('resize',checkMobile);
 
