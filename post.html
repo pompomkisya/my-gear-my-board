@@ -36,8 +36,8 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .s-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);cursor:pointer;transition:all .2s;touch-action:manipulation}
 .s-dot.on{background:#fff;transform:scale(1.2)}
 .no-img{aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;font-size:60px;opacity:.15;margin-bottom:24px;background:var(--sf);border-radius:8px;border:1px solid var(--bd)}
-.yt-section{margin-bottom:24px}
-.yt-embed-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;border:1px solid var(--bd);background:#000}
+.yt-section{margin-bottom:20px}
+.yt-embed-wrap{position:relative;padding-bottom:42%;height:0;overflow:hidden;border-radius:8px;border:1px solid var(--bd);background:#000}
 .yt-embed-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
 .meta{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;border:2px solid var(--bd);flex-shrink:0;background:linear-gradient(135deg,#e85c2f,#b03020)}
@@ -285,7 +285,7 @@ function renderPost(p){
   const ytId=getYouTubeId(p.youtube_url);
   let html='';
 
-  // 画像スライダー
+  // ① 画像スライダー
   if(imgs.length){
     html+='<div class="slider"><div class="slide-track" id="slide-track">';
     imgs.forEach(u=>html+='<div class="slide"><img src="'+u+'" loading="lazy"></div>');
@@ -302,23 +302,15 @@ function renderPost(p){
     html+='<div class="no-img">'+(isGear?'🎸':'🎛')+'</div>';
   }
 
-  // YouTube埋め込み
-  if(ytId){
-    html+='<div class="yt-section">'
-      +'<div class="section-lbl" style="margin-bottom:10px">▶ YouTube動画</div>'
-      +'<div class="yt-embed-wrap">'
-      +'<iframe src="https://www.youtube.com/embed/'+ytId+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
-      +'</div></div>';
-  }
-
+  // ② タイプバッジ・タイトル・投稿者・アクションボタン
   html+='<div class="type-badge '+(isGear?'gear':'board')+'">'+(isGear?'機材':'エフェクターボード')+'</div>';
+  html+='<div class="post-title">'+p.title+'</div>';
   html+='<div class="meta">'
     +'<div class="av">'+init+'</div>'
     +'<div class="meta-info"><div class="meta-name">'+(p.username||'匿名ユーザー')+'</div>'
     +'<div class="meta-time">'+timeAgo(p.created_at)+'</div></div>'
     +'<div class="edit-btn-wrap"><div class="edit-icon-btn" onclick="openEditModal()">✏️</div></div>'
     +'</div>';
-  html+='<div class="post-title">'+p.title+'</div>';
   html+='<div class="actions">'
     +'<div class="act-btn'+(liked?' liked':'')+'" id="like-btn" onclick="toggleLike()">'+(liked?'❤️':'🤍')+' いいね <span id="like-count">'+(p.likes||0)+'</span></div>'
     +'<div class="act-btn" onclick="copyUrl()">🔗 URLをコピー</div>'
@@ -327,8 +319,10 @@ function renderPost(p){
     +'<div class="act-btn" style="color:#e05050;border-color:rgba(224,80,80,.3)" onclick="openReport()">🚩 通報</div>'
     +'</div>';
 
+  // ③ タグ（ジャンル）
   if(genres.length){html+='<div class="genre-tags">'+genres.map(g=>'<span class="gtag">'+g+'</span>').join('')+'</div>';}
 
+  // ④ 機材リスト
   if(gear.length){
     html+='<div class="section"><div class="section-lbl">使用機材リスト</div>';
     gear.forEach(g=>{
@@ -339,6 +333,7 @@ function renderPost(p){
     html+='</div>';
   }
 
+  // ⑤ 本文
   if(p.description){
     const desc=p.description;const limit=200;
     html+='<div class="section">';
@@ -352,7 +347,16 @@ function renderPost(p){
     html+='</div>';
   }
 
-  // コメント欄（名前入力欄付き）
+  // ⑥ YouTube（小さめ）
+  if(ytId){
+    html+='<div class="section yt-section">'
+      +'<div class="section-lbl" style="margin-bottom:10px">▶ YouTube動画</div>'
+      +'<div class="yt-embed-wrap">'
+      +'<iframe src="https://www.youtube.com/embed/'+ytId+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>'
+      +'</div></div>';
+  }
+
+  // ⑦ コメント
   html+='<div class="section" id="comment-section">'
     +'<div class="section-lbl">コメント</div>'
     +'<div class="comment-input-wrap">'
