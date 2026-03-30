@@ -1,824 +1,747 @@
-const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const MASTER_KEY='MSTR';
-function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+Math.random().toString(36).slice(2)+Date.now();localStorage.setItem('mgmb_sid',s);}return s;}
-const SESSION_ID=getSessionId();
-let lang='ja';
-let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentTab='all',currentSort='new',currentDBPost=null;
-
-function togglePostDropdown(e){e.stopPropagation();document.getElementById('post-dropdown').classList.toggle('open');}
-function closeDropdownAndPost(type){document.getElementById('post-dropdown').classList.remove('open');openPost(type);}
-document.addEventListener('click',()=>document.getElementById('post-dropdown').classList.remove('open'));
-function toggleLang(){lang=lang==='ja'?'en':'ja';if(allDBPosts.length)applyFilter();}
-
-function buildTicker(posts){
-  const inner=document.getElementById('ticker-inner');if(!inner)return;
-  const items=[];
-  const top=[...posts].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,3);
-  top.forEach(p=>items.push({text:'人気急上昇 ▸ '+p.title,id:p.id}));
-  const recent=[...posts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,3);
-  recent.forEach(p=>items.push({text:'新着 ▸ @'+(p.username||'anon')+' 「'+p.title+'」',id:p.id}));
-  if(!items.length){inner.innerHTML='<span class="ti">My Gear My Board</span><span class="ti">My Gear My Board</span>';return;}
-  const doubled=[...items,...items];
-  inner.innerHTML=doubled.map(x=>'<span class="ti" onclick="location.href=\'/post?id='+x.id+'\'">'+x.text+'</span>').join('');
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Gear My Board</title>
+<meta name="description" content="エフェクターボード＆機材を投稿・共有するSNS">
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--ac2:#f0a500;--tx:#eae8e2;--tm:#78766f;--td:#3e3c3a}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:12px;background:rgba(13,13,14,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.h-search-wrap{flex:1;max-width:320px;position:relative;display:flex;align-items:center}
+.h-search-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:7px 12px 7px 34px;font-size:13px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
+.h-search-input:focus{border-color:var(--ac)}
+.h-search-input::placeholder{color:var(--td);font-size:12px}
+.h-search-icon{position:absolute;left:10px;font-size:13px;color:var(--td);pointer-events:none}
+.h-search-clear{position:absolute;right:8px;width:18px;height:18px;background:var(--td);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:var(--bg);cursor:pointer;border:none;touch-action:manipulation}
+.h-search-clear.show{display:flex}
+.search-results-badge{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tm);display:none;z-index:10}
+.search-results-badge.show{display:block}
+/* スマホ左パネル用検索窓 */
+.mob-search-wrap{position:relative;margin-bottom:16px}
+.mob-search-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:10px 12px 10px 36px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
+.mob-search-input:focus{border-color:var(--ac)}
+.mob-search-input::placeholder{color:var(--td)}
+.mob-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--td);pointer-events:none}
+.mob-search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--td);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:var(--bg);cursor:pointer;border:none;touch-action:manipulation}
+.mob-search-clear.show{display:flex}
+.mob-search-badge{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tm);margin-top:6px;display:none}
+.mob-search-badge.show{display:block}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo-img{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:center}
+.logo-text{display:flex;flex-direction:column;line-height:1}
+.logo-main{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:4px}
+.logo-sub{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-top:2px}
+.h-right{display:flex;align-items:center;gap:10px}
+.h-btn{display:flex;align-items:center;gap:6px;background:var(--ac);border:none;border-radius:4px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .18s;position:relative;touch-action:manipulation}
+.h-btn:hover{background:#cf4c26}
+.h-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-size:14px;cursor:pointer;transition:all .15s;color:var(--tm);touch-action:manipulation}
+.h-icon:hover{border-color:var(--ac);color:var(--ac)}
+.post-dropdown{position:absolute;top:calc(100% + 6px);right:0;background:var(--sf);border:1px solid var(--bd);border-radius:6px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:400;min-width:180px;display:none}
+.post-dropdown.open{display:block}
+.post-dropdown-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tx);cursor:pointer;transition:background .15s;border-bottom:1px solid var(--bd);touch-action:manipulation}
+.post-dropdown-item:last-child{border-bottom:none}
+.post-dropdown-item:hover{background:rgba(232,85,45,.1);color:var(--ac)}
+.ticker{height:28px;background:var(--ac);display:flex;align-items:center;overflow:hidden}
+.ticker-lbl{background:#bf4224;height:100%;display:flex;align-items:center;padding:0 12px;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:#fff;flex-shrink:0}
+.ticker-wrap{overflow:hidden;flex:1}
+.ticker-inner{display:flex;animation:tick 40s linear infinite;white-space:nowrap}
+.ti{padding:0 24px;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:600;color:rgba(255,255,255,.9);display:inline-flex;align-items:center;cursor:pointer}
+.ti+.ti::before{content:'▸';margin-right:20px;opacity:.55}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.wrap{display:grid;grid-template-columns:200px 1fr 260px;max-width:1280px;margin:0 auto}
+.sl{border-right:1px solid var(--bd);padding:20px 12px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto}
+.sl-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--td);padding:0 8px;margin-bottom:7px}
+.sl-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;font-size:12.5px;color:var(--tm);cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:1px}
+.sl-item:hover{background:var(--sf);color:var(--tx);border-color:var(--bd)}
+.sl-item.on{background:rgba(232,85,45,.1);color:var(--ac);border-color:rgba(232,85,45,.25)}
+.sl-div{height:1px;background:var(--bd);margin:14px 0}
+.tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 2px}
+.tag{padding:3px 8px;border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;text-transform:uppercase;letter-spacing:.4px;touch-action:manipulation}
+.tag:hover,.tag.on{border-color:var(--ac);color:var(--ac);background:rgba(232,85,45,.07)}
+.brand-more-btn{margin-top:8px;padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:600;color:var(--tm);cursor:pointer;border:1px solid var(--bd);border-radius:3px;background:transparent;width:100%;display:flex;justify-content:center;align-items:center;gap:4px;transition:all .15s;touch-action:manipulation}
+.brand-more-btn:hover{color:var(--ac);border-color:var(--ac)}
+.brands-extra{display:none;margin-top:10px}
+.brands-extra.open{display:block}
+.brand-group-lbl{font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:12px 0 5px 2px;border-bottom:1px solid var(--bd);padding-bottom:4px}
+.brand-group-lbl:first-child{margin-top:0}
+.feed{padding:20px 22px;border-right:1px solid var(--bd);min-height:calc(100vh - 86px)}
+.feed-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.feed-h{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.sort{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
+.sort-b{padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--td);cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;touch-action:manipulation}
+.sort-b:last-child{border-right:none}
+.sort-b.on{background:var(--sf2);color:var(--tx)}
+.post-banner{background:linear-gradient(135deg,rgba(232,85,45,.12),rgba(240,165,0,.06));border:1px solid rgba(232,85,45,.25);border-radius:6px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.post-banner-text{font-size:12.5px;color:var(--tx);line-height:1.5}
+.post-banner-text strong{color:var(--ac);font-weight:700}
+.post-banner-btns{display:flex;gap:8px;flex-wrap:wrap}
+.pb-btn{display:flex;align-items:center;justify-content:center;padding:9px 0;width:180px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s;border:none;touch-action:manipulation}
+.pb-btn.board{background:var(--ac);color:#fff}
+.pb-btn.board:hover{background:#cf4c26}
+.pb-btn.gear-b{background-color:rgba(232,85,45,.45);color:#fff}
+.pb-btn.gear-b:hover{background-color:rgba(232,85,45,.6)}
+.feed-tabs{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.feed-tab{flex:1;padding:7px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--td);cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;text-align:center;touch-action:manipulation}
+.feed-tab:last-child{border-right:none}
+.feed-tab.on{background:var(--sf2);color:var(--tx)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;animation:fu .4s ease both}
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card:hover{border-color:rgba(232,85,45,.4);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.45)}
+.iw{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--sf2);display:flex;align-items:center;justify-content:center}
+.iw img{width:100%;height:100%;object-fit:contain;object-position:center;background:#0d0d0e}
+.iw-ov{position:absolute;inset:0;background:linear-gradient(160deg,transparent 40%,rgba(13,13,14,.8) 100%);opacity:0;transition:opacity .2s}
+.card:hover .iw-ov{opacity:1}
+.bdg{position:absolute;top:10px;right:10px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:2px;background:var(--ac);color:#fff}
+.bdg.gear-bdg{background:#1a3a1a;color:#6aba6a;border:1px solid #2a5a2a}
+.yt-bdg{position:absolute;bottom:10px;left:10px;background:rgba(255,0,0,.85);border-radius:3px;padding:2px 6px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;color:#fff;display:flex;align-items:center;gap:3px}
+.body{padding:12px 14px}
+.cu{display:flex;align-items:center;gap:7px;margin-bottom:8px}
+.av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1.5px solid var(--bd);flex-shrink:0;background:linear-gradient(135deg,#e85c2f,#b03020)}
+.av-name{font-size:11.5px;font-weight:500}
+.av-time{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)}
+.ct{font-size:13.5px;font-weight:700;line-height:1.3;margin-bottom:7px}
+.ptags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:9px}
+.ptag{padding:2px 6px;background:var(--sf2);border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--tm)}
+.cf{display:flex;align-items:center;gap:11px;padding-top:8px;border-top:1px solid var(--bd)}
+.st{display:flex;align-items:center;gap:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tm);cursor:pointer;transition:color .15s;user-select:none;touch-action:manipulation}
+.st:hover{color:var(--ac)}.st.liked{color:var(--ac)}
+.ad-slot{background:var(--sf);border:1px solid var(--bd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;color:var(--td);font-family:'JetBrains Mono',monospace;font-size:9px}
+.ad-side{height:250px;margin-bottom:13px}
+.sr{padding:20px 16px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto}
+.widget{background:var(--sf);border:1px solid var(--bd);border-radius:5px;padding:14px;margin-bottom:13px}
+.wt{font-family:'Bebas Neue',sans-serif;font-size:13.5px;letter-spacing:2.5px;padding-bottom:9px;margin-bottom:10px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px}
+.ri{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer}
+.ri:last-child{border-bottom:none}
+.ri:hover .ri-t{color:var(--ac)}
+.rn{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;color:var(--td);width:20px;text-align:center;flex-shrink:0}
+.rn.hi{color:var(--ac)}
+.ri-i{flex:1;min-width:0}
+.ri-t{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .15s}
+.ri-u{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-top:1px}
+.ri-s{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--tm);flex-shrink:0}
+.gr{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.gr:last-child{border-bottom:none}
+.gr-i{flex:1;min-width:0}
+.gr-n{font-size:10.5px;font-weight:500}
+.gr-b{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--td)}
+.news-link{text-decoration:none;color:inherit;display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:color .15s}
+.news-link:last-child{border-bottom:none}
+.news-link:hover .nr-t{color:var(--ac)}
+.nth{width:44px;height:44px;border-radius:3px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.nr-t{font-size:10.5px;font-weight:500;line-height:1.4}
+.nr-d{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--td);margin-top:2px}
+.empty-filter{grid-column:1/-1;text-align:center;padding:40px 20px}
+.empty-filter-msg{font-size:13px;color:var(--tm);margin-bottom:8px;line-height:1.6}
+.empty-filter-promo{font-size:12px;color:var(--ac);margin-bottom:16px;font-weight:500}
+.empty-filter-btn{display:inline-block;padding:8px 20px;border:1px solid var(--ac);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ac);cursor:pointer;background:transparent;touch-action:manipulation}
+.gear-input-wrap{position:relative}
+.gear-tags{display:flex;flex-wrap:wrap;gap:5px;min-height:36px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:6px 8px;cursor:text;transition:border-color .15s}
+.gear-tags:focus-within{border-color:var(--ac)}
+.gear-tag{display:flex;align-items:center;gap:4px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:2px;padding:2px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);white-space:nowrap}
+.gear-tag-x{cursor:pointer;font-size:12px;color:var(--ac);opacity:.7;background:none;border:none;padding:0}
+.gear-text-input{background:transparent;border:none;outline:none;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;min-width:140px;flex:1;padding:1px 2px}
+.gear-text-input::placeholder{color:var(--td)}
+.ac-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:200;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.ac-dropdown.open{display:block}
+.ac-item{padding:8px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .12s;border-bottom:1px solid var(--bd)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.focus{background:rgba(232,85,45,.1)}
+.ac-item-name{flex:1;color:var(--tx)}
+.ac-item-brand{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)}
+.ac-empty{padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);text-align:center}
+.upload-progress-wrap{margin-top:10px;display:none}
+.upload-progress-wrap.show{display:block}
+.upload-progress-bar-bg{height:4px;background:var(--bd);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.upload-progress-bar{height:100%;background:var(--ac);border-radius:2px;width:0%;transition:width .3s}
+.upload-progress-msg{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tm);text-align:center}
+.pbd{position:fixed;inset:0;background:rgba(0,0,0,.9);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s;overflow-y:auto}
+.pbd.open{opacity:1;pointer-events:all}
+.pform{background:var(--sf);border:1px solid var(--bd);border-radius:8px;width:100%;max-width:540px;padding:28px;transform:scale(.94) translateY(10px);transition:transform .24s;position:relative;margin:auto}
+.pbd.open .pform{transform:scale(1) translateY(0)}
+.pform-close{position:absolute;top:16px;right:16px;width:28px;height:28px;background:var(--sf2);border:1px solid var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--tm)}
+.pform-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.step-header{margin-bottom:22px}
+.step-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px}
+.step-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);letter-spacing:1px;margin-top:3px}
+.step-dots{display:flex;gap:5px;margin-top:8px}
+.step-dot{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:all .2s}
+.step-dot.on{background:var(--ac);transform:scale(1.2)}
+.step-dot.done{background:rgba(232,85,45,.35)}
+.step-panel{display:none}
+.step-panel.on{display:block}
+.step-nav{display:flex;gap:8px;margin-top:18px}
+.step-btn{flex:1;padding:11px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .18s;border:none;touch-action:manipulation}
+.step-btn.next,.step-btn.submit-s{background:var(--ac);color:#fff}
+.step-btn.next:hover,.step-btn.submit-s:hover{background:#cf4c26}
+.step-btn.back{background:var(--sf2);color:var(--tm);border:1px solid var(--bd)}
+.step-btn.back:hover{border-color:var(--ac);color:var(--ac)}
+.step-btn:disabled{opacity:.5;cursor:not-allowed}
+.skip-btn{width:100%;margin-top:8px;padding:7px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid var(--bd);background:transparent;color:var(--td);transition:all .15s;touch-action:manipulation}
+.form-row{margin-bottom:14px}
+.form-lbl{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:#9a9890;margin-bottom:6px;display:block}
+.form-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--ac)}
+.form-input::placeholder{color:var(--td)}
+textarea.form-input{resize:vertical;min-height:90px}
+.yt-input-wrap{position:relative;display:flex;align-items:center}
+.yt-input-wrap .yt-icon{position:absolute;left:10px;font-size:16px;pointer-events:none}
+.yt-input-wrap .form-input{padding-left:34px}
+.genre-select{display:flex;flex-wrap:wrap;gap:5px}
+.gs{padding:4px 10px;border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--tm);cursor:pointer;transition:all .15s;user-select:none;touch-action:manipulation}
+.gs.on{border-color:var(--ac);color:var(--ac);background:rgba(232,85,45,.08)}
+.upload-area{border:1.5px dashed var(--bd);border-radius:4px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .15s;color:var(--td);font-size:13px;touch-action:manipulation}
+.upload-area:hover{border-color:var(--ac);color:var(--ac)}
+.upload-icon{font-size:34px;margin-bottom:8px;display:block}
+.photo-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.photo-thumb{position:relative;width:90px;height:90px;border-radius:4px;overflow:hidden;border:1px solid var(--bd);flex-shrink:0}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-remove{position:absolute;top:3px;right:3px;width:22px;height:22px;background:rgba(0,0,0,.75);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;cursor:pointer;color:#fff;border:none;touch-action:manipulation}
+.photo-remove:hover{background:var(--ac)}
+.photo-edit-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(232,85,45,.85);border:none;color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:5px 4px;cursor:pointer;text-align:center;touch-action:manipulation;min-height:28px}
+.photo-add-btn{width:90px;height:90px;border:1.5px dashed var(--bd);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--td);font-size:22px;transition:all .15s;flex-shrink:0;background:transparent;touch-action:manipulation}
+.photo-add-btn:hover{border-color:var(--ac);color:var(--ac)}
+.photo-add-label{font-family:'JetBrains Mono',monospace;font-size:8px}
+.photo-count{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:6px}
+.confirm-box{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:12px 14px;margin-bottom:2px}
+.confirm-row{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:12px}
+.confirm-row:last-child{border-bottom:none}
+.confirm-lbl{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--td);width:72px;flex-shrink:0;padding-top:1px}
+.confirm-val{flex:1;color:var(--tx);line-height:1.5;word-break:break-word}
+.pass-box{background:rgba(232,85,45,.06);border:1px solid rgba(232,85,45,.25);border-radius:5px;padding:14px 16px;margin-top:12px}
+.pass-box-title{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ac);margin-bottom:6px}
+.pass-warn{font-size:11.5px;color:var(--tx);line-height:1.65;margin-bottom:10px}
+.pass-warn strong{color:var(--ac);font-weight:700}
+.pass-digits{display:flex;gap:8px;justify-content:center}
+.pass-digit{width:52px;height:58px;background:var(--sf2);border:2px solid var(--bd);border-radius:6px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;color:var(--tx);outline:none;transition:border-color .15s;caret-color:var(--ac)}
+.pass-digit:focus{border-color:var(--ac)}
+.anon-note{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--td);text-align:center;margin-top:8px}
+.ebd{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s}
+.ebd.open{opacity:1;pointer-events:all}
+.eform{background:var(--sf);border:1px solid var(--bd);border-radius:8px;width:100%;max-width:460px;padding:28px;position:relative;transform:scale(.94) translateY(10px);transition:transform .24s;max-height:90vh;overflow-y:auto}
+.ebd.open .eform{transform:scale(1) translateY(0)}
+.eform-close{position:absolute;top:14px;right:14px;width:28px;height:28px;background:var(--sf2);border:1px solid var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--tm)}
+.eform-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.eform-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:6px}
+.eform-sub{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);letter-spacing:1px;margin-bottom:20px}
+.pin-row{display:flex;gap:8px;justify-content:center;margin:12px 0 18px}
+.pin-d{width:56px;height:62px;background:var(--sf2);border:2px solid var(--bd);border-radius:6px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;color:var(--tx);outline:none;transition:border-color .15s;caret-color:var(--ac)}
+.pin-d:focus{border-color:var(--ac)}
+.pin-err{font-family:'JetBrains Mono',monospace;font-size:10px;color:#e05050;text-align:center;min-height:16px;margin-bottom:6px}
+.submit-btn{width:100%;background:var(--ac);border:none;border-radius:4px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .18s;margin-top:4px;touch-action:manipulation}
+.submit-btn:hover{background:#cf4c26}
+.del-btn{width:100%;background:transparent;border:1px solid #5a1a1a;border-radius:4px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#e05050;cursor:pointer;transition:all .18s;margin-top:6px;touch-action:manipulation}
+.del-btn:hover{background:rgba(224,80,80,.1);border-color:#e05050}
+.done-bd{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:700;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+.done-bd.open{opacity:1;pointer-events:all}
+.done-box{background:var(--sf);border:1px solid rgba(232,85,45,.4);border-radius:10px;width:100%;max-width:340px;padding:32px 24px;text-align:center;transform:scale(.9) translateY(16px);transition:transform .28s}
+.done-bd.open .done-box{transform:scale(1) translateY(0)}
+.done-icon{font-size:44px;margin-bottom:12px}
+.done-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--ac);margin-bottom:8px}
+.done-sub{font-size:13px;color:var(--tm);line-height:1.6;margin-bottom:20px}
+.done-close-btn{background:var(--ac);border:none;border-radius:4px;padding:10px 28px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.footer-logo{height:28px;object-fit:contain;opacity:.7}
+.footer-links{display:flex;gap:14px}
+.footer-link{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);cursor:pointer;transition:color .15s;letter-spacing:.5px;text-decoration:none}
+.footer-link:hover{color:var(--ac)}
+.footer-copy{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+.img-editor-bd{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:800;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s}
+.img-editor-bd.open{opacity:1;pointer-events:all}
+.img-editor-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.img-editor-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.img-editor-subtitle{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-top:2px}
+.img-editor-done{background:var(--ac);border:none;border-radius:4px;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;min-height:44px;touch-action:manipulation}
+.img-editor-canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;background:#000}
+#editor-canvas{max-width:100%;max-height:100%;display:block;touch-action:none}
+.img-editor-toolbar{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-top:1px solid var(--bd);flex-shrink:0;flex-wrap:wrap}
+.editor-tool-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 16px;border-radius:4px;border:1px solid var(--bd);background:var(--sf);color:var(--tm);font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;min-width:64px;min-height:54px;touch-action:manipulation}
+.editor-tool-btn.active{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
+.editor-tool-icon{font-size:20px}
+.img-editor-hint{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);text-align:center;padding:6px;flex-shrink:0}
+.img-tab-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
+.img-tab{padding:6px 14px;border-radius:3px;border:1px solid var(--bd);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--tm);cursor:pointer;min-height:36px;touch-action:manipulation}
+.img-tab.on{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
+@media(max-width:1024px){.wrap{grid-template-columns:180px 1fr}.sr{display:none}}
+@media(max-width:680px){
+.wrap{display:block}.sl{display:none}.sr{display:none}.feed{padding:0;border:none}
+header{padding:0 14px;height:54px}
+.logo-img{width:40px;height:40px}
+.logo-main{font-size:16px;letter-spacing:2px}.logo-sub{font-size:6.5px;letter-spacing:2px}
+.h-search-wrap{display:none}
+.h-btn{padding:7px 12px;font-size:9px;letter-spacing:.5px}
+.h-icon{width:32px;height:32px;font-size:13px}
+#swipe-ui{overflow:hidden;width:100%}
+.swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
+.swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block;touch-action:manipulation}
+.swipe-dot.on{background:var(--ac);transform:scale(1.3)}
+.swipe-container{display:flex;width:300%;transition:transform .3s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start}
+.swipe-panel{width:33.333%;flex-shrink:0;min-height:calc(100vh - 108px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.mob-left-panel{padding:16px 14px}
+.mob-panel-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:14px;color:var(--tx);display:flex;align-items:center;gap:8px}
+.mob-panel-title::after{content:'';flex:1;height:1px;background:var(--bd)}
+.mob-feed-inner{padding:12px 14px}
+.post-banner{padding:12px 14px;flex-direction:column;align-items:flex-start;gap:10px}
+.post-banner-btns{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}.pb-btn{width:100%}
+.grid{grid-template-columns:1fr 1fr;gap:10px}.card .ct{font-size:12px}
+.feed-tabs .feed-tab{font-size:8px;padding:6px 4px;letter-spacing:.5px}
+.mob-right-panel{padding:16px 14px}.mob-right-panel .widget{margin-bottom:14px}
+footer{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:10px}.footer-links{gap:12px}
+.pform{padding:20px 16px;margin:8px auto}
+.img-editor-toolbar{gap:6px;padding:8px}.editor-tool-btn{padding:8px 10px;min-width:58px}
 }
-
-async function loadPostsFromDB(){
-  const{data:posts,error}=await sb.from('posts').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);return;}
-  const{data:cc}=await sb.from('comments').select('post_id');
-  const cm={};if(cc)cc.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  allDBPosts=(posts||[]).map(p=>({...p,comment_count:cm[p.id]||0}));
-  applyFilter();
-  buildTicker(allDBPosts);
-  renderRankingWidget(allDBPosts);renderGearWidget(allDBPosts);
-  renderRankingWidgetMob(allDBPosts);renderGearWidgetMob(allDBPosts);
-}
-
-function parseGenre(genre){
-  if(!genre)return[];
-  if(Array.isArray(genre))return genre;
-  if(typeof genre==='string'){try{const p=JSON.parse(genre);return Array.isArray(p)?p:[genre];}catch(e){return[genre];}}
-  return[];
-}
-
-// ジャンルフィルター（大文字小文字・配列対応）
-function genreMatches(post,filter){
-  if(filter==='ALL')return true;
-  const genres=parseGenre(post.genre);
-  return genres.some(g=>g===filter||g.toUpperCase()===filter.toUpperCase());
-}
-
-function applyFilter(){
-  let posts=[...allDBPosts];
-  if(currentTab==='board')posts=posts.filter(p=>!p.post_type||p.post_type==='board');
-  else if(currentTab==='gear')posts=posts.filter(p=>p.post_type==='gear');
-  if(currentGenreFilter!=='ALL')posts=posts.filter(p=>genreMatches(p,currentGenreFilter));
-  if(currentBrandFilter){
-    posts=posts.filter(p=>{
-      const g=Array.isArray(p.gear_list)?p.gear_list:[];
-      return g.some(x=>(x.brand||x.name||x||'').toLowerCase().includes(currentBrandFilter.toLowerCase()));
-    });
-  }
-  // フリーワード検索
-  if(currentSearchQuery){
-    posts=posts.filter(p=>searchMatches(p,currentSearchQuery));
-    const badgeText='「'+currentSearchQuery+'」の検索結果：'+posts.length+'件';
-    const badge=document.getElementById('search-badge');
-    if(badge){badge.textContent=badgeText;badge.classList.add('show');}
-    const mobBadge=document.getElementById('mob-search-badge');
-    if(mobBadge){mobBadge.textContent=badgeText;mobBadge.classList.add('show');}
-  }else{
-    const badge=document.getElementById('search-badge');
-    if(badge)badge.classList.remove('show');
-    const mobBadge=document.getElementById('mob-search-badge');
-    if(mobBadge)mobBadge.classList.remove('show');
-  }
-  if(currentSort==='likes')posts.sort((a,b)=>(b.likes||0)-(a.likes||0));
-  renderDBPosts(posts);
-}
-
-function timeAgo(ts){
-  const d=Math.floor((Date.now()-new Date(ts))/1000);
-  if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';
-}
-
-function getEmptyHTML(){
-  const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter!==null;
-  if(!isFiltered)return '<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--td)">投稿がありません</div>';
-  const label=currentBrandFilter||currentGenreFilter;
-  return '<div class="empty-filter"><div class="empty-filter-msg">「'+label+'」の投稿はまだありません</div><div class="empty-filter-promo">このジャンルで最初に投稿してみましょう！</div><div class="empty-filter-btn" onclick="clearFilter()">← フィルターを解除</div></div>';
-}
-
-function clearFilter(){
-  currentGenreFilter='ALL';currentBrandFilter=null;
-  document.querySelectorAll('.sl .tag, #swipe-ui .tag').forEach(t=>{
-    t.classList.toggle('on',t.getAttribute('data-genre')==='ALL');
-  });
-  clearSearch();
-}
-
-function renderDBPosts(posts){
-  const grid=document.getElementById('card-grid');
-  const gridMob=document.getElementById('card-grid-mob');
-  const html=posts.length?posts.map((p,i)=>{
-    const init=(p.username||'匿')[0].toUpperCase();
-    const gear=Array.isArray(p.gear_list)?p.gear_list:[];
-    const tags=gear.slice(0,3).map(g=>'<span class="ptag">'+(g.name||g)+'</span>').join('');
-    const isGear=p.post_type==='gear';
-    const genres=parseGenre(p.genre);
-    const glabel=genres.slice(0,2).join(' · ');
-    const destUrl='/post?id='+p.id;
-    const ytBadge=p.youtube_url?'<div class="yt-bdg">▶ YouTube</div>':'';
-    return '<div class="card" onclick="location.href=\''+destUrl+'\'" style="animation-delay:'+(i*.05)+'s">'
-      +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy">':'<div style="font-size:40px;opacity:.2">'+(isGear?'🎸':'🎛')+'</div>')
-      +'<div class="iw-ov"></div>'+(isGear?'<div class="bdg gear-bdg">機材</div>':(glabel?'<div class="bdg">'+glabel+'</div>':''))+ytBadge+'</div>'
-      +'<div class="body"><div class="cu"><div class="av">'+init+'</div>'
-      +'<div class="av-name">'+(p.username||'匿名ユーザー')+'</div>'
-      +'<div class="av-time">'+timeAgo(p.created_at)+'</div></div>'
-      +'<div class="ct">'+p.title+'</div><div class="ptags">'+tags+'</div>'
-      +'<div class="cf"><div class="st" onclick="toggleDBLike(event,\''+p.id+'\',this)">❤️ <span>'+(p.likes||0)+'</span></div>'
-      +'<div class="st">💬 <span>'+(p.comment_count||0)+'</span></div></div></div></div>';
-  }).join(''):getEmptyHTML();
-  if(grid)grid.innerHTML=html;
-  if(gridMob)gridMob.innerHTML=html;
-}
-
-async function toggleDBLike(e,postId,el){
-  e.stopPropagation();
-  const cnt=el.querySelector('span');
-  const{data:ex}=await sb.from('likes').select('id').eq('post_id',postId).eq('session_id',SESSION_ID);
-  if(ex&&ex.length){
-    await sb.from('likes').delete().eq('post_id',postId).eq('session_id',SESSION_ID);
-    const n=Math.max(0,(parseInt(cnt.textContent)||1)-1);
-    await sb.from('posts').update({likes:n}).eq('id',postId);cnt.textContent=n;el.classList.remove('liked');
-  }else{
-    await sb.from('likes').insert({post_id:postId,session_id:SESSION_ID});
-    const n=(parseInt(cnt.textContent)||0)+1;
-    await sb.from('posts').update({likes:n}).eq('id',postId);cnt.textContent=n;el.classList.add('liked');showToast('❤️ いいねしました');
-  }
-}
-
-function filterGenre(el,genre){
-  document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;applyFilter();
-}
-function filterBrand(el,brand){
-  document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';applyFilter();
-}
-function setTab(el,tab){
-  document.querySelectorAll('.feed-tab').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentTab=tab;
-  const fh=document.getElementById('feed-heading');if(fh)fh.textContent=tab==='gear'?'GEAR':'PEDALBOARDS';
-  const fhm=document.getElementById('feed-heading-mob');if(fhm)fhm.textContent=tab==='gear'?'GEAR':'PEDALBOARDS';
-  applyFilter();
-}
-function setSort(el,sort){document.querySelectorAll('.sort-b').forEach(b=>b.classList.remove('on'));el.classList.add('on');currentSort=sort;applyFilter();}
-
-function renderRankingWidget(posts){
-  const el=document.getElementById('ranking-widget');if(!el)return;
-  const bp=posts.filter(p=>!p.post_type||p.post_type==='board');
-  const monthAgo=Date.now()-30*24*60*60*1000;
-  const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);
-  const target=monthly.length>=3?monthly:bp;
-  const sorted=[...target].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
-  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:JetBrains Mono,monospace">まだ投稿がありません</div>';return;}
-  el.innerHTML=sorted.map((p,i)=>{
-    const crown=i===0?'<span style="margin-right:4px">👑</span>':'';
-    return '<div class="ri" onclick="location.href=\'/post?id='+p.id+'\'">'
-      +'<div class="rn '+(i<2?'hi':'')+'">'+crown+(i+1)+'</div>'
-      +'<div class="ri-i"><div class="ri-t">'+p.title+'</div><div class="ri-u">'+(p.username||'匿名')+'</div></div>'
-      +'<div class="ri-s">❤️'+(p.likes||0)+'</div></div>';
-  }).join('');
-}
-
-function soundhouseUrl(name){return'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(name);}
-
-function renderGearWidget(posts){
-  const el=document.getElementById('gear-widget');if(!el)return;
-  const count={};
-  posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
-  const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:JetBrains Mono,monospace">データなし</div>';return;}
-  el.innerHTML=sorted.map(([n,c])=>'<div class="gr" style="cursor:pointer" onclick="filterByGearName(\''+n.replace(/'/g,"\\'")+'\'">'
-    +'<div class="gr-i"><div class="gr-n">'+n+'</div><div class="gr-b">'+c+'件の投稿</div></div>'
-    +'<a href="'+soundhouseUrl(n)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:13px">🔍</a>'
-    +'</div>').join('');
-}
-
-function filterByGearName(name){
-  currentBrandFilter=null;currentGenreFilter='ALL';
-  const posts=allDBPosts.filter(p=>{
-    const g=Array.isArray(p.gear_list)?p.gear_list:[];
-    return g.some(x=>(x.name||x||'').toLowerCase()===name.toLowerCase());
-  });
-  renderDBPosts(posts.length?posts:[]);
-  if(window.innerWidth<=680)setTimeout(()=>goPanel(1),180);
-}
-
-// ── フリーワード検索（PC用）
-let currentSearchQuery='';
-
-function handleSearch(val){
-  currentSearchQuery=val.trim();
-  const clearBtn=document.getElementById('h-search-clear');
-  if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);
-  applyFilter();
-}
-
-function clearSearch(){
-  currentSearchQuery='';
-  const input=document.getElementById('h-search');
-  if(input)input.value='';
-  const clearBtn=document.getElementById('h-search-clear');
-  if(clearBtn)clearBtn.classList.remove('show');
-  const badge=document.getElementById('search-badge');
-  if(badge)badge.classList.remove('show');
-  applyFilter();
-}
-
-// スマホ用検索
-function handleSearchMob(val){
-  currentSearchQuery=val.trim();
-  const clearBtn=document.getElementById('mob-search-clear');
-  if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);
-  applyFilter();
-}
-
-function clearSearchMob(){
-  currentSearchQuery='';
-  const input=document.getElementById('mob-search');
-  if(input)input.value='';
-  const clearBtn=document.getElementById('mob-search-clear');
-  if(clearBtn)clearBtn.classList.remove('show');
-  const badge=document.getElementById('mob-search-badge');
-  if(badge)badge.classList.remove('show');
-  applyFilter();
-}
-
-function searchMatches(post,query){
-  if(!query)return true;
-  const q=query.toLowerCase();
-  const title=(post.title||'').toLowerCase();
-  const username=(post.username||'').toLowerCase();
-  const desc=(post.description||'').toLowerCase();
-  const gear=Array.isArray(post.gear_list)?post.gear_list:[];
-  const gearStr=gear.map(g=>(g.name||g||'').toLowerCase()).join(' ');
-  const genres=parseGenre(post.genre).join(' ').toLowerCase();
-  return title.includes(q)||username.includes(q)||desc.includes(q)||gearStr.includes(q)||genres.includes(q);
-}
-let selectedGears=[],acResults=[],acFocusIdx=-1;
-async function searchGear(val){
-  const q=val.trim();closeAC();if(!q)return;
-  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name')
-    .or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%').limit(10);
-  let results=prefixData||[];
-  if(results.length<5){
-    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name').ilike('full_name','%'+q+'%').limit(10);
-    if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
-  }
-  results=results.slice(0,10);acResults=results;acFocusIdx=-1;
-  const dd=document.getElementById('ac-dropdown');
-  if(!results.length){dd.innerHTML='<div class="ac-empty">「'+q+'」— 候補なし　Enterで追加</div>';dd.classList.add('open');return;}
-  dd.innerHTML=results.map((x,i)=>'<div class="ac-item" onmousedown="selectGear('+i+')" onmouseover="setACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>').join('');
-  dd.classList.add('open');
-}
-function setACFocus(i){acFocusIdx=i;document.querySelectorAll('.ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
-function selectGear(i){const x=acResults[i];if(!x)return;addGearTag({name:x.full_name,brand:x.brand});closeAC();}
-function addGearTag(g){
-  if(selectedGears.find(x=>x.name===g.name))return;
-  if(selectedGears.length>=20){showToast('⚠️ 最大20件まで');return;}
-  selectedGears.push(g);renderGearTags();document.getElementById('gear-search').value='';
-}
-function removeGearTag(i){selectedGears.splice(i,1);renderGearTags();}
-function renderGearTags(){
-  const wrap=document.getElementById('gear-tags');if(!wrap)return;
-  const inp=document.getElementById('gear-search');
-  wrap.querySelectorAll('.gear-tag').forEach(el=>el.remove());
-  selectedGears.forEach((g,i)=>{
-    const tag=document.createElement('div');tag.className='gear-tag';
-    tag.innerHTML=g.name+'<button class="gear-tag-x" onmousedown="event.preventDefault();removeGearTag('+i+')">✕</button>';
-    wrap.insertBefore(tag,inp);
-  });
-}
-function gearKeyDown(e){
-  const dd=document.getElementById('ac-dropdown');const open=dd.classList.contains('open');
-  if(e.key==='ArrowDown'){e.preventDefault();if(open)setACFocus(Math.min(acFocusIdx+1,acResults.length-1));}
-  else if(e.key==='ArrowUp'){e.preventDefault();setACFocus(Math.max(acFocusIdx-1,0));}
-  else if(e.key==='Enter'){
-    e.preventDefault();
-    if(open&&acFocusIdx>=0&&acResults[acFocusIdx])selectGear(acFocusIdx);
-    else{const v=e.target.value.trim();if(v)addGearTag({name:v,brand:''});}
-  }else if(e.key==='Backspace'&&!e.target.value&&selectedGears.length)removeGearTag(selectedGears.length-1);
-  else if(e.key==='Escape')closeAC();
-}
-function closeAC(){document.getElementById('ac-dropdown').classList.remove('open');}
-function toggleGenre(el){el.classList.toggle('on');}
-
-// ステップフォーム
-let currentStep=1,currentPostType='board';
-const TOTAL_STEPS=5;
-function openPost(type){
-  currentPostType=type||'board';currentStep=1;selectedGears=[];uploadedPhotos=[];editedPhotos=[];
-  document.querySelectorAll('#post-genre-select .gs').forEach(g=>g.classList.remove('on'));
-  ['post-username','post-desc','post-youtube','post-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
-  renderGearTags();renderPhotoPreviews();updateStepUI();
-  document.getElementById('post-bd').classList.add('open');document.body.style.overflow='hidden';
-}
-function goStep(n){
-  if(n===3&&currentStep===2){if(!document.getElementById('post-title').value.trim()){showToast('❌ タイトルを入力してください');return;}}
-  if(n===5)renderConfirm();
-  currentStep=n;updateStepUI();
-  if(n===3)renderStep3PhotoPreview();
-}
-function renderStep3PhotoPreview(){
-  const wrap=document.getElementById('step3-photo-preview');if(!wrap)return;
-  if(!uploadedPhotos.length){wrap.style.display='none';return;}
-  wrap.style.display='flex';
-  wrap.innerHTML=uploadedPhotos.map((src,i)=>{
-    const disp=editedPhotos[i]||src;
-    return '<img src="'+disp+'" style="width:72px;height:72px;object-fit:cover;border-radius:4px;border:1px solid var(--bd);cursor:pointer" onclick="openImgEditor('+i+')" title="タップして編集">';
-  }).join('');
-}
-function updateStepUI(){
-  document.querySelectorAll('.step-panel').forEach((el,i)=>el.classList.toggle('on',i+1===currentStep));
-  document.getElementById('step-title').textContent=currentPostType==='board'?'エフェクターボードを投稿':'機材を投稿';
-  document.getElementById('step-sub').textContent='Step '+currentStep+' / '+TOTAL_STEPS;
-  document.getElementById('step-dots').innerHTML=Array.from({length:TOTAL_STEPS},(_,i)=>'<div class="step-dot '+(i+1===currentStep?'on':i+1<currentStep?'done':'')+'"></div>').join('');
-}
-function renderConfirm(){
-  const username=document.getElementById('post-username').value.trim()||'匿名ユーザー';
-  const title=document.getElementById('post-title').value.trim();
-  const desc=document.getElementById('post-desc').value.trim();
-  const yt=document.getElementById('post-youtube').value.trim();
-  const genres=[...document.querySelectorAll('#post-genre-select .gs.on')].map(el=>el.getAttribute('data-val')||el.textContent.trim());
-  document.getElementById('confirm-content').innerHTML=[
-    ['タイプ',currentPostType==='board'?'エフェクターボード':'MY GEAR'],
-    ['ユーザー名',username],['タイトル',title||'(未入力)'],
-    ['機材',selectedGears.map(g=>g.name).join(', ')||'(未入力)'],
-    ['ジャンル',genres.join(', ')||'(未選択)'],
-    ['説明',desc?desc.slice(0,60)+(desc.length>60?'...':''):'(なし)'],
-    ['YouTube',yt||'(なし)'],
-    ['写真',(editedPhotos.filter(x=>x).length||uploadedPhotos.length)+'枚'],
-  ].map(([l,v])=>'<div class="confirm-row"><div class="confirm-lbl">'+l+'</div><div class="confirm-val">'+v+'</div></div>').join('');
-}
-
-// 写真
-let uploadedPhotos=[],editedPhotos=[];
-const MAX_PHOTOS=3,MAX_DIM=1280,JPEG_QUALITY=0.82;
-function compressImage(dataUrl){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.onload=()=>{
-      let{width,height}=img;
-      if(width>MAX_DIM||height>MAX_DIM){const ratio=Math.min(MAX_DIM/width,MAX_DIM/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}
-      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
-      canvas.getContext('2d').drawImage(img,0,0,width,height);
-      resolve(canvas.toDataURL('image/jpeg',JPEG_QUALITY));
-    };img.src=dataUrl;
-  });
-}
-function handlePhotos(e){
-  const files=Array.from(e.target.files);const rem=MAX_PHOTOS-uploadedPhotos.length;
-  files.slice(0,rem).forEach(f=>{
-    const r=new FileReader();
-    r.onload=async ev=>{const compressed=await compressImage(ev.target.result);uploadedPhotos.push(compressed);editedPhotos.push(null);renderPhotoPreviews();};
-    r.readAsDataURL(f);
-  });
-  if(files.length>rem)showToast('⚠️ 最大'+MAX_PHOTOS+'枚まで');e.target.value='';
-}
-function renderPhotoPreviews(){
-  const wrap=document.getElementById('photo-previews');if(!wrap)return;
-  const thumbs=uploadedPhotos.map((src,i)=>{
-    const displaySrc=editedPhotos[i]||src;
-    return '<div class="photo-thumb"><img src="'+displaySrc+'">'
-      +'<button class="photo-remove" onclick="removePhoto('+i+')">✕</button>'
-      +'<button class="photo-edit-btn" onclick="openImgEditor('+i+')">✏️ 編集</button>'
-      +'</div>';
-  }).join('');
-  const add=uploadedPhotos.length<MAX_PHOTOS?'<div class="photo-add-btn" onclick="document.getElementById(\'photo-input\').click()"><span>＋</span><span class="photo-add-label">追加</span></div>':'';
-  wrap.innerHTML=thumbs+add;
-  const cnt=document.getElementById('photo-count');if(cnt)cnt.textContent=uploadedPhotos.length+' / '+MAX_PHOTOS+'枚';
-  const ua=document.getElementById('upload-area-main');if(ua)ua.style.display=uploadedPhotos.length>0?'none':'block';
-}
-function removePhoto(i){uploadedPhotos.splice(i,1);editedPhotos.splice(i,1);renderPhotoPreviews();}
-function getFinalPhoto(i){return editedPhotos[i]||uploadedPhotos[i]||null;}
-
-function setUploadProgress(current,total,msg){
-  const wrap=document.getElementById('upload-progress-wrap');
-  const bar=document.getElementById('upload-progress-bar');
-  const msgEl=document.getElementById('upload-progress-msg');
-  if(!wrap)return;wrap.classList.add('show');
-  bar.style.width=Math.round(current/total*100)+'%';
-  if(msgEl)msgEl.textContent=msg||'アップロード中...';
-}
-function hideUploadProgress(){const wrap=document.getElementById('upload-progress-wrap');if(wrap)wrap.classList.remove('show');}
-
-async function uploadPhoto(b64,idx,total){
-  try{
-    const byteStr=atob(b64.split(',')[1]);
-    const mime=b64.split(',')[0].split(':')[1].split(';')[0];
-    const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);
-    for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
-    const blob=new Blob([ab],{type:mime});
-    const ext=mime.includes('png')?'png':'jpg';
-    const fn='posts/'+Date.now()+'_'+idx+'.'+ext;
-    setUploadProgress(idx,total,'📤 '+(idx+1)+' / '+total+'枚目をアップロード中...');
-    const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime});
-    if(error)return null;
-    const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);
-    setUploadProgress(idx+1,total,'📤 '+(idx+1)+' / '+total+'枚目 完了');
-    return u.publicUrl;
-  }catch(e){console.error(e);return null;}
-}
-
-async function submitPostToDB(){
-  const btn=document.getElementById('submit-btn');
-  if(btn){btn.disabled=true;btn.textContent='投稿中...';}
-  const title=document.getElementById('post-title').value.trim();
-  const desc=document.getElementById('post-desc').value.trim();
-  const ytRaw=document.getElementById('post-youtube').value.trim();
-  const ytMatch=ytRaw.match(/(https?:\/\/[^\s]+)/);
-  const youtube_url=ytMatch?ytMatch[1]:null;
-  const genres=[...document.querySelectorAll('#post-genre-select .gs.on')].map(el=>el.getAttribute('data-val')||el.textContent.trim());
-  const pin=['pd1','pd2','pd3','pd4'].map(id=>document.getElementById(id).value).join('');
-  if(!title){showToast('❌ タイトルを入力してください');if(btn){btn.disabled=false;btn.textContent='投稿する';}return;}
-  if(pin.length<4){showToast('❌ 4桁パスワードを設定してください');if(btn){btn.disabled=false;btn.textContent='投稿する';}return;}
-  let image_urls=[];
-  if(uploadedPhotos.length>0){
-    const finals=uploadedPhotos.map((_,i)=>getFinalPhoto(i));
-    const total=finals.filter(x=>x).length;
-    setUploadProgress(0,total,'📤 画像をアップロード中...');
-    for(let i=0;i<finals.length;i++){if(finals[i]){const url=await uploadPhoto(finals[i],i,total);if(url)image_urls.push(url);}}
-    hideUploadProgress();
-  }
-  const{error}=await sb.from('posts').insert({
-    username:document.getElementById('post-username').value.trim()||'匿名ユーザー',
-    title,description:desc,genre:genres,
-    gear_list:selectedGears.map(g=>({name:g.name,brand:g.brand||''})),
-    image_urls,pin_hash:pin,likes:0,post_type:currentPostType,youtube_url
-  });
-  if(btn){btn.disabled=false;btn.textContent='投稿する';}
-  if(error){showToast('❌ 投稿に失敗しました');console.error(error);return;}
-  closeModal('post-bd');
-  selectedGears=[];uploadedPhotos=[];editedPhotos=[];
-  ['post-username','post-title','post-desc','post-youtube'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
-  document.querySelectorAll('#post-genre-select .gs.on').forEach(el=>el.classList.remove('on'));
-  document.getElementById('done-sub').textContent=currentPostType==='gear'?'あなたの機材が公開されました！':'あなたのボードが公開されました！';
-  document.getElementById('done-bd').classList.add('open');
-  await loadPostsFromDB();
-}
-
-// 編集モーダル
-function openEditModal(){
-  if(!currentDBPost)return;
-  ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
-  document.getElementById('pin-err').textContent='';
-  document.getElementById('edit-step1').style.display='block';
-  document.getElementById('edit-step2').style.display='none';
-  document.getElementById('edit-bd').classList.add('open');
-  document.body.style.overflow='hidden';
-  setTimeout(()=>document.getElementById('pin1').focus(),300);
-}
-function verifyPin(){
-  const entered=['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('');
-  if(entered.length<4){document.getElementById('pin-err').textContent='4桁すべて入力してください';return;}
-  const isMaster=entered.toUpperCase()===MASTER_KEY;
-  if(currentDBPost&&(isMaster||entered===currentDBPost.pin_hash)){
-    document.getElementById('pin-err').textContent='';
-    document.getElementById('edit-step1').style.display='none';
-    document.getElementById('edit-title').value=currentDBPost.title||'';
-    const gear=Array.isArray(currentDBPost.gear_list)?currentDBPost.gear_list:[];
-    document.getElementById('edit-pedals').value=gear.map(g=>g.name||g).join(', ');
-    document.getElementById('edit-desc').value=currentDBPost.description||'';
-    const ytRaw=currentDBPost.youtube_url||'';
-    const ytMatch=ytRaw.match(/(https?:\/\/[^\s]+)/);
-    document.getElementById('edit-youtube').value=ytMatch?ytMatch[1]:'';
-    document.getElementById('edit-step2').style.display='block';
-    if(isMaster)showToast('🔑 管理者としてログインしました');
-  }else{
-    document.getElementById('pin-err').textContent='❌ パスワードが違います';
-    ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
-    document.getElementById('pin1').focus();
-  }
-}
-async function saveEdit(){
-  const title=document.getElementById('edit-title').value.trim();
-  if(!title){showToast('タイトルを入力してください');return;}
-  const gt=document.getElementById('edit-pedals').value.trim();
-  const gear_list=gt?gt.split(',').map(s=>({name:s.trim()})).filter(g=>g.name):[];
-  const description=document.getElementById('edit-desc').value.trim();
-  const youtube_url=document.getElementById('edit-youtube').value.trim()||null;
-  const{error}=await sb.from('posts').update({title,gear_list,description,youtube_url}).eq('id',currentDBPost.id);
-  if(error){showToast('❌ 更新に失敗しました');return;}
-  closeModal('edit-bd');showToast('✅ 投稿を更新しました');await loadPostsFromDB();
-}
-async function confirmDelete(){
-  if(!confirm('本当にこの投稿を削除しますか？\nこの操作は取り消せません。'))return;
-  const{error}=await sb.from('posts').delete().eq('id',currentDBPost.id);
-  if(error){showToast('❌ 削除に失敗しました');return;}
-  closeModal('edit-bd');showToast('🗑 投稿を削除しました');await loadPostsFromDB();
-}
-
-// ── 画像編集（ステッカー配置順修正・タップ削除修正・ピンチズーム）
-let editorPhotoIndex=0,editorCanvas=null,editorCtx=null,editorImage=null;
-let editorNumbers=[],editorMode='none';
-let cropStart=null,cropBox={x:0,y:0,w:0,h:0},cropActive=false,cropDragging=false,cropHandleDrag=null;
-let isDraggingNum=false,dragNumIdx=-1,dragOffX=0,dragOffY=0,dragMoved=false;
-let pinchActive=false,pinchStartDist=0,pinchNumIdx=-1,pinchStartSize=20;
-const DEFAULT_STICKER_SIZE=20;
-
-// 右上→左の順でステッカーを配置
-function getStickerPosition(num,canvasW,canvasH){
-  const cols=6;
-  const idx=num-1;
-  const row=Math.floor(idx/cols);
-  const colInRow=idx%cols;
-  const col=(cols-1)-colInRow; // 右から左
-  const cellW=canvasW/cols;
-  const totalRows=Math.ceil(24/cols); // 最大24個想定
-  const cellH=canvasH/Math.max(totalRows,4);
-  const margin=DEFAULT_STICKER_SIZE+4;
-  return{
-    x:Math.min(canvasW-margin,Math.max(margin,cellW*(col+0.5))),
-    y:Math.min(canvasH-margin,Math.max(margin,cellH*(row+0.5)))
-  };
-}
-
-function openImgEditor(idx){
-  editorPhotoIndex=idx;editorNumbers=[];editorMode='none';
-  cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropDragging=false;cropHandleDrag=null;
-  const bd=document.getElementById('img-editor-bd');
-  bd.classList.add('open');document.body.style.overflow='hidden';
-  const tabBar=document.getElementById('img-tab-bar');
-  tabBar.innerHTML=uploadedPhotos.map((_,i)=>'<div class="img-tab'+(i===idx?' on':'')+'" onclick="switchEditorPhoto('+i+')">写真'+(i+1)+'</div>').join('');
-  loadEditorImage(editedPhotos[idx]||uploadedPhotos[idx]);
-  updateToolUI();
-}
-function switchEditorPhoto(idx){
-  saveCurrentEditorState();editorPhotoIndex=idx;editorNumbers=[];editorMode='none';
-  cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;
-  document.querySelectorAll('.img-tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
-  loadEditorImage(editedPhotos[idx]||uploadedPhotos[idx]);updateToolUI();
-}
-function loadEditorImage(src){
-  const canvas=document.getElementById('editor-canvas');
-  const wrap=document.getElementById('canvas-wrap');
-  editorCanvas=canvas;editorCtx=canvas.getContext('2d');
-  const img=new Image();
-  img.onload=()=>{
-    editorImage=img;
-    const maxW=wrap.clientWidth||360;const maxH=wrap.clientHeight||400;
-    const scale=Math.min(maxW/img.width,maxH/img.height,1);
-    canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
-    drawEditor();
-  };img.src=src;
-}
-function drawEditor(){
-  if(!editorCtx||!editorImage)return;
-  const c=editorCanvas,ctx=editorCtx;
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.drawImage(editorImage,0,0,c.width,c.height);
-  if(editorMode==='crop'&&cropActive){
-    ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(0,0,c.width,c.height);
-    ctx.clearRect(cropBox.x,cropBox.y,cropBox.w,cropBox.h);
-    ctx.drawImage(editorImage,cropBox.x/c.width*editorImage.naturalWidth,cropBox.y/c.height*editorImage.naturalHeight,
-      cropBox.w/c.width*editorImage.naturalWidth,cropBox.h/c.height*editorImage.naturalHeight,
-      cropBox.x,cropBox.y,cropBox.w,cropBox.h);
-    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([]);ctx.strokeRect(cropBox.x,cropBox.y,cropBox.w,cropBox.h);
-    [{x:cropBox.x,y:cropBox.y},{x:cropBox.x+cropBox.w,y:cropBox.y},{x:cropBox.x,y:cropBox.y+cropBox.h},{x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h}].forEach(h=>{
-      ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(h.x,h.y,8,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle='#e8552d';ctx.lineWidth=2;ctx.stroke();
-    });
-    ctx.setLineDash([]);
-  }
-  editorNumbers.forEach(n=>{
-    const r=n.size||DEFAULT_STICKER_SIZE;
-    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();
-    ctx.strokeStyle='#e8552d';ctx.lineWidth=2.5;ctx.stroke();
-    ctx.fillStyle='#111';
-    const fs=Math.max(10,Math.round(r*0.65));
-    ctx.font='bold '+fs+'px JetBrains Mono,monospace';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(n.num,n.x,n.y);
-  });
-}
-function setTool(mode){
-  editorMode=editorMode===mode?'none':mode;updateToolUI();
-  const hints={crop:'ドラッグしてトリミング範囲を選択',move:'タップで削除・ドラッグで移動・ピンチでサイズ変更',none:'「番号追加」ボタンで番号を追加'};
-  document.getElementById('editor-hint').textContent=hints[editorMode]||hints.none;
-  drawEditor();
-}
-function addNumberSticker(){
-  if(!editorCanvas)return;
-  const num=editorNumbers.length+1;
-  const pos=getStickerPosition(num,editorCanvas.width,editorCanvas.height);
-  editorNumbers.push({x:pos.x,y:pos.y,num,size:DEFAULT_STICKER_SIZE});
-  editorMode='move';updateToolUI();
-  document.getElementById('editor-hint').textContent='タップで削除・ドラッグで移動・ピンチでサイズ変更';
-  drawEditor();showToast('番号 '+num+' を追加しました');
-}
-function updateToolUI(){
-  ['crop','move'].forEach(id=>{const btn=document.getElementById('tool-'+id);if(btn)btn.classList.toggle('active',editorMode===id);});
-}
-function resetEdits(){editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropStart=null;loadEditorImage(uploadedPhotos[editorPhotoIndex]);showToast('↩️ リセットしました');}
-
-function saveCurrentEditorState(){
-  if(!editorCanvas||!editorImage)return;
-  const c=editorCanvas;let sx=0,sy=0,sw=editorImage.naturalWidth,sh=editorImage.naturalHeight;
-  if(cropActive&&cropBox.w>10&&cropBox.h>10){
-    const scaleX=editorImage.naturalWidth/c.width;const scaleY=editorImage.naturalHeight/c.height;
-    sx=cropBox.x*scaleX;sy=cropBox.y*scaleY;sw=cropBox.w*scaleX;sh=cropBox.h*scaleY;
-  }
-  const out=document.createElement('canvas');out.width=Math.round(sw);out.height=Math.round(sh);
-  const ctx=out.getContext('2d');ctx.drawImage(editorImage,sx,sy,sw,sh,0,0,out.width,out.height);
-  editorNumbers.forEach(n=>{
-    const realX=n.x/c.width*editorImage.naturalWidth-sx;
-    const realY=n.y/c.height*editorImage.naturalHeight-sy;
-    if(realX<0||realY<0||realX>sw||realY>sh)return;
-    const r=Math.round((n.size||DEFAULT_STICKER_SIZE)/c.width*editorImage.naturalWidth);
-    const fs=Math.max(10,Math.round(r*0.65));
-    ctx.beginPath();ctx.arc(realX,realY,r,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();
-    ctx.strokeStyle='#e8552d';ctx.lineWidth=Math.max(2,Math.round(r*0.1));ctx.stroke();
-    ctx.fillStyle='#111';ctx.font='bold '+fs+'px JetBrains Mono,monospace';
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.num,realX,realY);
-  });
-  editedPhotos[editorPhotoIndex]=out.toDataURL('image/jpeg',0.92);
-}
-function finishEdit(){saveCurrentEditorState();document.getElementById('img-editor-bd').classList.remove('open');document.body.style.overflow='hidden';renderPhotoPreviews();showToast('✅ 編集を保存しました');}
-
-function getCanvasPos(touch){
-  const rect=editorCanvas.getBoundingClientRect();
-  const scaleX=editorCanvas.width/rect.width;const scaleY=editorCanvas.height/rect.height;
-  return{x:(touch.clientX-rect.left)*scaleX,y:(touch.clientY-rect.top)*scaleY};
-}
-function getTouchDist(t1,t2){return Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);}
-function getCropHandle(pos){
-  if(!cropActive)return null;
-  const handles=[{id:'tl',x:cropBox.x,y:cropBox.y},{id:'tr',x:cropBox.x+cropBox.w,y:cropBox.y},{id:'bl',x:cropBox.x,y:cropBox.y+cropBox.h},{id:'br',x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h}];
-  return handles.find(h=>Math.hypot(h.x-pos.x,h.y-pos.y)<20)||null;
-}
-
-function canvasPointerDown(e){
-  e.preventDefault();
-  if(e.touches&&e.touches.length===2){
-    pinchActive=true;pinchStartDist=getTouchDist(e.touches[0],e.touches[1]);
-    const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;
-    const midY=(e.touches[0].clientY+e.touches[1].clientY)/2;
-    const mid=getCanvasPos({clientX:midX,clientY:midY});
-    let minD=Infinity;
-    editorNumbers.forEach((n,i)=>{const d=Math.hypot(n.x-mid.x,n.y-mid.y);if(d<minD){minD=d;pinchNumIdx=i;}});
-    if(minD>100)pinchNumIdx=-1;
-    pinchStartSize=pinchNumIdx>=0?(editorNumbers[pinchNumIdx].size||DEFAULT_STICKER_SIZE):DEFAULT_STICKER_SIZE;
-    return;
-  }
-  pinchActive=false;
-  const touch=e.touches?e.touches[0]:e;
-  const pos=getCanvasPos(touch);
-  dragMoved=false;
-  if(editorMode==='move'){
-    const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<(n.size||DEFAULT_STICKER_SIZE)+8);
-    if(hit>=0){isDraggingNum=true;dragNumIdx=hit;dragOffX=pos.x-editorNumbers[hit].x;dragOffY=pos.y-editorNumbers[hit].y;}
-    else isDraggingNum=false;
-  }else if(editorMode==='crop'){
-    const handle=getCropHandle(pos);
-    if(handle){cropHandleDrag=handle;cropDragging=true;}
-    else if(cropActive&&pos.x>=cropBox.x&&pos.x<=cropBox.x+cropBox.w&&pos.y>=cropBox.y&&pos.y<=cropBox.y+cropBox.h){
-      cropHandleDrag={id:'move'};cropDragging=true;dragOffX=pos.x-cropBox.x;dragOffY=pos.y-cropBox.y;
-    }else{cropStart=pos;cropDragging=true;cropHandleDrag=null;cropActive=false;}
-  }
-}
-function canvasPointerMove(e){
-  e.preventDefault();if(!editorCanvas)return;
-  if(e.touches&&e.touches.length===2&&pinchActive){
-    const dist=getTouchDist(e.touches[0],e.touches[1]);
-    const ratio=dist/pinchStartDist;
-    if(pinchNumIdx>=0){editorNumbers[pinchNumIdx].size=Math.max(10,Math.min(60,Math.round(pinchStartSize*ratio)));drawEditor();}
-    return;
-  }
-  const touch=e.touches?e.touches[0]:e;
-  const pos=getCanvasPos(touch);const c=editorCanvas;
-  if(editorMode==='move'&&isDraggingNum&&dragNumIdx>=0){
-    editorNumbers[dragNumIdx].x=Math.max(10,Math.min(c.width-10,pos.x-dragOffX));
-    editorNumbers[dragNumIdx].y=Math.max(10,Math.min(c.height-10,pos.y-dragOffY));
-    dragMoved=true;drawEditor();
-  }else if(editorMode==='crop'&&cropDragging){
-    if(cropHandleDrag){
-      const id=cropHandleDrag.id;
-      if(id==='move'){cropBox.x=Math.max(0,Math.min(c.width-cropBox.w,pos.x-dragOffX));cropBox.y=Math.max(0,Math.min(c.height-cropBox.h,pos.y-dragOffY));}
-      else{let{x,y,w,h}=cropBox;
-        if(id==='tl'){const nx=Math.min(pos.x,x+w-20);const ny=Math.min(pos.y,y+h-20);w=x+w-nx;h=y+h-ny;x=nx;y=ny;}
-        else if(id==='tr'){w=Math.max(20,pos.x-x);const ny=Math.min(pos.y,y+h-20);h=y+h-ny;y=ny;}
-        else if(id==='bl'){const nx=Math.min(pos.x,x+w-20);w=x+w-nx;x=nx;h=Math.max(20,pos.y-y);}
-        else if(id==='br'){w=Math.max(20,pos.x-x);h=Math.max(20,pos.y-y);}
-        cropBox={x:Math.max(0,x),y:Math.max(0,y),w:Math.min(c.width-x,w),h:Math.min(c.height-y,h)};
-      }
-    }else if(cropStart){
-      const x=Math.min(cropStart.x,pos.x);const y=Math.min(cropStart.y,pos.y);
-      cropBox={x:Math.max(0,x),y:Math.max(0,y),w:Math.min(c.width-x,Math.abs(pos.x-cropStart.x)),h:Math.min(c.height-y,Math.abs(pos.y-cropStart.y))};cropActive=true;
-    }
-    dragMoved=true;drawEditor();
-  }
-}
-function canvasPointerUp(e){
-  e.preventDefault();
-  if(pinchActive&&e.touches&&e.touches.length<2){pinchActive=false;return;}
-  const touch=e.changedTouches?e.changedTouches[0]:e;
-  if(editorMode==='move'){
-    if(isDraggingNum&&!dragMoved&&dragNumIdx>=0){
-      editorNumbers.splice(dragNumIdx,1);
-      editorNumbers.forEach((n,i)=>n.num=i+1);
-      showToast('番号を削除しました');drawEditor();
-    }
-    isDraggingNum=false;dragNumIdx=-1;dragMoved=false;
-  }else if(editorMode==='crop'){
-    cropDragging=false;
-    if(cropBox.w>10&&cropBox.h>10)cropActive=true;else cropActive=false;
-    cropHandleDrag=null;cropStart=null;drawEditor();
-  }
-}
-
-document.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(()=>{
-    const c=document.getElementById('editor-canvas');if(!c)return;
-    c.addEventListener('mousedown',canvasPointerDown);
-    c.addEventListener('mousemove',canvasPointerMove);
-    c.addEventListener('mouseup',canvasPointerUp);
-    c.addEventListener('touchstart',canvasPointerDown,{passive:false});
-    c.addEventListener('touchmove',canvasPointerMove,{passive:false});
-    c.addEventListener('touchend',canvasPointerUp,{passive:false});
-  },500);
-});
-
-function toggleBrands(){const ex=document.getElementById('brands-extra');const lbl=document.getElementById('brand-toggle-label');const o=ex.classList.toggle('open');lbl.textContent=o?'▲ 閉じる':'▼ もっと見る（A–Z）';}
-function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
-function closeOnBd(e,id){if(e.target===document.getElementById(id))closeModal(id);}
-function closeAll(){['post-bd','edit-bd'].forEach(closeModal);document.getElementById('done-bd').classList.remove('open');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
-
-['pd1','pd2','pd3','pd4'].forEach((id,i,arr)=>{
-  const el=document.getElementById(id);
-  el.addEventListener('input',()=>{if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();});
-  el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
-});
-['pin1','pin2','pin3','pin4'].forEach((id,i,arr)=>{
-  const el=document.getElementById(id);
-  el.addEventListener('input',()=>{if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();if(el.value&&i===arr.length-1)verifyPin();});
-  el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
-});
-
-// スワイプUI
-let currentPanel=1;
-let swipeStartX=0,swipeStartY=0,isHorizSwipe=false,swipeDecided=false;
-const SWIPE_THRESHOLD=90,ANGLE_LOCK=0.4;
-function goPanel(n){
-  currentPanel=Math.max(0,Math.min(2,n));
-  const c=document.getElementById('swipe-container');if(!c)return;
-  c.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';
-  c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';
-  document.querySelectorAll('.swipe-dot').forEach((d,i)=>d.classList.toggle('on',i===currentPanel));
-}
-function initSwipe(){
-  const c=document.getElementById('swipe-container');if(!c)return;
-  c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';
-  c.addEventListener('touchstart',e=>{swipeStartX=e.touches[0].clientX;swipeStartY=e.touches[0].clientY;isHorizSwipe=false;swipeDecided=false;c.style.transition='none';},{passive:true});
-  c.addEventListener('touchmove',e=>{
-    const dx=e.touches[0].clientX-swipeStartX;const dy=e.touches[0].clientY-swipeStartY;
-    if(!swipeDecided&&(Math.abs(dx)>8||Math.abs(dy)>8)){swipeDecided=true;isHorizSwipe=Math.abs(dx)>Math.abs(dy)*(1/ANGLE_LOCK);}
-    if(!isHorizSwipe)return;
-    e.preventDefault&&e.cancelable&&e.preventDefault();
-    let offset=-currentPanel*window.innerWidth+dx;
-    if((currentPanel===0&&dx>0)||(currentPanel===2&&dx<0))offset=-currentPanel*window.innerWidth+dx*0.25;
-    c.style.transform='translateX('+offset+'px)';
-  },{passive:false});
-  c.addEventListener('touchend',e=>{
-    if(!isHorizSwipe){goPanel(currentPanel);return;}
-    const dx=e.changedTouches[0].clientX-swipeStartX;
-    if(dx<-SWIPE_THRESHOLD)goPanel(currentPanel+1);else if(dx>SWIPE_THRESHOLD)goPanel(currentPanel-1);else goPanel(currentPanel);
-  },{passive:true});
-  window.addEventListener('resize',()=>{c.style.transition='none';c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';});
-}
-function checkMobile(){
-  const isMob=window.innerWidth<=680;
-  const swipeUI=document.getElementById('swipe-ui');
-  const pcWrap=document.querySelector('.wrap');
-  const footer=document.querySelector('footer');
-  if(swipeUI)swipeUI.style.display=isMob?'block':'none';
-  if(pcWrap)pcWrap.style.display=isMob?'none':'grid';
-  if(footer)footer.style.display=isMob?'none':'flex';
-}
-window.addEventListener('resize',checkMobile);
-
-function filterGenreMob(el,genre){
-  document.querySelectorAll('#swipe-ui .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;applyFilter();setTimeout(()=>goPanel(1),180);
-}
-function filterBrandMob(el,brand){
-  document.querySelectorAll('#swipe-ui .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';applyFilter();setTimeout(()=>goPanel(1),180);
-}
-function renderRankingWidgetMob(posts){
-  const el=document.getElementById('ranking-widget-mob');if(!el)return;
-  const bp=posts.filter(p=>!p.post_type||p.post_type==='board');
-  const monthAgo=Date.now()-30*24*60*60*1000;const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);
-  const target=monthly.length>=3?monthly:bp;
-  const sorted=[...target].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
-  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:JetBrains Mono,monospace">まだ投稿がありません</div>';return;}
-  el.innerHTML=sorted.map((p,i)=>{const crown=i===0?'<span style="margin-right:4px">👑</span>':'';return '<div class="ri" onclick="location.href=\'/post?id='+p.id+'\'">'+'<div class="rn '+(i<2?'hi':'')+'">'+crown+(i+1)+'</div>'+'<div class="ri-i"><div class="ri-t">'+p.title+'</div><div class="ri-u">'+(p.username||'匿名')+'</div></div>'+'<div class="ri-s">❤️'+(p.likes||0)+'</div></div>';}).join('');
-}
-function renderGearWidgetMob(posts){
-  const el=document.getElementById('gear-widget-mob');if(!el)return;
-  const count={};posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
-  const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:JetBrains Mono,monospace">データなし</div>';return;}
-  el.innerHTML=sorted.map(([n,c])=>'<div class="gr" style="cursor:pointer" onclick="filterByGearName(\''+n.replace(/'/g,"\\'")+'\'">'+'<div class="gr-i"><div class="gr-n">'+n+'</div><div class="gr-b">'+c+'件の投稿</div></div>'+'<a href="'+soundhouseUrl(n)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:13px">🔍</a></div>').join('');
-}
-
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
-document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();});
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" onclick="closeAll()">
+    <img class="logo-img" src="IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
+    <div class="logo-text">
+      <div class="logo-main">My gear My board</div>
+      <div class="logo-sub">ペダルボードSNS · Japan</div>
+    </div>
+  </div>
+  <div class="h-right">
+    <div class="h-search-wrap">
+      <span class="h-search-icon">🔍</span>
+      <input class="h-search-input" id="h-search" type="text" placeholder="フリーワード"
+        oninput="handleSearch(this.value)" autocomplete="off" autocorrect="off" autocapitalize="off">
+      <button class="h-search-clear" id="h-search-clear" onclick="clearSearch()">✕</button>
+      <div class="search-results-badge" id="search-badge"></div>
+    </div>
+    <div class="h-icon" onclick="toggleLang()" title="EN / JA">🌐</div>
+    <div style="position:relative">
+      <button class="h-btn" onclick="togglePostDropdown(event)">＋ &nbsp;投稿する ▾</button>
+      <div class="post-dropdown" id="post-dropdown">
+        <div class="post-dropdown-item" onclick="closeDropdownAndPost('board')">🎛 &nbsp;ボードを投稿</div>
+        <div class="post-dropdown-item" onclick="closeDropdownAndPost('gear')">🎸 &nbsp;機材を投稿</div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="ticker">
+  <div class="ticker-lbl">NEW</div>
+  <div class="ticker-wrap"><div class="ticker-inner" id="ticker-inner"><span class="ti">読み込み中...</span></div></div>
+</div>
+<div id="swipe-ui" style="display:none">
+  <div class="swipe-indicator">
+    <div class="swipe-dot" onclick="goPanel(0)"></div>
+    <div class="swipe-dot on" onclick="goPanel(1)"></div>
+    <div class="swipe-dot" onclick="goPanel(2)"></div>
+  </div>
+  <div class="swipe-container" id="swipe-container">
+    <div class="swipe-panel mob-left-panel">
+      <!-- スマホ用検索窓 -->
+      <div class="mob-search-wrap">
+        <span class="mob-search-icon">🔍</span>
+        <input class="mob-search-input" id="mob-search" type="text" placeholder="フリーワード検索..."
+          oninput="handleSearchMob(this.value)" autocomplete="off" autocorrect="off" autocapitalize="off">
+        <button class="mob-search-clear" id="mob-search-clear" onclick="clearSearchMob()">✕</button>
+      </div>
+      <div class="mob-search-badge" id="mob-search-badge"></div>
+      <div class="mob-panel-title">ジャンル</div>
+      <div class="tags" style="margin-bottom:10px"><div class="tag on" data-genre="ALL" onclick="filterGenreMob(this,'ALL')">ALL</div></div>
+      <div class="brand-group-lbl">定番</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" data-genre="ROCK" onclick="filterGenreMob(this,'ROCK')">ROCK</div>
+        <div class="tag" data-genre="BLUES" onclick="filterGenreMob(this,'BLUES')">BLUES</div>
+        <div class="tag" data-genre="JAZZ" onclick="filterGenreMob(this,'JAZZ')">JAZZ</div>
+        <div class="tag" data-genre="METAL" onclick="filterGenreMob(this,'METAL')">METAL</div>
+        <div class="tag" data-genre="FUNK" onclick="filterGenreMob(this,'FUNK')">FUNK</div>
+        <div class="tag" data-genre="宅録" onclick="filterGenreMob(this,'宅録')">宅録</div>
+        <div class="tag" data-genre="初心者相談" onclick="filterGenreMob(this,'初心者相談')">初心者相談</div>
+      </div>
+      <div class="brand-group-lbl">空間系</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" data-genre="AMBIENT" onclick="filterGenreMob(this,'AMBIENT')">AMBIENT</div>
+        <div class="tag" data-genre="SHOEGAZE" onclick="filterGenreMob(this,'SHOEGAZE')">SHOEGAZE</div>
+        <div class="tag" data-genre="POST ROCK" onclick="filterGenreMob(this,'POST ROCK')">POST ROCK</div>
+      </div>
+      <div class="brand-group-lbl">オルタナ系</div>
+      <div class="tags" style="margin-bottom:16px">
+        <div class="tag" data-genre="INDIE" onclick="filterGenreMob(this,'INDIE')">INDIE</div>
+        <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenreMob(this,'ALTERNATIVE')">ALTERNATIVE</div>
+        <div class="tag" data-genre="PUNK" onclick="filterGenreMob(this,'PUNK')">PUNK</div>
+      </div>
+      <div class="mob-panel-title" style="margin-top:4px">ブランド</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" onclick="filterBrandMob(this,'Boss')">Boss</div>
+        <div class="tag" onclick="filterBrandMob(this,'DigiTech')">DigiTech</div>
+        <div class="tag" onclick="filterBrandMob(this,'Electro-Harmonix')">EHX</div>
+        <div class="tag" onclick="filterBrandMob(this,'Free The Tone')">Free The Tone</div>
+        <div class="tag" onclick="filterBrandMob(this,'Ibanez')">Ibanez</div>
+        <div class="tag" onclick="filterBrandMob(this,'Jim Dunlop')">Jim Dunlop</div>
+        <div class="tag" onclick="filterBrandMob(this,'Maxon')">Maxon</div>
+        <div class="tag" onclick="filterBrandMob(this,'MXR')">MXR</div>
+        <div class="tag" onclick="filterBrandMob(this,'Strymon')">Strymon</div>
+        <div class="tag" onclick="filterBrandMob(this,'TC Electronic')">TC Electronic</div>
+        <div class="tag" onclick="filterBrandMob(this,'Animals Pedal')">Animals Pedal</div>
+        <div class="tag" onclick="filterBrandMob(this,'Behringer')">Behringer</div>
+        <div class="tag" onclick="filterBrandMob(this,'Chase Bliss Audio')">Chase Bliss</div>
+        <div class="tag" onclick="filterBrandMob(this,'Darkglass Electronics')">Darkglass</div>
+        <div class="tag" onclick="filterBrandMob(this,'EarthQuaker Devices')">EarthQuaker</div>
+        <div class="tag" onclick="filterBrandMob(this,'Eventide')">Eventide</div>
+        <div class="tag" onclick="filterBrandMob(this,'JHS Pedals')">JHS</div>
+        <div class="tag" onclick="filterBrandMob(this,'Joyo')">Joyo</div>
+        <div class="tag" onclick="filterBrandMob(this,'Line 6')">Line 6</div>
+        <div class="tag" onclick="filterBrandMob(this,'Mooer')">Mooer</div>
+        <div class="tag" onclick="filterBrandMob(this,'One Control')">One Control</div>
+        <div class="tag" onclick="filterBrandMob(this,'Providence')">Providence</div>
+        <div class="tag" onclick="filterBrandMob(this,'Walrus Audio')">Walrus Audio</div>
+        <div class="tag" onclick="filterBrandMob(this,'Wampler Pedals')">Wampler</div>
+        <div class="tag" onclick="filterBrandMob(this,'Zoom')">Zoom</div>
+        <div class="tag" onclick="filterBrandMob(this,'Others')">Others</div>
+      </div>
+      <div style="height:40px"></div>
+    </div>
+    <div class="swipe-panel" id="mob-feed-panel">
+      <div class="mob-feed-inner">
+        <div class="post-banner">
+          <div class="post-banner-text"><strong>あなたのボードや機材を投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。</div>
+          <div class="post-banner-btns">
+            <button class="pb-btn board" onclick="openPost('board')">エフェクターボードを投稿</button>
+            <button class="pb-btn gear-b" onclick="openPost('gear')">機材を投稿</button>
+          </div>
+        </div>
+        <div class="feed-top">
+          <div class="feed-h" id="feed-heading-mob">PEDALBOARDS</div>
+          <div class="sort">
+            <div class="sort-b on" onclick="setSort(this,'new')">新着</div>
+            <div class="sort-b" onclick="setSort(this,'likes')">人気</div>
+          </div>
+        </div>
+        <div class="feed-tabs">
+          <div class="feed-tab on" onclick="setTab(this,'all')">すべて</div>
+          <div class="feed-tab" onclick="setTab(this,'board')">ボード</div>
+          <div class="feed-tab" onclick="setTab(this,'gear')">機材</div>
+        </div>
+        <div class="grid" id="card-grid-mob"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">読み込み中...</div></div>
+      </div>
+    </div>
+    <div class="swipe-panel mob-right-panel">
+      <div class="mob-panel-title">今月の人気ボード</div>
+      <div class="widget"><div id="ranking-widget-mob"></div></div>
+      <div class="mob-panel-title">よく使われている機材</div>
+      <div class="widget"><div id="gear-widget-mob"></div></div>
+      <div class="mob-panel-title">機材NEWS</div>
+      <div class="widget">
+        <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=outlet" target="_blank" rel="noopener"><div class="nth">💰</div><div><div class="nr-t">サウンドハウス アウトレット</div><div class="nr-d">お買い得品をチェック</div></div></a>
+        <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=sale" target="_blank" rel="noopener"><div class="nth">🏷</div><div><div class="nr-t">サウンドハウス セール情報</div><div class="nr-d">期間限定セール中</div></div></a>
+        <a class="news-link" href="https://www.soundhouse.co.jp/categories/detail/218" target="_blank" rel="noopener"><div class="nth">🎛</div><div><div class="nr-t">エフェクター新着</div><div class="nr-d">Soundhouse最新入荷</div></div></a>
+      </div>
+      <div class="mob-panel-title">広告</div>
+      <div class="widget ad-slot" style="height:120px"><div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace">Google AdSense</div></div>
+      <div style="height:40px"></div>
+    </div>
+  </div>
+</div>
+<div class="wrap">
+<aside class="sl">
+  <div style="margin-bottom:20px">
+    <div class="sl-lbl">メニュー</div>
+    <div class="sl-item on">🏠 &nbsp;ホーム</div>
+  </div>
+  <div class="sl-div"></div>
+  <div style="margin-bottom:20px">
+    <div class="sl-lbl">ジャンル</div>
+    <div class="tags"><div class="tag on" data-genre="ALL" onclick="filterGenre(this,'ALL')">ALL</div></div>
+    <div class="brand-group-lbl" style="margin-top:10px">定番</div>
+    <div class="tags">
+      <div class="tag" data-genre="ROCK" onclick="filterGenre(this,'ROCK')">ROCK</div>
+      <div class="tag" data-genre="BLUES" onclick="filterGenre(this,'BLUES')">BLUES</div>
+      <div class="tag" data-genre="JAZZ" onclick="filterGenre(this,'JAZZ')">JAZZ</div>
+      <div class="tag" data-genre="METAL" onclick="filterGenre(this,'METAL')">METAL</div>
+      <div class="tag" data-genre="FUNK" onclick="filterGenre(this,'FUNK')">FUNK</div>
+      <div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')">宅録</div>
+      <div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')">初心者相談</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:10px">空間系</div>
+    <div class="tags">
+      <div class="tag" data-genre="AMBIENT" onclick="filterGenre(this,'AMBIENT')">AMBIENT</div>
+      <div class="tag" data-genre="SHOEGAZE" onclick="filterGenre(this,'SHOEGAZE')">SHOEGAZE</div>
+      <div class="tag" data-genre="POST ROCK" onclick="filterGenre(this,'POST ROCK')">POST ROCK</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:10px">オルタナ系</div>
+    <div class="tags">
+      <div class="tag" data-genre="INDIE" onclick="filterGenre(this,'INDIE')">INDIE</div>
+      <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenre(this,'ALTERNATIVE')">ALTERNATIVE</div>
+      <div class="tag" data-genre="PUNK" onclick="filterGenre(this,'PUNK')">PUNK</div>
+    </div>
+  </div>
+  <div class="sl-div"></div>
+  <div>
+    <div class="sl-lbl">ブランドで絞る</div>
+    <div class="tags">
+      <div class="tag" onclick="filterBrand(this,'Boss')">Boss</div>
+      <div class="tag" onclick="filterBrand(this,'DigiTech')">DigiTech</div>
+      <div class="tag" onclick="filterBrand(this,'Electro-Harmonix')">EHX</div>
+      <div class="tag" onclick="filterBrand(this,'Free The Tone')">Free The Tone</div>
+      <div class="tag" onclick="filterBrand(this,'Ibanez')">Ibanez</div>
+      <div class="tag" onclick="filterBrand(this,'Jim Dunlop')">Jim Dunlop</div>
+      <div class="tag" onclick="filterBrand(this,'Maxon')">Maxon</div>
+      <div class="tag" onclick="filterBrand(this,'MXR')">MXR</div>
+      <div class="tag" onclick="filterBrand(this,'Strymon')">Strymon</div>
+      <div class="tag" onclick="filterBrand(this,'TC Electronic')">TC Electronic</div>
+    </div>
+    <div class="brand-more-btn" id="brand-toggle" onclick="toggleBrands()"><span id="brand-toggle-label">▼ もっと見る（A–Z）</span></div>
+    <div class="brands-extra" id="brands-extra">
+      <div class="tags">
+        <div class="tag" onclick="filterBrand(this,'Animals Pedal')">Animals Pedal</div>
+        <div class="tag" onclick="filterBrand(this,'Behringer')">Behringer</div>
+        <div class="tag" onclick="filterBrand(this,'Chase Bliss Audio')">Chase Bliss</div>
+        <div class="tag" onclick="filterBrand(this,'Darkglass Electronics')">Darkglass</div>
+        <div class="tag" onclick="filterBrand(this,'EarthQuaker Devices')">EarthQuaker</div>
+        <div class="tag" onclick="filterBrand(this,'Eventide')">Eventide</div>
+        <div class="tag" onclick="filterBrand(this,'JHS Pedals')">JHS</div>
+        <div class="tag" onclick="filterBrand(this,'Joyo')">Joyo</div>
+        <div class="tag" onclick="filterBrand(this,'Line 6')">Line 6</div>
+        <div class="tag" onclick="filterBrand(this,'Mooer')">Mooer</div>
+        <div class="tag" onclick="filterBrand(this,'One Control')">One Control</div>
+        <div class="tag" onclick="filterBrand(this,'Providence')">Providence</div>
+        <div class="tag" onclick="filterBrand(this,'Walrus Audio')">Walrus Audio</div>
+        <div class="tag" onclick="filterBrand(this,'Wampler Pedals')">Wampler</div>
+        <div class="tag" onclick="filterBrand(this,'Zoom')">Zoom</div>
+        <div class="tag" onclick="filterBrand(this,'Others')">Others</div>
+      </div>
+    </div>
+  </div>
+</aside>
+<main class="feed">
+  <div class="post-banner">
+    <div class="post-banner-text"><strong>🎸 あなたのボードや機材を投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。</div>
+    <div class="post-banner-btns">
+      <button class="pb-btn board" onclick="openPost('board')">エフェクターボードを投稿</button>
+      <button class="pb-btn gear-b" onclick="openPost('gear')">機材を投稿</button>
+    </div>
+  </div>
+  <div class="feed-top">
+    <div class="feed-h" id="feed-heading">PEDALBOARDS</div>
+    <div class="sort">
+      <div class="sort-b on" onclick="setSort(this,'new')">新着</div>
+      <div class="sort-b" onclick="setSort(this,'likes')">人気</div>
+    </div>
+  </div>
+  <div class="feed-tabs">
+    <div class="feed-tab on" onclick="setTab(this,'all')">すべて</div>
+    <div class="feed-tab" onclick="setTab(this,'board')">エフェクターボード</div>
+    <div class="feed-tab" onclick="setTab(this,'gear')">機材</div>
+  </div>
+  <div class="grid" id="card-grid"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">読み込み中...</div></div>
+</main>
+<aside class="sr">
+  <div class="ad-slot ad-side"><div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace">広告</div></div>
+  <div class="widget"><div class="wt">🔥 今月の人気ボード</div><div id="ranking-widget"></div></div>
+  <div class="widget"><div class="wt">🎛 よく使われている機材</div><div id="gear-widget"></div></div>
+  <div class="widget"><div class="wt">📰 機材NEWS</div>
+    <div id="news-widget">
+      <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=outlet" target="_blank" rel="noopener"><div class="nth">💰</div><div><div class="nr-t">サウンドハウス アウトレット</div><div class="nr-d">お買い得品をチェック</div></div></a>
+      <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=sale" target="_blank" rel="noopener"><div class="nth">🏷</div><div><div class="nr-t">サウンドハウス セール情報</div><div class="nr-d">期間限定セール中</div></div></a>
+      <a class="news-link" href="https://www.soundhouse.co.jp/categories/detail/218" target="_blank" rel="noopener"><div class="nth">🎛</div><div><div class="nr-t">エフェクター新着</div><div class="nr-d">Soundhouse最新入荷</div></div></a>
+    </div>
+  </div>
+</aside>
+</div>
+<footer>
+  <img class="footer-logo" src="IMG_2107.PNG" alt="MY GEAR MY BOARD" onerror="this.style.display='none'">
+  <div class="footer-links">
+    <a class="footer-link" href="/privacy.html">プライバシーポリシー</a>
+    <span class="footer-link" onclick="showToast('お問い合わせ機能は準備中です')">お問い合わせ</span>
+  </div>
+  <div class="footer-copy">© 2025 My Gear My Board. All rights reserved.</div>
+</footer>
+<!-- POST FORM -->
+<div class="pbd" id="post-bd" onclick="closeOnBd(event,'post-bd')">
+  <div class="pform">
+    <div class="pform-close" onclick="closeModal('post-bd')">✕</div>
+    <div class="step-header">
+      <div class="step-title" id="step-title">エフェクターボードを投稿</div>
+      <div class="step-sub" id="step-sub">Step 1 / 5</div>
+      <div class="step-dots" id="step-dots"></div>
+    </div>
+    <div class="step-panel on" id="step-1">
+      <label class="form-lbl">写真（最大3枚・任意）</label>
+      <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
+      <div class="upload-area" id="upload-area-main" onclick="document.getElementById('photo-input').click()">
+        <span class="upload-icon">📷</span><div>クリックして写真を選択</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:6px">最大3枚 · 1枚目がサムネイル</div>
+      </div>
+      <div class="photo-previews" id="photo-previews"></div>
+      <div class="photo-count" id="photo-count"></div>
+      <div class="step-nav"><button class="step-btn next" onclick="goStep(2)">次へ →</button></div>
+      <button class="skip-btn" onclick="goStep(2)">スキップ（写真なしで続ける）</button>
+    </div>
+    <div class="step-panel" id="step-2">
+      <div class="form-row">
+        <label class="form-lbl">ユーザー名（任意）</label>
+        <input class="form-input" id="post-username" type="text" placeholder="空欄の場合は匿名ユーザー" maxlength="30">
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">タイトル *</label>
+        <input class="form-input" id="post-title" type="text" placeholder="例：ライブ用最強ボード">
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">YouTube URL（任意）</label>
+        <div class="yt-input-wrap">
+          <span class="yt-icon">▶️</span>
+          <input class="form-input" id="post-youtube" type="url" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="step-btn back" onclick="goStep(1)">← 戻る</button>
+        <button class="step-btn next" onclick="goStep(3)">次へ →</button>
+      </div>
+    </div>
+    <div class="step-panel" id="step-3">
+      <div id="step3-photo-preview" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
+      <div class="form-row">
+        <label class="form-lbl">使用機材</label>
+        <div class="gear-input-wrap">
+          <div class="gear-tags" id="gear-tags" onclick="document.getElementById('gear-search').focus()">
+            <input class="gear-text-input" id="gear-search" type="text" placeholder="例: Boss DS-1..." autocomplete="off"
+              oninput="searchGear(this.value)" onkeydown="gearKeyDown(event)" onblur="setTimeout(()=>closeAC(),180)">
+          </div>
+          <div class="ac-dropdown" id="ac-dropdown"></div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#9a9890;margin-top:5px">候補が出ない場合はEnterで追加できます</div>
+      </div>
+      <div class="step-nav">
+        <button class="step-btn back" onclick="goStep(2)">← 戻る</button>
+        <button class="step-btn next" onclick="goStep(4)">次へ →</button>
+      </div>
+      <button class="skip-btn" onclick="goStep(4)">スキップ</button>
+    </div>
+    <div class="step-panel" id="step-4">
+      <div class="form-row">
+        <label class="form-lbl">ジャンル（複数選択OK）</label>
+        <div class="genre-select" id="post-genre-select">
+          <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:4px">定番</div>
+          <div class="gs" data-val="ROCK" onclick="toggleGenre(this)">ROCK</div>
+          <div class="gs" data-val="BLUES" onclick="toggleGenre(this)">BLUES</div>
+          <div class="gs" data-val="JAZZ" onclick="toggleGenre(this)">JAZZ</div>
+          <div class="gs" data-val="METAL" onclick="toggleGenre(this)">METAL</div>
+          <div class="gs" data-val="FUNK" onclick="toggleGenre(this)">FUNK</div>
+          <div class="gs" data-val="宅録" onclick="toggleGenre(this)">宅録</div>
+          <div class="gs" data-val="初心者相談" onclick="toggleGenre(this)">初心者相談</div>
+          <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:8px 0 4px">空間系</div>
+          <div class="gs" data-val="AMBIENT" onclick="toggleGenre(this)">AMBIENT</div>
+          <div class="gs" data-val="SHOEGAZE" onclick="toggleGenre(this)">SHOEGAZE</div>
+          <div class="gs" data-val="POST ROCK" onclick="toggleGenre(this)">POST ROCK</div>
+          <div style="width:100%;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:8px 0 4px">オルタナ系</div>
+          <div class="gs" data-val="INDIE" onclick="toggleGenre(this)">INDIE</div>
+          <div class="gs" data-val="ALTERNATIVE" onclick="toggleGenre(this)">ALTERNATIVE</div>
+          <div class="gs" data-val="PUNK" onclick="toggleGenre(this)">PUNK</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">コメント・説明（任意）</label>
+        <textarea class="form-input" id="post-desc" placeholder="機材の選び方、こだわりなど..."></textarea>
+      </div>
+      <div class="step-nav">
+        <button class="step-btn back" onclick="goStep(3)">← 戻る</button>
+        <button class="step-btn next" onclick="goStep(5)">次へ →</button>
+      </div>
+    </div>
+    <div class="step-panel" id="step-5">
+      <div class="confirm-box" id="confirm-content"></div>
+      <div class="pass-box">
+        <div class="pass-box-title">🔑 編集用4桁パスワードを設定</div>
+        <div class="pass-warn">投稿後に<strong>編集・削除</strong>するときに必要です。<strong>忘れると変更できません。</strong></div>
+        <div class="pass-digits" style="margin-top:12px">
+          <input class="pass-digit" id="pd1" type="password" inputmode="numeric" maxlength="1">
+          <input class="pass-digit" id="pd2" type="password" inputmode="numeric" maxlength="1">
+          <input class="pass-digit" id="pd3" type="password" inputmode="numeric" maxlength="1">
+          <input class="pass-digit" id="pd4" type="password" inputmode="numeric" maxlength="1">
+        </div>
+      </div>
+      <div class="upload-progress-wrap" id="upload-progress-wrap">
+        <div class="upload-progress-bar-bg"><div class="upload-progress-bar" id="upload-progress-bar"></div></div>
+        <div class="upload-progress-msg" id="upload-progress-msg">アップロード中...</div>
+      </div>
+      <div class="step-nav">
+        <button class="step-btn back" onclick="goStep(4)">← 戻る</button>
+        <button class="step-btn submit-s" id="submit-btn" onclick="submitPostToDB()">🚀 投稿する</button>
+      </div>
+      <div class="anon-note">※ 登録不要・名前は任意です</div>
+    </div>
+  </div>
+</div>
+<!-- EDIT MODAL -->
+<div class="ebd" id="edit-bd" onclick="closeOnBd(event,'edit-bd')">
+  <div class="eform">
+    <div class="eform-close" onclick="closeModal('edit-bd')">✕</div>
+    <div id="edit-step1">
+      <div class="eform-title">記事を編集・削除</div>
+      <div class="eform-sub">投稿時に設定した4桁パスワードを入力してください</div>
+      <div class="pin-row">
+        <input class="pin-d" id="pin1" type="password" inputmode="numeric" maxlength="1">
+        <input class="pin-d" id="pin2" type="password" inputmode="numeric" maxlength="1">
+        <input class="pin-d" id="pin3" type="password" inputmode="numeric" maxlength="1">
+        <input class="pin-d" id="pin4" type="password" inputmode="numeric" maxlength="1">
+      </div>
+      <div class="pin-err" id="pin-err"></div>
+      <button class="submit-btn" onclick="verifyPin()">確認する</button>
+    </div>
+    <div id="edit-step2" style="display:none">
+      <div class="eform-title">記事を編集</div>
+      <div class="eform-sub" style="color:#4caf50">✅ パスワード認証が完了しました</div>
+      <div class="form-row" style="margin-top:16px">
+        <label class="form-lbl">タイトル</label>
+        <input class="form-input" id="edit-title" type="text">
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">使用機材（カンマ区切り）</label>
+        <input class="form-input" id="edit-pedals" type="text">
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">コメント・説明</label>
+        <textarea class="form-input" id="edit-desc"></textarea>
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">YouTube URL</label>
+        <div class="yt-input-wrap">
+          <span class="yt-icon">▶️</span>
+          <input class="form-input" id="edit-youtube" type="url" placeholder="https://www.youtube.com/watch?v=...">
+        </div>
+      </div>
+      <button class="submit-btn" onclick="saveEdit()">変更を保存する</button>
+      <button class="del-btn" onclick="confirmDelete()">🗑 この投稿を削除する</button>
+    </div>
+  </div>
+</div>
+<div class="done-bd" id="done-bd">
+  <div class="done-box">
+    <div class="done-icon">🎉</div>
+    <div class="done-title">投稿完了！</div>
+    <div class="done-sub" id="done-sub">あなたのボードが公開されました！</div>
+    <button class="done-close-btn" onclick="document.getElementById('done-bd').classList.remove('open')">閉じる</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<!-- 画像編集 -->
+<div class="img-editor-bd" id="img-editor-bd">
+  <div class="img-editor-header">
+    <div><div class="img-editor-title">画像編集</div><div class="img-editor-subtitle">番号ステッカー・トリミング（任意）</div></div>
+    <button class="img-editor-done" onclick="finishEdit()">完了</button>
+  </div>
+  <div class="img-tab-bar" id="img-tab-bar"></div>
+  <div class="img-editor-canvas-wrap" id="canvas-wrap"><canvas id="editor-canvas"></canvas></div>
+  <div class="img-editor-hint" id="editor-hint">「番号追加」で追加・「移動・削除」でタップ削除/ドラッグ移動/ピンチでサイズ変更</div>
+  <div class="img-editor-toolbar">
+    <button class="editor-tool-btn" id="tool-crop" onclick="setTool('crop')"><span class="editor-tool-icon">✂️</span>トリミング</button>
+    <button class="editor-tool-btn" onclick="addNumberSticker()"><span class="editor-tool-icon">➕</span>番号追加</button>
+    <button class="editor-tool-btn" id="tool-move" onclick="setTool('move')"><span class="editor-tool-icon">✋</span>移動・削除</button>
+    <button class="editor-tool-btn" onclick="resetEdits()"><span class="editor-tool-icon">↩️</span>リセット</button>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="index.js"></script>
+</body>
+</html>
