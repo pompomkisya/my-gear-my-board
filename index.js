@@ -5,7 +5,7 @@ const MASTER_KEY='MSTR';
 function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+Math.random().toString(36).slice(2)+Date.now();localStorage.setItem('mgmb_sid',s);}return s;}
 const SESSION_ID=getSessionId();
 let lang='ja';
-let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentTab='all',currentSort='new',currentDBPost=null;
+let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentFxFilter=null,currentTab='all',currentSort='new',currentDBPost=null;
 
 function togglePostDropdown(e){e.stopPropagation();document.getElementById('post-dropdown').classList.toggle('open');}
 function closeDropdownAndPost(type){document.getElementById('post-dropdown').classList.remove('open');openPost(type);}
@@ -29,7 +29,19 @@ async function loadPostsFromDB(){
   if(error){console.error(error);return;}
   const{data:cc}=await sb.from('comments').select('post_id');
   const cm={};if(cc)cc.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  allDBPosts=(posts||[]).map(p=>({...p,comment_count:cm[p.id]||0}));
+  // pedalsのtypes情報を取得してキャッシュ
+  const{data:pedals}=await sb.from('pedals').select('full_name,types');
+  const pedalTypesMap={};
+  if(pedals)pedals.forEach(p=>{pedalTypesMap[p.full_name]=(p.types||[]);});
+  // 各投稿のgear_listにtypesを付加
+  allDBPosts=(posts||[]).map(p=>({
+    ...p,
+    comment_count:cm[p.id]||0,
+    gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
+      ...g,
+      types:pedalTypesMap[g.name]||[]
+    }))
+  }));
   applyFilter();
   buildTicker(allDBPosts);
   renderRankingWidget(allDBPosts);renderGearWidget(allDBPosts);
@@ -59,6 +71,16 @@ function applyFilter(){
     posts=posts.filter(p=>{
       const g=Array.isArray(p.gear_list)?p.gear_list:[];
       return g.some(x=>(x.brand||x.name||x||'').toLowerCase().includes(currentBrandFilter.toLowerCase()));
+    });
+  }
+  // エフェクタータイプフィルター（pedalsテーブルのtypesと照合）
+  if(currentFxFilter){
+    posts=posts.filter(p=>{
+      const g=Array.isArray(p.gear_list)?p.gear_list:[];
+      return g.some(x=>{
+        const types=Array.isArray(x.types)?x.types:(x.types?[x.types]:[]);
+        return types.some(t=>(t||'').toLowerCase()===currentFxFilter.toLowerCase());
+      });
     });
   }
   // フリーワード検索
@@ -92,7 +114,7 @@ function getEmptyHTML(){
 }
 
 function clearFilter(){
-  currentGenreFilter='ALL';currentBrandFilter=null;
+  currentGenreFilter='ALL';currentBrandFilter=null;currentFxFilter=null;
   document.querySelectorAll('.sl .tag, #swipe-ui .tag').forEach(t=>{
     t.classList.toggle('on',t.getAttribute('data-genre')==='ALL');
   });
@@ -142,11 +164,15 @@ async function toggleDBLike(e,postId,el){
 
 function filterGenre(el,genre){
   document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;applyFilter();
+  el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;currentFxFilter=null;applyFilter();
 }
 function filterBrand(el,brand){
   document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';applyFilter();
+  el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';currentFxFilter=null;applyFilter();
+}
+function filterFx(el,fx){
+  document.querySelectorAll('.sl .tag').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');currentFxFilter=fx;currentBrandFilter=null;currentGenreFilter='ALL';applyFilter();
 }
 function setTab(el,tab){
   document.querySelectorAll('.feed-tab').forEach(t=>t.classList.remove('on'));
@@ -797,11 +823,15 @@ window.addEventListener('resize',checkMobile);
 
 function filterGenreMob(el,genre){
   document.querySelectorAll('#swipe-ui .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;applyFilter();setTimeout(()=>goPanel(1),180);
+  el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;currentFxFilter=null;applyFilter();setTimeout(()=>goPanel(1),180);
 }
 function filterBrandMob(el,brand){
   document.querySelectorAll('#swipe-ui .tag').forEach(t=>t.classList.remove('on'));
-  el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';applyFilter();setTimeout(()=>goPanel(1),180);
+  el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';currentFxFilter=null;applyFilter();setTimeout(()=>goPanel(1),180);
+}
+function filterFxMob(el,fx){
+  document.querySelectorAll('#swipe-ui .tag').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');currentFxFilter=fx;currentBrandFilter=null;currentGenreFilter='ALL';applyFilter();setTimeout(()=>goPanel(1),180);
 }
 function renderRankingWidgetMob(posts){
   const el=document.getElementById('ranking-widget-mob');if(!el)return;
