@@ -22,7 +22,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .search-results-badge{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--tm);display:none;z-index:10}
 .search-results-badge.show{display:block}
 .logo{display:flex;align-items:center;gap:10px;cursor:pointer}
-.logo-img{height:42px;width:auto;border-radius:0;object-fit:contain}
+.logo-img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:center}
 .logo-text{display:flex;flex-direction:column;line-height:1}
 .logo-main{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:4px}
 .logo-sub{font-family:'JetBrains Mono',monospace;font-size:7.5px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-top:2px}
@@ -84,7 +84,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .card:hover{border-color:rgba(232,85,45,.4);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.45)}
 .iw{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--sf2);display:flex;align-items:center;justify-content:center}
-.iw img{width:100%;height:100%;object-fit:cover;object-position:center}
+.iw img{width:100%;height:100%;object-fit:contain;object-position:center;background:#0d0d0e}
 .iw-ov{position:absolute;inset:0;background:linear-gradient(160deg,transparent 40%,rgba(13,13,14,.8) 100%);opacity:0;transition:opacity .2s}
 .card:hover .iw-ov{opacity:1}
 .bdg{position:absolute;top:10px;right:10px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:2px;background:var(--ac);color:#fff}
@@ -263,12 +263,14 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 @media(max-width:1024px){.wrap{grid-template-columns:180px 1fr}.sr{display:none}}
 @media(max-width:680px){
 .wrap{display:block}.sl{display:none}.sr{display:none}.feed{padding:0;border:none}
-header{padding:0 14px;height:52px}
-.logo-main{font-size:17px;letter-spacing:2px}.logo-sub{font-size:6.5px;letter-spacing:2px}
-.h-btn{padding:7px 10px;font-size:9px;letter-spacing:.5px}
-.h-search-wrap{max-width:180px}
-.h-search-input{font-size:12px;padding:7px 8px 7px 28px}
-.logo-main{font-size:15px;letter-spacing:2px}.logo-sub{font-size:6px;letter-spacing:1.5px}
+header{padding:0 10px;height:52px}
+.logo-img{width:38px;height:38px}
+.logo-main{font-size:14px;letter-spacing:1.5px}.logo-sub{font-size:6px;letter-spacing:1.5px}
+.h-btn{padding:6px 9px;font-size:8.5px;letter-spacing:.3px}
+.h-icon{width:30px;height:30px;font-size:13px}
+.h-search-wrap{max-width:none;flex:1;min-width:0}
+.h-search-input{font-size:13px;padding:7px 8px 7px 28px}
+.h-search-icon{left:8px;font-size:12px}
 #swipe-ui{overflow:hidden;width:100%}
 .swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
 .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block;touch-action:manipulation}
@@ -413,6 +415,14 @@ footer{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:10px}.
       <div class="widget"><div id="ranking-widget-mob"></div></div>
       <div class="mob-panel-title">よく使われている機材</div>
       <div class="widget"><div id="gear-widget-mob"></div></div>
+      <div class="mob-panel-title">機材NEWS</div>
+      <div class="widget">
+        <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=outlet" target="_blank" rel="noopener"><div class="nth">💰</div><div><div class="nr-t">サウンドハウス アウトレット</div><div class="nr-d">お買い得品をチェック</div></div></a>
+        <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=sale" target="_blank" rel="noopener"><div class="nth">🏷</div><div><div class="nr-t">サウンドハウス セール情報</div><div class="nr-d">期間限定セール中</div></div></a>
+        <a class="news-link" href="https://www.soundhouse.co.jp/categories/detail/218" target="_blank" rel="noopener"><div class="nth">🎛</div><div><div class="nr-t">エフェクター新着</div><div class="nr-d">Soundhouse最新入荷</div></div></a>
+      </div>
+      <div class="mob-panel-title">広告</div>
+      <div class="widget ad-slot" style="height:120px"><div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace">Google AdSense</div></div>
       <div style="height:40px"></div>
     </div>
   </div>
