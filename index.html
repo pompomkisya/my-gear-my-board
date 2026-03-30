@@ -400,6 +400,41 @@ footer{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:10px}.
         <div class="tag" onclick="filterBrandMob(this,'Zoom')">Zoom</div>
         <div class="tag" onclick="filterBrandMob(this,'Others')">Others</div>
       </div>
+      <div class="mob-panel-title" style="margin-top:16px">エフェクタータイプ</div>
+      <div class="brand-group-lbl">歪み系</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" data-fx="overdrive" onclick="filterFxMob(this,'overdrive')">OD</div>
+        <div class="tag" data-fx="distortion" onclick="filterFxMob(this,'distortion')">Dist</div>
+        <div class="tag" data-fx="fuzz" onclick="filterFxMob(this,'fuzz')">Fuzz</div>
+        <div class="tag" data-fx="boost" onclick="filterFxMob(this,'boost')">Boost</div>
+      </div>
+      <div class="brand-group-lbl">空間系</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" data-fx="reverb" onclick="filterFxMob(this,'reverb')">Reverb</div>
+        <div class="tag" data-fx="delay" onclick="filterFxMob(this,'delay')">Delay</div>
+        <div class="tag" data-fx="chorus" onclick="filterFxMob(this,'chorus')">Chorus</div>
+        <div class="tag" data-fx="flanger" onclick="filterFxMob(this,'flanger')">Flanger</div>
+        <div class="tag" data-fx="phaser" onclick="filterFxMob(this,'phaser')">Phaser</div>
+      </div>
+      <div class="brand-group-lbl">モジュレーション</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" data-fx="modulation" onclick="filterFxMob(this,'modulation')">Mod</div>
+        <div class="tag" data-fx="tremolo" onclick="filterFxMob(this,'tremolo')">Tremolo</div>
+        <div class="tag" data-fx="vibrato" onclick="filterFxMob(this,'vibrato')">Vibrato</div>
+        <div class="tag" data-fx="pitch" onclick="filterFxMob(this,'pitch')">Pitch</div>
+        <div class="tag" data-fx="wah" onclick="filterFxMob(this,'wah')">Wah</div>
+      </div>
+      <div class="brand-group-lbl">その他</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" data-fx="compressor" onclick="filterFxMob(this,'compressor')">Comp</div>
+        <div class="tag" data-fx="eq" onclick="filterFxMob(this,'eq')">EQ</div>
+        <div class="tag" data-fx="noise-gate" onclick="filterFxMob(this,'noise-gate')">Noise Gate</div>
+        <div class="tag" data-fx="looper" onclick="filterFxMob(this,'looper')">Looper</div>
+        <div class="tag" data-fx="volume" onclick="filterFxMob(this,'volume')">Volume</div>
+        <div class="tag" data-fx="tuner" onclick="filterFxMob(this,'tuner')">Tuner</div>
+        <div class="tag" data-fx="multi-effects" onclick="filterFxMob(this,'multi-effects')">Multi FX</div>
+        <div class="tag" data-fx="preamp" onclick="filterFxMob(this,'preamp')">Preamp</div>
+      </div>
       <div style="height:40px"></div>
     </div>
     <div class="swipe-panel" id="mob-feed-panel">
@@ -431,14 +466,14 @@ footer{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:10px}.
       <div class="widget"><div id="ranking-widget-mob"></div></div>
       <div class="mob-panel-title">よく使われている機材</div>
       <div class="widget"><div id="gear-widget-mob"></div></div>
+      <div class="mob-panel-title">広告</div>
+      <div class="widget ad-slot" style="height:120px"><div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace">Google AdSense</div></div>
       <div class="mob-panel-title">機材NEWS</div>
       <div class="widget">
         <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=outlet" target="_blank" rel="noopener"><div class="nth">💰</div><div><div class="nr-t">サウンドハウス アウトレット</div><div class="nr-d">お買い得品をチェック</div></div></a>
         <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=sale" target="_blank" rel="noopener"><div class="nth">🏷</div><div><div class="nr-t">サウンドハウス セール情報</div><div class="nr-d">期間限定セール中</div></div></a>
         <a class="news-link" href="https://www.soundhouse.co.jp/categories/detail/218" target="_blank" rel="noopener"><div class="nth">🎛</div><div><div class="nr-t">エフェクター新着</div><div class="nr-d">Soundhouse最新入荷</div></div></a>
       </div>
-      <div class="mob-panel-title">広告</div>
-      <div class="widget ad-slot" style="height:120px"><div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace">Google AdSense</div></div>
       <div style="height:40px"></div>
     </div>
   </div>
@@ -513,6 +548,44 @@ footer{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:10px}.
       </div>
     </div>
   </div>
+  <div class="sl-div"></div>
+  <div>
+    <div class="sl-lbl">エフェクタータイプ</div>
+    <div class="brand-group-lbl">歪み系</div>
+    <div class="tags">
+      <div class="tag" data-fx="overdrive" onclick="filterFx(this,'overdrive')">OD</div>
+      <div class="tag" data-fx="distortion" onclick="filterFx(this,'distortion')">Dist</div>
+      <div class="tag" data-fx="fuzz" onclick="filterFx(this,'fuzz')">Fuzz</div>
+      <div class="tag" data-fx="boost" onclick="filterFx(this,'boost')">Boost</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:8px">空間系</div>
+    <div class="tags">
+      <div class="tag" data-fx="reverb" onclick="filterFx(this,'reverb')">Reverb</div>
+      <div class="tag" data-fx="delay" onclick="filterFx(this,'delay')">Delay</div>
+      <div class="tag" data-fx="chorus" onclick="filterFx(this,'chorus')">Chorus</div>
+      <div class="tag" data-fx="flanger" onclick="filterFx(this,'flanger')">Flanger</div>
+      <div class="tag" data-fx="phaser" onclick="filterFx(this,'phaser')">Phaser</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:8px">モジュレーション</div>
+    <div class="tags">
+      <div class="tag" data-fx="modulation" onclick="filterFx(this,'modulation')">Mod</div>
+      <div class="tag" data-fx="tremolo" onclick="filterFx(this,'tremolo')">Tremolo</div>
+      <div class="tag" data-fx="vibrato" onclick="filterFx(this,'vibrato')">Vibrato</div>
+      <div class="tag" data-fx="pitch" onclick="filterFx(this,'pitch')">Pitch</div>
+      <div class="tag" data-fx="wah" onclick="filterFx(this,'wah')">Wah</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:8px">その他</div>
+    <div class="tags">
+      <div class="tag" data-fx="compressor" onclick="filterFx(this,'compressor')">Comp</div>
+      <div class="tag" data-fx="eq" onclick="filterFx(this,'eq')">EQ</div>
+      <div class="tag" data-fx="noise-gate" onclick="filterFx(this,'noise-gate')">Noise Gate</div>
+      <div class="tag" data-fx="looper" onclick="filterFx(this,'looper')">Looper</div>
+      <div class="tag" data-fx="volume" onclick="filterFx(this,'volume')">Volume</div>
+      <div class="tag" data-fx="tuner" onclick="filterFx(this,'tuner')">Tuner</div>
+      <div class="tag" data-fx="multi-effects" onclick="filterFx(this,'multi-effects')">Multi FX</div>
+      <div class="tag" data-fx="preamp" onclick="filterFx(this,'preamp')">Preamp</div>
+    </div>
+  </div>
 </aside>
 <main class="feed">
   <div class="post-banner">
@@ -537,9 +610,9 @@ footer{padding:16px 14px;flex-direction:column;align-items:flex-start;gap:10px}.
   <div class="grid" id="card-grid"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">読み込み中...</div></div>
 </main>
 <aside class="sr">
-  <div class="ad-slot ad-side"><div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace">広告</div></div>
   <div class="widget"><div class="wt">🔥 今月の人気ボード</div><div id="ranking-widget"></div></div>
   <div class="widget"><div class="wt">🎛 よく使われている機材</div><div id="gear-widget"></div></div>
+  <div class="ad-slot ad-side"><div style="font-size:8px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:'JetBrains Mono',monospace">広告</div></div>
   <div class="widget"><div class="wt">📰 機材NEWS</div>
     <div id="news-widget">
       <a class="news-link" href="https://www.soundhouse.co.jp/search/index?i_type=outlet" target="_blank" rel="noopener"><div class="nth">💰</div><div><div class="nr-t">サウンドハウス アウトレット</div><div class="nr-d">お買い得品をチェック</div></div></a>
