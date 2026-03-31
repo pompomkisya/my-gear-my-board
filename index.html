@@ -588,10 +588,11 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <span class="upload-icon">📷</span><div>クリックして写真を選択</div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:6px">最大3枚 · 1枚目がサムネイル</div>
       </div>
+      <div id="upload-hint" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);text-align:center;margin-top:4px">番号をつけると伝わりやすくなります</div>
       <div class="photo-previews" id="photo-previews"></div>
       <div class="photo-count" id="photo-count"></div>
       <div class="step-nav"><button class="step-btn next" onclick="goStep(2)">次へ →</button></div>
-      <button class="skip-btn" onclick="goStep(2)">スキップ（写真なしで続ける）</button>
+      <button class="skip-btn" id="skip-photo-btn" onclick="goStep(2)">スキップ（写真なしで続ける）</button>
     </div>
     <div class="step-panel" id="step-2">
       <div class="form-row">
@@ -618,8 +619,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="step-panel" id="step-3">
       <div id="step3-photo-preview" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
       <div class="form-row">
-        <label class="form-lbl">使用機材（1つ以上推奨）</label>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--tm);margin-bottom:6px">※入力すると閲覧数が上がります</div>
+        <label class="form-lbl" id="gear-step-lbl">使用機材（1つ以上推奨）</label>
+        <div id="gear-hint1" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--tm);margin-bottom:6px">※入力すると閲覧数が上がります</div>
         <div class="gear-input-wrap">
           <div class="gear-tags" id="gear-tags" onclick="document.getElementById('gear-search').focus()">
             <input class="gear-text-input" id="gear-search" type="text"
@@ -631,16 +632,16 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           </div>
           <div class="ac-dropdown" id="ac-dropdown"></div>
         </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#9a9890;margin-top:5px">候補からタップで簡単に追加できます</div>
+        <div id="gear-hint2" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#9a9890;margin-top:5px">候補からタップで簡単に追加できます</div>
         <div id="gear-feedback" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#4caf50;margin-top:6px;display:none"></div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:4px">まずは1つだけでOKです</div>
+        <div id="gear-hint3" style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--td);margin-top:4px">まずは1つだけでOKです</div>
       </div>
       <div class="step-nav">
         <button class="step-btn back" onclick="goStep(2)">← 戻る</button>
         <button class="step-btn next" id="gear-next-btn" onclick="goStep(4)">次へ</button>
       </div>
       <div style="text-align:center;margin-top:10px">
-        <span onclick="goStep(4)" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);cursor:pointer;text-decoration:underline;opacity:.7">あとで入力する</span>
+        <span id="later-input-btn" onclick="goStep(4)" style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);cursor:pointer;text-decoration:underline;opacity:.7">あとで入力する</span>
       </div>
     </div>
     <div class="step-panel" id="step-4">
@@ -759,15 +760,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   </div>
   <div class="img-tab-bar" id="img-tab-bar"></div>
   <div class="img-editor-canvas-wrap" id="canvas-wrap"><canvas id="editor-canvas"></canvas></div>
-  <div class="img-editor-hint" id="editor-hint">ツールを選んで編集してください</div>
-  <div class="img-editor-toolbar">
-    <button class="editor-tool-btn" id="tool-crop" onclick="setTool('crop')"><span class="editor-tool-icon">✂️</span>トリミング</button>
-    <button class="editor-tool-btn" onclick="rotateImage()"><span class="editor-tool-icon">🔄</span>回転</button>
-    <button class="editor-tool-btn" onclick="addNumberSticker()"><span class="editor-tool-icon">➕</span>番号追加</button>
-    <button class="editor-tool-btn" id="tool-move" onclick="setTool('move')"><span class="editor-tool-icon">✋</span>番号を<br>移動・削除</button>
-    <button class="editor-tool-btn" onclick="resetEdits()"><span class="editor-tool-icon">↩️</span>リセット</button>
-    <button class="editor-done-btn" onclick="finishEdit()"><span class="editor-done-icon">✅</span>完了</button>
-  </div>
+  <div class="img-editor-hint" id="editor-hint">「番号を追加」で機材に番号をつけられます</div>
+  <div class="img-editor-toolbar" id="img-editor-toolbar"></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="index.js"></script>
