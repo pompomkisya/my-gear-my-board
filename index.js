@@ -408,7 +408,7 @@ async function searchGear(val){
 function setACFocus(i){acFocusIdx=i;document.querySelectorAll('.ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
 function selectGear(i){const x=acResults[i];if(!x)return;addGearTag({name:x.full_name,brand:x.brand});closeAC();}
 function addGearTag(g){
-  if(selectedGears.find(x=>x.name===g.name))return;
+  // 重複許可（同じ機材を複数使う人もいる）
   if(selectedGears.length>=20){showToast(lang==='en'?'⚠️ Max 20 items':'⚠️ 最大20件まで');return;}
   selectedGears.push(g);renderGearTags();document.getElementById('gear-search').value='';updateGearFeedback();
 }
@@ -428,7 +428,7 @@ function gearKeyDown(e){
   const dd=document.getElementById('ac-dropdown');const open=dd.classList.contains('open');
   if(e.key==='ArrowDown'){e.preventDefault();if(open)setACFocus(Math.min(acFocusIdx+1,acResults.length-1));}
   else if(e.key==='ArrowUp'){e.preventDefault();setACFocus(Math.max(acFocusIdx-1,0));}
-  else if(e.key==='Enter'){e.preventDefault();if(open&&acFocusIdx>=0&&acResults[acFocusIdx])selectGear(acFocusIdx);else{const v=e.target.value.trim();if(v)addGearTag({name:v,brand:''});}}
+  else if(e.key==='Enter'){e.preventDefault();if(open&&acFocusIdx>=0&&acResults[acFocusIdx]){selectGear(acFocusIdx);}else{const v=e.target.value.trim();if(v){addGearTag({name:v,brand:''});document.getElementById('gear-search').value='';closeAC();}}}
   else if(e.key==='Backspace'&&!e.target.value&&selectedGears.length)removeGearTag(selectedGears.length-1);
   else if(e.key==='Escape')closeAC();
 }
