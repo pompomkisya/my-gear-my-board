@@ -48,7 +48,7 @@ const I18N={
     tickerHot:'人気急上昇 ▸ ',tickerNew:'新着 ▸ @',
     toolAddNum:'＋ 番号を追加',toolCrop:'トリミング',toolRotate:'回転',toolDone:'完了',toolBack:'← 戻る',
     toolMore:'…',menuReset:'すべてリセット',menuUndo:'番号をすべて削除',
-    hintNormal:'「番号を追加」で機材に番号をつけられます',hintNumberMode:'ドラッグで移動・タップで削除・ピンチでサイズ変更',hintCrop:'ドラッグしてトリミング範囲を選択',
+    hintNormal:'「番号を追加」で機材に番号をつけられます',hintNumberMode:'ドラッグで移動・タップで削除',hintCrop:'ドラッグしてトリミング範囲を選択',
     tutorialText:'機材ごとに番号をつけると、配置がわかりやすくなります',tutorialBtn:'番号をつける',tutorialSkip:'スキップ',
     stepPhotoSub:'Step 1：写真 & 番号付け',stepInfoSub:'Step 2：タイトル・説明',
     stepGearSub:'Step 3：使用機材',stepGenreSub:'Step 4：ジャンル・詳細',stepConfirmSub:'Step 5：確認・投稿',
@@ -96,7 +96,7 @@ const I18N={
     tickerHot:'Trending ▸ ',tickerNew:'New ▸ @',
     toolAddNum:'＋ Add Number',toolCrop:'Crop',toolRotate:'Rotate',toolDone:'Done',toolBack:'← Back',
     toolMore:'…',menuReset:'Reset All',menuUndo:'Remove All Numbers',
-    hintNormal:'Tap "Add Number" to label your gear',hintNumberMode:'Drag to move · Tap to delete · Pinch to resize',hintCrop:'Drag to select crop area',
+    hintNormal:'Tap "Add Number" to label your gear',hintNumberMode:'Drag to move · Tap to delete',hintCrop:'Drag to select crop area',
     tutorialText:'Adding numbers to each pedal makes your layout easy to understand',tutorialBtn:'Add Numbers',tutorialSkip:'Skip',
     stepPhotoSub:'Step 1: Photo & Numbers',stepInfoSub:'Step 2: Title & Info',
     stepGearSub:'Step 3: Gear List',stepGenreSub:'Step 4: Genre & Details',stepConfirmSub:'Step 5: Review & Post',
@@ -639,9 +639,16 @@ let editorPhotoIndex=0,editorCanvas=null,editorCtx=null,editorImage=null;
 let editorNumbers=[],editorMode='normal';
 let cropStart=null,cropBox={x:0,y:0,w:0,h:0},cropActive=false,cropDragging=false,cropHandleDrag=null;
 let isDraggingNum=false,dragNumIdx=-1,dragOffX=0,dragOffY=0,dragMoved=false;
-let pinchActive=false,pinchStartDist=0,pinchNumIdx=-1,pinchStartSize=20;
+let currentStickerSize='large'; // large=20, medium=15, small=10
 const DEFAULT_STICKER_SIZE=20;
 
+function getStickerSize(){return currentStickerSize==='large'?20:currentStickerSize==='medium'?15:10;}
+function cycleStickerSize(){
+  currentStickerSize=currentStickerSize==='large'?'medium':currentStickerSize==='medium'?'small':'large';
+  editorNumbers.forEach(n=>n.size=getStickerSize());
+  drawEditor();renderEditorToolbar();
+}
+function stickerSizeLabel(){return currentStickerSize==='large'?'大':'medium'===currentStickerSize?'中':'小';}
 function getStickerPosition(num,canvasW,canvasH){
   const cols=6;const idx=num-1;const row=Math.floor(idx/cols);const colInRow=idx%cols;
   const col=(cols-1)-colInRow;const cellW=canvasW/cols;const totalRows=Math.ceil(24/cols);
@@ -650,7 +657,7 @@ function getStickerPosition(num,canvasW,canvasH){
 }
 
 function openImgEditor(idx){
-  editorPhotoIndex=idx;editorNumbers=[];editorMode='normal';
+  editorPhotoIndex=idx;editorNumbers=[];editorMode='normal';currentStickerSize='large';
   cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropDragging=false;cropHandleDrag=null;
   document.getElementById('img-editor-bd').classList.add('open');document.body.style.overflow='hidden';
   const tabBar=document.getElementById('img-tab-bar');
@@ -685,9 +692,11 @@ function renderEditorToolbar(){
       +'<button class="editor-done-btn" onclick="finishEdit()"><span class="editor-done-icon">✅</span>'+tr('toolDone')+'</button>';
     if(hint)hint.textContent=editorMode==='crop'?tr('hintCrop'):tr('hintNormal');
   }else if(editorMode==='number'){
+    const _szL=stickerSizeLabel();
     toolbar.innerHTML=
       '<button class="editor-tool-btn" onclick="exitNumberMode()" style="flex:0 0 auto"><span class="editor-tool-icon">◀</span>'+tr('toolBack')+'</button>'
       +'<button class="editor-tool-btn" onclick="addNumberSticker()" style="background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700"><span class="editor-tool-icon">➕</span>'+tr('toolAddNum')+'</button>'
+      +'<button class="editor-tool-btn" onclick="cycleStickerSize()" style="min-width:48px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:700">'+_szL+'</button>'
       +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--tm)">'+editorNumbers.length+(lang==='en'?' number'+(editorNumbers.length!==1?'s':''):' 個')+'</div>'
       +'<button class="editor-done-btn" onclick="finishEdit()"><span class="editor-done-icon">✅</span>'+tr('toolDone')+'</button>';
     if(hint)hint.textContent=tr('hintNumberMode');
@@ -732,7 +741,7 @@ function drawEditor(){
 }
 function addNumberSticker(){
   if(!editorCanvas)return;const num=editorNumbers.length+1;const pos=getStickerPosition(num,editorCanvas.width,editorCanvas.height);
-  editorNumbers.push({x:pos.x,y:pos.y,num,size:DEFAULT_STICKER_SIZE});drawEditor();
+  editorNumbers.push({x:pos.x,y:pos.y,num,size:getStickerSize()});drawEditor();
   showToast((lang==='en'?'Number ':'番号 ')+num+(lang==='en'?' added':' を追加しました'));
   if(editorMode==='number')renderEditorToolbar();
 }
@@ -769,14 +778,7 @@ function getCropHandle(pos){
 }
 function canvasPointerDown(e){
   e.preventDefault();
-  if(e.touches&&e.touches.length===2){
-    pinchActive=true;pinchStartDist=getTouchDist(e.touches[0],e.touches[1]);
-    const midX=(e.touches[0].clientX+e.touches[1].clientX)/2;const midY=(e.touches[0].clientY+e.touches[1].clientY)/2;
-    const mid=getCanvasPos({clientX:midX,clientY:midY});let minD=Infinity;
-    editorNumbers.forEach((n,i)=>{const d=Math.hypot(n.x-mid.x,n.y-mid.y);if(d<minD){minD=d;pinchNumIdx=i;}});
-    if(minD>100)pinchNumIdx=-1;pinchStartSize=pinchNumIdx>=0?(editorNumbers[pinchNumIdx].size||DEFAULT_STICKER_SIZE):DEFAULT_STICKER_SIZE;return;
-  }
-  pinchActive=false;const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);dragMoved=false;
+  if(e.touches&&e.touches.length===2)return;const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);dragMoved=false;
   if(editorMode==='number'){
     const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<(n.size||DEFAULT_STICKER_SIZE)+8);
     if(hit>=0){isDraggingNum=true;dragNumIdx=hit;dragOffX=pos.x-editorNumbers[hit].x;dragOffY=pos.y-editorNumbers[hit].y;}else isDraggingNum=false;
@@ -789,7 +791,7 @@ function canvasPointerDown(e){
 }
 function canvasPointerMove(e){
   e.preventDefault();if(!editorCanvas)return;
-  if(e.touches&&e.touches.length===2&&pinchActive){const dist=getTouchDist(e.touches[0],e.touches[1]);const ratio=dist/pinchStartDist;if(pinchNumIdx>=0){editorNumbers[pinchNumIdx].size=Math.max(10,Math.min(60,Math.round(pinchStartSize*ratio)));drawEditor();}return;}
+  if(e.touches&&e.touches.length===2)return;
   const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);const c=editorCanvas;
   if(editorMode==='number'&&isDraggingNum&&dragNumIdx>=0){
     editorNumbers[dragNumIdx].x=Math.max(10,Math.min(c.width-10,pos.x-dragOffX));editorNumbers[dragNumIdx].y=Math.max(10,Math.min(c.height-10,pos.y-dragOffY));dragMoved=true;drawEditor();
@@ -808,7 +810,7 @@ function canvasPointerMove(e){
   }
 }
 function canvasPointerUp(e){
-  e.preventDefault();if(pinchActive&&e.touches&&e.touches.length<2){pinchActive=false;return;}
+  e.preventDefault();if(e.touches&&e.touches.length>=2)return;
   if(editorMode==='number'){
     if(isDraggingNum&&!dragMoved&&dragNumIdx>=0){editorNumbers.splice(dragNumIdx,1);editorNumbers.forEach((n,i)=>n.num=i+1);showToast(lang==='en'?'Number removed':'番号を削除しました');drawEditor();renderEditorToolbar();}
     isDraggingNum=false;dragNumIdx=-1;dragMoved=false;
