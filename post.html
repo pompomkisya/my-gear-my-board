@@ -750,14 +750,22 @@ function openEditImgEditor(target,idx){
   document.getElementById('img-editor-bd').classList.add('open');
   document.body.style.overflow='hidden';
   currentStickerSize='large';
-  const src=target==='url'?editPhotoUrls[idx]:editNewPhotos[idx];
-  loadEditorImage(src);
+  if(target==='url'){
+    // URL画像はfetchでbase64に変換してからcanvasに渡す（PCのCORSエラー対策）
+    fetch(editPhotoUrls[idx])
+      .then(r=>r.blob())
+      .then(blob=>{const reader=new FileReader();reader.onload=ev=>loadEditorImage(ev.target.result);reader.readAsDataURL(blob);})
+      .catch(()=>loadEditorImage(editPhotoUrls[idx]));
+  }else{
+    loadEditorImage(editNewPhotos[idx]);
+  }
 }
 function loadEditorImage(src){
   const canvas=document.getElementById('editor-canvas');
   const wrap=document.getElementById('canvas-wrap');
   editorCanvas=canvas;editorCtx=canvas.getContext('2d');
   const img=new Image();
+  img.crossOrigin='anonymous';
   img.onload=()=>{
     editorImage=img;
     const maxW=wrap.clientWidth||360;const maxH=wrap.clientHeight||400;
@@ -869,6 +877,7 @@ function rotateImage(){
 }
 function finishEditPhoto(){
   if(!editorCanvas||!editorImage){document.getElementById('img-editor-bd').classList.remove('open');document.body.style.overflow='hidden';return;}
+  try{
   const c=editorCanvas;let sx=0,sy=0,sw=editorImage.naturalWidth,sh=editorImage.naturalHeight;
   if(cropActive&&cropBox.w>10&&cropBox.h>10){
     const scaleX=editorImage.naturalWidth/c.width;const scaleY=editorImage.naturalHeight/c.height;
@@ -899,6 +908,12 @@ function finishEditPhoto(){
   document.getElementById('img-editor-bd').classList.remove('open');
   document.body.style.overflow='hidden';
   renderEditPhotoPreviews();showToast('✅ 編集を保存しました');
+  }catch(err){
+    console.error('finishEditPhoto error:',err);
+    document.getElementById('img-editor-bd').classList.remove('open');
+    document.body.style.overflow='hidden';
+    renderEditPhotoPreviews();showToast('✅ 保存しました');
+  }
 }
 
 function getCanvasPos(touch){
