@@ -289,15 +289,8 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
   <div class="img-tab-bar" id="img-tab-bar"></div>
   <div class="img-editor-canvas-wrap" id="canvas-wrap"><canvas id="editor-canvas"></canvas></div>
-  <div class="img-editor-hint" id="editor-hint">ツールを選んで編集してください</div>
-  <div class="img-editor-toolbar">
-    <button class="editor-tool-btn" id="tool-crop" onclick="setTool('crop')"><span class="editor-tool-icon">✂️</span>トリミング</button>
-    <button class="editor-tool-btn" onclick="rotateImage()"><span class="editor-tool-icon">🔄</span>回転</button>
-    <button class="editor-tool-btn" onclick="addNumberSticker()"><span class="editor-tool-icon">➕</span>番号追加</button>
-    <button class="editor-tool-btn" id="tool-move" onclick="setTool('move')"><span class="editor-tool-icon">✋</span>番号を<br>移動・削除</button>
-    <button class="editor-tool-btn" onclick="resetEdits()"><span class="editor-tool-icon">↩️</span>リセット</button>
-    <button class="editor-done-btn" onclick="finishEditPhoto()"><span class="editor-done-icon">✅</span>完了</button>
-  </div>
+  <div class="img-editor-hint" id="editor-hint">「番号を追加」で機材に番号をつけられます</div>
+  <div class="img-editor-toolbar" id="img-editor-toolbar"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -728,7 +721,7 @@ function closeEditAC(){const dd=document.getElementById('edit-ac-dropdown');if(d
 
 // ── 画像エディター（編集モーダル用）
 let editorCanvas=null,editorCtx=null,editorImage=null;
-let editorNumbers=[],editorMode='none';
+let editorNumbers=[],editorMode='normal';
 let cropStart=null,cropBox={x:0,y:0,w:0,h:0},cropActive=false,cropDragging=false,cropHandleDrag=null;
 let isDraggingNum=false,dragNumIdx=-1,dragOffX=0,dragOffY=0,dragMoved=false;
 let pinchActive=false,pinchStartDist=0,pinchNumIdx=-1,pinchStartSize=20;
@@ -743,13 +736,13 @@ function getStickerPosition(num,canvasW,canvasH){
 
 function openEditImgEditor(target,idx){
   editImgEditorTarget=target;editImgEditorTargetIdx=idx;
-  editorNumbers=[];editorMode='none';
+  editorNumbers=[];editorMode='normal';
   cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropDragging=false;cropHandleDrag=null;
   document.getElementById('img-tab-bar').innerHTML='';
   document.getElementById('img-editor-bd').classList.add('open');
   document.body.style.overflow='hidden';
   const src=target==='url'?editPhotoUrls[idx]:editNewPhotos[idx];
-  loadEditorImage(src);updateToolUI();
+  loadEditorImage(src);setTimeout(()=>renderEditorToolbar(),100);
 }
 function loadEditorImage(src){
   const canvas=document.getElementById('editor-canvas');
@@ -792,28 +785,59 @@ function drawEditor(){
     ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.num,n.x,n.y);
   });
 }
-function setTool(mode){
-  editorMode=editorMode===mode?'none':mode;updateToolUI();
-  const hints={crop:'ドラッグしてトリミング範囲を選択',move:'タップで削除・ドラッグで移動・ピンチでサイズ変更',none:'ツールを選んで編集してください'};
-  document.getElementById('editor-hint').textContent=hints[editorMode]||hints.none;drawEditor();
+function renderEditorToolbar(){
+  const toolbar=document.getElementById('img-editor-toolbar');if(!toolbar)return;
+  const hint=document.getElementById('editor-hint');
+  if(editorMode==='normal'||editorMode==='crop'){
+    toolbar.innerHTML=
+      '<button class="editor-tool-btn'+(editorMode==='crop'?' active':'')+'" onclick="enterCropMode()"><span class="editor-tool-icon">✂️</span>トリミング</button>'
+      +'<button class="editor-tool-btn" onclick="rotateImage()"><span class="editor-tool-icon">🔄</span>回転</button>'
+      +'<button class="editor-tool-btn" onclick="enterNumberMode()" style="background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700"><span class="editor-tool-icon">➕</span>番号を追加</button>'
+      +'<button class="editor-tool-btn" onclick="showEditorMenu(this)" style="min-width:44px"><span class="editor-tool-icon" style="font-size:22px">⋯</span></button>'
+      +'<button class="editor-done-btn" onclick="finishEditPhoto()"><span class="editor-done-icon">✅</span>完了</button>';
+    if(hint)hint.textContent=editorMode==='crop'?'ドラッグしてトリミング範囲を選択':'「番号を追加」で機材に番号をつけられます';
+  }else if(editorMode==='number'){
+    toolbar.innerHTML=
+      '<button class="editor-tool-btn" onclick="exitNumberMode()" style="flex:0 0 auto"><span class="editor-tool-icon">◀</span>← 戻る</button>'
+      +'<button class="editor-tool-btn" onclick="addNumberSticker()" style="background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700"><span class="editor-tool-icon">➕</span>番号を追加</button>'
+      +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--tm)">'+editorNumbers.length+' 個</div>'
+      +'<button class="editor-done-btn" onclick="finishEditPhoto()"><span class="editor-done-icon">✅</span>完了</button>';
+    if(hint)hint.textContent='ドラッグで移動・タップで削除・ピンチでサイズ変更';
+  }
 }
+function enterCropMode(){editorMode=editorMode==='crop'?'normal':'crop';cropActive=false;cropStart=null;cropBox={x:0,y:0,w:0,h:0};renderEditorToolbar();drawEditor();}
+function enterNumberMode(){editorMode='number';addNumberSticker();renderEditorToolbar();}
+function exitNumberMode(){editorMode='normal';renderEditorToolbar();drawEditor();}
+function showEditorMenu(btn){
+  const existing=document.getElementById('editor-menu');if(existing){existing.remove();return;}
+  const menu=document.createElement('div');menu.id='editor-menu';
+  menu.style.cssText='position:fixed;background:var(--sf);border:1px solid var(--bd);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:900;min-width:160px;overflow:hidden';
+  const rect=btn.getBoundingClientRect();
+  menu.style.bottom=(window.innerHeight-rect.top+4)+'px';menu.style.right=(window.innerWidth-rect.right)+'px';
+  menu.innerHTML=
+    '<div onclick="resetAllEdits();closeEditorMenu()" style="padding:12px 16px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--bd);color:var(--tm)">↩️ すべてリセット</div>'
+    +'<div onclick="removeAllNumbers();closeEditorMenu()" style="padding:12px 16px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:600;cursor:pointer;color:#e05050">🗑 番号をすべて削除</div>';
+  document.body.appendChild(menu);
+  setTimeout(()=>document.addEventListener('click',closeEditorMenuOnce,{once:true}),10);
+}
+function closeEditorMenu(){const m=document.getElementById('editor-menu');if(m)m.remove();}
+function closeEditorMenuOnce(){closeEditorMenu();}
+function removeAllNumbers(){editorNumbers=[];drawEditor();renderEditorToolbar();showToast('番号をすべて削除しました');}
 function addNumberSticker(){
   if(!editorCanvas)return;
   const num=editorNumbers.length+1;
   const pos=getStickerPosition(num,editorCanvas.width,editorCanvas.height);
   editorNumbers.push({x:pos.x,y:pos.y,num,size:DEFAULT_STICKER_SIZE});
-  editorMode='move';updateToolUI();
-  document.getElementById('editor-hint').textContent='タップで削除・ドラッグで移動・ピンチでサイズ変更';
   drawEditor();showToast('番号 '+num+' を追加しました');
+  if(editorMode==='number')renderEditorToolbar();
 }
-function updateToolUI(){
-  ['crop','move'].forEach(id=>{const btn=document.getElementById('tool-'+id);if(btn)btn.classList.toggle('active',editorMode===id);});
-}
-function resetEdits(){
-  editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropStart=null;
+function updateToolUI(){}
+function resetAllEdits(){
+  editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropStart=null;editorMode='normal';
   const src=editImgEditorTarget==='url'?editPhotoUrls[editImgEditorTargetIdx]:editNewPhotos[editImgEditorTargetIdx];
-  loadEditorImage(src);showToast('↩️ リセットしました');
+  loadEditorImage(src);renderEditorToolbar();showToast('↩️ リセットしました');
 }
+function resetEdits(){resetAllEdits();}
 function rotateImage(){
   if(!editorImage)return;
   const canvas=document.createElement('canvas');
