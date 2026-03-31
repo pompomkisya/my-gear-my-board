@@ -52,6 +52,9 @@ const I18N={
     tutorialText:'機材ごとに番号をつけると、配置がわかりやすくなります',tutorialBtn:'番号をつける',tutorialSkip:'スキップ',
     stepPhotoSub:'Step 1：写真 & 番号付け',stepInfoSub:'Step 2：タイトル・説明',
     stepGearSub:'Step 3：使用機材',stepGenreSub:'Step 4：ジャンル・詳細',stepConfirmSub:'Step 5：確認・投稿',
+    panelGenre:'ジャンル',panelBrand:'ブランド',panelFxType:'エフェクタータイプ',
+    slBrand:'ブランドで絞る',slFxType:'エフェクタータイプ',
+    lblPhoto:'写真（最大3枚・任意）',
   },
   en:{
     postBannerTitle:'Share your board or gear!',postBannerSub:'No sign-up needed. Post anonymously with just one photo.',
@@ -97,6 +100,9 @@ const I18N={
     tutorialText:'Adding numbers to each pedal makes your layout easy to understand',tutorialBtn:'Add Numbers',tutorialSkip:'Skip',
     stepPhotoSub:'Step 1: Photo & Numbers',stepInfoSub:'Step 2: Title & Info',
     stepGearSub:'Step 3: Gear List',stepGenreSub:'Step 4: Genre & Details',stepConfirmSub:'Step 5: Review & Post',
+    panelGenre:'Genre',panelBrand:'Brand',panelFxType:'Effect Type',
+    slBrand:'Filter by Brand',slFxType:'Effect Type',
+    lblPhoto:'Photos (max 3 · optional)',
   }
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
@@ -151,6 +157,32 @@ function applyLangUI(){
     else if(el.textContent.match(/お問い合わせ|Contact/)){el.textContent=tr('footerContact');el.setAttribute('onclick',"showToast('"+tr('contactMsg')+"')");}
   });
   const fcopy=document.querySelector('.footer-copy');if(fcopy)fcopy.textContent=tr('footerCopy');
+  // 左パネルタイトル
+  const mpGenre=document.getElementById('mob-title-genre');if(mpGenre)mpGenre.textContent=tr('panelGenre');
+  const mpBrand=document.getElementById('mob-title-brand');if(mpBrand)mpBrand.textContent=tr('panelBrand');
+  const mpFx=document.getElementById('mob-title-fxtype');if(mpFx)mpFx.textContent=tr('panelFxType');
+  // PC サイドバータイトル
+  document.querySelectorAll('.sl-lbl').forEach(el=>{
+    const txt=el.textContent;
+    if(txt.match(/ブランドで絞る|Filter by Brand/))el.textContent=tr('slBrand');
+    else if(txt.match(/エフェクタータイプ|Effect Type/))el.textContent=tr('slFxType');
+  });
+  // フォームラベル
+  const lblPhoto=document.getElementById('lbl-photo');if(lblPhoto)lblPhoto.textContent=tr('lblPhoto');
+  const lblUser=document.getElementById('lbl-username');if(lblUser)lblUser.textContent=tr('lblUsername');
+  const lblTitle=document.getElementById('lbl-title');if(lblTitle)lblTitle.textContent=tr('lblTitle');
+  const lblYt=document.getElementById('lbl-youtube');if(lblYt)lblYt.textContent=tr('lblYoutube');
+  const lblGenreF=document.getElementById('lbl-genre');if(lblGenreF)lblGenreF.textContent=tr('lblGenre');
+  const lblDesc=document.getElementById('lbl-desc');if(lblDesc)lblDesc.textContent=tr('lblDesc');
+  const passTitle=document.getElementById('pass-box-title');if(passTitle)passTitle.textContent=tr('passTitle');
+  const passWarn=document.getElementById('pass-warn');if(passWarn)passWarn.innerHTML=tr('passWarn');
+  const anonNote=document.getElementById('anon-note');if(anonNote)anonNote.textContent=tr('anonNote');
+  // フォームplaceholder
+  const pusr=document.getElementById('post-username');if(pusr)pusr.placeholder=tr('phUsername');
+  const ptitle=document.getElementById('post-title');if(ptitle)ptitle.placeholder=tr('phTitle');
+  const pdesc=document.getElementById('post-desc');if(pdesc)pdesc.placeholder=tr('phDesc');
+  const hsearch=document.getElementById('h-search');if(hsearch)hsearch.placeholder=lang==='en'?'Search...':'フリーワード';
+  const msearch=document.getElementById('mob-search');if(msearch)msearch.placeholder=lang==='en'?'Search...':'フリーワード検索...';
   const grTitle=document.querySelector('#gear-remind-bd div[style*="font-size:20px"]');if(grTitle)grTitle.textContent=tr('gearRemindTitle');
   const grSub=document.querySelector('#gear-remind-bd div[style*="font-size:12px"]');if(grSub)grSub.textContent=tr('gearRemindSub');
   const grBtns=document.querySelectorAll('#gear-remind-bd button');
@@ -414,7 +446,7 @@ function openPost(type){
   ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
   updateGearFeedback();renderGearTags();renderPhotoPreviews();updateStepUI();
   document.getElementById('post-bd').classList.add('open');document.body.style.overflow='hidden';
-  if(!localStorage.getItem('mgmb_tutorial_seen'))setTimeout(()=>showEditorTutorial(),400);
+
 }
 function goStep(n){
   if(n===3&&currentStep===2){if(!document.getElementById('post-title').value.trim()){showToast(lang==='en'?'❌ Please enter a title':'❌ タイトルを入力してください');return;}}
@@ -485,14 +517,14 @@ function renderPhotoPreviews(){
     const displaySrc=editedPhotos[i]||src;const hasEdit=!!editedPhotos[i];
     return '<div class="photo-thumb"><img src="'+displaySrc+'">'
       +'<button class="photo-remove" onclick="removePhoto('+i+')">✕</button>'
-      +(hasEdit?'':'<button class="photo-edit-btn" onclick="openImgEditor('+i+')">'+tr('photoEditBtn')+'</button>')
+      +'<button class="photo-edit-btn" onclick="openImgEditor('+i+')">'+tr('photoEditBtn')+'</button>'
       +'</div>';
   }).join('');
   const add=uploadedPhotos.length<MAX_PHOTOS?'<div class="photo-add-btn" onclick="document.getElementById(\'photo-input\').click()"><span>＋</span><span class="photo-add-label">'+(lang==='en'?'Add':'追加')+'</span></div>':'';
   wrap.innerHTML=thumbs+add;
   const cnt=document.getElementById('photo-count');if(cnt)cnt.textContent=uploadedPhotos.length+' / '+MAX_PHOTOS+(lang==='en'?' photos':'枚');
   const ua=document.getElementById('upload-area-main');if(ua)ua.style.display=uploadedPhotos.length>0?'none':'block';
-  if(uploadedPhotos.length>0)hideTutorial();
+
 }
 function removePhoto(i){uploadedPhotos.splice(i,1);editedPhotos.splice(i,1);renderPhotoPreviews();}
 function getFinalPhoto(i){return editedPhotos[i]||uploadedPhotos[i]||null;}
@@ -598,18 +630,8 @@ async function confirmDelete(){
 }
 
 // ── 初回チュートリアル
-function showEditorTutorial(){
-  const existing=document.getElementById('editor-tutorial');if(existing)return;
-  const tut=document.createElement('div');tut.id='editor-tutorial';
-  tut.style.cssText='position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(232,85,45,.95);border-radius:8px;padding:14px 16px;max-width:280px;width:90%;text-align:center;z-index:10;box-shadow:0 4px 20px rgba(0,0,0,.5)';
-  tut.innerHTML='<div style="font-size:12px;color:#fff;line-height:1.5;margin-bottom:10px">'+tr('tutorialText')+'</div>'
-    +'<div style="display:flex;gap:8px;justify-content:center">'
-    +'<button onclick="tutorialAddNumber()" style="padding:7px 14px;background:#fff;border:none;border-radius:4px;font-family:JetBrains Mono,monospace;font-size:9px;font-weight:600;color:var(--ac);cursor:pointer">'+tr('tutorialBtn')+'</button>'
-    +'<button onclick="hideTutorial()" style="padding:7px 14px;background:transparent;border:1px solid rgba(255,255,255,.5);border-radius:4px;font-family:JetBrains Mono,monospace;font-size:9px;font-weight:600;color:#fff;cursor:pointer">'+tr('tutorialSkip')+'</button>'
-    +'</div>';
-  const step1=document.getElementById('step-1');if(step1){step1.style.position='relative';step1.appendChild(tut);}
-}
-function hideTutorial(){const tut=document.getElementById('editor-tutorial');if(tut)tut.remove();localStorage.setItem('mgmb_tutorial_seen','1');}
+function hideTutorial(){localStorage.setItem('mgmb_tutorial_seen','1');}
+function tutorialAddNumber(){}
 function tutorialAddNumber(){hideTutorial();if(uploadedPhotos.length>0)openImgEditor(0);}
 
 // ── 画像エディター（③ モード分離）
@@ -665,6 +687,7 @@ function renderEditorToolbar(){
   }else if(editorMode==='number'){
     toolbar.innerHTML=
       '<button class="editor-tool-btn" onclick="exitNumberMode()" style="flex:0 0 auto"><span class="editor-tool-icon">◀</span>'+tr('toolBack')+'</button>'
+      +'<button class="editor-tool-btn" onclick="addNumberSticker()" style="background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700"><span class="editor-tool-icon">➕</span>'+tr('toolAddNum')+'</button>'
       +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--tm)">'+editorNumbers.length+(lang==='en'?' number'+(editorNumbers.length!==1?'s':''):' 個')+'</div>'
       +'<button class="editor-done-btn" onclick="finishEdit()"><span class="editor-done-icon">✅</span>'+tr('toolDone')+'</button>';
     if(hint)hint.textContent=tr('hintNumberMode');
