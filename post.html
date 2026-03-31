@@ -372,7 +372,7 @@ function renderPost(p){
   }
 
   // ② タイプバッジ・タイトル・投稿者
-  html+='<div class="type-badge '+(isGear?'gear':'board')+'">'+(isGear?'機材':'エフェクターボード')+'</div>';
+  html+='<div class="type-badge '+(isGear?'gear':'board')+'">'+(isGear?(lang==='en'?'Gear':'機材'):(lang==='en'?'Pedalboard':'エフェクターボード'))+'</div>';
   html+='<div class="post-title">'+p.title+'</div>';
   // ✏️アイコンは削除（編集ボタンと役割重複のため）
   html+='<div class="meta">'
@@ -383,11 +383,11 @@ function renderPost(p){
 
   // ③ アクションボタン
   html+='<div class="actions">'
-    +'<div class="act-btn'+(liked?' liked':'')+'" id="like-btn" onclick="toggleLike()">'+(liked?'❤️':'🤍')+' いいね <span id="like-count">'+(p.likes||0)+'</span></div>'
-    +'<div class="act-btn" onclick="copyUrl()">🔗 URLをコピー</div>'
+    +'<div class="act-btn'+(liked?' liked':'')+'" id="like-btn" onclick="toggleLike()">'+(liked?'❤️':'🤍')+(lang==='en'?' Like ':' いいね ')+'<span id="like-count">'+(p.likes||0)+'</span></div>'
+    +'<div class="act-btn" onclick="copyUrl()">🔗 '+(lang==='en'?'Copy URL':'URLをコピー')+'</div>'
     +'<div class="act-btn x-act" onclick="postToX()">𝕏 Xに投稿</div>'
-    +'<div class="act-btn" onclick="openEditModal()">✏️ 編集</div>'
-    +'<div class="act-btn" style="color:#e05050;border-color:rgba(224,80,80,.3)" onclick="openReport()">🚩 通報</div>'
+    +'<div class="act-btn" onclick="openEditModal()">✏️ '+(lang==='en'?'Edit':'編集')+'</div>'
+    +'<div class="act-btn" style="color:#e05050;border-color:rgba(224,80,80,.3)" onclick="openReport()">🚩 '+(lang==='en'?'Report':'通報')+'</div>'
     +'</div>';
 
   // ④ タグ（ジャンル）
@@ -395,11 +395,11 @@ function renderPost(p){
 
   // ⑤ 機材リスト
   if(gear.length){
-    html+='<div class="section"><div class="section-lbl">使用機材リスト</div>';
+    html+='<div class="section"><div class="section-lbl">'+(lang==='en'?'Gear List':'使用機材リスト')+'</div>';
     gear.forEach(g=>{
       const name=g.name||g;
       html+='<div class="gear-item"><div class="gear-dot"></div><div class="gear-name">'+name+'</div>'
-        +'<a class="sh-link" href="'+soundhouseUrl(name)+'" target="_blank" rel="noopener">サウンドハウスで見る →</a></div>';
+        +'<a class="sh-link" href="'+soundhouseUrl(name)+'" target="_blank" rel="noopener">'+(lang==='en'?'View on Soundhouse →':'サウンドハウスで見る →')+'</a></div>';
     });
     html+='</div>';
   }
@@ -410,7 +410,7 @@ function renderPost(p){
     html+='<div class="section">';
     if(desc.length>limit){
       html+='<div class="desc" id="desc-text">'+escHtml(desc.slice(0,limit))+'...</div>';
-      html+='<span class="desc-toggle" onclick="expandDesc()">もっと見る</span>';
+      html+='<span class="desc-toggle" onclick="expandDesc()">'+(lang==='en'?'Read more':'もっと見る')+'</span>';
       window._fullDesc=desc;
     }else{
       html+='<div class="desc">'+escHtml(desc)+'</div>';
@@ -428,14 +428,15 @@ function renderPost(p){
   }
 
   // ⑧ コメント
+  const _cL=lang==='en'?'Comments':'コメント',_cN=lang==='en'?'Name (optional)':'名前（任意）',_cP=lang==='en'?'Write a comment...':'コメントを投稿する...',_cB=lang==='en'?'Post':'投稿';
   html+='<div class="section" id="comment-section">'
-    +'<div class="section-lbl">コメント</div>'
+    +'<div class="section-lbl">'+_cL+'</div>'
     +'<div class="comment-input-wrap">'
     +'<div class="comment-input-col">'
-    +'<input class="comment-name-input" id="comment-name" type="text" placeholder="名前（任意）" maxlength="30">'
-    +'<textarea class="comment-input" id="comment-input" placeholder="コメントを投稿する..." rows="2"></textarea>'
+    +'<input class="comment-name-input" id="comment-name" type="text" placeholder="'+_cN+'" maxlength="30">'
+    +'<textarea class="comment-input" id="comment-input" placeholder="'+_cP+'" rows="2"></textarea>'
     +'</div>'
-    +'<button class="comment-submit" onclick="postComment(null)">投稿</button>'
+    +'<button class="comment-submit" onclick="postComment(null)">'+_cB+'</button>'
     +'</div>'
     +'<div id="comments-list"></div>'
     +'</div>';
@@ -496,7 +497,7 @@ async function loadComments(){
 function renderComments(){
   const el=document.getElementById('comments-list');if(!el)return;
   const roots=allComments.filter(c=>!c.parent_id);
-  if(!roots.length){el.innerHTML='<div style="font-size:13px;color:var(--td);padding:16px 0">まだコメントはありません。最初のコメントを書いてみましょう！</div>';return;}
+  if(!roots.length){el.innerHTML='<div style="font-size:13px;color:var(--td);padding:16px 0">'+(lang==='en'?'No comments yet. Be the first!':'まだコメントはありません。最初のコメントを書いてみましょう！')+'</div>';return;}
   el.innerHTML=roots.map(c=>renderComment(c,0)).join('');
 }
 function renderComment(c,depth){
@@ -505,15 +506,15 @@ function renderComment(c,depth){
   const mention=c.reply_to_name?'<span class="c-mention">@'+c.reply_to_name+'</span> ':'';
   let html='<div class="comment" id="c-'+c.id+'">'
     +'<div class="c-head"><div class="c-av">'+init+'</div>'
-    +'<div class="c-name">'+(c.username||'匿名ユーザー')+'</div>'
+    +'<div class="c-name">'+(c.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div>'
     +'<div class="c-time">'+timeAgo(c.created_at)+'</div></div>'
     +'<div class="c-body">'+mention+escHtml(c.content)+'</div>'
-    +'<span class="c-reply-btn" onclick="openReply(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+'↩ 返信</span>'
+    +'<span class="c-reply-btn" onclick="openReply(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">↩ '+(lang==='en'?'Reply':'返信')+'</span>'
     +'<div class="reply-form" id="rf-'+c.id+'">'
-    +'<input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="名前（任意）" maxlength="30">'
+    +'<input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30">'
     +'<div class="reply-row">'
     +'<input class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." type="text">'
-    +'<button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">投稿</button>'
+    +'<button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button>'
     +'</div></div>';
   if(children.length){html+='<div class="reply-indent">'+children.map(ch=>renderComment(ch,depth+1)).join('')+'</div>';}
   html+='</div>';
@@ -529,12 +530,12 @@ async function postComment(parentId,replyToName){
   const inputEl=parentId?document.getElementById('ri-'+parentId):document.getElementById('comment-input');
   const content=inputEl.value.trim();
   const username=nameEl?nameEl.value.trim()||null:null;
-  if(!content){showToast('❌ コメントを入力してください');return;}
+  if(!content){showToast(lang==='en'?'❌ Please enter a comment':'❌ コメントを入力してください');return;}
   const{error}=await sb.from('comments').insert({post_id:POST_ID,parent_id:parentId||null,username,content,reply_to_name:replyToName||null});
-  if(error){showToast('❌ 投稿に失敗しました');console.error(error);return;}
+  if(error){showToast(lang==='en'?'❌ Failed to post':'❌ 投稿に失敗しました');console.error(error);return;}
   inputEl.value='';if(nameEl)nameEl.value='';
   if(parentId){const form=document.getElementById('rf-'+parentId);if(form)form.classList.remove('open');}
-  showToast('💬 コメントしました');
+  showToast(lang==='en'?'💬 Comment posted':'💬 コメントしました');
   await loadComments();
 }
 
@@ -691,7 +692,7 @@ async function editSearchGear(val){
 function setEditACFocus(i){editAcFocusIdx=i;document.querySelectorAll('#edit-ac-dropdown .ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
 function selectEditGear(i){const x=editAcResults[i];if(!x)return;addEditGearTag({name:x.full_name,brand:x.brand});closeEditAC();}
 function addEditGearTag(g){
-  if(editSelectedGears.find(x=>x.name===g.name))return;
+  // 重複許可（同じ機材を複数使う人もいる）
   if(editSelectedGears.length>=20){showToast('⚠️ 最大20件まで');return;}
   editSelectedGears.push(g);renderEditGearTags();document.getElementById('edit-gear-search').value='';
 }
@@ -713,7 +714,7 @@ function editGearKeyDown(e){
   else if(e.key==='Enter'){
     e.preventDefault();
     if(open&&editAcFocusIdx>=0&&editAcResults[editAcFocusIdx])selectEditGear(editAcFocusIdx);
-    else{const v=e.target.value.trim();if(v)addEditGearTag({name:v,brand:''});}
+    else{const v=e.target.value.trim();if(v){addEditGearTag({name:v,brand:''});const gs=document.getElementById('edit-gear-search');if(gs)gs.value='';closeEditAC();}}
   }else if(e.key==='Backspace'&&!e.target.value&&editSelectedGears.length)removeEditGearTag(editSelectedGears.length-1);
   else if(e.key==='Escape')closeEditAC();
 }
@@ -858,7 +859,7 @@ function rotateImage(){
   loadEditorImage(rotated);showToast('🔄 90度回転しました');
 }
 function finishEditPhoto(){
-  if(!editorCanvas||!editorImage)return;
+  if(!editorCanvas||!editorImage){document.getElementById('img-editor-bd').classList.remove('open');document.body.style.overflow='hidden';return;}
   const c=editorCanvas;let sx=0,sy=0,sw=editorImage.naturalWidth,sh=editorImage.naturalHeight;
   if(cropActive&&cropBox.w>10&&cropBox.h>10){
     const scaleX=editorImage.naturalWidth/c.width;const scaleY=editorImage.naturalHeight/c.height;
