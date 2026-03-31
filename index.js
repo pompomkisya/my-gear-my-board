@@ -696,11 +696,18 @@ function renderEditorToolbar(){
     toolbar.innerHTML=
       '<button class="editor-tool-btn" onclick="exitNumberMode()" style="flex:0 0 auto"><span class="editor-tool-icon">◀</span>'+tr('toolBack')+'</button>'
       +'<button class="editor-tool-btn" onclick="addNumberSticker()" style="background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700"><span class="editor-tool-icon">➕</span>'+tr('toolAddNum')+'</button>'
+      +'<button class="editor-tool-btn" onclick="eraseLastNumber()" style="min-width:44px" title="最後の番号を削除"><span class="editor-tool-icon">🧹</span></button>'
       +'<button class="editor-tool-btn" onclick="cycleStickerSize()" style="min-width:48px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:700">'+_szL+'</button>'
       +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--tm)">'+editorNumbers.length+(lang==='en'?' number'+(editorNumbers.length!==1?'s':''):' 個')+'</div>'
       +'<button class="editor-done-btn" onclick="finishEdit()"><span class="editor-done-icon">✅</span>'+tr('toolDone')+'</button>';
     if(hint)hint.textContent=tr('hintNumberMode');
   }
+}
+function eraseLastNumber(){
+  if(!editorNumbers.length)return;
+  editorNumbers.pop();
+  editorNumbers.forEach((n,i)=>n.num=i+1);
+  drawEditor();renderEditorToolbar();
 }
 function enterCropMode(){editorMode=editorMode==='crop'?'normal':'crop';cropActive=false;cropStart=null;cropBox={x:0,y:0,w:0,h:0};renderEditorToolbar();drawEditor();}
 function enterNumberMode(){editorMode='number';addNumberSticker();renderEditorToolbar();}
@@ -742,7 +749,7 @@ function drawEditor(){
 function addNumberSticker(){
   if(!editorCanvas)return;const num=editorNumbers.length+1;const pos=getStickerPosition(num,editorCanvas.width,editorCanvas.height);
   editorNumbers.push({x:pos.x,y:pos.y,num,size:getStickerSize()});drawEditor();
-  showToast((lang==='en'?'Number ':'番号 ')+num+(lang==='en'?' added':' を追加しました'));
+  
   if(editorMode==='number')renderEditorToolbar();
 }
 function rotateImage(){
