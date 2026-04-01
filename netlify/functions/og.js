@@ -38,7 +38,8 @@ exports.handler = async (event) => {
         };
       }
     } catch (e) {
-      // エラー時はデフォルトOGP
+      // エラー時はデフォルトOGPだがタイトルにエラー内容を入れてデバッグ
+      ogp.title = 'ERROR: ' + e.message;
     }
   }
 
