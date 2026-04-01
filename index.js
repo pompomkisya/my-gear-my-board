@@ -24,7 +24,7 @@ const I18N={
     photoEditBtn:'🎯 機材に番号をつける',skipPhoto:'スキップ（写真なしで続ける）',
     lblUsername:'ユーザー名（任意）',
     // ★変更: phUsername 新プレースホルダー
-    phUsername:'名前をつけると自分の投稿を探せます（空欄は匿名）',
+    phUsername:'名前をつけると自分の投稿を探せます',
     lblTitle:'タイトル *',phTitle:'例：ライブ用最強ボード',lblYoutube:'YouTube URL（任意）',
     lblGear:'使用機材（1つ以上推奨）',gearHint1:'※入力すると閲覧数が上がります',
     gearHint2:'候補からタップで簡単に追加できます',gearHint3:'まずは1つだけでOKです',
