@@ -4,10 +4,9 @@ const SUPABASE_KEY = ‘eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmF
 exports.handler = async (event) => {
 const id = event.queryStringParameters && event.queryStringParameters.id;
 
-// デフォルトOGP（投稿IDなし）
 const defaultOgp = {
 title: ‘My Gear My Board’,
-description: ‘エフェクターボード＆機材を投稿・共有するSNS。登録不要・匿名OK。’,
+description: ‘Share your pedalboard & gear. No sign-up needed.’,
 image: ‘https://mygearmyboard.com/IMG_0206.PNG’,
 url: ‘https://mygearmyboard.com’,
 };
@@ -16,58 +15,55 @@ let ogp = defaultOgp;
 
 if (id) {
 try {
-const res = await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${id}&select=title,description,image_urls,username,post_type`, {
+const res = await fetch(
+SUPABASE_URL + ‘/rest/v1/posts?id=eq.’ + id + ‘&select=title,description,image_urls,username,post_type’,
+{
 headers: {
 apikey: SUPABASE_KEY,
-Authorization: `Bearer ${SUPABASE_KEY}`,
+Authorization: ‘Bearer ’ + SUPABASE_KEY,
 },
-});
+}
+);
 const data = await res.json();
 if (data && data[0]) {
 const post = data[0];
-const typeLabel = post.post_type === ‘gear’ ? ‘機材投稿’ : ‘エフェクターボード’;
-// image_urlsの形式をデバッグ
 const imgUrls = post.image_urls;
-const imgDebug = JSON.stringify(imgUrls).slice(0, 80);
 const firstImg = Array.isArray(imgUrls) && imgUrls.length > 0 ? imgUrls[0] : null;
 ogp = {
-title: `DBG:${imgDebug}`,
+title: (post.title || ‘My Gear My Board’) + ’ - My Gear My Board’,
 description: post.description
 ? post.description.slice(0, 100)
-: `${post.username || '匿名ユーザー'}さんの${typeLabel}`,
+: (post.username || ‘Anonymous’) + ’ on My Gear My Board’,
 image: firstImg || defaultOgp.image,
-url: `https://mygearmyboard.com/post?id=${id}`,
+url: ‘https://mygearmyboard.com/post?id=’ + id,
 };
 }
 } catch (e) {
-// エラー時はデフォルトOGPだがタイトルにエラー内容を入れてデバッグ
-ogp.title = ’ERROR: ’ + e.message;
+ogp.description = ’error: ’ + e.message;
 }
 }
 
-const html = `<!DOCTYPE html>
-
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escHtml(ogp.title)}</title>
-<meta name="description" content="${escHtml(ogp.description)}">
-<meta property="og:type" content="website">
-<meta property="og:title" content="${escHtml(ogp.title)}">
-<meta property="og:description" content="${escHtml(ogp.description)}">
-<meta property="og:image" content="${escHtml(ogp.image)}">
-<meta property="og:url" content="${escHtml(ogp.url)}">
-<meta property="og:site_name" content="My Gear My Board">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${escHtml(ogp.title)}">
-<meta name="twitter:description" content="${escHtml(ogp.description)}">
-<meta name="twitter:image" content="${escHtml(ogp.image)}">
-<meta name="twitter:site" content="@MGMBpedalboard">
-<script>location.replace("${escHtml(ogp.url)}");</script>
-</head>
-<body></body>
-</html>`;
+const html = ‘<!DOCTYPE html>\n’
++ ‘<html lang="ja">\n’
++ ‘<head>\n’
++ ‘<meta charset="UTF-8">\n’
++ ‘<title>’ + escHtml(ogp.title) + ‘</title>\n’
++ ‘<meta name="description" content="' + escHtml(ogp.description) + '">\n’
++ ‘<meta property="og:type" content="website">\n’
++ ‘<meta property="og:title" content="' + escHtml(ogp.title) + '">\n’
++ ‘<meta property="og:description" content="' + escHtml(ogp.description) + '">\n’
++ ‘<meta property="og:image" content="' + escHtml(ogp.image) + '">\n’
++ ‘<meta property="og:url" content="' + escHtml(ogp.url) + '">\n’
++ ‘<meta property="og:site_name" content="My Gear My Board">\n’
++ ‘<meta name="twitter:card" content="summary_large_image">\n’
++ ‘<meta name="twitter:title" content="' + escHtml(ogp.title) + '">\n’
++ ‘<meta name="twitter:description" content="' + escHtml(ogp.description) + '">\n’
++ ‘<meta name="twitter:image" content="' + escHtml(ogp.image) + '">\n’
++ ‘<meta name="twitter:site" content="@MGMBpedalboard">\n’
++ ‘<script>location.replace(”’ + escHtml(ogp.url) + ‘”);</script>\n’
++ ‘</head>\n’
++ ‘<body></body>\n’
++ ‘</html>’;
 
 return {
 statusCode: 200,
