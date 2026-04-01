@@ -497,8 +497,9 @@ function copyUrl(){
 function postToX(){
   if(!currentPost)return;
   const text=encodeURIComponent(currentPost.title+' #MyGearMyBoard #エフェクターボード');
-  const url=encodeURIComponent(location.href);
-  window.open('https://twitter.com/intent/tweet?text='+text+'&url='+url,'_blank','width=550,height=420');
+  // OGP対応URL（/og?id=xxx）を使うことでXのカードに画像が表示される
+  const ogUrl=encodeURIComponent('https://mygearmyboard.com/og?id='+currentPost.id);
+  window.open('https://twitter.com/intent/tweet?text='+text+'&url='+ogUrl,'_blank','width=550,height=420');
 }
 
 async function loadComments(){
