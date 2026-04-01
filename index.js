@@ -382,7 +382,16 @@ function filterByGearName(name){
 let currentSearchQuery='';
 function handleSearch(val){currentSearchQuery=val.trim();const clearBtn=document.getElementById('h-search-clear');if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);applyFilter();}
 function clearSearch(){currentSearchQuery='';const input=document.getElementById('h-search');if(input)input.value='';const clearBtn=document.getElementById('h-search-clear');if(clearBtn)clearBtn.classList.remove('show');const badge=document.getElementById('search-badge');if(badge)badge.classList.remove('show');applyFilter();}
-function handleSearchMob(val){currentSearchQuery=val.trim();const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);applyFilter();if(currentSearchQuery)setTimeout(()=>goPanel(1),180);updateMobFilterClear();}
+let _mobSearchTimer=null;
+function handleSearchMob(val){
+  currentSearchQuery=val.trim();
+  const clearBtn=document.getElementById('mob-search-clear');
+  if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);
+  applyFilter();updateMobFilterClear();
+  // 入力が止まって600ms後に遷移
+  clearTimeout(_mobSearchTimer);
+  if(currentSearchQuery)_mobSearchTimer=setTimeout(()=>goPanel(1),600);
+}
 function clearSearchMob(){currentSearchQuery='';const input=document.getElementById('mob-search');if(input)input.value='';const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.remove('show');const badge=document.getElementById('mob-search-badge');if(badge)badge.classList.remove('show');applyFilter();updateMobFilterClear();}
 function searchMatches(post,query){
   if(!query)return true;const q=query.toLowerCase();
