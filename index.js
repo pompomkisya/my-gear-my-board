@@ -291,7 +291,7 @@ function getEmptyHTML(){
 function clearFilter(){
   currentGenreFilter='ALL';currentBrandFilter=null;currentFxFilter=null;
   document.querySelectorAll('.sl .tag, #swipe-ui .tag').forEach(t2=>{t2.classList.toggle('on',t2.getAttribute('data-genre')==='ALL');});
-  clearSearch();
+  clearSearch();updateMobFilterClear();
 }
 
 function renderDBPosts(posts){
@@ -382,8 +382,8 @@ function filterByGearName(name){
 let currentSearchQuery='';
 function handleSearch(val){currentSearchQuery=val.trim();const clearBtn=document.getElementById('h-search-clear');if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);applyFilter();}
 function clearSearch(){currentSearchQuery='';const input=document.getElementById('h-search');if(input)input.value='';const clearBtn=document.getElementById('h-search-clear');if(clearBtn)clearBtn.classList.remove('show');const badge=document.getElementById('search-badge');if(badge)badge.classList.remove('show');applyFilter();}
-function handleSearchMob(val){currentSearchQuery=val.trim();const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);applyFilter();}
-function clearSearchMob(){currentSearchQuery='';const input=document.getElementById('mob-search');if(input)input.value='';const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.remove('show');const badge=document.getElementById('mob-search-badge');if(badge)badge.classList.remove('show');applyFilter();}
+function handleSearchMob(val){currentSearchQuery=val.trim();const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);applyFilter();if(currentSearchQuery)setTimeout(()=>goPanel(1),180);updateMobFilterClear();}
+function clearSearchMob(){currentSearchQuery='';const input=document.getElementById('mob-search');if(input)input.value='';const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.remove('show');const badge=document.getElementById('mob-search-badge');if(badge)badge.classList.remove('show');applyFilter();updateMobFilterClear();}
 function searchMatches(post,query){
   if(!query)return true;const q=query.toLowerCase();
   const title=(post.title||'').toLowerCase();const username=(post.username||'').toLowerCase();const desc=(post.description||'').toLowerCase();
@@ -696,8 +696,8 @@ function renderEditorToolbar(){
     toolbar.innerHTML=
       '<button class="editor-tool-btn" onclick="exitNumberMode()" style="flex:0 0 auto"><span class="editor-tool-icon">◀</span>'+tr('toolBack')+'</button>'
       +'<button class="editor-tool-btn" onclick="addNumberSticker()" style="background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700"><span class="editor-tool-icon">➕</span>'+tr('toolAddNum')+'</button>'
-      +'<button class="editor-tool-btn" onclick="eraseLastNumber()" style="min-width:44px" title="最後の番号を削除"><span class="editor-tool-icon">🧹</span></button>'
-      +'<button class="editor-tool-btn" onclick="cycleStickerSize()" style="min-width:48px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:700">'+_szL+'</button>'
+      +'<button class="editor-tool-btn" onclick="cycleStickerSize()" style="min-width:52px;display:flex;flex-direction:column;align-items:center;gap:1px"><span style="font-family:JetBrains Mono,monospace;font-size:11px;font-weight:700;line-height:1">'+_szL+'</span><span style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--td);line-height:1">'+(lang==='en'?'size':'サイズ')+'</span></button>'
+      +'<button class="editor-tool-btn" onclick="eraseLastNumber()" style="min-width:44px">消す</button>'
       +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:JetBrains Mono,monospace;font-size:9px;color:var(--tm)">'+editorNumbers.length+(lang==='en'?' number'+(editorNumbers.length!==1?'s':''):' 個')+'</div>'
       +'<button class="editor-done-btn" onclick="finishEdit()"><span class="editor-done-icon">✅</span>'+tr('toolDone')+'</button>';
     if(hint)hint.textContent=tr('hintNumberMode');
@@ -852,6 +852,18 @@ function showToast(msg){const t2=document.getElementById('toast');t2.textContent
   el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
 });
 
+// ── スマホ フィルター解除ボタン
+function updateMobFilterClear(){
+  const bar=document.getElementById('mob-filter-clear-bar');if(!bar)return;
+  const active=currentGenreFilter!=='ALL'||currentBrandFilter!==null||currentFxFilter!==null||currentSearchQuery;
+  bar.style.display=active?'flex':'none';
+  const lbl=document.getElementById('mob-filter-clear-lbl');
+  if(lbl){
+    let txt=currentSearchQuery?'「'+currentSearchQuery+'」を解除':tr('filterClear');
+    lbl.textContent=txt;
+  }
+}
+
 // ── スワイプUI
 let currentPanel=1,swipeStartX=0,swipeStartY=0,isHorizSwipe=false,swipeDecided=false;
 const SWIPE_THRESHOLD=90,ANGLE_LOCK=0.4;
@@ -884,9 +896,9 @@ function checkMobile(){
 }
 window.addEventListener('resize',checkMobile);
 
-function filterGenreMob(el,genre){document.querySelectorAll('#swipe-ui .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;currentFxFilter=null;applyFilter();setTimeout(()=>goPanel(1),180);}
-function filterBrandMob(el,brand){document.querySelectorAll('#swipe-ui .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';currentFxFilter=null;applyFilter();setTimeout(()=>goPanel(1),180);}
-function filterFxMob(el,fx){document.querySelectorAll('#swipe-ui .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentFxFilter=fx;currentBrandFilter=null;currentGenreFilter='ALL';applyFilter();setTimeout(()=>goPanel(1),180);}
+function filterGenreMob(el,genre){document.querySelectorAll('#swipe-ui .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;currentFxFilter=null;applyFilter();setTimeout(()=>{goPanel(1);updateMobFilterClear();},180);}
+function filterBrandMob(el,brand){document.querySelectorAll('#swipe-ui .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';currentFxFilter=null;applyFilter();setTimeout(()=>{goPanel(1);updateMobFilterClear();},180);}
+function filterFxMob(el,fx){document.querySelectorAll('#swipe-ui .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentFxFilter=fx;currentBrandFilter=null;currentGenreFilter='ALL';applyFilter();setTimeout(()=>{goPanel(1);updateMobFilterClear();},180);}
 
 function renderRankingWidgetMob(posts){
   const el=document.getElementById('ranking-widget-mob');if(!el)return;
