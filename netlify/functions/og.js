@@ -2,7 +2,29 @@ const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 
 exports.handler = async (event) => {
-  const id = event.queryStringParameters && event.queryStringParameters.id;
+  const params = event.queryStringParameters || {};
+  const id = params.id;
+
+  // 画像プロキシモード
+  if (params.img) {
+    try {
+      const imgRes = await fetch(params.img);
+      const buffer = await imgRes.arrayBuffer();
+      const contentType = imgRes.headers.get('content-type') || 'image/jpeg';
+      return {
+        statusCode: 200,
+        headers: {
+          'Content-Type': contentType,
+          'Cache-Control': 'public, max-age=86400',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: Buffer.from(buffer).toString('base64'),
+        isBase64Encoded: true,
+      };
+    } catch (e) {
+      return { statusCode: 404, body: 'Not found' };
+    }
+  }
 
   const defaultOgp = {
     title: 'My Gear My Board',
@@ -29,12 +51,16 @@ exports.handler = async (event) => {
         const post = data[0];
         const imgUrls = post.image_urls;
         const firstImg = Array.isArray(imgUrls) && imgUrls.length > 0 ? imgUrls[0] : null;
+        // 画像URLをプロキシ経由に変換
+        const proxyImg = firstImg
+          ? 'https://mygearmyboard.com/.netlify/functions/og?img=' + encodeURIComponent(firstImg)
+          : defaultOgp.image;
         ogp = {
           title: (post.title || 'My Gear My Board') + ' - My Gear My Board',
           description: post.description
             ? post.description.slice(0, 100)
             : (post.username || 'Anonymous') + ' on My Gear My Board',
-          image: firstImg || defaultOgp.image,
+          image: proxyImg,
           url: 'https://mygearmyboard.com/post?id=' + id,
         };
       }
