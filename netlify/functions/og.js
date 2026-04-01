@@ -8,7 +8,7 @@ exports.handler = async (event) => {
   const defaultOgp = {
     title: 'My Gear My Board',
     description: 'エフェクターボード＆機材を投稿・共有するSNS。登録不要・匿名OK。',
-    image: 'https://mygearmyboard.com/IMG_2107.PNG',
+    image: 'https://mygearmyboard.com/IMG_0206.PNG',
     url: 'https://mygearmyboard.com',
   };
 
