@@ -390,7 +390,7 @@ function handleSearchMob(val){
   applyFilter();updateMobFilterClear();
   // 入力が止まって600ms後に遷移
   clearTimeout(_mobSearchTimer);
-  if(currentSearchQuery)_mobSearchTimer=setTimeout(()=>goPanel(1),600);
+  if(currentSearchQuery)_mobSearchTimer=setTimeout(()=>goPanel(1),5000);
 }
 function clearSearchMob(){currentSearchQuery='';const input=document.getElementById('mob-search');if(input)input.value='';const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.remove('show');const badge=document.getElementById('mob-search-badge');if(badge)badge.classList.remove('show');applyFilter();updateMobFilterClear();}
 function searchMatches(post,query){
