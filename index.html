@@ -19,7 +19,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .h-search-icon{position:absolute;left:10px;font-size:13px;color:var(--td);pointer-events:none}
 .h-search-clear{position:absolute;right:8px;width:18px;height:18px;background:var(--td);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:var(--bg);cursor:pointer;border:none;touch-action:manipulation}
 .h-search-clear.show{display:flex}
-.search-results-badge{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm);display:none;z-index:10}
+.search-results-badge{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);display:none;z-index:10}
 .search-results-badge.show{display:block}
 .mob-search-wrap{position:relative;margin-bottom:16px}
 .mob-search-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:10px 12px 10px 36px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
@@ -28,10 +28,10 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .mob-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--td);pointer-events:none}
 .mob-search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--td);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:var(--bg);cursor:pointer;border:none;touch-action:manipulation}
 .mob-search-clear.show{display:flex}
-.mob-search-badge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm);margin-top:6px;display:none}
+.mob-search-badge{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);margin-top:6px;display:none}
 .mob-search-badge.show{display:block}
 .logo{display:flex;align-items:center;gap:10px;cursor:pointer}
-.logo-img{width:56px;height:56px;border-radius:0;object-fit:contain}
+.logo-img{width:64px;height:64px;border-radius:0;object-fit:contain}
 .logo-text{display:flex;flex-direction:column;line-height:1}
 .logo-main{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:4px}
 .logo-sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-top:2px}
@@ -54,7 +54,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .wrap{display:grid;grid-template-columns:200px 1fr 260px;max-width:1280px;margin:0 auto}
 .sl{border-right:1px solid var(--bd);padding:20px 12px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto}
-.sl-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--td);padding:0 8px;margin-bottom:7px}
+.sl-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--tm);padding:0 8px;margin-bottom:7px}
 .sl-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;font-size:12.5px;color:var(--tm);cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:1px}
 .sl-item:hover{background:var(--sf);color:var(--tx);border-color:var(--bd)}
 .sl-item.on{background:rgba(232,85,45,.1);color:var(--ac);border-color:rgba(232,85,45,.25)}
@@ -66,13 +66,13 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .brand-more-btn:hover{color:var(--ac);border-color:var(--ac)}
 .brands-extra{display:none;margin-top:10px}
 .brands-extra.open{display:block}
-.brand-group-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:12px 0 5px 2px;border-bottom:1px solid var(--bd);padding-bottom:4px}
+.brand-group-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin:12px 0 5px 2px;border-bottom:1px solid var(--bd);padding-bottom:4px}
 .brand-group-lbl:first-child{margin-top:0}
 .feed{padding:20px 22px;border-right:1px solid var(--bd);min-height:calc(100vh - 86px)}
 .feed-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .feed-h{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
 .sort{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
-.sort-b{padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--td);cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;touch-action:manipulation}
+.sort-b{padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;touch-action:manipulation}
 .sort-b:last-child{border-right:none}
 .sort-b.on{background:var(--sf2);color:var(--tx)}
 .post-banner{background:linear-gradient(135deg,rgba(232,85,45,.12),rgba(240,165,0,.06));border:1px solid rgba(232,85,45,.25);border-radius:6px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -103,7 +103,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .cu{display:flex;align-items:center;gap:7px;margin-bottom:8px}
 .av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1.5px solid var(--bd);flex-shrink:0;background:linear-gradient(135deg,#e85c2f,#b03020)}
 .av-name{font-size:11.5px;font-weight:500}
-.av-time{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)}
+.av-time{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)}
 .ct{font-size:13.5px;font-weight:700;line-height:1.3;margin-bottom:7px}
 .ptags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:9px}
 .ptag{padding:2px 6px;background:var(--sf2);border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tm)}
@@ -122,19 +122,19 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .rn.hi{color:var(--ac)}
 .ri-i{flex:1;min-width:0}
 .ri-t{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .15s}
-.ri-u{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-top:1px}
+.ri-u{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm);margin-top:1px}
 .ri-s{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm);flex-shrink:0}
 .gr{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--bd)}
 .gr:last-child{border-bottom:none}
 .gr-i{flex:1;min-width:0}
 .gr-n{font-size:10.5px;font-weight:500}
-.gr-b{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td)}
+.gr-b{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tm)}
 .news-link{text-decoration:none;color:inherit;display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:color .15s}
 .news-link:last-child{border-bottom:none}
 .news-link:hover .nr-t{color:var(--ac)}
 .nth{width:44px;height:44px;border-radius:3px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
 .nr-t{font-size:10.5px;font-weight:500;line-height:1.4}
-.nr-d{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:2px}
+.nr-d{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tm);margin-top:2px}
 .empty-filter{grid-column:1/-1;text-align:center;padding:40px 20px}
 .empty-filter-msg{font-size:13px;color:var(--tm);margin-bottom:8px;line-height:1.6}
 .empty-filter-promo{font-size:12px;color:var(--ac);margin-bottom:16px;font-weight:500}
@@ -167,7 +167,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .pform-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
 .step-header{margin-bottom:22px}
 .step-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px}
-.step-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);letter-spacing:1px;margin-top:3px}
+.step-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm);letter-spacing:1px;margin-top:3px}
 .step-dots{display:flex;gap:5px;margin-top:8px}
 .step-dot{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:all .2s}
 .step-dot.on{background:var(--ac);transform:scale(1.2)}
@@ -276,7 +276,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 @media(max-width:680px){
 .wrap{display:block}.sl{display:none}.sr{display:none}.feed{padding:0;border:none}
 header{padding:0 14px;height:54px}
-.logo-img{width:48px;height:48px}
+.logo-img{width:56px;height:56px}
 .logo-main{font-size:16px;letter-spacing:2px}.logo-sub{font-size:6.5px;letter-spacing:2px}
 .h-search-wrap{display:none}
 .h-btn{padding:7px 12px;font-size:11px;letter-spacing:.5px}
@@ -437,6 +437,10 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
             <button class="pb-btn board" onclick="openPost('board')">エフェクターボードを投稿</button>
             <button class="pb-btn gear-b" onclick="openPost('gear')">機材を投稿</button>
           </div>
+        </div>
+        <div id="mob-filter-clear-bar" style="display:none;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.3);border-radius:4px;margin-bottom:8px">
+          <span id="mob-filter-clear-lbl" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac)"></span>
+          <button onclick="clearFilter();clearSearchMob();" style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--ac);background:transparent;border:1px solid rgba(232,85,45,.4);border-radius:3px;padding:3px 8px;cursor:pointer;touch-action:manipulation">✕ 解除</button>
         </div>
         <div class="feed-top">
           <div class="feed-h" id="feed-heading-mob">PEDALBOARDS</div>
