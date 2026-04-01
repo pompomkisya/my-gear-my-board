@@ -498,7 +498,7 @@ function postToX(){
   if(!currentPost)return;
   const text=encodeURIComponent(currentPost.title+' #MyGearMyBoard #エフェクターボード');
   // OGP対応URL（/og?id=xxx）を使うことでXのカードに画像が表示される
-  const ogUrl=encodeURIComponent('https://mygearmyboard.com/og?id='+currentPost.id);
+  const ogUrl=encodeURIComponent('https://mygearmyboard.com/.netlify/functions/og?id='+currentPost.id+'&t='+Date.now());
   window.open('https://twitter.com/intent/tweet?text='+text+'&url='+ogUrl,'_blank','width=550,height=420');
 }
 
