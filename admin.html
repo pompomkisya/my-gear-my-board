@@ -282,14 +282,14 @@ async function loadPosts(){
   loadUnknownGear();
 }
 async function loadPedals(){
-  // 総数を正確に取得
-  const{count}=await sb.from('pedals').select('*',{count:'exact',head:true});
-  // 表示用データ取得（上限1000はSupabaseの仕様のため、countと分ける）
-  const{data}=await sb.from('pedals').select('*').order('brand').order('model').limit(5000);
-  allPedals=data||[];
-  const total=count||allPedals.length;
+  // 件数はcountのみで取得（データ取得とは別クエリ）
+  const countRes=await sb.from('pedals').select('id',{count:'exact',head:true});
+  const total=countRes.count||0;
   document.getElementById('stat-pedals').textContent=total;
   document.getElementById('pedals-count').textContent=total;
+  // 表示用データは1000件まで（Supabase無料プランの上限）
+  const{data}=await sb.from('pedals').select('*').order('brand').order('model');
+  allPedals=data||[];
   renderPedals();
 }
 async function loadComments(){
