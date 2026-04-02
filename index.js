@@ -933,4 +933,15 @@ function renderGearWidgetMob(posts){
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
-document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();});
+document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();});
+
+// ── 機材NEWSをSupabaseから取得して表示
+async function loadNewsWidget(){
+  const{data,error}=await sb.from('news').select('*').order('sort_order').order('created_at').limit(10);
+  if(error||!data||!data.length)return;
+  const html=data.map(item=>`<a class="news-link" href="${item.url}" target="_blank" rel="noopener"><div class="nth">${item.thumb_url?`<img src="${item.thumb_url}" style="width:100%;height:100%;object-fit:cover;border-radius:3px" onerror="this.parentElement.textContent='${item.emoji||'🔗'}'">`:item.emoji||'🔗'}</div><div><div class="nr-t">${item.title}</div><div class="nr-d">${item.subtitle||''}</div></div></a>`).join('');
+  const w1=document.getElementById('news-widget');
+  const w2=document.getElementById('news-widget-mob');
+  if(w1)w1.innerHTML=html;
+  if(w2)w2.innerHTML=html;
+}
