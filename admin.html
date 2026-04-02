@@ -201,9 +201,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="news-list">
       <div class="loading">読み込み中...</div>
     </div>
-    <div style="margin-top:16px;text-align:right">
-      <button class="submit-btn" onclick="saveNews()">💾 変更を保存してサイトに反映</button>
-    </div>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#4ade80;margin-top:12px">✅ 追加・削除・並び替えは即時サイトに反映されます。GitHubの更新は不要です。</p>
   </div>
 
   <!-- ペダルDB -->
@@ -284,7 +282,7 @@ async function loadPosts(){
   loadUnknownGear();
 }
 async function loadPedals(){
-  const{data}=await sb.from('pedals').select('*').order('brand').order('model');
+  const{data}=await sb.from('pedals').select('*').order('brand').order('model').limit(5000);
   allPedals=data||[];
   renderPedals();
 }
@@ -459,25 +457,15 @@ async function deletePedal(id){
   document.getElementById('stat-pedals').textContent=allPedals.length;
 }
 
-// ── 機材NEWS管理
-const NEWS_STORAGE_KEY='mgmb_news_items';
+// ── 機材NEWS管理（Supabase連携）
 
-function loadNews(){
-  const saved=localStorage.getItem(NEWS_STORAGE_KEY);
-  if(saved){
-    try{newsItems=JSON.parse(saved);}catch(e){newsItems=getDefaultNews();}
-  }else{
-    newsItems=getDefaultNews();
-  }
+async function loadNews(){
+  const el=document.getElementById('news-list');
+  el.innerHTML='<div class="loading">読み込み中...</div>';
+  const{data,error}=await sb.from('news').select('*').order('sort_order').order('created_at');
+  if(error){el.innerHTML='<div class="empty-msg">読み込みに失敗しました</div>';return;}
+  newsItems=data||[];
   renderNewsList();
-}
-
-function getDefaultNews(){
-  return[
-    {url:'https://www.soundhouse.co.jp/search/index?i_type=outlet',title:'サウンドハウス アウトレット',subtitle:'お買い得品をチェック',emoji:'💰',thumb:''},
-    {url:'https://www.soundhouse.co.jp/search/index?i_type=sale',title:'サウンドハウス セール情報',subtitle:'期間限定セール中',emoji:'🏷',thumb:''},
-    {url:'https://www.soundhouse.co.jp/categories/detail/218',title:'エフェクター新着',subtitle:'Soundhouse最新入荷',emoji:'🎛',thumb:''},
-  ];
 }
 
 function renderNewsList(){
@@ -487,7 +475,7 @@ function renderNewsList(){
     <div class="news-item" data-idx="${i}">
       <div class="drag-handle">⠿</div>
       <div class="news-thumb">
-        ${item.thumb?`<img src="${item.thumb}" onerror="this.style.display='none';this.parentElement.textContent='${item.emoji||'🔗'}'">`:item.emoji||'🔗'}
+        ${item.thumb_url?`<img src="${item.thumb_url}" onerror="this.style.display='none';this.parentElement.textContent='${item.emoji||'🔗'}'">`:item.emoji||'🔗'}
       </div>
       <div class="news-info">
         <div class="news-title-text">${escHtml(item.title)}</div>
@@ -496,36 +484,39 @@ function renderNewsList(){
         <div class="news-actions">
           ${i>0?`<button class="news-action-btn" onclick="moveNews(${i},-1)">↑ 上へ</button>`:''}
           ${i<newsItems.length-1?`<button class="news-action-btn" onclick="moveNews(${i},1)">↓ 下へ</button>`:''}
-          <button class="news-action-btn danger" onclick="removeNews(${i})">🗑 削除</button>
+          <button class="news-action-btn danger" onclick="removeNews('${item.id}',${i})">🗑 削除</button>
         </div>
       </div>
     </div>
   `).join('');
 }
 
-function moveNews(idx,dir){
+async function moveNews(idx,dir){
   const newIdx=idx+dir;
   if(newIdx<0||newIdx>=newsItems.length)return;
-  [newsItems[idx],newsItems[newIdx]]=[newsItems[newIdx],newsItems[idx]];
-  renderNewsList();
-}
-function removeNews(idx){
-  if(!confirm('このNEWSを削除しますか？'))return;
-  newsItems.splice(idx,1);
-  renderNewsList();
+  // sort_orderを入れ替え
+  const a=newsItems[idx],b=newsItems[newIdx];
+  const tmpOrder=a.sort_order;
+  await sb.from('news').update({sort_order:b.sort_order}).eq('id',a.id);
+  await sb.from('news').update({sort_order:tmpOrder}).eq('id',b.id);
+  await loadNews();
 }
 
-async function fetchOGP(){
+async function removeNews(id,idx){
+  if(!confirm('このNEWSを削除しますか？'))return;
+  const{error}=await sb.from('news').delete().eq('id',id);
+  if(error){showToast('❌ 削除に失敗しました');return;}
+  showToast('🗑 削除しました');
+  await loadNews();
+}
+
+function fetchOGP(){
   const url=document.getElementById('news-url-input').value.trim();
   if(!url){showToast('⚠️ URLを入力してください');return;}
-  showToast('🔍 情報を取得中...');
   try{
-    // Netlify Function経由でOGP取得（CORSのため）
-    // フォールバック：URLからタイトルを推測
     const domain=new URL(url).hostname.replace('www.','');
-    const title=domain+' のページ';
-    document.getElementById('news-title-input').value=title;
-    document.getElementById('ogp-title').textContent=title;
+    document.getElementById('news-title-input').value=domain;
+    document.getElementById('ogp-title').textContent=domain;
     document.getElementById('ogp-url').textContent=url;
     document.getElementById('ogp-thumb').src='';
     document.getElementById('ogp-preview').classList.add('show');
@@ -535,48 +526,23 @@ async function fetchOGP(){
   }
 }
 
-function addNewsItem(){
+async function addNewsItem(){
   const url=document.getElementById('news-url-input').value.trim();
   const title=document.getElementById('news-title-input').value.trim();
   const emoji=document.getElementById('news-emoji-input').value.trim()||'🔗';
-  const thumb=document.getElementById('ogp-thumb').src||'';
   if(!url||!title){showToast('⚠️ URLとタイトルは必須です');return;}
-  newsItems.push({url,title,subtitle:'',emoji,thumb});
-  renderNewsList();
+  const maxOrder=newsItems.length?Math.max(...newsItems.map(n=>n.sort_order||0))+1:1;
+  const{error}=await sb.from('news').insert({url,title,subtitle:'',emoji,thumb_url:'',sort_order:maxOrder});
+  if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
   document.getElementById('news-url-input').value='';
   document.getElementById('news-title-input').value='';
   document.getElementById('news-emoji-input').value='';
   document.getElementById('ogp-preview').classList.remove('show');
-  showToast('✅ 追加しました');
+  showToast('✅ 追加してサイトに反映しました！');
+  await loadNews();
 }
 
-function saveNews(){
-  localStorage.setItem(NEWS_STORAGE_KEY,JSON.stringify(newsItems));
-  // index.htmlのnews-widgetを更新するためのコードを生成
-  const html=newsItems.map(item=>`
-<a class="news-link" href="${item.url}" target="_blank" rel="noopener">
-  <div class="nth">${item.thumb?`<img src="${item.thumb}" style="width:100%;height:100%;object-fit:cover;border-radius:3px">`:item.emoji||'🔗'}</div>
-  <div><div class="nr-t">${item.title}</div><div class="nr-d">${item.subtitle||''}</div></div>
-</a>`).join('');
-
-  const output=`
---- index.html の news-widget 内に貼り付けるHTML ---
-<div id="news-widget">
-${html}
-</div>
-  `.trim();
-
-  // コードをクリップボードにコピー
-  navigator.clipboard.writeText(output).then(()=>{
-    showToast('✅ HTMLをクリップボードにコピーしました！index.htmlに貼り付けてください');
-  }).catch(()=>{
-    // フォールバック: テキストエリアで表示
-    const ta=document.createElement('textarea');ta.value=output;ta.style.cssText='position:fixed;top:20px;left:20px;right:20px;height:300px;z-index:9999;font-family:monospace;font-size:12px;background:#1c1c1f;color:#eae8e2;border:1px solid #e8552d;border-radius:6px;padding:12px';
-    document.body.appendChild(ta);ta.select();document.execCommand('copy');
-    setTimeout(()=>ta.remove(),5000);
-    showToast('✅ コピーしました（下のテキストエリアから確認できます）');
-  });
-}
+// saveNewsは不要（追加・削除・並び替えが即時反映）のため削除
 
 function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
