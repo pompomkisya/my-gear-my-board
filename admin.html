@@ -302,10 +302,9 @@ function loadStats(){
   document.getElementById('stat-comments').textContent=allComments.length;
   const likes=allPosts.reduce((s,p)=>s+(p.likes||0),0);
   document.getElementById('stat-likes').textContent=likes;
-  document.getElementById('stat-pedals').textContent=allPedals.length;
+  // ペダルDB件数はloadPedals内で設定するためここでは更新しない
   document.getElementById('stat-reports').textContent='0';
   document.getElementById('posts-count').textContent=allPosts.length;
-  document.getElementById('pedals-count').textContent=allPedals.length;
 }
 
 function timeAgo(ts){
