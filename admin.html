@@ -284,6 +284,8 @@ async function loadPosts(){
 async function loadPedals(){
   const{data}=await sb.from('pedals').select('*').order('brand').order('model').limit(5000);
   allPedals=data||[];
+  document.getElementById('stat-pedals').textContent=allPedals.length;
+  document.getElementById('pedals-count').textContent=allPedals.length;
   renderPedals();
 }
 async function loadComments(){
