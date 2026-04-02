@@ -282,10 +282,14 @@ async function loadPosts(){
   loadUnknownGear();
 }
 async function loadPedals(){
+  // 総数を正確に取得
+  const{count}=await sb.from('pedals').select('*',{count:'exact',head:true});
+  // 表示用データ取得（上限1000はSupabaseの仕様のため、countと分ける）
   const{data}=await sb.from('pedals').select('*').order('brand').order('model').limit(5000);
   allPedals=data||[];
-  document.getElementById('stat-pedals').textContent=allPedals.length;
-  document.getElementById('pedals-count').textContent=allPedals.length;
+  const total=count||allPedals.length;
+  document.getElementById('stat-pedals').textContent=total;
+  document.getElementById('pedals-count').textContent=total;
   renderPedals();
 }
 async function loadComments(){
