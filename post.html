@@ -577,6 +577,7 @@ function verifyPin(){
     document.getElementById('pin-err').textContent='';
     document.getElementById('edit-step1').style.display='none';
     document.getElementById('edit-title').value=currentPost.title||'';
+    document.getElementById('edit-title').placeholder=currentPost.post_type==='gear'?'例：My New Gear！':'例：ライブ用最強ボード';
     // 機材：並び替えUIに反映
     const gear=Array.isArray(currentPost.gear_list)?currentPost.gear_list:[];
     postEditGearList=gear.map(g=>({name:g.name||g,brand:g.brand||'',search_query:g.search_query||null}));
