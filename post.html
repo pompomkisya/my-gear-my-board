@@ -95,7 +95,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .reply-name-input:focus{border-color:var(--ac)}
 .reply-name-input::placeholder{color:var(--td)}
 .reply-row{display:flex;gap:6px}
-.reply-input{flex:1;min-width:0;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 3px 3px;padding:7px 10px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
+.reply-input{flex:1;min-width:0;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 3px 3px;padding:7px 10px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s;resize:none;min-height:44px;overflow-y:hidden}
 .reply-input:focus{border-color:var(--ac)}
 .reply-submit{padding:7px 12px;background:var(--ac);border:none;border-radius:3px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation;white-space:nowrap;flex-shrink:0}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
@@ -533,7 +533,7 @@ function renderComment(c,depth){
     +'<div class="reply-form" id="rf-'+c.id+'">'
     +'<input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30">'
     +'<div class="reply-row">'
-    +'<input class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." type="text">'
+    +'<textarea class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." rows="1" oninput="autoResize(this)"></textarea>'
     +'<button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button>'
     +'</div></div>';
   if(children.length){html+='<div class="reply-indent">'+children.map(ch=>renderComment(ch,depth+1)).join('')+'</div>';}
@@ -545,6 +545,12 @@ function openReply(parentId,name){
   const form=document.getElementById('rf-'+parentId);
   if(form){form.classList.add('open');document.getElementById('rn-'+parentId).focus();}
 }
+// テキストエリア自動リサイズ
+function autoResize(el){
+  el.style.height='auto';
+  el.style.height=Math.min(el.scrollHeight,120)+'px';
+}
+
 async function postComment(parentId,replyToName){
   const nameEl=parentId?document.getElementById('rn-'+parentId):document.getElementById('comment-name');
   const inputEl=parentId?document.getElementById('ri-'+parentId):document.getElementById('comment-input');
@@ -553,7 +559,7 @@ async function postComment(parentId,replyToName){
   if(!content){showToast(lang==='en'?'❌ Please enter a comment':'❌ コメントを入力してください');return;}
   const{error}=await sb.from('comments').insert({post_id:POST_ID,parent_id:parentId||null,username,content,reply_to_name:replyToName||null});
   if(error){showToast(lang==='en'?'❌ Failed to post':'❌ 投稿に失敗しました');console.error(error);return;}
-  inputEl.value='';if(nameEl)nameEl.value='';
+  inputEl.value='';inputEl.style.height='';if(nameEl)nameEl.value='';
   if(parentId){const form=document.getElementById('rf-'+parentId);if(form)form.classList.remove('open');}
   showToast(lang==='en'?'💬 Comment posted':'💬 コメントしました');
   await loadComments();
