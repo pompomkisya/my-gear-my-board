@@ -25,7 +25,7 @@ const I18N={
     lblUsername:'ユーザー名（任意）',
     // ★変更: phUsername 新プレースホルダー
     phUsername:'名前をつけると自分の投稿を探せます',
-    lblTitle:'タイトル',phTitle:'例：ライブ用最強ボード',lblYoutube:'YouTube URL（任意）',
+    lblTitle:'タイトル',phTitle:'例：ライブ用最強ボード',phTitleGear:'例：My New Gear！',lblYoutube:'YouTube URL（任意）',
     lblGear:'使用機材（1つ以上推奨）',gearHint1:'※入力すると閲覧数が上がります',
     gearHint2:'候補からタップで簡単に追加できます',gearHint3:'まずは1つだけでOKです',
     gearPlaceholder:'機材名を入力（例: DS-1, Big Muff）',laterInput:'あとで入力する',
@@ -79,7 +79,7 @@ const I18N={
     photoEditBtn:'🎯 Number your gear',skipPhoto:'Skip (continue without photo)',
     lblUsername:'Username (optional)',
     phUsername:'Add a name to find your posts later (blank = anonymous)',
-    lblTitle:'Title',phTitle:'e.g. My Live Pedalboard',lblYoutube:'YouTube URL (optional)',
+    lblTitle:'Title',phTitle:'e.g. My Live Pedalboard',phTitleGear:'e.g. My New Gear！',lblYoutube:'YouTube URL (optional)',
     lblGear:'Gear (1+ recommended)',gearHint1:'※ Adding gear increases views',
     gearHint2:'Tap a suggestion to add easily',gearHint3:'Just one is fine to start',
     gearPlaceholder:'Enter gear name (e.g. DS-1, Big Muff)',laterInput:'Add later',
@@ -219,7 +219,7 @@ function applyLangUI(){
   const anonNote=document.getElementById('anon-note');if(anonNote)anonNote.textContent=tr('anonNote');
   // フォームplaceholder
   const pusr=document.getElementById('post-username');if(pusr)pusr.placeholder=tr('phUsername');
-  const ptitle=document.getElementById('post-title');if(ptitle)ptitle.placeholder=tr('phTitle');
+  const ptitle=document.getElementById('post-title');if(ptitle)ptitle.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
   const pdesc=document.getElementById('post-desc');if(pdesc)pdesc.placeholder=tr('phDesc');
   const hsearch=document.getElementById('h-search');if(hsearch)hsearch.placeholder=lang==='en'?'Search...':'フリーワード';
   const msearch=document.getElementById('mob-search');if(msearch)msearch.placeholder=lang==='en'?'Search...':'フリーワード検索...';
@@ -525,6 +525,9 @@ function updateStepUI(){
   const titleEl=document.getElementById('step-title');
   if(titleEl)titleEl.textContent=currentPostType==='board'?tr('btnPostBoard'):tr('btnPostGear');
   const subEl=document.getElementById('step-sub');if(subEl)subEl.textContent=tr(STEP_SUBS[currentStep-1]);
+  // タイトルplaceholderを投稿タイプ別に切り替え
+  const ptitleEl=document.getElementById('post-title');
+  if(ptitleEl)ptitleEl.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
   document.getElementById('step-dots').innerHTML=Array.from({length:TOTAL_STEPS},(_,i)=>'<div class="step-dot '+(i+1===currentStep?'on':i+1<currentStep?'done':'')+'"></div>').join('');
   if(currentStep===1){
     const ua=document.getElementById('upload-area-main');
