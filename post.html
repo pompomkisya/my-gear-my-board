@@ -23,11 +23,11 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .logo-img{width:32px;height:32px;border-radius:50%;object-fit:cover}
 .logo-text{display:flex;flex-direction:column;line-height:1}
 .logo-main{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
-.logo-sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-top:2px}
-.back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;transition:all .15s;touch-action:manipulation}
+.logo-sub{font-family:'Noto Sans JP',sans-serif;font-size:9px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-top:2px}
+.back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;transition:all .15s;touch-action:manipulation}
 .back-btn:hover{border-color:var(--ac);color:var(--ac)}
 .lang-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-size:14px;cursor:pointer;touch-action:manipulation}
-.page{max-width:900px;margin:0 auto;padding:32px 20px;position:relative;z-index:1}
+.page{max-width:900px;margin:0 auto;padding:32px 20px;position:relative;z-index:1;background:linear-gradient(160deg,#0d0d0e 0%,#1a1008 40%,#1a0a05 100%);min-height:calc(100vh - 58px)}
 .slider{position:relative;background:var(--sf2);border-radius:8px;overflow:hidden;margin-bottom:24px;border:1px solid var(--bd)}
 .slide{min-width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center}
 .slide img{width:100%;height:100%;object-fit:contain;background:#000}
@@ -46,28 +46,28 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;border:2px solid var(--bd);flex-shrink:0;background:linear-gradient(135deg,#e85c2f,#b03020)}
 .meta-info{flex:1}
 .meta-name{font-size:14px;font-weight:500}
-.meta-time{font-family:'JetBrains Mono',monospace;font-size:12px;color:#ccc9c2;margin-top:2px}
+.meta-time{font-family:'Noto Sans JP',sans-serif;font-size:12px;color:#ccc9c2;margin-top:2px}
 .post-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;line-height:1.2;margin-bottom:16px}
-.type-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.type-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:2px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
 .type-badge.board{background:rgba(232,85,45,.12);color:var(--ac);border:1px solid rgba(232,85,45,.25)}
 .type-badge.gear{background:#1a3a1a;color:#6aba6a;border:1px solid #2a5a2a}
 .actions{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
-.act-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s;border:1px solid var(--bd);background:var(--sf);color:var(--tm);touch-action:manipulation}
+.act-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .15s;border:1px solid var(--bd);background:var(--sf);color:var(--tm);touch-action:manipulation}
 .act-btn:hover{border-color:var(--ac);color:var(--ac)}
 .act-btn.liked{color:var(--ac);border-color:rgba(232,85,45,.4)}
 .act-btn.x-act{background:#000;border-color:#333;color:#fff}
 .act-btn.x-act:hover{background:#111;border-color:var(--ac)}
 .section{border-top:1px solid var(--bd);padding-top:20px;margin-top:20px}
-.section-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#aaa8a2;margin-bottom:12px}
+.section-lbl{font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#aaa8a2;margin-bottom:12px}
 .gear-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;margin-bottom:6px}
 .gear-dot{width:6px;height:6px;border-radius:50%;background:var(--ac);flex-shrink:0;margin-right:10px}
 .gear-name{font-size:14px;font-weight:400;flex:1}
-.sh-link{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--ac);text-decoration:none;padding:4px 10px;border:1px solid rgba(232,85,45,.3);border-radius:3px;white-space:nowrap;transition:all .15s}
+.sh-link{font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--ac);text-decoration:none;padding:4px 10px;border:1px solid rgba(232,85,45,.3);border-radius:3px;white-space:nowrap;transition:all .15s}
 .sh-link:hover{background:rgba(232,85,45,.1);border-color:var(--ac)}
 .genre-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
-.gtag{padding:4px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#b8b5ae}
+.gtag{padding:4px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:2px;font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm)}
 .desc{font-size:14px;line-height:1.8;color:#b8b5ae;white-space:pre-wrap}
-.desc-toggle{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac);cursor:pointer;margin-top:8px;display:inline-block}
+.desc-toggle{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--ac);cursor:pointer;margin-top:8px;display:inline-block}
 .comment-name-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;padding:8px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s;border-bottom:none}
 .comment-name-input:focus{border-color:var(--ac)}
 .comment-name-input::placeholder{color:var(--td)}
@@ -76,16 +76,16 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .comment-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 4px 4px;padding:10px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;resize:none;min-height:44px;transition:border-color .15s}
 .comment-input:focus{border-color:var(--ac)}
 .comment-input::placeholder{color:var(--td)}
-.comment-submit{padding:10px 16px;background:var(--ac);border:none;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;touch-action:manipulation;min-height:44px}
+.comment-submit{padding:10px 16px;background:var(--ac);border:none;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;touch-action:manipulation;min-height:44px}
 .comment-submit:hover{background:#cf4c26}
 .comment{padding:14px 0;border-bottom:1px solid var(--bd)}
 .comment:last-child{border-bottom:none}
 .c-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .c-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:linear-gradient(135deg,#e85c2f,#b03020);flex-shrink:0}
 .c-name{font-size:12px;font-weight:500}
-.c-time{font-family:'JetBrains Mono',monospace;font-size:11px;color:#ccc9c2;margin-left:auto}
+.c-time{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:#c0bcb4;margin-left:auto}
 .c-body{font-size:14px;line-height:1.65;color:#b8b5ae;padding-left:36px}
-.c-reply-btn{display:inline-flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--ac);cursor:pointer;margin-top:8px;transition:all .15s;touch-action:manipulation;background:transparent;border:none;padding:5px 10px 5px 36px;border-radius:3px}
+.c-reply-btn{display:inline-flex;align-items:center;gap:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--ac);cursor:pointer;margin-top:8px;transition:all .15s;touch-action:manipulation;background:transparent;border:none;padding:5px 10px 5px 36px;border-radius:3px}
 .c-reply-btn:hover{background:rgba(232,85,45,.1)}
 .c-mention{color:var(--ac);font-weight:500}
 .reply-indent{padding-left:28px;border-left:2px solid var(--bd);margin-top:8px}
@@ -97,8 +97,8 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .reply-row{display:flex;gap:6px}
 .reply-input{flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 3px 3px;padding:7px 10px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
 .reply-input:focus{border-color:var(--ac)}
-.reply-submit{padding:7px 12px;background:var(--ac);border:none;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation;white-space:nowrap}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.reply-submit{padding:7px 12px;background:var(--ac);border:none;border-radius:3px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation;white-space:nowrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .ebd{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s}
 .ebd.open{opacity:1;pointer-events:all}
@@ -107,22 +107,22 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .eform-close{position:absolute;top:14px;right:14px;width:28px;height:28px;background:var(--sf2);border:1px solid var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--tm)}
 .eform-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
 .eform-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:6px}
-.eform-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);letter-spacing:1px;margin-bottom:20px}
+.eform-sub{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);letter-spacing:1px;margin-bottom:20px}
 .pin-row{display:flex;gap:8px;justify-content:center;margin:12px 0 18px}
-.pin-d{width:56px;height:62px;background:var(--sf2);border:2px solid var(--bd);border-radius:6px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;color:var(--tx);outline:none;transition:border-color .15s;caret-color:var(--ac)}
+.pin-d{width:56px;height:62px;background:var(--sf2);border:2px solid var(--bd);border-radius:6px;text-align:center;font-family:'Noto Sans JP',sans-serif;font-size:26px;font-weight:600;color:var(--tx);outline:none;transition:border-color .15s;caret-color:var(--ac)}
 .pin-d:focus{border-color:var(--ac)}
-.pin-err{font-family:'JetBrains Mono',monospace;font-size:10px;color:#e05050;text-align:center;min-height:16px;margin-bottom:6px}
+.pin-err{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:#e05050;text-align:center;min-height:16px;margin-bottom:6px}
 .form-row{margin-bottom:14px}
-.form-lbl{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#b0ada6;margin-bottom:6px;display:block}
+.form-lbl{font-family:'Noto Sans JP',sans-serif;font-size:12px;letter-spacing:0px;text-transform:none;color:#b0ada6;margin-bottom:6px;display:block}
 .form-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
 .form-input:focus{border-color:var(--ac)}
 textarea.form-input{resize:vertical;min-height:80px}
 .yt-input-wrap{position:relative;display:flex;align-items:center}
 .yt-input-wrap .yt-icon{position:absolute;left:10px;font-size:16px;pointer-events:none}
 .yt-input-wrap .form-input{padding-left:34px}
-.submit-btn{width:100%;background:var(--ac);border:none;border-radius:4px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .18s;margin-top:4px;touch-action:manipulation}
+.submit-btn{width:100%;background:var(--ac);border:none;border-radius:4px;padding:12px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .18s;margin-top:4px;touch-action:manipulation}
 .submit-btn:hover{background:#cf4c26}
-.del-btn{width:100%;background:transparent;border:1px solid #5a1a1a;border-radius:4px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#e05050;cursor:pointer;transition:all .18s;margin-top:6px;touch-action:manipulation}
+.del-btn{width:100%;background:transparent;border:1px solid #5a1a1a;border-radius:4px;padding:10px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#e05050;cursor:pointer;transition:all .18s;margin-top:6px;touch-action:manipulation}
 .del-btn:hover{background:rgba(224,80,80,.1);border-color:#e05050}
 .report-bd{position:fixed;inset:0;background:rgba(0,0,0,.9);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s}
 .report-bd.open{opacity:1;pointer-events:all}
@@ -132,18 +132,18 @@ textarea.form-input{resize:vertical;min-height:80px}
 .report-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:12px;transition:all .15s;touch-action:manipulation}
 .report-opt:hover{border-color:rgba(224,80,80,.4);color:#e05050}
 .report-opt.on{border-color:#e05050;background:rgba(224,80,80,.08);color:#e05050}
-.report-submit{width:100%;background:#c03030;border:none;border-radius:4px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation}
+.report-submit{width:100%;background:#c03030;border:none;border-radius:4px;padding:10px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation}
 .report-close{position:absolute;top:14px;right:14px;width:26px;height:26px;background:var(--sf2);border:1px solid var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--tm)}
 .report-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
 /* 編集モーダル 画像サムネイル */
 .edit-img-small{position:relative;width:90px;height:90px;border-radius:4px;overflow:hidden;border:1px solid var(--bd);flex-shrink:0;background:#000}
 .edit-img-small img{width:100%;height:100%;object-fit:contain}
-.edit-img-edit-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(232,85,45,.85);border:none;color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:4px;cursor:pointer;text-align:center;touch-action:manipulation}
+.edit-img-edit-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(232,85,45,.85);border:none;color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;padding:4px;cursor:pointer;text-align:center;touch-action:manipulation}
 /* サジェスト入力（機材） */
 .gear-input-wrap{position:relative}
 .gear-tags{display:flex;flex-wrap:wrap;gap:5px;min-height:36px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:6px 8px;cursor:text;transition:border-color .15s}
 .gear-tags:focus-within{border-color:var(--ac)}
-.gear-tag{display:flex;align-items:center;gap:4px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:2px;padding:2px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);white-space:nowrap}
+.gear-tag{display:flex;align-items:center;gap:4px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:2px;padding:2px 7px;font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ac);white-space:nowrap}
 .gear-tag-x{cursor:pointer;font-size:12px;color:var(--ac);opacity:.7;background:none;border:none;padding:0}
 .gear-text-input{background:transparent;border:none;outline:none;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;min-width:140px;flex:1;padding:1px 2px}
 .gear-text-input::placeholder{color:var(--td)}
@@ -153,27 +153,27 @@ textarea.form-input{resize:vertical;min-height:80px}
 .ac-item:last-child{border-bottom:none}
 .ac-item:hover,.ac-item.focus{background:rgba(232,85,45,.1)}
 .ac-item-name{flex:1;color:var(--tx)}
-.ac-item-brand{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)}
-.ac-empty{padding:10px 12px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);text-align:center}
+.ac-item-brand{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td)}
+.ac-empty{padding:10px 12px;font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);text-align:center}
 /* 画像エディター */
 .img-editor-bd{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:800;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s}
 .img-editor-bd.open{opacity:1;pointer-events:all}
 .img-editor-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
 .img-editor-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
-.img-editor-subtitle{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-top:2px}
+.img-editor-subtitle{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-top:2px}
 .img-editor-canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;background:#000}
 #editor-canvas{max-width:100%;max-height:100%;display:block;touch-action:none}
 .img-editor-toolbar{display:flex;align-items:center;gap:6px;padding:10px 12px;border-top:1px solid var(--bd);flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;background:var(--sf)}
-.editor-tool-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--sf2);color:var(--tm);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;flex-shrink:0;min-width:58px;min-height:52px;touch-action:manipulation;transition:all .15s}
+.editor-tool-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 10px;border-radius:6px;border:1px solid var(--bd);background:var(--sf2);color:var(--tm);font-family:'Noto Sans JP',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;flex-shrink:0;min-width:58px;min-height:52px;touch-action:manipulation;transition:all .15s}
 .editor-tool-btn:hover{border-color:var(--ac);color:var(--ac)}
 .editor-tool-btn.active{background:rgba(232,85,45,.2);border-color:var(--ac);color:var(--ac)}
 .editor-tool-icon{font-size:18px;line-height:1}
-.editor-done-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 14px;border-radius:6px;border:none;background:var(--ac);color:#fff;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;flex-shrink:0;min-width:58px;min-height:52px;touch-action:manipulation;margin-left:auto}
+.editor-done-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px 14px;border-radius:6px;border:none;background:var(--ac);color:#fff;font-family:'Noto Sans JP',sans-serif;font-size:9px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;cursor:pointer;flex-shrink:0;min-width:58px;min-height:52px;touch-action:manipulation;margin-left:auto}
 .editor-done-btn:hover{background:#cf4c26}
 .editor-done-icon{font-size:18px;line-height:1}
-.img-editor-hint{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);text-align:center;padding:5px;flex-shrink:0;background:var(--bg)}
+.img-editor-hint{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);text-align:center;padding:5px;flex-shrink:0;background:var(--bg)}
 .img-tab-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--bg)}
-.img-tab{padding:5px 12px;border-radius:3px;border:1px solid var(--bd);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;min-height:32px;touch-action:manipulation}
+.img-tab{padding:5px 12px;border-radius:3px;border:1px solid var(--bd);font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;min-height:32px;touch-action:manipulation}
 .img-tab.on{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 @media(max-width:600px){
@@ -208,7 +208,7 @@ textarea.form-input{resize:vertical;min-height:80px}
 </header>
 
 <div class="page" id="page-content">
-  <div style="text-align:center;padding:60px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">読み込み中...</div>
+  <div style="text-align:center;padding:60px;font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td)">読み込み中...</div>
 </div>
 
 <!-- EDIT MODAL -->
@@ -236,10 +236,10 @@ textarea.form-input{resize:vertical;min-height:80px}
         <div id="edit-photo-previews" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
         <input type="file" id="edit-photo-input" accept="image/*" multiple style="display:none" onchange="handleEditPhotos(event)">
         <button type="button" onclick="document.getElementById('edit-photo-input').click()"
-          style="width:100%;padding:8px;border:1.5px dashed var(--bd);border-radius:4px;background:transparent;color:var(--td);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;cursor:pointer;touch-action:manipulation">
+          style="width:100%;padding:8px;border:1.5px dashed var(--bd);border-radius:4px;background:transparent;color:var(--td);font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;cursor:pointer;touch-action:manipulation">
           ＋ 写真を追加・変更（最大3枚）
         </button>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px">※ 既存の写真はサムネイルをタップして削除できます</div>
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);margin-top:4px">※ 既存の写真はサムネイルをタップして削除できます</div>
       </div>
       <div class="form-row">
         <label class="form-lbl">タイトル</label>
@@ -259,7 +259,7 @@ textarea.form-input{resize:vertical;min-height:80px}
           </div>
           <div class="ac-dropdown" id="edit-ac-dropdown"></div>
         </div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a9890;margin-top:5px">候補からタップで追加・Enterでも追加できます</div>
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:#9a9890;margin-top:5px">候補からタップで追加・Enterでも追加できます</div>
       </div>
       <div class="form-row">
         <label class="form-lbl">コメント・説明</label>
@@ -322,14 +322,12 @@ let currentPost=null,allComments=[];
 function toggleLang(){lang=lang==='ja'?'en':'ja';if(currentPost)renderPost(currentPost);}
 function goBack(){location.href='/';}
 function soundhouseUrl(gearItem){
-  // gearItemはオブジェクト({name, search_query})か文字列
   let q;
   if(gearItem&&typeof gearItem==='object'){
     q=gearItem.search_query||gearItem.name||'';
   }else{
     q=gearItem||'';
   }
-  // フォールバック: "mod"/"modified"/"custom"を含む場合はmod以降のモデル名部分を抽出
   if(!gearItem?.search_query){
     const modMatch=q.match(/\bmod(?:ified)?\b\s+(.+)/i);
     if(modMatch)q=modMatch[1].trim();
@@ -355,9 +353,9 @@ function getYouTubeId(url){
 }
 
 async function loadPost(){
-  if(!POST_ID){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:JetBrains Mono,monospace">投稿が見つかりません</div>';return;}
+  if(!POST_ID){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:'Noto Sans JP',sans-serif">投稿が見つかりません</div>';return;}
   const{data,error}=await sb.from('posts').select('*').eq('id',POST_ID).single();
-  if(error||!data){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:JetBrains Mono,monospace">投稿が見つかりません</div>';return;}
+  if(error||!data){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:'Noto Sans JP',sans-serif">投稿が見つかりません</div>';return;}
   currentPost=data;
   document.title=data.title+' — My Gear My Board';
   document.querySelector('meta[property="og:title"]').setAttribute('content',data.title+' — My Gear My Board');
@@ -628,7 +626,7 @@ function renderEditPhotoPreviews(){
     div.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain">'
       +'<button onclick="removeEditNewPhoto('+i+')" style="position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.75);border-radius:50%;border:none;color:#fff;font-size:10px;cursor:pointer;touch-action:manipulation;z-index:2">✕</button>'
       +'<button class="edit-img-edit-btn" onclick="openEditImgEditor(\'new\','+i+')">✏️ 編集</button>'
-      +'<div style="position:absolute;bottom:18px;left:0;right:0;background:rgba(232,85,45,.8);font-family:JetBrains Mono,monospace;font-size:9px;text-align:center;color:#fff;padding:2px;pointer-events:none">新規</div>';
+      +'<div style="position:absolute;bottom:18px;left:0;right:0;background:rgba(232,85,45,.8);font-family:'Noto Sans JP',sans-serif;font-size:9px;text-align:center;color:#fff;padding:2px;pointer-events:none">新規</div>';
     wrap.appendChild(div);
   });
 }
@@ -843,9 +841,9 @@ function renderEditorToolbar(){
     toolbar.innerHTML=
       '<button class="editor-tool-btn" onclick="exitNumberMode()" style="flex:0 0 auto"><span class="editor-tool-icon">◀</span>← 戻る</button>'
       +'<button class="editor-tool-btn" onclick="addNumberSticker()" style="background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700"><span class="editor-tool-icon">➕</span>番号を追加</button>'
-      +'<button class="editor-tool-btn" onclick="cycleStickerSize()" style="min-width:52px;display:flex;flex-direction:column;align-items:center;gap:1px"><span style="font-family:JetBrains Mono,monospace;font-size:11px;font-weight:700;line-height:1">'+stickerSizeLabel()+'</span><span style="font-family:JetBrains Mono,monospace;font-size:8px;color:var(--td);line-height:1">サイズ</span></button>'
+      +'<button class="editor-tool-btn" onclick="cycleStickerSize()" style="min-width:52px;display:flex;flex-direction:column;align-items:center;gap:1px"><span style="font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;line-height:1">'+stickerSizeLabel()+'</span><span style="font-family:'Noto Sans JP',sans-serif;font-size:8px;color:var(--td);line-height:1">サイズ</span></button>'
       +'<button class="editor-tool-btn" onclick="eraseLastNumber()" style="min-width:44px">消す</button>'
-      +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--tm)">'+editorNumbers.length+' 個</div>'
+      +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm)">'+editorNumbers.length+' 個</div>'
       +'<button class="editor-done-btn" onclick="finishEditPhoto()"><span class="editor-done-icon">✅</span>完了</button>';
     if(hint)hint.textContent='ドラッグで移動・タップで削除';
   }
@@ -866,8 +864,8 @@ function showEditorMenu(btn){
   const rect=btn.getBoundingClientRect();
   menu.style.bottom=(window.innerHeight-rect.top+4)+'px';menu.style.right=(window.innerWidth-rect.right)+'px';
   menu.innerHTML=
-    '<div onclick="resetAllEdits();closeEditorMenu()" style="padding:12px 16px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--bd);color:var(--tm)">↩️ すべてリセット</div>'
-    +'<div onclick="removeAllNumbers();closeEditorMenu()" style="padding:12px 16px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:600;cursor:pointer;color:#e05050">🗑 番号をすべて削除</div>';
+    '<div onclick="resetAllEdits();closeEditorMenu()" style="padding:12px 16px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--bd);color:var(--tm)">↩️ すべてリセット</div>'
+    +'<div onclick="removeAllNumbers();closeEditorMenu()" style="padding:12px 16px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;cursor:pointer;color:#e05050">🗑 番号をすべて削除</div>';
   document.body.appendChild(menu);
   setTimeout(()=>document.addEventListener('click',closeEditorMenuOnce,{once:true}),10);
 }
