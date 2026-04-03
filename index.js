@@ -59,6 +59,7 @@ const I18N={
     slGenre:'ジャンル',slBrandTitle:'ブランド',slFxTitle:'エフェクタータイプ',
     subStandard:'定番',subAmbient:'空間系',subAlterna:'オルタナ系',
     subDrive:'歪み系',subModulation:'モジュレーション',subOther:'その他',
+    tagHomRec:'宅録',tagBeginner:'初心者相談',
     lblPhoto:'写真（最大3枚・任意）',
     langBtn:'EN',
   },
@@ -112,6 +113,7 @@ const I18N={
     slGenre:'Genre',slBrandTitle:'Brand',slFxTitle:'Effect Type',
     subStandard:'Classics',subAmbient:'Ambient',subAlterna:'Alternative',
     subDrive:'Drive',subModulation:'Modulation',subOther:'Other',
+    tagHomRec:'Home Rec',tagBeginner:'Beginner',
     lblPhoto:'Photos (max 3 · optional)',
     langBtn:'JA',
   }
@@ -179,6 +181,13 @@ function applyLangUI(){
     else if(txt.match(/エフェクタータイプ|Effect Type/))el.textContent=tr('slFxType');
     else if(txt.match(/ジャンル|Genre/))el.textContent=tr('slGenre');
     else if(txt.match(/ブランド$|^Brand$/))el.textContent=tr('slBrandTitle');
+  });
+  // 宅録・初心者相談タグ（フィルター＋投稿フォーム）
+  ['tag-tagroku-pc','tag-tagroku-mob','gs-tagroku'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.textContent=tr('tagHomRec');
+  });
+  ['tag-shoshinsha-pc','tag-shoshinsha-mob','gs-shoshinsha'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.textContent=tr('tagBeginner');
   });
   // brand-group-lbl（ジャンル・エフェクトタイプのサブラベル）
   document.querySelectorAll('.brand-group-lbl').forEach(el=>{
@@ -1003,7 +1012,42 @@ function renderGearWidgetMob(posts){
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
-document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();});
+document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();initPCScrollSync();});
+
+// ── PC版スクロール連携（中央パネル ↔ 右パネル）
+function initPCScrollSync(){
+  const feed=document.querySelector('.feed');
+  const sr=document.querySelector('.sr');
+  if(!feed||!sr)return;
+  let syncLock=false;
+  // ページ全体のスクロールに合わせて右パネルの位置を調整
+  window.addEventListener('scroll',()=>{
+    if(window.innerWidth<=680)return;// スマホは無効
+    if(syncLock)return;
+    syncLock=true;
+    // 右パネルはstickyなのでwindowスクロールに自動追従
+    // 中央パネル内スクロールを右パネルに反映
+    requestAnimationFrame(()=>{syncLock=false;});
+  },{passive:true});
+  // 中央パネル内スクロール → 右パネルに比率で同期
+  feed.addEventListener('scroll',()=>{
+    if(window.innerWidth<=680)return;
+    if(syncLock)return;
+    syncLock=true;
+    const ratio=feed.scrollTop/(feed.scrollHeight-feed.clientHeight||1);
+    sr.scrollTop=ratio*(sr.scrollHeight-sr.clientHeight);
+    requestAnimationFrame(()=>{syncLock=false;});
+  },{passive:true});
+  // 右パネルスクロール → 中央パネルに反映
+  sr.addEventListener('scroll',()=>{
+    if(window.innerWidth<=680)return;
+    if(syncLock)return;
+    syncLock=true;
+    const ratio=sr.scrollTop/(sr.scrollHeight-sr.clientHeight||1);
+    feed.scrollTop=ratio*(feed.scrollHeight-feed.clientHeight);
+    requestAnimationFrame(()=>{syncLock=false;});
+  },{passive:true});
+}
 
 // ── 機材NEWSをSupabaseから取得して表示
 async function loadNewsWidget(){
