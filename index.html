@@ -83,7 +83,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 /* ★変更: brand-group-lbl 視認性改善 */
 .brand-group-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:#c0bcb4;margin:12px 0 5px 2px;border-bottom:1px solid var(--bd);padding-bottom:4px}
 .brand-group-lbl:first-child{margin-top:0}
-.feed{padding:20px 22px;border-right:1px solid var(--bd);min-height:calc(100vh - 86px);background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 60%,#140c05 100%)}
+.feed{padding:20px 22px;border-right:1px solid var(--bd);min-height:calc(100vh - 86px);background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 55%,#1a0c05 100%)}
 .feed-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .feed-h{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
 .sort{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
@@ -135,7 +135,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .st:hover{color:var(--ac)}.st.liked{color:var(--ac)}
 .ad-slot{background:var(--sf);border:1px solid var(--bd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;color:var(--td);font-family:Noto Sans JP,sans-serif;font-size:11px}
 .ad-side{height:250px;margin-bottom:13px}
-.sr{padding:20px 16px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto;background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 60%,#140c05 100%)}
+.sr{padding:20px 16px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto;background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 55%,#1a0c05 100%)}
 .widget{background:var(--sf);border:1px solid var(--bd);border-radius:5px;padding:14px;margin-bottom:13px}
 .wt{font-family:'Bebas Neue',sans-serif;font-size:13.5px;letter-spacing:2.5px;padding-bottom:9px;margin-bottom:10px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:6px}
 .ri{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer}
@@ -328,16 +328,16 @@ header{padding:0 14px;height:54px}
 .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block;touch-action:manipulation}
 .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
 .swipe-container{display:flex;width:300%;transition:transform .3s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start}
-.swipe-panel{width:33.333%;flex-shrink:0;min-height:calc(100vh - 108px);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.swipe-panel{width:33.333%;flex-shrink:0;min-height:100vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .mob-left-panel{padding:16px 14px}
 .mob-panel-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:14px;color:var(--tx);display:flex;align-items:center;gap:8px}
 .mob-panel-title::after{content:'';flex:1;height:1px;background:var(--bd)}
-.mob-feed-inner{padding:12px 14px;min-height:100vh}#mob-feed-panel{background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 60%,#140c05 100%)}
+.mob-feed-inner{padding:12px 14px;min-height:100vh}#mob-feed-panel{background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 55%,#1a0c05 100%)}
 .post-banner{padding:12px 14px;flex-direction:column;align-items:flex-start;gap:10px}
 .post-banner-btns{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}.pb-btn{width:100%}
 .grid{grid-template-columns:1fr 1fr;gap:10px}.card .ct{font-size:12px}
 .feed-tabs .feed-tab{font-size:10px;padding:6px 4px;letter-spacing:.5px}
-.mob-right-panel{padding:16px 14px;background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 60%,#140c05 100%)}.mob-right-panel .widget{margin-bottom:14px}
+.mob-right-panel{padding:16px 14px;background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 55%,#1a0c05 100%)}.mob-right-panel .widget{margin-bottom:14px}
 footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;display:flex!important}.footer-links{gap:12px}
 .pform{padding:20px 16px;margin:8px auto}
 .img-editor-toolbar{gap:6px;padding:8px}.editor-tool-btn{padding:8px 10px;min-width:58px}
@@ -413,8 +413,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div class="tag" data-genre="JAZZ" onclick="filterGenreMob(this,'JAZZ')">JAZZ</div>
         <div class="tag" data-genre="METAL" onclick="filterGenreMob(this,'METAL')">METAL</div>
         <div class="tag" data-genre="FUNK" onclick="filterGenreMob(this,'FUNK')">FUNK</div>
-        <div class="tag" data-genre="宅録" onclick="filterGenreMob(this,'宅録')">宅録</div>
-        <div class="tag" data-genre="初心者相談" onclick="filterGenreMob(this,'初心者相談')">初心者相談</div>
+        <div class="tag" data-genre="宅録" onclick="filterGenreMob(this,'宅録')" id="tag-tagroku-mob">宅録</div>
+        <div class="tag" data-genre="初心者相談" onclick="filterGenreMob(this,'初心者相談')" id="tag-shoshinsha-mob">初心者相談</div>
       </div>
       <div class="brand-group-lbl">空間系</div>
       <div class="tags" style="margin-bottom:6px">
@@ -542,7 +542,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="tags"><div class="tag on" data-genre="ALL" onclick="filterGenre(this,'ALL')">ALL</div></div>
     <div class="brand-group-lbl" style="margin-top:10px">定番</div>
     <div class="tags">
-      <div class="tag" data-genre="ROCK" onclick="filterGenre(this,'ROCK')">ROCK</div><div class="tag" data-genre="BLUES" onclick="filterGenre(this,'BLUES')">BLUES</div><div class="tag" data-genre="JAZZ" onclick="filterGenre(this,'JAZZ')">JAZZ</div><div class="tag" data-genre="METAL" onclick="filterGenre(this,'METAL')">METAL</div><div class="tag" data-genre="FUNK" onclick="filterGenre(this,'FUNK')">FUNK</div><div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')">宅録</div><div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')">初心者相談</div>
+      <div class="tag" data-genre="ROCK" onclick="filterGenre(this,'ROCK')">ROCK</div><div class="tag" data-genre="BLUES" onclick="filterGenre(this,'BLUES')">BLUES</div><div class="tag" data-genre="JAZZ" onclick="filterGenre(this,'JAZZ')">JAZZ</div><div class="tag" data-genre="METAL" onclick="filterGenre(this,'METAL')">METAL</div><div class="tag" data-genre="FUNK" onclick="filterGenre(this,'FUNK')">FUNK</div><div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')" id="tag-tagroku-pc">宅録</div><div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')" id="tag-shoshinsha-pc">初心者相談</div>
     </div>
     <div class="brand-group-lbl" style="margin-top:10px">空間系</div>
     <div class="tags">
@@ -707,7 +707,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <label class="form-lbl" id="lbl-genre">ジャンル（複数選択OK）</label>
         <div class="genre-select" id="post-genre-select">
           <div style="width:100%;font-family:Noto Sans JP,sans-serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:4px">定番</div>
-          <div class="gs" data-val="ROCK" onclick="toggleGenre(this)">ROCK</div><div class="gs" data-val="BLUES" onclick="toggleGenre(this)">BLUES</div><div class="gs" data-val="JAZZ" onclick="toggleGenre(this)">JAZZ</div><div class="gs" data-val="METAL" onclick="toggleGenre(this)">METAL</div><div class="gs" data-val="FUNK" onclick="toggleGenre(this)">FUNK</div><div class="gs" data-val="宅録" onclick="toggleGenre(this)">宅録</div><div class="gs" data-val="初心者相談" onclick="toggleGenre(this)">初心者相談</div>
+          <div class="gs" data-val="ROCK" onclick="toggleGenre(this)">ROCK</div><div class="gs" data-val="BLUES" onclick="toggleGenre(this)">BLUES</div><div class="gs" data-val="JAZZ" onclick="toggleGenre(this)">JAZZ</div><div class="gs" data-val="METAL" onclick="toggleGenre(this)">METAL</div><div class="gs" data-val="FUNK" onclick="toggleGenre(this)">FUNK</div><div class="gs" data-val="宅録" onclick="toggleGenre(this)" id="gs-tagroku">宅録</div><div class="gs" data-val="初心者相談" onclick="toggleGenre(this)" id="gs-shoshinsha">初心者相談</div>
           <div style="width:100%;font-family:Noto Sans JP,sans-serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:8px 0 4px">空間系</div>
           <div class="gs" data-val="AMBIENT" onclick="toggleGenre(this)">AMBIENT</div><div class="gs" data-val="SHOEGAZE" onclick="toggleGenre(this)">SHOEGAZE</div><div class="gs" data-val="POST ROCK" onclick="toggleGenre(this)">POST ROCK</div>
           <div style="width:100%;font-family:Noto Sans JP,sans-serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:8px 0 4px">オルタナ系</div>
