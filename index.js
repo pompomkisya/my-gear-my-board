@@ -56,7 +56,11 @@ const I18N={
     stepGearSub:'Step 3：使用機材',stepGenreSub:'Step 4：ジャンル・詳細',stepConfirmSub:'Step 5：確認・投稿',
     panelGenre:'ジャンル',panelBrand:'ブランド',panelFxType:'エフェクタータイプ',
     slBrand:'ブランドで絞る',slFxType:'エフェクタータイプ',
+    slGenre:'ジャンル',slBrandTitle:'ブランド',slFxTitle:'エフェクタータイプ',
+    subStandard:'定番',subAmbient:'空間系',subAlterna:'オルタナ系',
+    subDrive:'歪み系',subModulation:'モジュレーション',subOther:'その他',
     lblPhoto:'写真（最大3枚・任意）',
+    langBtn:'EN',
   },
   en:{
     postBannerTitle:'Share your board or gear!',postBannerSub:'No sign-up needed. Post anonymously with just one photo.',
@@ -105,7 +109,11 @@ const I18N={
     stepGearSub:'Step 3: Gear List',stepGenreSub:'Step 4: Genre & Details',stepConfirmSub:'Step 5: Review & Post',
     panelGenre:'Genre',panelBrand:'Brand',panelFxType:'Effect Type',
     slBrand:'Filter by Brand',slFxType:'Effect Type',
+    slGenre:'Genre',slBrandTitle:'Brand',slFxTitle:'Effect Type',
+    subStandard:'Classics',subAmbient:'Ambient',subAlterna:'Alternative',
+    subDrive:'Drive',subModulation:'Modulation',subOther:'Other',
     lblPhoto:'Photos (max 3 · optional)',
+    langBtn:'JA',
   }
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
@@ -169,7 +177,27 @@ function applyLangUI(){
     const txt=el.textContent;
     if(txt.match(/ブランドで絞る|Filter by Brand/))el.textContent=tr('slBrand');
     else if(txt.match(/エフェクタータイプ|Effect Type/))el.textContent=tr('slFxType');
+    else if(txt.match(/ジャンル|Genre/))el.textContent=tr('slGenre');
+    else if(txt.match(/ブランド$|^Brand$/))el.textContent=tr('slBrandTitle');
   });
+  // brand-group-lbl（ジャンル・エフェクトタイプのサブラベル）
+  document.querySelectorAll('.brand-group-lbl').forEach(el=>{
+    const txt=el.textContent.trim();
+    if(txt.match(/^定番$|^Classics$/))el.textContent=tr('subStandard');
+    else if(txt.match(/^空間系$|^Ambient$/))el.textContent=tr('subAmbient');
+    else if(txt.match(/^オルタナ系$|^Alternative$/))el.textContent=tr('subAlterna');
+    else if(txt.match(/^歪み系$|^Drive$/))el.textContent=tr('subDrive');
+    else if(txt.match(/^モジュレーション$|^Modulation$/))el.textContent=tr('subModulation');
+    else if(txt.match(/^その他$|^Other$/))el.textContent=tr('subOther');
+  });
+  // 投稿フォーム内のジャンルサブラベル
+  document.querySelectorAll('#post-genre-select [style*="font-size"]').forEach(el=>{
+    const txt=el.textContent.trim();
+    if(txt.match(/^定番$|^Classics$/))el.textContent=tr('subStandard');
+    else if(txt.match(/^空間系$|^Ambient$/))el.textContent=tr('subAmbient');
+    else if(txt.match(/^オルタナ系$|^Alternative$/))el.textContent=tr('subAlterna');
+  });
+  const lblGearStep=document.getElementById('gear-step-lbl');if(lblGearStep)lblGearStep.textContent=tr('lblGear');
   // フォームラベル
   const lblPhoto=document.getElementById('lbl-photo');if(lblPhoto)lblPhoto.textContent=tr('lblPhoto');
   const lblUser=document.getElementById('lbl-username');if(lblUser)lblUser.textContent=tr('lblUsername');
@@ -198,7 +226,13 @@ function applyLangUI(){
 function togglePostDropdown(e){e.stopPropagation();document.getElementById('post-dropdown').classList.toggle('open');}
 function closeDropdownAndPost(type){document.getElementById('post-dropdown').classList.remove('open');openPost(type);}
 document.addEventListener('click',()=>document.getElementById('post-dropdown').classList.remove('open'));
-function toggleLang(){lang=lang==='ja'?'en':'ja';applyLangUI();if(allDBPosts.length)applyFilter();}
+function toggleLang(){
+  lang=lang==='ja'?'en':'ja';
+  const label=document.getElementById('lang-label');
+  if(label)label.textContent=lang==='ja'?'EN':'JA';
+  applyLangUI();
+  if(allDBPosts.length)applyFilter();
+}
 
 function buildTicker(posts){
   const inner=document.getElementById('ticker-inner');if(!inner)return;
@@ -284,7 +318,7 @@ function timeAgo(ts){
 
 function getEmptyHTML(){
   const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter!==null||currentFxFilter!==null;
-  if(!isFiltered)return '<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
+  if(!isFiltered)return '<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
   const label=currentFxFilter||currentBrandFilter||currentGenreFilter;
   const promo=currentFxFilter?tr('emptyFxPromo'):currentBrandFilter?tr('emptyBrandPromo'):tr('emptyGenrePromo');
   const noPostMsg=lang==='en'?'"'+label+'": no posts yet':'「'+label+'」の投稿はまだありません';
