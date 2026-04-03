@@ -130,6 +130,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="tab-bar">
     <div class="tab on" onclick="switchTab(this,'tab-dashboard')">📊 ダッシュボード</div>
     <div class="tab" onclick="switchTab(this,'tab-posts')">📝 投稿管理</div>
+    <div class="tab" onclick="switchTab(this,'tab-comments')">💬 コメント管理</div>
+    <div class="tab" onclick="switchTab(this,'tab-likes')">❤️ いいね管理</div>
     <div class="tab" onclick="switchTab(this,'tab-reports')">🚩 通報管理</div>
     <div class="tab" onclick="switchTab(this,'tab-gear-unknown')">🔍 未登録機材</div>
     <div class="tab" onclick="switchTab(this,'tab-news')">📰 機材NEWS</div>
@@ -155,6 +157,26 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="panel" id="tab-posts">
     <div class="section-title">📝 投稿管理 <span class="badge" id="posts-count">-</span></div>
     <div id="posts-list" class="loading">読み込み中...</div>
+  </div>
+
+  <!-- コメント管理 -->
+  <div class="panel" id="tab-comments">
+    <div class="section-title">💬 コメント管理 <span class="badge" id="comments-count">-</span></div>
+    <p style="font-size:12px;color:var(--td);margin-bottom:16px">投稿を選択してコメントを確認・削除できます。</p>
+    <div style="margin-bottom:14px">
+      <select id="comment-post-select" onchange="loadPostComments(this.value)"
+        style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:9px 12px;font-size:13px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none">
+        <option value="">▼ 投稿を選択してください</option>
+      </select>
+    </div>
+    <div id="comments-list-admin" class="empty-msg">投稿を選択するとコメントが表示されます</div>
+  </div>
+
+  <!-- いいね管理 -->
+  <div class="panel" id="tab-likes">
+    <div class="section-title">❤️ いいね管理</div>
+    <p style="font-size:12px;color:var(--td);margin-bottom:16px">投稿のいいね数を直接編集できます。自然な範囲で調整してください。</p>
+    <div id="likes-list" class="loading">読み込み中...</div>
   </div>
 
   <!-- 通報管理 -->
@@ -272,6 +294,7 @@ async function loadAll(){
   await Promise.all([loadPosts(),loadPedals(),loadComments()]);
   loadStats();
   loadNews();
+  renderLikesList();
 }
 
 async function loadPosts(){
@@ -293,8 +316,106 @@ async function loadPedals(){
   renderPedals();
 }
 async function loadComments(){
-  const{data}=await sb.from('comments').select('post_id');
+  const{data}=await sb.from('comments').select('*').order('created_at',{ascending:false});
   allComments=data||[];
+  // コメント管理の投稿セレクト更新
+  renderCommentPostSelect();
+}
+
+function renderCommentPostSelect(){
+  const sel=document.getElementById('comment-post-select');
+  if(!sel)return;
+  const commentPostIds=[...new Set(allComments.map(c=>c.post_id))];
+  sel.innerHTML='<option value="">▼ 投稿を選択してください</option>'
+    +commentPostIds.map(pid=>{
+      const post=allPosts.find(p=>p.id===pid);
+      const title=post?escHtml(post.title):'削除済み投稿';
+      const count=allComments.filter(c=>c.post_id===pid).length;
+      return '<option value="'+pid+'">'+title+' （'+count+'件）</option>';
+    }).join('');
+  document.getElementById('comments-count').textContent=allComments.length;
+}
+
+function loadPostComments(postId){
+  const el=document.getElementById('comments-list-admin');
+  if(!postId){el.innerHTML='<div class="empty-msg">投稿を選択するとコメントが表示されます</div>';return;}
+  const comments=allComments.filter(c=>c.post_id===postId);
+  if(!comments.length){el.innerHTML='<div class="empty-msg">コメントはありません</div>';return;}
+  el.innerHTML='<div class="table-wrap"><table>'
+    +'<thead><tr><th>投稿者</th><th>コメント内容</th><th>返信先</th><th>投稿日</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +comments.map(c=>'<tr>'
+      +'<td style="font-size:12px;font-weight:500">'+(c.username||'匿名')+'</td>'
+      +'<td style="font-size:13px;max-width:240px">'+escHtml(c.content)+'</td>'
+      +'<td style="font-size:11px;color:var(--td)">'+(c.reply_to_name?'@'+c.reply_to_name:'')+'</td>'
+      +'<td style="font-size:11px;color:var(--td)">'+timeAgo(c.created_at)+'</td>'
+      +'<td><button class="del-btn" onclick="deleteComment(\''+c.id+'\',\''+postId+'\')">🗑 削除</button></td>'
+      +'</tr>').join('')
+    +'</tbody></table></div>';
+}
+
+async function deleteComment(commentId, postId){
+  if(!confirm('このコメントを削除しますか？'))return;
+  const{error}=await sb.from('comments').delete().eq('id',commentId);
+  if(error){showToast('❌ 削除に失敗しました');return;}
+  showToast('🗑 コメントを削除しました');
+  allComments=allComments.filter(c=>c.id!==commentId);
+  renderCommentPostSelect();
+  loadPostComments(postId);
+  document.getElementById('stat-comments').textContent=allComments.length;
+}
+
+// ── いいね管理
+function renderLikesList(){
+  const el=document.getElementById('likes-list');
+  if(!allPosts.length){el.innerHTML='<div class="empty-msg">投稿がありません</div>';return;}
+  el.innerHTML='<div class="table-wrap"><table>'
+    +'<thead><tr><th>タイトル</th><th>投稿者</th><th>現在のいいね数</th><th>変更</th></tr></thead>'
+    +'<tbody>'
+    +allPosts.map(p=>'<tr>'
+      +'<td><a class="post-link" href="/post?id='+p.id+'" target="_blank">'+escHtml(p.title)+'</a></td>'
+      +'<td style="font-size:12px;color:var(--tm)">'+(p.username||'匿名')+'</td>'
+      +'<td style="text-align:center">'
+        +'<span id="likes-val-'+p.id+'" style="font-size:18px;font-weight:700;color:var(--ac)">'+( p.likes||0)+'</span>'
+      +'</td>'
+      +'<td>'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+          +'<button onclick="adjustLikes(\''+p.id+'\',-1)" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:18px;cursor:pointer;touch-action:manipulation">−</button>'
+          +'<button onclick="adjustLikes(\''+p.id+'\',1)" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(232,85,45,.4);background:rgba(232,85,45,.1);color:var(--ac);font-size:18px;cursor:pointer;touch-action:manipulation">＋</button>'
+          +'<input type="number" id="likes-input-'+p.id+'" value="'+(p.likes||0)+'" min="0" style="width:60px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:5px 8px;font-size:13px;color:var(--tx);text-align:center">'
+          +'<button onclick="setLikes(\''+p.id+'\')" style="padding:5px 10px;background:var(--ac);border:none;border-radius:3px;color:#fff;font-size:12px;cursor:pointer;touch-action:manipulation">SET</button>'
+        +'</div>'
+      +'</td>'
+      +'</tr>').join('')
+    +'</tbody></table></div>';
+}
+
+async function adjustLikes(postId, delta){
+  const post=allPosts.find(p=>p.id===postId);if(!post)return;
+  const newVal=Math.max(0,(post.likes||0)+delta);
+  await updateLikes(postId, newVal);
+}
+
+async function setLikes(postId){
+  const input=document.getElementById('likes-input-'+postId);
+  if(!input)return;
+  const newVal=Math.max(0,parseInt(input.value)||0);
+  await updateLikes(postId, newVal);
+}
+
+async function updateLikes(postId, newVal){
+  const{error}=await sb.from('posts').update({likes:newVal}).eq('id',postId);
+  if(error){showToast('❌ 更新に失敗しました');return;}
+  const post=allPosts.find(p=>p.id===postId);
+  if(post)post.likes=newVal;
+  const valEl=document.getElementById('likes-val-'+postId);
+  const inputEl=document.getElementById('likes-input-'+postId);
+  if(valEl)valEl.textContent=newVal;
+  if(inputEl)inputEl.value=newVal;
+  // 統計更新
+  const totalLikes=allPosts.reduce((s,p)=>s+(p.likes||0),0);
+  document.getElementById('stat-likes').textContent=totalLikes;
+  showToast('❤️ いいね数を '+newVal+' に更新しました');
 }
 
 function loadStats(){
