@@ -356,7 +356,7 @@ function renderRankingWidget(posts){
   const monthAgo=Date.now()-30*24*60*60*1000;const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);
   const target=monthly.length>=3?monthly:bp;
   const sorted=[...target].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
-  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:'Noto Sans JP',sans-serif">'+tr('noPost')+'</div>';return;}
+  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noPost')+'</div>';return;}
   const anon=lang==='en'?'Anonymous':'匿名';
   el.innerHTML=sorted.map((p,i)=>{const crown=i===0?'<span style="margin-right:4px">👑</span>':'';
     return '<div class="ri" onclick="location.href=\'/post?id='+p.id+'\'">'+'<div class="rn '+(i<2?'hi':'')+'">'+crown+(i+1)+'</div>'+'<div class="ri-i"><div class="ri-t">'+p.title+'</div><div class="ri-u">'+(p.username||anon)+'</div></div>'+'<div class="ri-s">❤️'+(p.likes||0)+'</div></div>';
@@ -370,7 +370,7 @@ function renderGearWidget(posts){
   const count={};
   posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
   const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:'Noto Sans JP',sans-serif">'+tr('noData')+'</div>';return;}
+  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noData')+'</div>';return;}
   el.innerHTML=sorted.map(([n,c])=>'<div class="gr">'
     +'<a href="'+soundhouseUrl(n)+'" target="_blank" rel="noopener" style="flex:1;min-width:0;text-decoration:none" onclick="event.stopPropagation();filterByGearName(\''+n.replace(/'/g,"\\'")+'\')">'
     +'<div class="gr-n" style="color:var(--tx)">'+n+'</div><div class="gr-b">'+c+tr('posts')+'</div></a>'
@@ -640,9 +640,9 @@ function renderEditGearSortList(){
     <div style="display:flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:6px 10px">
       <span style="color:var(--td);cursor:grab;font-size:16px;user-select:none">⠿</span>
       <span style="flex:1;font-size:13px">${g.name}</span>
-      <button type="button" onclick="moveEditGear(${i},-1)" ${i===0?'disabled':''} style="padding:2px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:11px;font-family:'Noto Sans JP',sans-serif">↑</button>
-      <button type="button" onclick="moveEditGear(${i},1)" ${i===editGearList.length-1?'disabled':''} style="padding:2px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:11px;font-family:'Noto Sans JP',sans-serif">↓</button>
-      <button type="button" onclick="removeEditGear(${i})" style="padding:2px 8px;background:transparent;border:1px solid #5a1a1a;border-radius:3px;color:#e05050;cursor:pointer;font-size:11px;font-family:'Noto Sans JP',sans-serif">削除</button>
+      <button type="button" onclick="moveEditGear(${i},-1)" ${i===0?'disabled':''} style="padding:2px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:11px;font-family:Noto Sans JP,sans-serif">↑</button>
+      <button type="button" onclick="moveEditGear(${i},1)" ${i===editGearList.length-1?'disabled':''} style="padding:2px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:11px;font-family:Noto Sans JP,sans-serif">↓</button>
+      <button type="button" onclick="removeEditGear(${i})" style="padding:2px 8px;background:transparent;border:1px solid #5a1a1a;border-radius:3px;color:#e05050;cursor:pointer;font-size:11px;font-family:Noto Sans JP,sans-serif">削除</button>
     </div>
   `).join('');
 }
@@ -745,9 +745,9 @@ function renderEditorToolbar(){
     toolbar.innerHTML=
       '<button class="editor-tool-btn" onclick="exitNumberMode()" style="flex:0 0 auto"><span class="editor-tool-icon">◀</span>'+tr('toolBack')+'</button>'
       +'<button class="editor-tool-btn" onclick="addNumberSticker()" style="background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700"><span class="editor-tool-icon">➕</span>'+tr('toolAddNum')+'</button>'
-      +'<button class="editor-tool-btn" onclick="cycleStickerSize()" style="min-width:52px;display:flex;flex-direction:column;align-items:center;gap:1px"><span style="font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;line-height:1">'+_szL+'</span><span style="font-family:'Noto Sans JP',sans-serif;font-size:8px;color:var(--td);line-height:1">'+(lang==='en'?'size':'サイズ')+'</span></button>'
+      +'<button class="editor-tool-btn" onclick="cycleStickerSize()" style="min-width:52px;display:flex;flex-direction:column;align-items:center;gap:1px"><span style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:700;line-height:1">'+_szL+'</span><span style="font-family:Noto Sans JP,sans-serif;font-size:8px;color:var(--td);line-height:1">'+(lang==='en'?'size':'サイズ')+'</span></button>'
       +'<button class="editor-tool-btn" onclick="eraseLastNumber()" style="min-width:44px">消す</button>'
-      +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans JP',sans-serif;font-size:9px;color:var(--tm)">'+editorNumbers.length+(lang==='en'?' number'+(editorNumbers.length!==1?'s':''):' 個')+'</div>'
+      +'<div style="flex:1;display:flex;align-items:center;justify-content:center;font-family:Noto Sans JP,sans-serif;font-size:9px;color:var(--tm)">'+editorNumbers.length+(lang==='en'?' number'+(editorNumbers.length!==1?'s':''):' 個')+'</div>'
       +'<button class="editor-done-btn" onclick="finishEdit()"><span class="editor-done-icon">✅</span>'+tr('toolDone')+'</button>';
     if(hint)hint.textContent=tr('hintNumberMode');
   }
@@ -768,8 +768,8 @@ function showEditorMenu(btn){
   const rect=btn.getBoundingClientRect();
   menu.style.bottom=(window.innerHeight-rect.top+4)+'px';menu.style.right=(window.innerWidth-rect.right)+'px';
   menu.innerHTML=
-    '<div onclick="resetAllEdits();closeEditorMenu()" style="padding:12px 16px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--bd);color:var(--tm)" onmouseover="this.style.background=\'rgba(232,85,45,.1)\'" onmouseout="this.style.background=\'\'">↩️ '+tr('menuReset')+'</div>'
-    +'<div onclick="removeAllNumbers();closeEditorMenu()" style="padding:12px 16px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;cursor:pointer;color:#e05050" onmouseover="this.style.background=\'rgba(224,80,80,.08)\'" onmouseout="this.style.background=\'\'">🗑 '+tr('menuUndo')+'</div>';
+    '<div onclick="resetAllEdits();closeEditorMenu()" style="padding:12px 16px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;cursor:pointer;border-bottom:1px solid var(--bd);color:var(--tm)" onmouseover="this.style.background=\'rgba(232,85,45,.1)\'" onmouseout="this.style.background=\'\'">↩️ '+tr('menuReset')+'</div>'
+    +'<div onclick="removeAllNumbers();closeEditorMenu()" style="padding:12px 16px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;cursor:pointer;color:#e05050" onmouseover="this.style.background=\'rgba(224,80,80,.08)\'" onmouseout="this.style.background=\'\'">🗑 '+tr('menuUndo')+'</div>';
   document.body.appendChild(menu);
   setTimeout(()=>document.addEventListener('click',closeEditorMenuOnce,{once:true}),10);
 }
@@ -952,7 +952,7 @@ function renderRankingWidgetMob(posts){
   const bp=posts.filter(p=>!p.post_type||p.post_type==='board');const monthAgo=Date.now()-30*24*60*60*1000;
   const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);const target=monthly.length>=3?monthly:bp;
   const sorted=[...target].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
-  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:'Noto Sans JP',sans-serif">'+tr('noPost')+'</div>';return;}
+  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noPost')+'</div>';return;}
   const anon=lang==='en'?'Anonymous':'匿名';
   el.innerHTML=sorted.map((p,i)=>{const crown=i===0?'<span style="margin-right:4px">👑</span>':'';return '<div class="ri" onclick="location.href=\'/post?id='+p.id+'\'">'+'<div class="rn '+(i<2?'hi':'')+'">'+crown+(i+1)+'</div>'+'<div class="ri-i"><div class="ri-t">'+p.title+'</div><div class="ri-u">'+(p.username||anon)+'</div></div>'+'<div class="ri-s">❤️'+(p.likes||0)+'</div></div>';}).join('');
 }
@@ -960,7 +960,7 @@ function renderGearWidgetMob(posts){
   const el=document.getElementById('gear-widget-mob');if(!el)return;
   const count={};posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
   const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:'Noto Sans JP',sans-serif">'+tr('noData')+'</div>';return;}
+  if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noData')+'</div>';return;}
   el.innerHTML=sorted.map(([n,c])=>'<div class="gr">'
     +'<a href="'+soundhouseUrl(n)+'" target="_blank" rel="noopener" style="flex:1;min-width:0;text-decoration:none" onclick="event.stopPropagation();filterByGearName(\''+n.replace(/'/g,"\\'")+'\')">'
     +'<div class="gr-n" style="color:var(--tx)">'+n+'</div><div class="gr-b">'+c+tr('posts')+'</div></a>'
