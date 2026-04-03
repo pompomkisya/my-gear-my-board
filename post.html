@@ -245,21 +245,14 @@ textarea.form-input{resize:vertical;min-height:80px}
         <label class="form-lbl">タイトル</label>
         <input class="form-input" id="edit-title" type="text">
       </div>
-      <!-- 機材入力（サジェスト対応） -->
+      <!-- 機材並び替えUI -->
       <div class="form-row">
-        <label class="form-lbl">使用機材（1つ以上推奨）</label>
-        <div class="gear-input-wrap">
-          <div class="gear-tags" id="edit-gear-tags" onclick="document.getElementById('edit-gear-search').focus()">
-            <input class="gear-text-input" id="edit-gear-search" type="text"
-              placeholder="機材名を入力（例: DS-1, Big Muff）"
-              autocomplete="off"
-              oninput="editSearchGear(this.value)"
-              onkeydown="editGearKeyDown(event)"
-              onblur="setTimeout(()=>closeEditAC(),180)">
-          </div>
-          <div class="ac-dropdown" id="edit-ac-dropdown"></div>
+        <label class="form-lbl">使用機材（↑↓で並び替え可）</label>
+        <div id="post-edit-gear-sort-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <input class="form-input" id="post-edit-gear-add" type="text" placeholder="機材名を追加..." style="flex:1">
+          <button type="button" onclick="addPostEditGearItem()" style="padding:8px 14px;background:var(--ac);border:none;border-radius:3px;font-size:13px;color:#fff;cursor:pointer;white-space:nowrap;font-family:Noto Sans JP,sans-serif">追加</button>
         </div>
-        <div style="font-family:Noto Sans JP,sans-serif;font-size:10px;color:#9a9890;margin-top:5px">候補からタップで追加・Enterでも追加できます</div>
       </div>
       <div class="form-row">
         <label class="form-lbl">コメント・説明</label>
@@ -484,17 +477,20 @@ function slide(dir){const imgs=currentPost.image_urls||[];if(imgs.length<=1)retu
 function goSlide(i){const track=document.getElementById('slide-track');if(!track)return;slideIdx=i;track.style.transform='translateX(-'+i+'00%)';document.querySelectorAll('.s-dot').forEach((d,j)=>d.classList.toggle('on',j===i));}
 
 async function toggleLike(){
-  const btn=document.getElementById('like-btn');const cnt=document.getElementById('like-count');
+  const btn=document.getElementById('like-btn');
   const liked=localStorage.getItem('liked_'+POST_ID)==='1';
+  // DBから最新のlikes数を取得してからカウントを計算
+  const{data:fresh}=await sb.from('posts').select('likes').eq('id',POST_ID).single();
+  const currentLikes=fresh?(fresh.likes||0):0;
   if(liked){
     await sb.from('likes').delete().eq('post_id',POST_ID).eq('session_id',SESSION_ID);
-    const n=Math.max(0,(parseInt(cnt.textContent)||1)-1);
+    const n=Math.max(0,currentLikes-1);
     await sb.from('posts').update({likes:n}).eq('id',POST_ID);
     btn.innerHTML='🤍 いいね <span id="like-count">'+n+'</span>';
     btn.classList.remove('liked');localStorage.removeItem('liked_'+POST_ID);
   }else{
     await sb.from('likes').insert({post_id:POST_ID,session_id:SESSION_ID});
-    const n=(parseInt(cnt.textContent)||0)+1;
+    const n=currentLikes+1;
     await sb.from('posts').update({likes:n}).eq('id',POST_ID);
     btn.innerHTML='❤️ いいね <span id="like-count">'+n+'</span>';
     btn.classList.add('liked');localStorage.setItem('liked_'+POST_ID,'1');showToast('❤️ いいねしました');
@@ -581,10 +577,10 @@ function verifyPin(){
     document.getElementById('pin-err').textContent='';
     document.getElementById('edit-step1').style.display='none';
     document.getElementById('edit-title').value=currentPost.title||'';
-    // 機材：サジェスト入力に反映
+    // 機材：並び替えUIに反映
     const gear=Array.isArray(currentPost.gear_list)?currentPost.gear_list:[];
-    editSelectedGears=gear.map(g=>({name:g.name||g,brand:g.brand||''}));
-    renderEditGearTags();
+    postEditGearList=gear.map(g=>({name:g.name||g,brand:g.brand||'',search_query:g.search_query||null}));
+    renderPostEditGearSortList();
     document.getElementById('edit-desc').value=currentPost.description||'';
     const ytRaw=currentPost.youtube_url||'';
     const ytMatch=ytRaw.match(/(https?:\/\/[^\s]+)/);
@@ -674,8 +670,8 @@ async function uploadEditPhoto(b64){
 async function saveEdit(){
   const title=document.getElementById('edit-title').value.trim();
   if(!title){showToast('タイトルを入力してください');return;}
-  // 機材はサジェスト入力から取得
-  const gear_list=editSelectedGears.map(g=>({name:g.name,brand:g.brand||''}));
+  // 機材は並び替えUIから取得
+  const gear_list=postEditGearList.map(g=>({name:g.name,brand:g.brand||'',search_query:g.search_query||null}));
   const description=document.getElementById('edit-desc').value.trim();
   const youtube_url=document.getElementById('edit-youtube').value.trim()||null;
   let newUrls=[];
@@ -695,7 +691,42 @@ async function confirmDelete(){
   showToast('🗑 投稿を削除しました');setTimeout(()=>location.href='/',1500);
 }
 
-// ── 機材サジェスト（編集モーダル用）
+// ── 機材並び替え（編集モーダル用）
+let postEditGearList=[];
+
+function renderPostEditGearSortList(){
+  const wrap=document.getElementById('post-edit-gear-sort-list');if(!wrap)return;
+  if(!postEditGearList.length){wrap.innerHTML='<div style="font-size:12px;color:var(--td);padding:4px 0">機材が登録されていません</div>';return;}
+  wrap.innerHTML=postEditGearList.map((g,i)=>`
+    <div style="display:flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:7px 10px">
+      <span style="font-size:13px;color:var(--td);flex-shrink:0;min-width:20px;text-align:center;font-weight:600">${i+1}</span>
+      <span style="flex:1;font-size:13px">${g.name}</span>
+      <button type="button" onclick="movePostEditGear(${i},-1)" ${i===0?'disabled':''} style="padding:3px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:12px;touch-action:manipulation">↑</button>
+      <button type="button" onclick="movePostEditGear(${i},1)" ${i===postEditGearList.length-1?'disabled':''} style="padding:3px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:12px;touch-action:manipulation">↓</button>
+      <button type="button" onclick="removePostEditGear(${i})" style="padding:3px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:3px;color:#e05050;cursor:pointer;font-size:12px;touch-action:manipulation">削除</button>
+    </div>
+  `).join('');
+}
+
+function movePostEditGear(idx,dir){
+  const newIdx=idx+dir;
+  if(newIdx<0||newIdx>=postEditGearList.length)return;
+  [postEditGearList[idx],postEditGearList[newIdx]]=[postEditGearList[newIdx],postEditGearList[idx]];
+  renderPostEditGearSortList();
+}
+function removePostEditGear(idx){
+  postEditGearList.splice(idx,1);
+  renderPostEditGearSortList();
+}
+function addPostEditGearItem(){
+  const input=document.getElementById('post-edit-gear-add');if(!input)return;
+  const name=input.value.trim();if(!name){showToast('機材名を入力してください');return;}
+  postEditGearList.push({name,brand:'',search_query:null});
+  renderPostEditGearSortList();
+  input.value='';
+}
+
+// ── 機材サジェスト（編集モーダル用・未使用になったが残す）
 let editSelectedGears=[],editAcResults=[],editAcFocusIdx=-1;
 
 async function editSearchGear(val){
