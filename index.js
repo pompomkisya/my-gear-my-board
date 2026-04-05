@@ -4,7 +4,14 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const MASTER_KEY='MSTR';
 function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+Math.random().toString(36).slice(2)+Date.now();localStorage.setItem('mgmb_sid',s);}return s;}
 const SESSION_ID=getSessionId();
-let lang='ja';
+// 言語自動判定（ブラウザ設定に基づく）
+function detectLang(){
+  const saved=localStorage.getItem('mgmb_lang');
+  if(saved)return saved;
+  const bl=navigator.language||navigator.userLanguage||'ja';
+  return bl.toLowerCase().startsWith('ja')?'ja':'en';
+}
+let lang=detectLang();
 let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentFxFilter=null,currentTab='all',currentSort='new',currentDBPost=null;
 
 // ── 翻訳辞書
@@ -121,6 +128,9 @@ const I18N={
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
 
 function applyLangUI(){
+  // lang-labelを現在の言語に合わせて更新
+  const label=document.getElementById('lang-label');
+  if(label)label.textContent=lang==='ja'?'EN':'JA';
   document.querySelectorAll('.logo-sub').forEach(el=>el.textContent=tr('logoSub'));
   const hbtn=document.querySelector('.h-btn');if(hbtn)hbtn.innerHTML=tr('headerPost');
   const ddItems=document.querySelectorAll('.post-dropdown-item');
@@ -237,6 +247,7 @@ function closeDropdownAndPost(type){document.getElementById('post-dropdown').cla
 document.addEventListener('click',()=>document.getElementById('post-dropdown').classList.remove('open'));
 function toggleLang(){
   lang=lang==='ja'?'en':'ja';
+  localStorage.setItem('mgmb_lang',lang);
   const label=document.getElementById('lang-label');
   if(label)label.textContent=lang==='ja'?'EN':'JA';
   applyLangUI();
@@ -350,12 +361,12 @@ function renderDBPosts(posts){
     const SHOW=2;
     const tags=gear.slice(0,SHOW).map(g=>'<span class="ptag">'+(g.name||g)+'</span>').join('');
     const moreCount=gear.length-SHOW;
-    const moreBadge=moreCount>0?'<span class="ptag-more">…他'+(lang==='en'?moreCount+' more':moreCount+'件')+'</span>':'';
+    const moreBadge=moreCount>0?'<span class="ptag-more">…'+(lang==='en'?moreCount+' more':'他'+moreCount+'件')+'</span>':'';
     const isGear=p.post_type==='gear';
     const genres=parseGenre(p.genre);const glabel=genres.slice(0,2).join(' · ');
     const destUrl='/post?id='+p.id;const ytBadge=p.youtube_url?'<div class="yt-bdg">▶ YouTube</div>':'';
     return '<div class="card" onclick="location.href=\''+destUrl+'\'" style="animation-delay:'+(i*.05)+'s">'
-      +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy">':'<div style="font-size:40px;opacity:.2">'+(isGear?'🎸':'🎛')+'</div>')
+      +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy" onclick="event.stopPropagation();openLightbox(this.src)" style="cursor:zoom-in">':'<div style="font-size:40px;opacity:.2">'+(isGear?'🎸':'🎛')+'</div>')
       +'<div class="iw-ov"></div>'+(isGear?'<div class="bdg gear-bdg">'+(lang==='en'?'Gear':'機材')+'</div>':(glabel?'<div class="bdg">'+glabel+'</div>':''))+ytBadge+'</div>'
       +'<div class="body"><div class="cu"><div class="av">'+init+'</div>'
       +'<div class="av-name">'+(p.username||anonName)+'</div>'
@@ -529,6 +540,11 @@ function updateStepUI(){
   const ptitleEl=document.getElementById('post-title');
   if(ptitleEl)ptitleEl.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
   document.getElementById('step-dots').innerHTML=Array.from({length:TOTAL_STEPS},(_,i)=>'<div class="step-dot '+(i+1===currentStep?'on':i+1<currentStep?'done':'')+'"></div>').join('');
+  // ナビゲーションボタンを翻訳
+  document.querySelectorAll('.step-btn.back').forEach(b=>b.textContent=tr('btnBack'));
+  document.querySelectorAll('.step-btn.next').forEach(b=>{if(b.id!=='gear-next-btn')b.textContent=tr('btnNext')+' →';});
+  const submitBtn=document.getElementById('submit-btn');if(submitBtn&&!submitBtn.disabled)submitBtn.textContent=tr('btnSubmit');
+  const gearNextBtn=document.getElementById('gear-next-btn');if(gearNextBtn)gearNextBtn.textContent=tr('btnNext');
   if(currentStep===1){
     const ua=document.getElementById('upload-area-main');
     if(ua){const divs=ua.querySelectorAll('div');if(divs[0])divs[0].textContent=tr('uploadAreaText');if(divs[1])divs[1].textContent=tr('uploadAreaSub');}
@@ -1016,6 +1032,23 @@ function renderGearWidgetMob(posts){
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
 document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();initPCScrollSync();});
+
+
+// ── 画像ライトボックス
+function openLightbox(src){
+  const lb=document.getElementById('lightbox');
+  const img=document.getElementById('lightbox-img');
+  if(!lb||!img)return;
+  img.src=src;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLightbox(){
+  const lb=document.getElementById('lightbox');
+  if(lb)lb.classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 
 // ── PC版スクロール連携（中央パネル ↔ 右パネル）
 function initPCScrollSync(){
