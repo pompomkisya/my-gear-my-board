@@ -1095,17 +1095,7 @@ function canvasPointerUp(e){
   }
 }
 
-document.addEventListener('DOMContentLoaded',()=>{
-  setTimeout(()=>{
-    const c=document.getElementById('editor-canvas');if(!c)return;
-    c.addEventListener('mousedown',canvasPointerDown);
-    c.addEventListener('mousemove',canvasPointerMove);
-    c.addEventListener('mouseup',canvasPointerUp);
-    c.addEventListener('touchstart',canvasPointerDown,{passive:false});
-    c.addEventListener('touchmove',canvasPointerMove,{passive:false});
-    c.addEventListener('touchend',canvasPointerUp,{passive:false});
-  },500);
-});
+// canvasイベントは言語初期化と統合（下のDOMContentLoadedで処理）
 
 // ── 通報
 let selectedReason='';
@@ -1140,7 +1130,17 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal('edit-bd');closeModal('report-bd');closePostLightbox();}
 });
 document.addEventListener('DOMContentLoaded',()=>{
-  // 言語ラベル初期化
+  // canvasイベント登録
+  setTimeout(()=>{
+    const c=document.getElementById('editor-canvas');if(!c)return;
+    c.addEventListener('mousedown',canvasPointerDown);
+    c.addEventListener('mousemove',canvasPointerMove);
+    c.addEventListener('mouseup',canvasPointerUp);
+    c.addEventListener('touchstart',canvasPointerDown,{passive:false});
+    c.addEventListener('touchmove',canvasPointerMove,{passive:false});
+    c.addEventListener('touchend',canvasPointerUp,{passive:false});
+  },500);
+  // 言語初期化
   const label=document.getElementById('post-lang-label');
   if(label)label.textContent=lang==='ja'?'EN':'JA';
   const backBtn=document.getElementById('back-btn');
