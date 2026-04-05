@@ -297,6 +297,14 @@ function genreMatches(post,filter){
   return genres.some(g=>g===filter||g.toUpperCase()===filter.toUpperCase());
 }
 
+
+// ジャンル名を言語に応じて翻訳
+function translateGenre(g){
+  if(lang!=='en')return g;
+  const map={'初心者相談':'Beginner','宅録':'Home Rec','ROCK':'ROCK','BLUES':'BLUES','JAZZ':'JAZZ','METAL':'METAL','FUNK':'FUNK','AMBIENT':'AMBIENT','SHOEGAZE':'SHOEGAZE','POST ROCK':'POST ROCK','INDIE':'INDIE','ALTERNATIVE':'ALTERNATIVE','PUNK':'PUNK'};
+  return map[g]||g;
+}
+
 function applyFilter(){
   let posts=[...allDBPosts];
   if(currentTab==='board')posts=posts.filter(p=>!p.post_type||p.post_type==='board');
@@ -363,7 +371,7 @@ function renderDBPosts(posts){
     const moreCount=gear.length-SHOW;
     const moreBadge=moreCount>0?'<span class="ptag-more">…'+(lang==='en'?moreCount+' more':'他'+moreCount+'件')+'</span>':'';
     const isGear=p.post_type==='gear';
-    const genres=parseGenre(p.genre);const glabel=genres.slice(0,2).join(' · ');
+    const genres=parseGenre(p.genre);const glabel=genres.slice(0,2).map(translateGenre).join(' · ');
     const destUrl='/post?id='+p.id;const ytBadge=p.youtube_url?'<div class="yt-bdg">▶ YouTube</div>':'';
     return '<div class="card" onclick="location.href=\''+destUrl+'\'" style="animation-delay:'+(i*.05)+'s">'
       +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy" onclick="event.stopPropagation();openLightbox(this.src)" style="cursor:zoom-in">':'<div style="font-size:40px;opacity:.2">'+(isGear?'🎸':'🎛')+'</div>')
