@@ -136,6 +136,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-gear-unknown')">🔍 未登録機材</div>
     <div class="tab" onclick="switchTab(this,'tab-news')">📰 機材NEWS</div>
     <div class="tab" onclick="switchTab(this,'tab-pedals')">🎛 ペダルDB</div>
+    <div class="tab" onclick="switchTab(this,'tab-regions')">🌍 言語圏別</div>
   </div>
 
   <!-- ダッシュボード -->
@@ -245,6 +246,22 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
     <div id="pedals-list" class="loading">読み込み中...</div>
   </div>
+  <!-- 言語圏別投稿 -->
+  <div class="panel" id="tab-regions">
+    <div class="section-title">🌍 言語圏別 投稿一覧</div>
+    <p style="font-size:12px;color:var(--td);margin-bottom:16px">ブラウザ言語設定から判定した投稿者の言語圏を表示します。※ユーザーが手動で言語を変更している場合は正確でない場合があります。</p>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="submit-btn" onclick="filterRegion('all')" id="region-btn-all" style="background:var(--ac)">すべて</button>
+      <button class="submit-btn" onclick="filterRegion('ja')" id="region-btn-ja" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tm)">🇯🇵 日本語</button>
+      <button class="submit-btn" onclick="filterRegion('en')" id="region-btn-en" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tm)">🌐 海外</button>
+    </div>
+    <div class="stats-grid" style="margin-bottom:16px">
+      <div class="stat-card"><div class="stat-num" id="stat-region-all">-</div><div class="stat-lbl">総投稿数</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-region-ja">-</div><div class="stat-lbl">🇯🇵 日本語圏</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-region-en">-</div><div class="stat-lbl">🌐 海外圏</div></div>
+    </div>
+    <div id="region-posts-list" class="loading">投稿を読み込み中...</div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -295,6 +312,8 @@ async function loadAll(){
   loadStats();
   loadNews();
   renderLikesList();
+  renderRegionStats();
+  renderRegionPosts();
 }
 
 async function loadPosts(){
@@ -303,6 +322,8 @@ async function loadPosts(){
   renderPosts();
   renderRecentPosts();
   loadUnknownGear();
+  renderRegionStats();
+  renderRegionPosts();
 }
 async function loadPedals(){
   // 件数はcountのみで取得（データ取得とは別クエリ）
@@ -669,6 +690,63 @@ async function addNewsItem(){
 }
 
 // saveNewsは不要（追加・削除・並び替えが即時反映）のため削除
+
+
+// ── 言語圏別投稿管理
+let currentRegionFilter='all';
+
+function detectPostRegion(post){
+  // user_langカラムがあればそれを使用、なければusernameや投稿内容から推測
+  if(post.user_lang)return post.user_lang;
+  // タイトルや説明に日本語が含まれていれば日本語圏と判定
+  const text=(post.title||'')+(post.description||'')+(post.username||'');
+  const hasJapanese=/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(text);
+  return hasJapanese?'ja':'en';
+}
+
+function renderRegionStats(){
+  const ja=allPosts.filter(p=>detectPostRegion(p)==='ja').length;
+  const en=allPosts.filter(p=>detectPostRegion(p)==='en').length;
+  document.getElementById('stat-region-all').textContent=allPosts.length;
+  document.getElementById('stat-region-ja').textContent=ja;
+  document.getElementById('stat-region-en').textContent=en;
+}
+
+function filterRegion(region){
+  currentRegionFilter=region;
+  // ボタンのスタイル更新
+  ['all','ja','en'].forEach(r=>{
+    const btn=document.getElementById('region-btn-'+r);
+    if(!btn)return;
+    if(r===region){btn.style.background='var(--ac)';btn.style.color='#fff';btn.style.border='none';}
+    else{btn.style.background='var(--sf2)';btn.style.color='var(--tm)';btn.style.border='1px solid var(--bd)';}
+  });
+  renderRegionPosts();
+}
+
+function renderRegionPosts(){
+  const el=document.getElementById('region-posts-list');
+  if(!el)return;
+  const filtered=currentRegionFilter==='all'?allPosts:allPosts.filter(p=>detectPostRegion(p)===currentRegionFilter);
+  if(!filtered.length){el.innerHTML='<div class="empty-msg">投稿がありません</div>';return;}
+  el.innerHTML='<div class="table-wrap"><table>'
+    +'<thead><tr><th>言語圏</th><th>タイトル</th><th>投稿者</th><th>いいね</th><th>投稿日</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +filtered.map(p=>{
+      const region=detectPostRegion(p);
+      const regionBadge=region==='ja'?'🇯🇵 日本語':'🌐 海外';
+      const badgeColor=region==='ja'?'color:#4ade80':'color:#60a5fa';
+      return '<tr>'
+        +'<td style="font-size:12px;font-weight:600;'+badgeColor+'">'+regionBadge+'</td>'
+        +'<td><a class="post-link" href="/post?id='+p.id+'" target="_blank">'+escHtml(p.title)+'</a></td>'
+        +'<td style="font-size:12px;color:var(--tm)">'+(p.username||'匿名')+'</td>'
+        +'<td style="font-size:12px">❤️ '+(p.likes||0)+'</td>'
+        +'<td style="font-size:11px;color:var(--td)">'+timeAgo(p.created_at)+'</td>'
+        +'<td><button class="del-btn" onclick="deletePost(\''+p.id+'\')" >🗑</button></td>'
+        +'</tr>';
+    }).join('')
+    +'</tbody></table></div>';
+}
 
 function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
