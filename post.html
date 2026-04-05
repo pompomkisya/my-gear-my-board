@@ -175,6 +175,12 @@ textarea.form-input{resize:vertical;min-height:80px}
 .img-tab-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--bg)}
 .img-tab{padding:5px 12px;border-radius:3px;border:1px solid var(--bd);font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;min-height:32px;touch-action:manipulation}
 .img-tab.on{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
+.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;cursor:zoom-out}
+.lightbox-overlay.open{opacity:1;pointer-events:all}
+.lightbox-img{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:4px;transform:scale(.92);transition:transform .25s}
+.lightbox-overlay.open .lightbox-img{transform:scale(1)}
+.lightbox-close{position:absolute;top:16px;right:16px;width:36px;height:36px;background:rgba(255,255,255,.15);border:none;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+.lightbox-close:hover{background:rgba(232,85,45,.7)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 @media(max-width:600px){
 .page{padding:16px 14px}
@@ -202,8 +208,13 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <div class="back-btn" onclick="goBack()">← ボード一覧へ</div>
-    <div class="lang-btn" onclick="toggleLang()" title="EN / JA">🌐</div>
+    <div class="back-btn" id="back-btn" onclick="goBack()">← ボード一覧へ</div>
+    <div id="lang-btn" onclick="toggleLang()" title="Switch Language / 言語切替"
+      style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;cursor:pointer;transition:all .15s;touch-action:manipulation;font-size:12px;font-weight:600;color:var(--tm)"
+      onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'"
+      onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
+      🌐 <span id="post-lang-label">JA</span>
+    </div>
   </div>
 </header>
 
@@ -297,6 +308,10 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="img-editor-toolbar" id="img-editor-toolbar"></div>
 </div>
 
+<div class="lightbox-overlay" id="post-lightbox" onclick="closePostLightbox()">
+  <button class="lightbox-close" onclick="closePostLightbox()">✕</button>
+  <img class="lightbox-img" id="post-lightbox-img" src="" alt="">
+</div>
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -309,12 +324,35 @@ function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+M
 const SESSION_ID=getSessionId();
 const params=new URLSearchParams(location.search);
 const POST_ID=params.get('id');
-let lang=params.get('lang')||'ja';
+// 言語自動判定（URLパラメータ優先、なければブラウザ設定、なければlocalStorage）
+function detectPostLang(){
+  const urlLang=new URLSearchParams(location.search).get('lang');
+  if(urlLang)return urlLang;
+  const saved=localStorage.getItem('mgmb_lang');
+  if(saved)return saved;
+  const bl=navigator.language||navigator.userLanguage||'ja';
+  return bl.toLowerCase().startsWith('ja')?'ja':'en';
+}
+let lang=detectPostLang();
 let currentPost=null,allComments=[];
 
-function toggleLang(){lang=lang==='ja'?'en':'ja';if(currentPost)renderPost(currentPost);}
+function toggleLang(){
+  lang=lang==='ja'?'en':'ja';
+  localStorage.setItem('mgmb_lang',lang);
+  // lang-labelを更新
+  const label=document.getElementById('post-lang-label');
+  if(label)label.textContent=lang==='ja'?'EN':'JA';
+  const backBtn=document.getElementById('back-btn');
+  if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧へ';
+  const logosub=document.querySelector('.logo-sub');
+  if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
+  if(currentPost)renderPost(currentPost);
+}
 function goBack(){location.href='/';}
-function soundhouseUrl(gearItem){
+// Sweetwaterアフィリエイトタグ（申請承認後に設定）
+const SWEETWATER_TAG=''; // 例: 'affiliate_tag=XXXXX'
+
+function gearUrl(gearItem){
   let q;
   if(gearItem&&typeof gearItem==='object'){
     q=gearItem.search_query||gearItem.name||'';
@@ -325,8 +363,16 @@ function soundhouseUrl(gearItem){
     const modMatch=q.match(/\bmod(?:ified)?\b\s+(.+)/i);
     if(modMatch)q=modMatch[1].trim();
   }
+  if(lang==='en'){
+    // 海外ユーザー → Sweetwater
+    const base='https://www.sweetwater.com/store/search.php?s='+encodeURIComponent(q);
+    return SWEETWATER_TAG?base+'&'+SWEETWATER_TAG:base;
+  }
+  // 日本語ユーザー → サウンドハウス
   return'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(q);
 }
+// 後方互換のため旧関数名を維持
+function soundhouseUrl(gearItem){return gearUrl(gearItem);}
 
 function parseGenre(genre){
   if(!genre)return[];
@@ -373,7 +419,7 @@ function renderPost(p){
   // ① 画像スライダー
   if(imgs.length){
     html+='<div class="slider"><div class="slide-track" id="slide-track">';
-    imgs.forEach(u=>html+='<div class="slide"><img src="'+u+'" loading="lazy"></div>');
+    imgs.forEach(u=>html+='<div class="slide"><img src="'+u+'" loading="lazy" onclick="openPostLightbox(this.src)" style="cursor:zoom-in"></div>');
     html+='</div>';
     if(imgs.length>1){
       html+='<div class="s-btn prev" onclick="slide(-1)">‹</div>';
@@ -401,7 +447,7 @@ function renderPost(p){
   html+='<div class="actions">'
     +'<div class="act-btn'+(liked?' liked':'')+'" id="like-btn" onclick="toggleLike()">'+(liked?'❤️':'🤍')+(lang==='en'?' Like ':' いいね ')+'<span id="like-count">'+(p.likes||0)+'</span></div>'
     +'<div class="act-btn" onclick="copyUrl()">🔗 '+(lang==='en'?'Copy URL':'URLをコピー')+'</div>'
-    +'<div class="act-btn x-act" onclick="postToX()">𝕏 Xに投稿</div>'
+    +'<div class="act-btn x-act" onclick="postToX()">𝕏 '+(lang=='en'?'Post to X':'Xに投稿')+'</div>'
     +'<div class="act-btn" onclick="openEditModal()">✏️ '+(lang==='en'?'Edit':'編集')+'</div>'
     +'<div class="act-btn" style="color:#e05050;border-color:rgba(224,80,80,.3)" onclick="openReport()">🚩 '+(lang==='en'?'Report':'通報')+'</div>'
     +'</div>';
@@ -415,7 +461,7 @@ function renderPost(p){
     gear.forEach(g=>{
       const name=g.name||g;
       html+='<div class="gear-item"><div class="gear-dot"></div><div class="gear-name">'+name+'</div>'
-        +'<a class="sh-link" href="'+soundhouseUrl(g)+'" target="_blank" rel="noopener">'+(lang==='en'?'View on Soundhouse →':'サウンドハウスで見る →')+'</a></div>';
+        +'<a class="sh-link" href="'+gearUrl(g)+'" target="_blank" rel="noopener">'+(lang==='en'?'View on Sweetwater →':'サウンドハウスで見る →')+'</a></div>';
     });
     html+='</div>';
   }
@@ -1071,14 +1117,38 @@ function closeModal(id){document.getElementById(id).classList.remove('open');doc
 function closeOnBd(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 
+
+// ── 投稿ページ ライトボックス
+function openPostLightbox(src){
+  const lb=document.getElementById('post-lightbox');
+  const img=document.getElementById('post-lightbox-img');
+  if(!lb||!img)return;
+  img.src=src;lb.classList.add('open');document.body.style.overflow='hidden';
+}
+function closePostLightbox(){
+  const lb=document.getElementById('post-lightbox');
+  if(lb)lb.classList.remove('open');document.body.style.overflow='';
+}
+
 ['pin1','pin2','pin3','pin4'].forEach((id,i,arr)=>{
   const el=document.getElementById(id);
   el.addEventListener('input',()=>{if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();if(el.value&&i===arr.length-1)verifyPin();});
   el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
 });
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('edit-bd');closeModal('report-bd');}});
-document.addEventListener('DOMContentLoaded',()=>{loadPost();});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal('edit-bd');closeModal('report-bd');closePostLightbox();}
+});
+document.addEventListener('DOMContentLoaded',()=>{
+  // 言語ラベル初期化
+  const label=document.getElementById('post-lang-label');
+  if(label)label.textContent=lang==='ja'?'EN':'JA';
+  const backBtn=document.getElementById('back-btn');
+  if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧へ';
+  const logosub=document.querySelector('.logo-sub');
+  if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
+  loadPost();
+});
 </script>
 </body>
 </html>
