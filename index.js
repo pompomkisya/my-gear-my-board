@@ -30,7 +30,6 @@ const I18N={
     uploadAreaText:'クリックして写真を選択',uploadAreaSub:'最大3枚 · 1枚目がサムネイル',uploadAreaHint:'番号をつけると伝わりやすくなります',
     photoEditBtn:'🎯 機材に番号をつける',skipPhoto:'スキップ（写真なしで続ける）',
     lblUsername:'ユーザー名（任意）',
-    // ★変更: phUsername 新プレースホルダー
     phUsername:'名前をつけると自分の投稿を探せます',
     lblTitle:'タイトル',phTitle:'例：ライブ用最強ボード',phTitleGear:'例：My New Gear！',lblYoutube:'YouTube URL（任意）',
     lblGear:'使用機材（1つ以上推奨）',gearHint1:'※入力すると閲覧数が上がります',
@@ -69,6 +68,7 @@ const I18N={
     tagHomRec:'宅録',tagBeginner:'初心者相談',
     lblPhoto:'写真（最大3枚・任意）',
     langBtn:'EN',
+    brandMoreOpen:'▲ 閉じる',brandMoreClose:'▼ もっと見る（A–Z）',
   },
   en:{
     postBannerTitle:'Share your board or gear!',postBannerSub:'No sign-up needed. Post anonymously with just one photo.',
@@ -123,12 +123,12 @@ const I18N={
     tagHomRec:'Home Rec',tagBeginner:'Beginner',
     lblPhoto:'Photos (max 3 · optional)',
     langBtn:'JA',
+    brandMoreOpen:'▲ Close',brandMoreClose:'▼ Show more (A–Z)',
   }
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
 
 function applyLangUI(){
-  // lang-labelを現在の言語に合わせて更新
   const label=document.getElementById('lang-label');
   if(label)label.textContent=lang==='ja'?'EN':'JA';
   document.querySelectorAll('.logo-sub').forEach(el=>el.textContent=tr('logoSub'));
@@ -238,6 +238,17 @@ function applyLangUI(){
   const grBtns=document.querySelectorAll('#gear-remind-bd button');
   if(grBtns[0])grBtns[0].textContent=tr('gearRemindAdd');
   if(grBtns[1])grBtns[1].textContent=tr('gearRemindSkip');
+  // ★修正①: もっと見るボタンのラベルを翻訳
+  const brandToggleLbl=document.getElementById('brand-toggle-label');
+  if(brandToggleLbl){
+    const isOpen=document.getElementById('brands-extra')&&document.getElementById('brands-extra').classList.contains('open');
+    brandToggleLbl.textContent=isOpen?tr('brandMoreOpen'):tr('brandMoreClose');
+  }
+  const mobBrandToggleLbl=document.getElementById('mob-brand-toggle-label');
+  if(mobBrandToggleLbl){
+    const isOpen=document.getElementById('mob-brands-extra')&&document.getElementById('mob-brands-extra').classList.contains('open');
+    mobBrandToggleLbl.textContent=isOpen?tr('brandMoreOpen'):tr('brandMoreClose');
+  }
   updateStepUI();
   if(allDBPosts.length){renderGearWidget(allDBPosts);renderGearWidgetMob(allDBPosts);renderRankingWidget(allDBPosts);renderRankingWidgetMob(allDBPosts);}
 }
@@ -296,7 +307,6 @@ function genreMatches(post,filter){
   const genres=parseGenre(post.genre);
   return genres.some(g=>g===filter||g.toUpperCase()===filter.toUpperCase());
 }
-
 
 // ジャンル名を言語に応じて翻訳
 function translateGenre(g){
@@ -365,12 +375,12 @@ function renderDBPosts(posts){
   const html=posts.length?posts.map((p,i)=>{
     const init=(p.username||'匿')[0].toUpperCase();
     const gear=Array.isArray(p.gear_list)?p.gear_list:[];
-    // ★変更: 2件表示 + 残り件数を「…他N件」で表示
     const SHOW=2;
     const tags=gear.slice(0,SHOW).map(g=>'<span class="ptag">'+(g.name||g)+'</span>').join('');
     const moreCount=gear.length-SHOW;
     const moreBadge=moreCount>0?'<span class="ptag-more">…'+(lang==='en'?moreCount+' more':'他'+moreCount+'件')+'</span>':'';
     const isGear=p.post_type==='gear';
+    // ★修正②: ジャンルバッジを翻訳して表示
     const genres=parseGenre(p.genre);const glabel=genres.slice(0,2).map(translateGenre).join(' · ');
     const destUrl='/post?id='+p.id;const ytBadge=p.youtube_url?'<div class="yt-bdg">▶ YouTube</div>':'';
     return '<div class="card" onclick="location.href=\''+destUrl+'\'" style="animation-delay:'+(i*.05)+'s">'
@@ -484,7 +494,6 @@ async function searchGear(val){
 function setACFocus(i){acFocusIdx=i;document.querySelectorAll('.ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
 function selectGear(i){
   const x=acResults[i];if(!x)return;
-  // ★変更: search_queryも一緒に保存
   addGearTag({name:x.full_name,brand:x.brand,search_query:x.search_query||null});closeAC();
 }
 function addGearTag(g){
@@ -544,11 +553,9 @@ function updateStepUI(){
   const titleEl=document.getElementById('step-title');
   if(titleEl)titleEl.textContent=currentPostType==='board'?tr('btnPostBoard'):tr('btnPostGear');
   const subEl=document.getElementById('step-sub');if(subEl)subEl.textContent=tr(STEP_SUBS[currentStep-1]);
-  // タイトルplaceholderを投稿タイプ別に切り替え
   const ptitleEl=document.getElementById('post-title');
   if(ptitleEl)ptitleEl.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
   document.getElementById('step-dots').innerHTML=Array.from({length:TOTAL_STEPS},(_,i)=>'<div class="step-dot '+(i+1===currentStep?'on':i+1<currentStep?'done':'')+'"></div>').join('');
-  // ナビゲーションボタンを翻訳
   document.querySelectorAll('.step-btn.back').forEach(b=>b.textContent=tr('btnBack'));
   document.querySelectorAll('.step-btn.next').forEach(b=>{if(b.id!=='gear-next-btn')b.textContent=tr('btnNext')+' →';});
   const submitBtn=document.getElementById('submit-btn');if(submitBtn&&!submitBtn.disabled)submitBtn.textContent=tr('btnSubmit');
@@ -635,16 +642,22 @@ let _skipGearRemind=false;
 function closeGearRemind(){const r=document.getElementById('gear-remind-bd');if(r)r.style.display='none';}
 async function doSubmitPost(){closeGearRemind();_skipGearRemind=true;await submitPostToDB();}
 
+// ★修正⑦: 投稿連打防止フラグ
+let _isSubmitting=false;
+
 async function submitPostToDB(){
+  // 連打防止
+  if(_isSubmitting)return;
   if(selectedGears.length===0&&!_skipGearRemind){const remind=document.getElementById('gear-remind-bd');if(remind){remind.style.display='flex';return;}}
   _skipGearRemind=false;
+  _isSubmitting=true;
   const btn=document.getElementById('submit-btn');if(btn){btn.disabled=true;btn.textContent=lang==='en'?'Posting...':'投稿中...';}
   const title=document.getElementById('post-title').value.trim();const desc=document.getElementById('post-desc').value.trim();
   const ytRaw=document.getElementById('post-youtube').value.trim();const ytMatch=ytRaw.match(/(https?:\/\/[^\s]+)/);const youtube_url=ytMatch?ytMatch[1]:null;
   const genres=[...document.querySelectorAll('#post-genre-select .gs.on')].map(el=>el.getAttribute('data-val')||el.textContent.trim());
   const pin=['pd1','pd2','pd3','pd4'].map(id=>document.getElementById(id).value).join('');
-  if(!title){showToast(lang==='en'?'❌ Please enter a title':'❌ タイトルを入力してください');if(btn){btn.disabled=false;btn.textContent=tr('btnSubmit');}return;}
-  if(pin.length<4){showToast(lang==='en'?'❌ Set a 4-digit password':'❌ 4桁パスワードを設定してください');if(btn){btn.disabled=false;btn.textContent=tr('btnSubmit');}return;}
+  if(!title){showToast(lang==='en'?'❌ Please enter a title':'❌ タイトルを入力してください');if(btn){btn.disabled=false;btn.textContent=tr('btnSubmit');}  _isSubmitting=false;return;}
+  if(pin.length<4){showToast(lang==='en'?'❌ Set a 4-digit password':'❌ 4桁パスワードを設定してください');if(btn){btn.disabled=false;btn.textContent=tr('btnSubmit');}  _isSubmitting=false;return;}
   let image_urls=[];
   if(uploadedPhotos.length>0){
     const finals=uploadedPhotos.map((_,i)=>getFinalPhoto(i));const total=finals.filter(x=>x).length;
@@ -655,11 +668,11 @@ async function submitPostToDB(){
   const{error}=await sb.from('posts').insert({
     username:document.getElementById('post-username').value.trim()||(lang==='en'?'Anonymous':'匿名ユーザー'),
     title,description:desc,genre:genres,
-    // ★変更: search_queryも保存
     gear_list:selectedGears.map(g=>({name:g.name,brand:g.brand||'',search_query:g.search_query||null})),
     image_urls,pin_hash:pin,likes:0,post_type:currentPostType,youtube_url
   });
   if(btn){btn.disabled=false;btn.textContent=tr('btnSubmit');}
+  _isSubmitting=false;
   if(error){showToast(lang==='en'?'❌ Failed to post':'❌ 投稿に失敗しました');console.error(error);return;}
   closeModal('post-bd');
   selectedGears=[];uploadedPhotos=[];editedPhotos=[];
@@ -672,7 +685,7 @@ async function submitPostToDB(){
 }
 
 // ── 編集モーダル（index.html用）
-let editGearList=[]; // 並び替え用
+let editGearList=[];
 
 function openEditModal(){
   if(!currentDBPost)return;
@@ -952,8 +965,17 @@ document.addEventListener('DOMContentLoaded',()=>{
   },500);
 });
 
-function toggleBrands(){const ex=document.getElementById('brands-extra');const lbl=document.getElementById('brand-toggle-label');const o=ex.classList.toggle('open');lbl.textContent=o?'▲ 閉じる':'▼ もっと見る（A–Z）';}
-function toggleBrandsMob(){const ex=document.getElementById('mob-brands-extra');const lbl=document.getElementById('mob-brand-toggle-label');const o=ex.classList.toggle('open');lbl.textContent=o?'▲ 閉じる':'▼ もっと見る（A–Z）';}
+// ★修正①: もっと見るボタンのラベルを翻訳対応
+function toggleBrands(){
+  const ex=document.getElementById('brands-extra');const lbl=document.getElementById('brand-toggle-label');
+  const o=ex.classList.toggle('open');
+  lbl.textContent=o?tr('brandMoreOpen'):tr('brandMoreClose');
+}
+function toggleBrandsMob(){
+  const ex=document.getElementById('mob-brands-extra');const lbl=document.getElementById('mob-brand-toggle-label');
+  const o=ex.classList.toggle('open');
+  lbl.textContent=o?tr('brandMoreOpen'):tr('brandMoreClose');
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');document.body.style.overflow='';}
 function closeOnBd(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 function closeAll(){['post-bd','edit-bd'].forEach(closeModal);document.getElementById('done-bd').classList.remove('open');}
@@ -1058,22 +1080,18 @@ function closeLightbox(){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 
-// ── PC版スクロール連携（中央パネル ↔ 右パネル）
+// ── PC版スクロール連携
 function initPCScrollSync(){
   const feed=document.querySelector('.feed');
   const sr=document.querySelector('.sr');
   if(!feed||!sr)return;
   let syncLock=false;
-  // ページ全体のスクロールに合わせて右パネルの位置を調整
   window.addEventListener('scroll',()=>{
-    if(window.innerWidth<=680)return;// スマホは無効
+    if(window.innerWidth<=680)return;
     if(syncLock)return;
     syncLock=true;
-    // 右パネルはstickyなのでwindowスクロールに自動追従
-    // 中央パネル内スクロールを右パネルに反映
     requestAnimationFrame(()=>{syncLock=false;});
   },{passive:true});
-  // 中央パネル内スクロール → 右パネルに比率で同期
   feed.addEventListener('scroll',()=>{
     if(window.innerWidth<=680)return;
     if(syncLock)return;
@@ -1082,7 +1100,6 @@ function initPCScrollSync(){
     sr.scrollTop=ratio*(sr.scrollHeight-sr.clientHeight);
     requestAnimationFrame(()=>{syncLock=false;});
   },{passive:true});
-  // 右パネルスクロール → 中央パネルに反映
   sr.addEventListener('scroll',()=>{
     if(window.innerWidth<=680)return;
     if(syncLock)return;
