@@ -46,7 +46,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .logo-img{width:64px;height:64px;border-radius:0;object-fit:contain}
 .logo-text{display:flex;flex-direction:column;line-height:1}
 .logo-main{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:4px}
-/* ★変更: · Japan 削除 */
 .logo-sub{font-family:Noto Sans JP,sans-serif;font-size:9px;letter-spacing:3px;color:var(--ac);text-transform:uppercase;margin-top:2px}
 .h-right{display:flex;align-items:center;gap:10px}
 .h-btn{display:flex;align-items:center;gap:6px;background:var(--ac);border:none;border-radius:4px;padding:8px 16px;font-family:Noto Sans JP,sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:all .18s;position:relative;touch-action:manipulation}
@@ -67,7 +66,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .wrap{display:grid;grid-template-columns:200px 1fr 260px;max-width:1280px;margin:0 auto}
 .sl{border-right:1px solid var(--bd);padding:20px 12px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto}
-/* ★変更: sl-lbl 視認性改善 */
 .sl-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:none;color:#c0bcb4;padding:0 8px;margin-bottom:7px}
 .sl-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;font-size:13px;color:var(--tm);cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:1px}
 .sl-item:hover{background:var(--sf);color:var(--tx);border-color:var(--bd)}
@@ -80,14 +78,12 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .brand-more-btn:hover{color:var(--ac);border-color:var(--ac)}
 .brands-extra{display:none;margin-top:10px}
 .brands-extra.open{display:block}
-/* ★変更: brand-group-lbl 視認性改善 */
 .brand-group-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:#c0bcb4;margin:12px 0 5px 2px;border-bottom:1px solid var(--bd);padding-bottom:4px}
 .brand-group-lbl:first-child{margin-top:0}
 .feed{padding:20px 22px;border-right:1px solid var(--bd);min-height:calc(100vh - 86px);background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%)}
 .feed-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .feed-h{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
 .sort{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
-/* ★変更: sort-b 視認性改善 */
 .sort-b{padding:5px 12px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:#b0ada6;cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;touch-action:manipulation}
 .sort-b:last-child{border-right:none}
 .sort-b.on{background:var(--sf2);color:var(--tx)}
@@ -101,7 +97,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .pb-btn.gear-b{background-color:rgba(232,85,45,.45);color:#fff}
 .pb-btn.gear-b:hover{background-color:rgba(232,85,45,.6)}
 .feed-tabs{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden;margin-bottom:14px}
-/* ★変更: feed-tab 視認性改善 */
 .feed-tab{flex:1;padding:7px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:#8a8880;cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;text-align:center;touch-action:manipulation}
 .feed-tab:last-child{border-right:none}
 .feed-tab.on{background:var(--sf2);color:var(--tx)}
@@ -119,18 +114,13 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .body{padding:12px 14px}
 .cu{display:flex;align-items:center;gap:7px;margin-bottom:8px}
 .av{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1.5px solid var(--bd);flex-shrink:0;background:linear-gradient(135deg,#e85c2f,#b03020)}
-/* ★変更: av-name 視認性改善 */
 .av-name{font-size:12px;font-weight:500}
-/* ★変更: av-time 視認性改善 */
 .av-time{margin-left:auto;font-family:Noto Sans JP,sans-serif;font-size:12px;color:#ccc9c2}
 .ct{font-size:13.5px;font-weight:700;line-height:1.3;margin-bottom:7px}
 .ptags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:9px}
-/* ★変更: ptag 視認性改善 */
 .ptag{padding:2px 6px;background:var(--sf2);border:1px solid var(--bd);border-radius:2px;font-family:Noto Sans JP,sans-serif;font-size:10px;color:#b0ada6}
-/* ★追加: 機材「…他N件」表示用 */
 .ptag-more{padding:2px 6px;border-radius:2px;font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--ac);font-style:italic}
 .cf{display:flex;align-items:center;gap:11px;padding-top:8px;border-top:1px solid var(--bd)}
-/* ★変更: st 視認性改善 */
 .st{display:flex;align-items:center;gap:3px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:#9a9890;cursor:pointer;transition:color .15s;user-select:none;touch-action:manipulation}
 .st:hover{color:var(--ac)}.st.liked{color:var(--ac)}
 .ad-slot{background:var(--sf);border:1px solid var(--bd);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;color:var(--td);font-family:Noto Sans JP,sans-serif;font-size:11px}
@@ -144,29 +134,21 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .rn{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;color:var(--td);width:20px;text-align:center;flex-shrink:0}
 .rn.hi{color:var(--ac)}
 .ri-i{flex:1;min-width:0}
-/* ★変更: ri-t 視認性改善 */
 .ri-t{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .15s}
-/* ★変更: ri-u 視認性改善 */
 .ri-u{font-family:Noto Sans JP,sans-serif;font-size:12px;color:#ccc9c2;margin-top:1px}
-/* ★変更: ri-s 視認性改善 */
 .ri-s{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm);flex-shrink:0}
 .gr{display:flex;align-items:center;gap:7px;padding:6px 0;border-bottom:1px solid var(--bd)}
 .gr:last-child{border-bottom:none}
 .gr-i{flex:1;min-width:0}
-/* ★変更: gr-n 視認性改善 */
 .gr-n{font-size:12px;font-weight:500}
-/* ★変更: gr-b 視認性改善 */
 .gr-b{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#ccc9c2}
 .news-link{text-decoration:none;color:inherit;display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer;transition:color .15s}
 .news-link:last-child{border-bottom:none}
 .news-link:hover .nr-t{color:var(--ac)}
 .nth{width:44px;height:44px;border-radius:3px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-/* ★変更: nr-t 視認性改善 */
 .nr-t{font-size:12px;font-weight:500;line-height:1.4}
-/* ★変更: nr-d 視認性改善 */
 .nr-d{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#ccc9c2;margin-top:2px}
 .empty-filter{grid-column:1/-1;text-align:center;padding:40px 20px}
-/* ★変更: empty-filter-msg 視認性改善 */
 .empty-filter-msg{font-size:14px;color:var(--tm);margin-bottom:8px;line-height:1.6}
 .empty-filter-promo{font-size:13px;color:var(--ac);margin-bottom:16px;font-weight:500}
 .empty-filter-btn{display:inline-block;padding:8px 20px;border:1px solid var(--ac);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--ac);cursor:pointer;background:transparent;touch-action:manipulation}
@@ -183,14 +165,12 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .ac-item:last-child{border-bottom:none}
 .ac-item:hover,.ac-item.focus{background:rgba(232,85,45,.1)}
 .ac-item-name{flex:1;color:var(--tx)}
-/* ★変更: ac-item-brand 視認性改善 */
 .ac-item-brand{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#9a9890}
 .ac-empty{padding:10px 12px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);text-align:center}
 .upload-progress-wrap{margin-top:10px;display:none}
 .upload-progress-wrap.show{display:block}
 .upload-progress-bar-bg{height:4px;background:var(--bd);border-radius:2px;overflow:hidden;margin-bottom:6px}
 .upload-progress-bar{height:100%;background:var(--ac);border-radius:2px;width:0%;transition:width .3s}
-/* ★変更: upload-progress-msg 視認性改善 */
 .upload-progress-msg{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm);text-align:center}
 .pbd{position:fixed;inset:0;background:rgba(0,0,0,.9);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s;overflow-y:auto}
 .pbd.open{opacity:1;pointer-events:all}
@@ -200,7 +180,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .pform-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
 .step-header{margin-bottom:22px}
 .step-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px}
-/* ★変更: step-sub 視認性改善 */
 .step-sub{font-family:Noto Sans JP,sans-serif;font-size:12px;color:#b0ada6;margin-top:3px}
 .step-dots{display:flex;gap:5px;margin-top:8px}
 .step-dot{width:7px;height:7px;border-radius:50%;background:var(--bd);transition:all .2s}
@@ -215,9 +194,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .step-btn.back{background:var(--sf2);color:var(--tm);border:1px solid var(--bd)}
 .step-btn.back:hover{border-color:var(--ac);color:var(--ac)}
 .step-btn:disabled{opacity:.5;cursor:not-allowed}
-
 .form-row{margin-bottom:14px}
-/* ★変更: form-lbl 視認性改善 */
 .form-lbl{font-family:Noto Sans JP,sans-serif;font-size:12px;letter-spacing:0;text-transform:none;color:#b0ada6;margin-bottom:6px;display:block}
 .form-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 12px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
 .form-input:focus{border-color:var(--ac)}
@@ -241,23 +218,19 @@ textarea.form-input{resize:vertical;min-height:90px}
 .photo-add-btn{width:90px;height:90px;border:1.5px dashed var(--bd);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;color:var(--td);font-size:22px;transition:all .15s;flex-shrink:0;background:transparent;touch-action:manipulation}
 .photo-add-btn:hover{border-color:var(--ac);color:var(--ac)}
 .photo-add-label{font-family:Noto Sans JP,sans-serif;font-size:10px}
-/* ★変更: photo-count 視認性改善 */
 .photo-count{font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);margin-top:6px}
 .confirm-box{background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:12px 14px;margin-bottom:2px}
 .confirm-row{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px}
 .confirm-row:last-child{border-bottom:none}
-/* ★変更: confirm-lbl 視認性改善 */
 .confirm-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8a8880;width:72px;flex-shrink:0;padding-top:1px}
 .confirm-val{flex:1;color:var(--tx);line-height:1.5;word-break:break-word}
 .pass-box{background:rgba(232,85,45,.06);border:1px solid rgba(232,85,45,.25);border-radius:5px;padding:14px 16px;margin-top:12px}
 .pass-box-title{font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ac);margin-bottom:6px}
-/* ★変更: pass-warn 視認性改善 */
 .pass-warn{font-size:13px;color:var(--tx);line-height:1.65;margin-bottom:10px}
 .pass-warn strong{color:var(--ac);font-weight:700}
 .pass-digits{display:flex;gap:8px;justify-content:center}
 .pass-digit{width:52px;height:58px;background:var(--sf2);border:2px solid var(--bd);border-radius:6px;text-align:center;font-family:Noto Sans JP,sans-serif;font-size:24px;font-weight:600;color:var(--tx);outline:none;transition:border-color .15s;caret-color:var(--ac)}
 .pass-digit:focus{border-color:var(--ac)}
-/* ★変更: anon-note 視認性改善 */
 .anon-note{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#8a8880;text-align:center;margin-top:8px}
 .ebd{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s}
 .ebd.open{opacity:1;pointer-events:all}
@@ -266,7 +239,6 @@ textarea.form-input{resize:vertical;min-height:90px}
 .eform-close{position:absolute;top:14px;right:14px;width:28px;height:28px;background:var(--sf2);border:1px solid var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--tm)}
 .eform-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
 .eform-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:6px}
-/* ★変更: eform-sub 視認性改善 */
 .eform-sub{font-family:Noto Sans JP,sans-serif;font-size:12px;color:#8a8880;letter-spacing:1px;margin-bottom:20px}
 .pin-row{display:flex;gap:8px;justify-content:center;margin:12px 0 18px}
 .pin-d{width:56px;height:62px;background:var(--sf2);border:2px solid var(--bd);border-radius:6px;text-align:center;font-family:Noto Sans JP,sans-serif;font-size:26px;font-weight:600;color:var(--tx);outline:none;transition:border-color .15s;caret-color:var(--ac)}
@@ -282,7 +254,6 @@ textarea.form-input{resize:vertical;min-height:90px}
 .done-bd.open .done-box{transform:scale(1) translateY(0)}
 .done-icon{font-size:44px;margin-bottom:12px}
 .done-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--ac);margin-bottom:8px}
-/* ★変更: done-sub 視認性改善 */
 .done-sub{font-size:14px;color:var(--tm);line-height:1.6;margin-bottom:20px}
 .done-close-btn{background:var(--ac);border:none;border-radius:4px;padding:10px 28px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
@@ -292,9 +263,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 .footer-links{display:flex;gap:14px}
 .footer-link{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#eae8e2;cursor:pointer;transition:color .15s;letter-spacing:.5px;text-decoration:none;font-weight:600}
 .footer-link:hover{color:var(--ac)}
-/* ★変更: footer-copy 視認性改善 */
 .footer-copy{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#8a8880}
-
 .lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;cursor:zoom-out}
 .lightbox-overlay.open{opacity:1;pointer-events:all}
 .lightbox-img{max-width:95vw;max-height:90vh;object-fit:contain;border-radius:4px;transform:scale(.92);transition:transform .25s}
@@ -365,7 +334,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <img class="logo-img" src="IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
     <div class="logo-text">
       <div class="logo-main">My gear My board</div>
-      <!-- ★変更: · Japan 削除 -->
       <div class="logo-sub">ペダルボードSNS</div>
     </div>
   </div>
@@ -406,7 +374,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="swipe-panel mob-left-panel">
       <div class="mob-search-wrap">
         <span class="mob-search-icon">🔍</span>
-        <input class="mob-search-input" id="mob-search" type="text" id="mob-search-placeholder-ref" placeholder="フリーワード検索..."
+        <input class="mob-search-input" id="mob-search" type="text" placeholder="フリーワード検索..."
           oninput="handleSearchMob(this.value)" onkeydown="if(event.key==='Enter'){clearTimeout(_mobSearchTimer);if(currentSearchQuery)goPanel(1);}" autocomplete="off" autocorrect="off" autocapitalize="off">
         <button class="mob-search-clear" id="mob-search-clear" onclick="clearSearchMob()">✕</button>
       </div>
@@ -488,6 +456,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div class="tag" data-fx="tuner" onclick="filterFxMob(this,'tuner')">Tuner</div>
         <div class="tag" data-fx="multi-effects" onclick="filterFxMob(this,'multi-effects')">Multi FX</div>
         <div class="tag" data-fx="preamp" onclick="filterFxMob(this,'preamp')">Preamp</div>
+        <div class="tag" data-fx="switcher" onclick="filterFxMob(this,'switcher')">Switcher</div>
+        <div class="tag" data-fx="buffer" onclick="filterFxMob(this,'buffer')">Buffer</div>
+        <div class="tag" data-fx="junction" onclick="filterFxMob(this,'junction')">Junction Box</div>
       </div>
       <div class="ad-slot" style="height:100px;margin-top:14px;border-radius:4px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">Google AdSense</div></div>
       <div style="height:40px"></div>
@@ -589,7 +560,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </div>
     <div class="brand-group-lbl" style="margin-top:8px">その他</div>
     <div class="tags">
-      <div class="tag" data-fx="compressor" onclick="filterFx(this,'compressor')">Comp</div><div class="tag" data-fx="eq" onclick="filterFx(this,'eq')">EQ</div><div class="tag" data-fx="noise-gate" onclick="filterFx(this,'noise-gate')">Noise Gate</div><div class="tag" data-fx="looper" onclick="filterFx(this,'looper')">Looper</div><div class="tag" data-fx="volume" onclick="filterFx(this,'volume')">Volume</div><div class="tag" data-fx="tuner" onclick="filterFx(this,'tuner')">Tuner</div><div class="tag" data-fx="multi-effects" onclick="filterFx(this,'multi-effects')">Multi FX</div><div class="tag" data-fx="preamp" onclick="filterFx(this,'preamp')">Preamp</div>
+      <div class="tag" data-fx="compressor" onclick="filterFx(this,'compressor')">Comp</div><div class="tag" data-fx="eq" onclick="filterFx(this,'eq')">EQ</div><div class="tag" data-fx="noise-gate" onclick="filterFx(this,'noise-gate')">Noise Gate</div><div class="tag" data-fx="looper" onclick="filterFx(this,'looper')">Looper</div><div class="tag" data-fx="volume" onclick="filterFx(this,'volume')">Volume</div><div class="tag" data-fx="tuner" onclick="filterFx(this,'tuner')">Tuner</div><div class="tag" data-fx="multi-effects" onclick="filterFx(this,'multi-effects')">Multi FX</div><div class="tag" data-fx="preamp" onclick="filterFx(this,'preamp')">Preamp</div><div class="tag" data-fx="switcher" onclick="filterFx(this,'switcher')">Switcher</div><div class="tag" data-fx="buffer" onclick="filterFx(this,'buffer')">Buffer</div><div class="tag" data-fx="junction" onclick="filterFx(this,'junction')">Junction Box</div>
     </div>
     <div class="ad-slot" style="height:100px;margin-top:14px;border-radius:4px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">広告</div></div>
   </div>
@@ -660,7 +631,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="step-panel" id="step-2">
       <div class="form-row">
         <label class="form-lbl" id="lbl-username">ユーザー名（任意）</label>
-        <!-- ★変更: プレースホルダー変更 -->
         <input class="form-input" id="post-username" type="text" placeholder="名前をつけると自分の投稿を探せます" maxlength="30">
       </div>
       <div class="form-row">
@@ -679,7 +649,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <button class="step-btn next" onclick="goStep(3)">次へ →</button>
       </div>
     </div>
-    <!-- Step3: 機材入力 -->
     <div class="step-panel" id="step-3">
       <div id="step3-photo-preview" style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap"></div>
       <div class="form-row">
@@ -821,7 +790,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<!-- 画像編集 -->
 <div class="img-editor-bd" id="img-editor-bd">
   <div class="img-editor-header">
     <div><div class="img-editor-title">画像編集</div><div class="img-editor-subtitle">ステッカー・トリミング・回転（任意）</div></div>
