@@ -436,6 +436,12 @@ function parseGenre(genre){
   return[];
 }
 
+function translateGenre(g){
+  if(lang!=='en')return g;
+  const map={'初心者相談':'Beginner','宅録':'Home Rec','ROCK':'ROCK','BLUES':'BLUES','JAZZ':'JAZZ','METAL':'METAL','FUNK':'FUNK','AMBIENT':'AMBIENT','SHOEGAZE':'SHOEGAZE','POST ROCK':'POST ROCK','INDIE':'INDIE','ALTERNATIVE':'ALTERNATIVE','PUNK':'PUNK'};
+  return map[g]||g;
+}
+
 function getYouTubeId(url){
   if(!url)return null;
   const patterns=[
@@ -503,7 +509,7 @@ function renderPost(p){
     +'<div class="act-btn" style="color:#e05050;border-color:rgba(224,80,80,.3)" onclick="openReport()">🚩 '+(lang==='en'?'Report':'通報')+'</div>'
     +'</div>';
 
-  if(genres.length){html+='<div class="genre-tags">'+genres.map(g=>'<span class="gtag">'+g+'</span>').join('')+'</div>';}
+  if(genres.length){html+='<div class="genre-tags">'+genres.map(g=>'<span class="gtag">'+translateGenre(g)+'</span>').join('')+'</div>';}
 
   if(gear.length){
     html+='<div class="section"><div class="section-lbl">'+(lang==='en'?'Gear List':'使用機材リスト')+'</div>';
