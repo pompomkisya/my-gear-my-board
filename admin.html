@@ -220,8 +220,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="form-grid">
         <input class="form-input" id="new-brand" type="text" placeholder="ブランド名">
         <input class="form-input" id="new-model" type="text" placeholder="モデル名">
-        <input class="form-input" id="new-types" type="text" placeholder="タイプ（例: overdrive,boost）">
+        <div style="position:relative">
+          <input class="form-input" id="new-types" type="text" placeholder="タイプ（例: overdrive,boost）"
+            oninput="suggestTypes(this.value)"
+            onfocus="suggestTypes(this.value)"
+            onblur="setTimeout(()=>closeTypeAC(),200)"
+            autocomplete="off">
+          <div id="type-ac-dropdown" style="position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:300;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)"></div>
+        </div>
       </div>
+      <div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--td);margin-bottom:8px">※ 複数タイプはカンマ区切り。タイプ欄をクリックすると候補一覧が表示されます。</div>
       <button class="submit-btn" onclick="addPedal()">＋ DBに追加</button>
     </div>
 
@@ -560,6 +568,55 @@ function prefillPedal(name){
   document.getElementById('new-model').value=parts.slice(1).join(' ')||'';
   document.getElementById('new-brand').focus();
   showToast('フォームに入力しました。内容を確認して追加してください');
+}
+
+// ── タイプ入力サジェスト
+const VALID_TYPES=[
+  'overdrive','distortion','fuzz','boost',
+  'reverb','delay','chorus','flanger','phaser',
+  'modulation','tremolo','vibrato','pitch','wah',
+  'compressor','eq','noise-gate','looper','volume',
+  'tuner','multi-effects','preamp','switcher','buffer','junction box'
+];
+
+function suggestTypes(val){
+  const dd=document.getElementById('type-ac-dropdown');
+  if(!dd)return;
+  // カンマ区切りの最後のトークンを取得
+  const parts=val.split(',');
+  const current=parts[parts.length-1].trim().toLowerCase();
+  const candidates=current
+    ?VALID_TYPES.filter(t=>t.includes(current))
+    :VALID_TYPES;
+  if(!candidates.length){dd.style.display='none';return;}
+  dd.innerHTML=candidates.map(t=>`
+    <div onmousedown="selectType('${t}')"
+      style="padding:8px 12px;cursor:pointer;font-family:JetBrains Mono,monospace;font-size:11px;border-bottom:1px solid var(--bd);transition:background .12s"
+      onmouseover="this.style.background='rgba(232,85,45,.1)'"
+      onmouseout="this.style.background=''">
+      ${t}
+    </div>
+  `).join('');
+  dd.style.display='block';
+}
+
+function selectType(type){
+  const input=document.getElementById('new-types');
+  if(!input)return;
+  const parts=input.value.split(',');
+  parts[parts.length-1]=type;
+  // 末尾にカンマを追加して次のタイプも入力しやすくする
+  input.value=parts.join(',')+', ';
+  closeTypeAC();
+  input.focus();
+  // カーソルを末尾に
+  const len=input.value.length;
+  input.setSelectionRange(len,len);
+}
+
+function closeTypeAC(){
+  const dd=document.getElementById('type-ac-dropdown');
+  if(dd)dd.style.display='none';
 }
 
 // ── エフェクタータイプ正規化（大文字小文字・スペース・ハイフン無視）
