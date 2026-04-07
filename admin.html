@@ -225,8 +225,13 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="submit-btn" onclick="addPedal()">＋ DBに追加</button>
     </div>
 
-    <div style="margin-bottom:12px">
-      <input class="form-input" id="pedal-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="filterPedals(this.value)" style="max-width:360px">
+    <div style="margin-bottom:12px;position:relative;max-width:360px">
+      <input class="form-input" id="pedal-search" type="text" placeholder="🔍 ブランド・モデル名で検索..."
+        oninput="filterPedals(this.value)"
+        onblur="setTimeout(()=>closePedalAC(),200)"
+        autocomplete="off"
+        style="width:100%">
+      <div id="pedal-ac-dropdown" style="position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:200;max-height:240px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)"></div>
     </div>
     <div id="pedals-list" class="loading">読み込み中...</div>
   </div>
@@ -313,9 +318,10 @@ async function loadPedals(){
   const total=countRes.count||0;
   document.getElementById('stat-pedals').textContent=total;
   document.getElementById('pedals-count').textContent=total;
-  // 表示用データは1000件まで
+  // allPedals は未登録機材チェック用に引き続き使用（1000件上限）
   const{data}=await sb.from('pedals').select('*').order('brand').order('model');
   allPedals=data||[];
+  // 初期表示は「検索してください」メッセージ
   renderPedals();
 }
 
@@ -556,29 +562,84 @@ function prefillPedal(name){
   showToast('フォームに入力しました。内容を確認して追加してください');
 }
 
-let pedalFilter='';
-function filterPedals(val){
-  pedalFilter=val.toLowerCase();
-  renderPedals();
+// ── エフェクタータイプ正規化（大文字小文字・スペース・ハイフン無視）
+function normalizeFx(str){
+  return (str||'').toLowerCase().replace(/[\s\-]/g,'');
 }
+
+let pedalFilter='';
+let _pedalSearchTimer=null;
+
+async function filterPedals(val){
+  pedalFilter=val.trim();
+  clearTimeout(_pedalSearchTimer);
+  if(!pedalFilter){
+    closePedalAC();
+    renderPedals();
+    return;
+  }
+  // サジェスト：Supabaseから直接検索
+  _pedalSearchTimer=setTimeout(async()=>{
+    const q=pedalFilter.toLowerCase();
+    const{data}=await sb.from('pedals').select('id,brand,model,full_name,types,search_query')
+      .or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.%'+q+'%')
+      .order('brand').order('model').limit(20);
+    const results=data||[];
+    const dd=document.getElementById('pedal-ac-dropdown');
+    if(!results.length){
+      dd.innerHTML='<div style="padding:10px 12px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td);text-align:center">該当なし</div>';
+      dd.style.display='block';
+    }else{
+      dd.innerHTML=results.map(p=>`
+        <div onmousedown="selectPedalAC('${p.id}')" style="padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;transition:background .12s" onmouseover="this.style.background='rgba(232,85,45,.1)'" onmouseout="this.style.background=''">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:500">${escHtml(p.full_name)}</div>
+            <div style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--td);margin-top:2px">${(p.types||[]).join(', ')||'—'}</div>
+          </div>
+          <button onmousedown="event.stopPropagation();deletePedal('${p.id}')" style="padding:3px 8px;background:transparent;border:1px solid #5a1a1a;border-radius:3px;font-family:JetBrains Mono,monospace;font-size:10px;color:#e05050;cursor:pointer;flex-shrink:0">削除</button>
+        </div>
+      `).join('');
+      dd.style.display='block';
+    }
+    // テーブルにも反映
+    renderPedalsFromData(results);
+  },250);
+}
+
+function selectPedalAC(id){
+  // クリックした機材をテーブルでハイライト（将来拡張用）
+  closePedalAC();
+}
+
+function closePedalAC(){
+  const dd=document.getElementById('pedal-ac-dropdown');
+  if(dd)dd.style.display='none';
+}
+
 function renderPedals(){
   const el=document.getElementById('pedals-list');
-  const list=pedalFilter
-    ?allPedals.filter(p=>(p.brand+' '+p.model+' '+p.full_name).toLowerCase().includes(pedalFilter))
-    :allPedals;
-  if(!list.length){el.innerHTML='<div class="empty-msg">'+(pedalFilter?'該当なし':'データなし')+'</div>';return;}
+  if(!pedalFilter){
+    el.innerHTML='<div class="empty-msg" style="font-size:12px">🔍 上の検索窓でブランド・モデル名を入力すると表示されます</div>';
+    return;
+  }
+  // filterPedals の非同期処理に任せるため、ここでは何もしない
+}
+
+function renderPedalsFromData(list){
+  const el=document.getElementById('pedals-list');
+  if(!list.length){el.innerHTML='<div class="empty-msg">該当なし</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
     +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>search_query</th><th>操作</th></tr></thead>'
     +'<tbody>'
-    +list.slice(0,200).map(p=>'<tr>'
+    +list.map(p=>'<tr>'
       +'<td style="font-weight:500">'+escHtml(p.brand)+'</td>'
       +'<td>'+escHtml(p.model)+'</td>'
-      +'<td>'+(p.types||[]).map(t=>'<span class="tag-chip">'+t+'</span>').join('')+'</td>'
+      +'<td>'+(p.types||[]).map(t=>'<span class="tag-chip">'+escHtml(t)+'</span>').join('')+'</td>'
       +'<td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">'+(p.search_query||'')+'</td>'
       +'<td><button class="del-btn" onclick="deletePedal(\''+p.id+'\')">削除</button></td>'
       +'</tr>').join('')
     +'</tbody></table></div>'
-    +(list.length>200?'<div style="text-align:center;padding:12px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">先頭200件を表示中（全'+list.length+'件）</div>':'');
+    +(list.length>=20?'<div style="text-align:center;padding:10px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">最大20件を表示中。絞り込みで詳細検索できます。</div>':'');
 }
 
 async function addPedal(){
@@ -599,6 +660,9 @@ async function addPedal(){
   showToast('✅ 追加しました: '+full_name);
   ['new-brand','new-model','new-types'].forEach(id=>document.getElementById(id).value='');
   await loadPedals();
+  // 追加した機材名で検索窓を自動更新
+  const searchEl=document.getElementById('pedal-search');
+  if(searchEl){searchEl.value=full_name;filterPedals(full_name);}
 }
 
 async function deletePedal(id){
@@ -607,9 +671,14 @@ async function deletePedal(id){
   if(error){showToast('❌ 削除に失敗しました');return;}
   showToast('🗑 削除しました');
   allPedals=allPedals.filter(p=>p.id!==id);
-  renderPedals();
-  document.getElementById('pedals-count').textContent=allPedals.length;
-  document.getElementById('stat-pedals').textContent=allPedals.length;
+  // 件数を再取得
+  const countRes=await sb.from('pedals').select('id',{count:'exact',head:true});
+  const total=countRes.count||0;
+  document.getElementById('pedals-count').textContent=total;
+  document.getElementById('stat-pedals').textContent=total;
+  // 検索結果を再描画
+  if(pedalFilter)filterPedals(pedalFilter);
+  else renderPedals();
 }
 
 async function loadNews(){
