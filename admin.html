@@ -479,6 +479,8 @@ async function deletePost(id){
 // ── ⑥ 未登録機材（修正版）
 // allPedals は表示用で最大1000件しかない。
 // 未登録判定のために pedals テーブルの full_name を全件別クエリで取得する。
+const ignoredGearNames=new Set(); // セッション中のみ非表示（DBには触れない）
+
 async function loadUnknownGear(){
   const el=document.getElementById('unknown-list');
   el.innerHTML='<div class="loading">読み込み中...</div>';
@@ -508,19 +510,36 @@ async function loadUnknownGear(){
   });
 
   const sorted=Object.entries(unknownMap).sort((a,b)=>b[1]-a[1]);
-  document.getElementById('unknown-count').textContent=sorted.length;
-  document.getElementById('stat-unknown').textContent=sorted.length;
+  // 無視リストを除外
+  const filtered=sorted.filter(([name])=>!ignoredGearNames.has(name));
+  document.getElementById('unknown-count').textContent=filtered.length;
+  document.getElementById('stat-unknown').textContent=filtered.length;
 
-  if(!sorted.length){el.innerHTML='<div class="empty-msg">未登録機材はありません 🎉</div>';return;}
+  if(!filtered.length){el.innerHTML='<div class="empty-msg">未登録機材はありません 🎉</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
     +'<thead><tr><th>機材名</th><th>使用投稿数</th><th>操作</th></tr></thead>'
     +'<tbody>'
-    +sorted.map(([name,count])=>'<tr>'
+    +filtered.map(([name,count])=>'<tr>'
       +'<td style="font-weight:500">'+escHtml(name)+'</td>'
       +'<td style="font-family:JetBrains Mono,monospace;font-size:12px;color:var(--ac)">'+count+' 件</td>'
-      +'<td><button class="approve-btn" onclick="prefillPedal(\''+escHtml(name)+'\')">＋ DBに追加</button></td>'
+      +'<td style="display:flex;gap:6px"><button class="approve-btn" onclick="prefillPedal(\''+escHtml(name)+'\')">＋ DBに追加</button>'
+      +'<button class="del-btn" style="width:auto;margin:0;padding:4px 10px" onclick="ignoreGear(\''+escHtml(name)+'\')">✕ 無視</button></td>'
       +'</tr>').join('')
     +'</tbody></table></div>';
+}
+
+function ignoreGear(name){
+  ignoredGearNames.add(name);
+  // カウントバッジを更新して行を再描画
+  const rows=document.querySelectorAll('#unknown-list tbody tr');
+  rows.forEach(row=>{
+    const nameTd=row.querySelector('td:first-child');
+    if(nameTd&&nameTd.textContent.trim()===name)row.remove();
+  });
+  const remaining=document.querySelectorAll('#unknown-list tbody tr').length;
+  document.getElementById('unknown-count').textContent=remaining;
+  document.getElementById('stat-unknown').textContent=remaining;
+  showToast('✕ 「'+name+'」を無視しました（ページ再読み込みで復活します）');
 }
 
 function prefillPedal(name){
