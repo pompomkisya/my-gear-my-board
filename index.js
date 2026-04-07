@@ -309,6 +309,11 @@ function genreMatches(post,filter){
 }
 
 // ジャンル名を言語に応じて翻訳
+// ── エフェクタータイプ正規化（大文字小文字・スペース・ハイフンを無視）
+function normalizeFx(str){
+  return (str||'').toLowerCase().replace(/[\s\-]/g,'');
+}
+
 function translateGenre(g){
   if(lang!=='en')return g;
   const map={'初心者相談':'Beginner','宅録':'Home Rec','ROCK':'ROCK','BLUES':'BLUES','JAZZ':'JAZZ','METAL':'METAL','FUNK':'FUNK','AMBIENT':'AMBIENT','SHOEGAZE':'SHOEGAZE','POST ROCK':'POST ROCK','INDIE':'INDIE','ALTERNATIVE':'ALTERNATIVE','PUNK':'PUNK'};
@@ -331,7 +336,7 @@ function applyFilter(){
       const g=Array.isArray(p.gear_list)?p.gear_list:[];
       return g.some(x=>{
         const types=Array.isArray(x.types)?x.types:(x.types?[x.types]:[]);
-        return types.some(t2=>(t2||'').toLowerCase()===currentFxFilter.toLowerCase());
+        return types.some(t2=>normalizeFx(t2)===normalizeFx(currentFxFilter));
       });
     });
   }
