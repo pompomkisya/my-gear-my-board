@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Page — My Gear My Board</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--ac2:#f0a500;--tx:#eae8e2;--tm:#9a9890;--td:#6e6c68}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:Noto Sans JP,sans-serif;font-weight:300;min-height:100vh}
+header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(13,13,14,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo-img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.logo-text{display:flex;flex-direction:column;line-height:1}
+.logo-main{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.logo-sub{font-family:Noto Sans JP,sans-serif;font-size:9px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-top:2px}
+.back-btn{padding:7px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;transition:all .15s;touch-action:manipulation;text-decoration:none;display:flex;align-items:center}
+.back-btn:hover{border-color:var(--ac);color:var(--ac)}
+.page{max-width:640px;margin:0 auto;padding:32px 20px;min-height:calc(100vh - 58px)}
+/* タブ切り替え */
+.auth-tabs{display:flex;border:1px solid var(--bd);border-radius:6px;overflow:hidden;margin-bottom:28px}
+.auth-tab{flex:1;padding:10px;text-align:center;font-family:Noto Sans JP,sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--tm);touch-action:manipulation}
+.auth-tab.on{background:var(--ac);color:#fff}
+/* フォーム */
+.form-box{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:28px}
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;margin-bottom:6px}
+.form-sub{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td);margin-bottom:24px}
+.form-row{margin-bottom:16px}
+.form-lbl{font-family:Noto Sans JP,sans-serif;font-size:12px;color:#b0ada6;margin-bottom:6px;display:block}
+.form-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:10px 12px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--ac)}
+.form-input::placeholder{color:var(--td)}
+.form-err{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#e05050;margin-top:6px;min-height:16px}
+.submit-btn{width:100%;background:var(--ac);border:none;border-radius:4px;padding:12px;font-family:Noto Sans JP,sans-serif;font-size:13px;font-weight:600;letter-spacing:1px;color:#fff;cursor:pointer;transition:all .18s;margin-top:8px;touch-action:manipulation}
+.submit-btn:hover{background:#cf4c26}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+.text-link{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--ac);cursor:pointer;text-align:center;margin-top:14px;display:block}
+.text-link:hover{text-decoration:underline}
+/* マイページ */
+.mypage-wrap{display:none}
+.mypage-wrap.show{display:block}
+.profile-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:24px;margin-bottom:20px}
+.profile-top{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;cursor:pointer;position:relative;overflow:hidden;border:2px solid var(--bd)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-avatar-edit{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-family:Noto Sans JP,sans-serif;font-size:9px;text-align:center;padding:3px;color:#fff}
+.profile-info{flex:1;min-width:0}
+.profile-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px}
+.profile-email{font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--tm);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.edit-form-row{margin-bottom:12px}
+.edit-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#b0ada6;margin-bottom:5px;display:block}
+.edit-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:8px 12px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
+.edit-input:focus{border-color:var(--ac)}
+.edit-input::placeholder{color:var(--td)}
+textarea.edit-input{resize:vertical;min-height:70px}
+.save-btn{padding:9px 20px;background:var(--ac);border:none;border-radius:3px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;touch-action:manipulation;transition:all .15s}
+.save-btn:hover{background:#cf4c26}
+/* 投稿タブ */
+.tab-bar{display:flex;border-bottom:1px solid var(--bd);margin-bottom:20px}
+.tab{padding:10px 16px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:var(--td);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;touch-action:manipulation}
+.tab.on{color:var(--ac);border-bottom-color:var(--ac)}
+/* 投稿カード（コンパクト） */
+.post-list{display:flex;flex-direction:column;gap:10px}
+.post-item{display:flex;gap:12px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px;cursor:pointer;transition:border-color .15s;touch-action:manipulation}
+.post-item:hover{border-color:rgba(232,85,45,.4)}
+.post-thumb{width:72px;height:54px;border-radius:4px;object-fit:contain;background:var(--sf2);flex-shrink:0;border:1px solid var(--bd)}
+.post-thumb-empty{width:72px;height:54px;border-radius:4px;background:var(--sf2);flex-shrink:0;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:20px;opacity:.4}
+.post-info{flex:1;min-width:0}
+.post-item-title{font-size:13px;font-weight:600;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post-item-meta{font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)}
+.post-item-likes{font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--tm);margin-top:4px}
+.empty-msg{text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)}
+/* 通知バッジ */
+.notif-badge{background:var(--ac);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-family:JetBrains Mono,monospace;font-weight:600;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle}
+/* ログアウト */
+.logout-btn{width:100%;padding:10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s;margin-top:16px;touch-action:manipulation}
+.logout-btn:hover{background:rgba(224,80,80,.1);border-color:#e05050}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+@media(max-width:600px){.page{padding:16px 14px}.form-box{padding:20px 16px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo" onclick="location.href='/'">
+    <img class="logo-img" src="IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
+    <div class="logo-text">
+      <div class="logo-main">My Gear My Board</div>
+      <div class="logo-sub">ペダルボードSNS</div>
+    </div>
+  </div>
+  <a class="back-btn" href="/">← ホームへ</a>
+</header>
+
+<div class="page" id="page">
+
+  <!-- ── 未ログイン：登録・ログインフォーム ── -->
+  <div id="auth-wrap">
+    <div class="auth-tabs">
+      <div class="auth-tab on" id="tab-login" onclick="switchAuthTab('login')">ログイン</div>
+      <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">新規登録</div>
+    </div>
+
+    <!-- ログインフォーム -->
+    <div class="form-box" id="login-form">
+      <div class="form-title">ログイン</div>
+      <div class="form-sub">メールアドレスとパスワードでログイン</div>
+      <div class="form-row">
+        <label class="form-lbl">メールアドレス</label>
+        <input class="form-input" id="login-email" type="email" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">パスワード</label>
+        <input class="form-input" id="login-password" type="password" placeholder="6文字以上" autocomplete="current-password">
+      </div>
+      <div class="form-err" id="login-err"></div>
+      <button class="submit-btn" id="login-btn" onclick="doLogin()">ログイン</button>
+      <span class="text-link" onclick="showResetForm()">パスワードを忘れた方はこちら</span>
+    </div>
+
+    <!-- 登録フォーム -->
+    <div class="form-box" id="register-form" style="display:none">
+      <div class="form-title">新規登録</div>
+      <div class="form-sub">登録不要で投稿できますが、登録するとマイページを持てます</div>
+      <div class="form-row">
+        <label class="form-lbl">ユーザー名 <span style="color:#e05050">*</span></label>
+        <input class="form-input" id="reg-username" type="text" placeholder="あなたの名前" maxlength="30">
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">メールアドレス <span style="color:#e05050">*</span></label>
+        <input class="form-input" id="reg-email" type="email" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="form-row">
+        <label class="form-lbl">パスワード <span style="color:#e05050">*</span>（6文字以上）</label>
+        <input class="form-input" id="reg-password" type="password" placeholder="6文字以上" autocomplete="new-password">
+      </div>
+      <div class="form-err" id="register-err"></div>
+      <button class="submit-btn" id="register-btn" onclick="doRegister()">登録する</button>
+      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);text-align:center;margin-top:12px">登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。</div>
+    </div>
+
+    <!-- パスワードリセットフォーム -->
+    <div class="form-box" id="reset-form" style="display:none">
+      <div class="form-title">パスワードリセット</div>
+      <div class="form-sub">登録済みのメールアドレスにリセットリンクを送ります</div>
+      <div class="form-row">
+        <label class="form-lbl">メールアドレス</label>
+        <input class="form-input" id="reset-email" type="email" placeholder="your@email.com">
+      </div>
+      <div class="form-err" id="reset-err"></div>
+      <button class="submit-btn" id="reset-btn" onclick="doReset()">リセットメールを送る</button>
+      <span class="text-link" onclick="showLoginForm()">← ログインに戻る</span>
+    </div>
+  </div>
+
+  <!-- ── ログイン済み：マイページ ── -->
+  <div class="mypage-wrap" id="mypage-wrap">
+
+    <!-- プロフィールカード -->
+    <div class="profile-card">
+      <div class="profile-top">
+        <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()">
+          <span id="avatar-initial">?</span>
+          <div class="profile-avatar-edit">変更</div>
+        </div>
+        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatarChange(event)">
+        <div class="profile-info">
+          <div class="profile-name" id="profile-name">-</div>
+          <div class="profile-email" id="profile-email">-</div>
+        </div>
+      </div>
+
+      <!-- プロフィール編集 -->
+      <div class="section-title">プロフィール編集</div>
+      <div class="edit-form-row">
+        <label class="edit-lbl">ユーザー名</label>
+        <input class="edit-input" id="edit-username" type="text" maxlength="30">
+      </div>
+      <div class="edit-form-row">
+        <label class="edit-lbl">自己紹介</label>
+        <textarea class="edit-input" id="edit-bio" placeholder="使用アンプ、音楽のジャンルなど..."></textarea>
+      </div>
+      <div class="edit-form-row">
+        <label class="edit-lbl">使用アンプ</label>
+        <input class="edit-input" id="edit-amp" type="text" placeholder="例: Fender Twin Reverb">
+      </div>
+      <div class="edit-form-row">
+        <label class="edit-lbl">X（Twitter）URL</label>
+        <input class="edit-input" id="edit-x-url" type="url" placeholder="https://x.com/yourname">
+      </div>
+      <div class="edit-form-row">
+        <label class="edit-lbl">Instagram URL</label>
+        <input class="edit-input" id="edit-instagram-url" type="url" placeholder="https://instagram.com/yourname">
+      </div>
+      <button class="save-btn" onclick="saveProfile()">プロフィールを保存</button>
+      <button class="logout-btn" onclick="doLogout()">ログアウト</button>
+    </div>
+
+    <!-- 投稿・いいね タブ -->
+    <div class="tab-bar">
+      <div class="tab on" id="my-tab-posts" onclick="switchMyTab('posts')">自分の投稿</div>
+      <div class="tab" id="my-tab-likes" onclick="switchMyTab('likes')">いいねした投稿</div>
+      <div class="tab" id="my-tab-notif" onclick="switchMyTab('notif')">通知 <span class="notif-badge" id="notif-badge" style="display:none">0</span></div>
+    </div>
+
+    <div id="my-panel-posts" class="post-list"></div>
+    <div id="my-panel-likes" class="post-list" style="display:none"></div>
+    <div id="my-panel-notif" style="display:none"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let currentUser=null;
+let currentProfile=null;
+
+// ── 初期化
+document.addEventListener('DOMContentLoaded',async()=>{
+  // パスワードリセットのコールバック処理
+  const hash=window.location.hash;
+  if(hash.includes('type=recovery')){
+    showResetPasswordForm();
+    return;
+  }
+  // ログイン状態確認
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentUser=session.user;
+    showMyPage();
+  }else{
+    showAuthWrap();
+  }
+  // 認証状態の変化を監視
+  sb.auth.onAuthStateChange((_event,session)=>{
+    if(session){currentUser=session.user;showMyPage();}
+    else{currentUser=null;showAuthWrap();}
+  });
+});
+
+function showAuthWrap(){
+  document.getElementById('auth-wrap').style.display='block';
+  document.getElementById('mypage-wrap').classList.remove('show');
+}
+function showMyPage(){
+  document.getElementById('auth-wrap').style.display='none';
+  document.getElementById('mypage-wrap').classList.add('show');
+  loadProfile();
+  loadMyPosts();
+  loadNotifCount();
+}
+
+// ── タブ切り替え
+function switchAuthTab(tab){
+  document.getElementById('tab-login').classList.toggle('on',tab==='login');
+  document.getElementById('tab-register').classList.toggle('on',tab==='register');
+  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
+  document.getElementById('register-form').style.display=tab==='register'?'block':'none';
+  document.getElementById('reset-form').style.display='none';
+}
+function showResetForm(){
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('register-form').style.display='none';
+  document.getElementById('reset-form').style.display='block';
+  document.getElementById('tab-login').classList.remove('on');
+  document.getElementById('tab-register').classList.remove('on');
+}
+function showLoginForm(){
+  switchAuthTab('login');
+}
+
+// ── ログイン
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  const err=document.getElementById('login-err');
+  const btn=document.getElementById('login-btn');
+  if(!email||!password){err.textContent='メールアドレスとパスワードを入力してください';return;}
+  btn.disabled=true;btn.textContent='ログイン中...';
+  const{error}=await sb.auth.signInWithPassword({email,password});
+  btn.disabled=false;btn.textContent='ログイン';
+  if(error){
+    if(error.message.includes('Invalid login')){err.textContent='❌ メールアドレスまたはパスワードが違います';}
+    else if(error.message.includes('Email not confirmed')){err.textContent='❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。';}
+    else{err.textContent='❌ '+error.message;}
+    return;
+  }
+  err.textContent='';
+}
+
+// ── 新規登録
+async function doRegister(){
+  const username=document.getElementById('reg-username').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const password=document.getElementById('reg-password').value;
+  const err=document.getElementById('register-err');
+  const btn=document.getElementById('register-btn');
+  if(!username){err.textContent='ユーザー名を入力してください';return;}
+  if(!email){err.textContent='メールアドレスを入力してください';return;}
+  if(password.length<6){err.textContent='パスワードは6文字以上で設定してください';return;}
+  btn.disabled=true;btn.textContent='登録中...';
+  const{data,error}=await sb.auth.signUp({
+    email,password,
+    options:{data:{username}}
+  });
+  btn.disabled=false;btn.textContent='登録する';
+  if(error){
+    if(error.message.includes('already registered')){err.textContent='❌ このメールアドレスはすでに登録されています';}
+    else{err.textContent='❌ '+error.message;}
+    return;
+  }
+  // usersテーブルにも保存
+  if(data.user){
+    await sb.from('users').upsert({
+      id:data.user.id,
+      email,
+      username,
+      password_hash:'',// Supabase authで管理するため不要
+    },{onConflict:'id'});
+  }
+  err.textContent='';
+  showToast('✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。');
+  document.getElementById('reg-username').value='';
+  document.getElementById('reg-email').value='';
+  document.getElementById('reg-password').value='';
+}
+
+// ── パスワードリセット
+async function doReset(){
+  const email=document.getElementById('reset-email').value.trim();
+  const err=document.getElementById('reset-err');
+  const btn=document.getElementById('reset-btn');
+  if(!email){err.textContent='メールアドレスを入力してください';return;}
+  btn.disabled=true;btn.textContent='送信中...';
+  const{error}=await sb.auth.resetPasswordForEmail(email,{
+    redirectTo:'https://mygearmyboard.com/mypage'
+  });
+  btn.disabled=false;btn.textContent='リセットメールを送る';
+  if(error){err.textContent='❌ '+error.message;return;}
+  err.textContent='';
+  showToast('✅ パスワードリセットメールを送りました');
+}
+
+// パスワードリセット後の新パスワード設定
+function showResetPasswordForm(){
+  document.getElementById('auth-wrap').innerHTML=`
+    <div class="form-box">
+      <div class="form-title">新しいパスワードを設定</div>
+      <div class="form-sub">新しいパスワードを入力してください（6文字以上）</div>
+      <div class="form-row">
+        <label class="form-lbl">新しいパスワード</label>
+        <input class="form-input" id="new-password" type="password" placeholder="6文字以上">
+      </div>
+      <div class="form-err" id="newpass-err"></div>
+      <button class="submit-btn" onclick="doUpdatePassword()">パスワードを更新する</button>
+    </div>
+  `;
+}
+async function doUpdatePassword(){
+  const password=document.getElementById('new-password').value;
+  const err=document.getElementById('newpass-err');
+  if(password.length<6){err.textContent='6文字以上で入力してください';return;}
+  const{error}=await sb.auth.updateUser({password});
+  if(error){err.textContent='❌ '+error.message;return;}
+  showToast('✅ パスワードを更新しました');
+  setTimeout(()=>location.href='/mypage',1500);
+}
+
+// ── ログアウト
+async function doLogout(){
+  if(!confirm('ログアウトしますか？'))return;
+  await sb.auth.signOut();
+  showToast('ログアウトしました');
+}
+
+// ── プロフィール読み込み
+async function loadProfile(){
+  if(!currentUser)return;
+  const{data}=await sb.from('users').select('*').eq('id',currentUser.id).single();
+  currentProfile=data;
+  const username=data?.username||currentUser.user_metadata?.username||'ユーザー';
+  const initial=username[0].toUpperCase();
+  document.getElementById('profile-name').textContent=username;
+  document.getElementById('profile-email').textContent=currentUser.email;
+  document.getElementById('avatar-initial').textContent=initial;
+  document.getElementById('edit-username').value=username;
+  document.getElementById('edit-bio').value=data?.bio||'';
+  document.getElementById('edit-amp').value=data?.amp||'';
+  document.getElementById('edit-x-url').value=data?.x_url||'';
+  document.getElementById('edit-instagram-url').value=data?.instagram_url||'';
+  // アバター画像
+  if(data?.avatar_url){
+    const av=document.getElementById('profile-avatar');
+    av.innerHTML=`<img src="${data.avatar_url}" alt="avatar"><div class="profile-avatar-edit">変更</div>`;
+    av.onclick=()=>document.getElementById('avatar-input').click();
+  }
+}
+
+// ── アバター変更
+async function handleAvatarChange(e){
+  const file=e.target.files[0];if(!file)return;
+  const MAX=512;
+  const compressed=await new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=ev=>{const img=new Image();img.onload=()=>{
+      let{width,height}=img;
+      if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}
+      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+      canvas.getContext('2d').drawImage(img,0,0,width,height);
+      resolve(canvas.toDataURL('image/jpeg',0.85));
+    };img.src=ev.target.result;};r.readAsDataURL(file);
+  });
+  showToast('📤 アップロード中...');
+  const byteStr=atob(compressed.split(',')[1]);const mime='image/jpeg';
+  const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);
+  for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+  const blob=new Blob([ab],{type:mime});
+  const fn='avatars/'+currentUser.id+'_'+Date.now()+'.jpg';
+  const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime,upsert:true});
+  if(error){showToast('❌ アップロードに失敗しました');return;}
+  const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);
+  await sb.from('users').update({avatar_url:u.publicUrl}).eq('id',currentUser.id);
+  const av=document.getElementById('profile-avatar');
+  av.innerHTML=`<img src="${u.publicUrl}" alt="avatar"><div class="profile-avatar-edit">変更</div>`;
+  av.onclick=()=>document.getElementById('avatar-input').click();
+  showToast('✅ アバターを更新しました');
+  e.target.value='';
+}
+
+// ── プロフィール保存
+async function saveProfile(){
+  if(!currentUser)return;
+  const username=document.getElementById('edit-username').value.trim();
+  if(!username){showToast('ユーザー名を入力してください');return;}
+  const bio=document.getElementById('edit-bio').value.trim();
+  const amp=document.getElementById('edit-amp').value.trim();
+  const x_url=document.getElementById('edit-x-url').value.trim();
+  const instagram_url=document.getElementById('edit-instagram-url').value.trim();
+  const{error}=await sb.from('users').upsert({
+    id:currentUser.id,
+    email:currentUser.email,
+    username,bio,amp,x_url,instagram_url,
+    password_hash:''
+  },{onConflict:'id'});
+  if(error){showToast('❌ 保存に失敗しました');return;}
+  // auth.usersのメタデータも更新
+  await sb.auth.updateUser({data:{username}});
+  document.getElementById('profile-name').textContent=username;
+  document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
+  showToast('✅ プロフィールを保存しました');
+}
+
+// ── マイタブ切り替え
+function switchMyTab(tab){
+  ['posts','likes','notif'].forEach(t=>{
+    document.getElementById('my-tab-'+t).classList.toggle('on',t===tab);
+    document.getElementById('my-panel-'+t).style.display=t===tab?'block':'none';
+  });
+  if(tab==='likes')loadLikedPosts();
+  if(tab==='notif')loadNotifications();
+}
+
+// ── 自分の投稿
+async function loadMyPosts(){
+  if(!currentUser)return;
+  const el=document.getElementById('my-panel-posts');
+  el.innerHTML='<div class="empty-msg">読み込み中...</div>';
+  const{data}=await sb.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  if(!data||!data.length){el.innerHTML='<div class="empty-msg">まだ投稿がありません</div>';return;}
+  el.innerHTML=data.map(p=>postItemHTML(p)).join('');
+}
+
+// ── いいねした投稿
+async function loadLikedPosts(){
+  if(!currentUser)return;
+  const el=document.getElementById('my-panel-likes');
+  el.innerHTML='<div class="empty-msg">読み込み中...</div>';
+  // セッションIDでいいねを取得
+  const sid=localStorage.getItem('mgmb_sid');
+  const{data:likes}=await sb.from('likes').select('post_id').eq('session_id',sid);
+  if(!likes||!likes.length){el.innerHTML='<div class="empty-msg">まだいいねした投稿がありません</div>';return;}
+  const ids=likes.map(l=>l.post_id);
+  const{data:posts}=await sb.from('posts').select('*').in('id',ids).order('created_at',{ascending:false});
+  if(!posts||!posts.length){el.innerHTML='<div class="empty-msg">投稿が見つかりません</div>';return;}
+  el.innerHTML=posts.map(p=>postItemHTML(p)).join('');
+}
+
+function postItemHTML(p){
+  const thumb=p.image_urls&&p.image_urls[0]
+    ?`<img class="post-thumb" src="${p.image_urls[0]}" loading="lazy">`
+    :`<div class="post-thumb-empty">${p.post_type==='gear'?'🎸':'🎛'}</div>`;
+  return`<div class="post-item" onclick="location.href='/post?id=${p.id}'">
+    ${thumb}
+    <div class="post-info">
+      <div class="post-item-title">${escHtml(p.title)}</div>
+      <div class="post-item-meta">${timeAgo(p.created_at)}</div>
+      <div class="post-item-likes">❤️ ${p.likes||0}</div>
+    </div>
+  </div>`;
+}
+
+// ── 通知
+async function loadNotifCount(){
+  if(!currentUser)return;
+  const{count}=await sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id).eq('is_read',false);
+  const badge=document.getElementById('notif-badge');
+  if(count&&count>0){badge.textContent=count;badge.style.display='inline-flex';}
+  else{badge.style.display='none';}
+}
+
+async function loadNotifications(){
+  if(!currentUser)return;
+  const el=document.getElementById('my-panel-notif');
+  el.innerHTML='<div class="empty-msg">読み込み中...</div>';
+  const{data}=await sb.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
+  // 既読にする
+  await sb.from('notifications').update({is_read:true}).eq('user_id',currentUser.id).eq('is_read',false);
+  document.getElementById('notif-badge').style.display='none';
+  if(!data||!data.length){el.innerHTML='<div class="empty-msg">通知はありません</div>';return;}
+  el.innerHTML=data.map(n=>`
+    <div style="padding:14px;background:${n.is_read?'var(--sf)':'rgba(232,85,45,.06)'};border:1px solid ${n.is_read?'var(--bd)':'rgba(232,85,45,.2)'};border-radius:6px;margin-bottom:8px;cursor:pointer" onclick="${n.post_id?`location.href='/post?id=${n.post_id}'`:''}">
+      <div style="font-size:13px;margin-bottom:4px">${escHtml(n.message)}</div>
+      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${timeAgo(n.created_at)}</div>
+    </div>
+  `).join('');
+}
+
+function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function timeAgo(ts){
+  const d=Math.floor((Date.now()-new Date(ts))/1000);
+  if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';
+  if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+</script>
+</body>
+</html>
