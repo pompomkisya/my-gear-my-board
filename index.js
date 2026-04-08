@@ -249,6 +249,10 @@ function applyLangUI(){
     const isOpen=document.getElementById('mob-brands-extra')&&document.getElementById('mob-brands-extra').classList.contains('open');
     mobBrandToggleLbl.textContent=isOpen?tr('brandMoreOpen'):tr('brandMoreClose');
   }
+  const mypageLabel=document.getElementById('mypage-btn-label');
+  if(mypageLabel&&mypageLabel.textContent.match(/^MY PAGE$|^マイページ$/)){
+    mypageLabel.textContent=lang==='en'?'MY PAGE':'マイページ';
+  }
   updateStepUI();
   if(allDBPosts.length){renderGearWidget(allDBPosts);renderGearWidgetMob(allDBPosts);renderRankingWidget(allDBPosts);renderRankingWidgetMob(allDBPosts);}
 }
