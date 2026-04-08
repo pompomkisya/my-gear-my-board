@@ -253,6 +253,27 @@ function applyLangUI(){
   if(allDBPosts.length){renderGearWidget(allDBPosts);renderGearWidgetMob(allDBPosts);renderRankingWidget(allDBPosts);renderRankingWidgetMob(allDBPosts);}
 }
 
+// ── 認証状態チェック
+let currentUserId=null;
+async function checkAuthState(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(session){
+    currentUserId=session.user.id;
+    const btn=document.getElementById('mypage-btn-label');
+    if(btn){
+      // ユーザー名を表示
+      const{data}=await sb.from('users').select('username').eq('id',session.user.id).single();
+      if(data?.username)btn.textContent=data.username;
+    }
+    // 未読通知バッジ
+    const{count}=await sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',session.user.id).eq('is_read',false);
+    if(count&&count>0){
+      const badge=document.getElementById('header-notif-badge');
+      if(badge){badge.style.display='flex';badge.textContent=count;}
+    }
+  }
+}
+
 function togglePostDropdown(e){e.stopPropagation();document.getElementById('post-dropdown').classList.toggle('open');}
 function closeDropdownAndPost(type){document.getElementById('post-dropdown').classList.remove('open');openPost(type);}
 document.addEventListener('click',()=>document.getElementById('post-dropdown').classList.remove('open'));
@@ -674,7 +695,8 @@ async function submitPostToDB(){
     username:document.getElementById('post-username').value.trim()||(lang==='en'?'Anonymous':'匿名ユーザー'),
     title,description:desc,genre:genres,
     gear_list:selectedGears.map(g=>({name:g.name,brand:g.brand||'',search_query:g.search_query||null})),
-    image_urls,pin_hash:pin,likes:0,post_type:currentPostType,youtube_url
+    image_urls,pin_hash:pin,likes:0,post_type:currentPostType,youtube_url,
+    user_id:currentUserId||null
   });
   if(btn){btn.disabled=false;btn.textContent=tr('btnSubmit');}
   _isSubmitting=false;
@@ -963,6 +985,7 @@ function canvasPointerUp(e){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+  checkAuthState();
   setTimeout(()=>{
     const c=document.getElementById('editor-canvas');if(!c)return;
     c.addEventListener('mousedown',canvasPointerDown);c.addEventListener('mousemove',canvasPointerMove);c.addEventListener('mouseup',canvasPointerUp);
