@@ -669,7 +669,44 @@ async function postComment(parentId,replyToName){
   if(inputEl){inputEl.value='';inputEl.style.height='';}if(nameEl)nameEl.value='';
   if(parentId){const form=document.getElementById('rf-'+parentId);if(form)form.classList.remove('open');}
   showToast(lang==='en'?'💬 Comment posted':'💬 コメントしました');
+  // 通知生成：投稿者またはコメント投稿者に通知
+  await generateCommentNotification(parentId,username,content,replyToName);
   await loadComments();
+}
+
+async function generateCommentNotification(parentId,commenterName,content,replyToName){
+  try{
+    const commenter=commenterName||(lang==='en'?'Anonymous':'匿名ユーザー');
+    const preview=content.length>30?content.slice(0,30)+'...':content;
+    if(parentId){
+      // 返信の場合：元コメントの投稿者に通知
+      const{data:parentComment}=await sb.from('comments').select('*').eq('id',parentId).single();
+      if(parentComment&&currentPost){
+        // 元コメントのuser_idがあれば通知
+        if(parentComment.user_id){
+          await sb.from('notifications').insert({
+            user_id:parentComment.user_id,
+            post_id:POST_ID,
+            message:`${commenter}さんがあなたのコメントに返信しました：「${preview}」`,
+            is_read:false
+          });
+        }
+      }
+    }else{
+      // 新規コメントの場合：投稿者に通知
+      if(currentPost&&currentPost.user_id){
+        await sb.from('notifications').insert({
+          user_id:currentPost.user_id,
+          post_id:POST_ID,
+          message:`${commenter}さんが「${currentPost.title}」にコメントしました：「${preview}」`,
+          is_read:false
+        });
+      }
+    }
+  }catch(e){
+    // 通知エラーはサイレントに無視
+    console.log('notification error:',e);
+  }
 }
 
 // ── 編集モーダル
