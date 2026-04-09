@@ -36,6 +36,8 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .submit-btn:disabled{opacity:.5;cursor:not-allowed}
 .text-link{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--ac);cursor:pointer;text-align:center;margin-top:14px;display:block}
 .text-link:hover{text-decoration:underline}
+.rf-note-box{background:rgba(232,85,45,.08);border:1px solid rgba(232,85,45,.3);border-radius:4px;padding:10px 14px;margin-top:14px;display:flex;align-items:flex-start;gap:8px}
+.rf-note-icon{font-size:15px;flex-shrink:0;margin-top:1px}
 .mypage-wrap{display:none}
 .mypage-wrap.show{display:block}
 .profile-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:24px;margin-bottom:20px}
@@ -96,17 +98,12 @@ textarea.edit-input{resize:vertical;min-height:70px}
     </div>
   </div>
 </header>
-
 <div class="page" id="page">
-
-  <!-- 未ログイン -->
   <div id="auth-wrap">
     <div class="auth-tabs">
       <div class="auth-tab on" id="tab-login" onclick="switchAuthTab('login')">ログイン</div>
       <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">新規登録</div>
     </div>
-
-    <!-- ログイン -->
     <div class="form-box" id="login-form">
       <div class="form-title" id="lf-title">ログイン</div>
       <div class="form-sub" id="lf-sub">メールアドレスとパスワードでログイン</div>
@@ -116,14 +113,12 @@ textarea.edit-input{resize:vertical;min-height:70px}
       </div>
       <div class="form-row">
         <label class="form-lbl" id="lf-lbl-pw">パスワード</label>
-        <input class="form-input" id="login-password" type="password" id="login-password-input" autocomplete="current-password">
+        <input class="form-input" id="login-password" type="password" autocomplete="current-password">
       </div>
       <div class="form-err" id="login-err"></div>
       <button class="submit-btn" id="login-btn" onclick="doLogin()">ログイン</button>
       <span class="text-link" id="lf-reset-link" onclick="showResetForm()">パスワードを忘れた方はこちら</span>
     </div>
-
-    <!-- 新規登録 -->
     <div class="form-box" id="register-form" style="display:none">
       <div class="form-title" id="rf-title">新規登録</div>
       <div class="form-sub" id="rf-sub">登録不要で投稿できますが、登録するとマイページを持てます</div>
@@ -141,10 +136,11 @@ textarea.edit-input{resize:vertical;min-height:70px}
       </div>
       <div class="form-err" id="register-err"></div>
       <button class="submit-btn" id="register-btn" onclick="doRegister()">登録する</button>
-      <div id="rf-note" style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);text-align:center;margin-top:12px">登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。</div>
+      <div class="rf-note-box">
+        <span class="rf-note-icon">📧</span>
+        <span id="rf-note" style="font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);line-height:1.6">登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。</span>
+      </div>
     </div>
-
-    <!-- パスワードリセット -->
     <div class="form-box" id="reset-form" style="display:none">
       <div class="form-title" id="rst-title">パスワードリセット</div>
       <div class="form-sub" id="rst-sub">登録済みのメールアドレスにリセットリンクを送ります</div>
@@ -157,8 +153,6 @@ textarea.edit-input{resize:vertical;min-height:70px}
       <span class="text-link" id="rst-back-link" onclick="showLoginForm()">← ログインに戻る</span>
     </div>
   </div>
-
-  <!-- ログイン済み -->
   <div class="mypage-wrap" id="mypage-wrap">
     <div class="profile-card">
       <div class="profile-top">
@@ -196,7 +190,6 @@ textarea.edit-input{resize:vertical;min-height:70px}
       <button class="save-btn" id="mp-save-btn" onclick="saveProfile()">プロフィールを保存</button>
       <button class="logout-btn" id="mp-logout-btn" onclick="doLogout()">ログアウト</button>
     </div>
-
     <div class="tab-bar">
       <div class="tab on" id="my-tab-posts" onclick="switchMyTab('posts')">自分の投稿</div>
       <div class="tab" id="my-tab-likes" onclick="switchMyTab('likes')">いいねした投稿</div>
@@ -207,254 +200,86 @@ textarea.edit-input{resize:vertical;min-height:70px}
     <div id="my-panel-notif" style="display:none"></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
-// ── 言語
-function detectLang(){
-  const saved=localStorage.getItem('mgmb_lang');
-  if(saved)return saved;
-  const bl=navigator.language||navigator.userLanguage||'ja';
-  return bl.toLowerCase().startsWith('ja')?'ja':'en';
-}
+function detectLang(){const saved=localStorage.getItem('mgmb_lang');if(saved)return saved;const bl=navigator.language||navigator.userLanguage||'ja';return bl.toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
-
 const MP_I18N={
-  ja:{
-    logoSub:'ペダルボードSNS',backBtn:'← ホームへ',
-    tabLogin:'ログイン',tabRegister:'新規登録',
-    lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',
-    lfLblEmail:'メールアドレス',lfLblPw:'パスワード',
-    loginBtn:'ログイン',loginBtnLoading:'ログイン中...',
-    resetLink:'パスワードを忘れた方はこちら',
-    rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとマイページを持てます',
-    rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',
-    registerBtn:'登録する',registerBtnLoading:'登録中...',
-    rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',
-    rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',
-    rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',
-    rstBackLink:'← ログインに戻る',
-    avEditLbl:'変更',sectionProfile:'プロフィール編集',
-    lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',
-    bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',
-    pwPh:'6文字以上',regPwPh:'6文字以上',
-    saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',
-    tabPosts:'自分の投稿',tabLikes:'いいねした投稿',tabNotif:'通知',
-    emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyNotif:'通知はありません',
-    loading:'読み込み中...',
-    errEmailPw:'メールアドレスとパスワードを入力してください',
-    errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',
-    errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',
-    errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',
-    errPwShort:'パスワードは6文字以上で設定してください',
-    errAlreadyReg:'❌ このメールアドレスはすでに登録されています',
-    errResetEmail:'メールアドレスを入力してください',
-    toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',
-    toastReset:'✅ パスワードリセットメールを送りました',
-    toastAvatarUploading:'📤 アップロード中...',toastAvatarFail:'❌ アップロードに失敗しました',toastAvatarDone:'✅ アバターを更新しました',
-    toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',
-    toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',
-    newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',
-    newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました',
-  },
-  en:{
-    logoSub:'Pedalboard SNS',backBtn:'← Home',
-    tabLogin:'Login',tabRegister:'Sign Up',
-    lfTitle:'Login',lfSub:'Sign in with your email and password',
-    lfLblEmail:'Email address',lfLblPw:'Password',
-    loginBtn:'Login',loginBtnLoading:'Logging in...',
-    resetLink:'Forgot your password?',
-    rfTitle:'Sign Up',rfSub:'You can post without registering, but signing up gives you a profile page.',
-    rfLblName:'Username',rfLblEmail:'Email address',rfLblPw:'Password (6+ characters)',
-    registerBtn:'Sign Up',registerBtnLoading:'Signing up...',
-    rfNote:'A confirmation email will be sent. Click the link to complete registration.',
-    rstTitle:'Reset Password',rstSub:"We'll send a reset link to your registered email.",
-    rstLblEmail:'Email address',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',
-    rstBackLink:'← Back to Login',
-    avEditLbl:'Edit',sectionProfile:'Edit Profile',
-    lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',
-    bioPh:'Your amp, genre, etc...',ampPh:'e.g. Fender Twin Reverb',
-    pwPh:'6+ characters',regPwPh:'6+ characters',
-    saveBtn:'Save Profile',logoutBtn:'Log Out',confirmLogout:'Log out?',
-    tabPosts:'My Posts',tabLikes:'Liked Posts',tabNotif:'Notifications',
-    emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyNotif:'No notifications',
-    loading:'Loading...',
-    errEmailPw:'Please enter your email and password',
-    errInvalidLogin:'❌ Invalid email or password',
-    errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',
-    errUsername:'Please enter a username',errEmail:'Please enter an email address',
-    errPwShort:'Password must be at least 6 characters',
-    errAlreadyReg:'❌ This email address is already registered',
-    errResetEmail:'Please enter your email address',
-    toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',
-    toastReset:'✅ Password reset email sent',
-    toastAvatarUploading:'📤 Uploading...',toastAvatarFail:'❌ Upload failed',toastAvatarDone:'✅ Avatar updated',
-    toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',
-    toastUsernameReq:'Please enter a username',toastLogout:'Logged out',
-    newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',
-    newPwLbl:'New password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',
-  }
+  ja:{logoSub:'ペダルボードSNS',backBtn:'← ホームへ',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとマイページを持てます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',avEditLbl:'変更',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'自分の投稿',tabLikes:'いいねした投稿',tabNotif:'通知',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyNotif:'通知はありません',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastAvatarUploading:'📤 アップロード中...',toastAvatarFail:'❌ アップロードに失敗しました',toastAvatarDone:'✅ アバターを更新しました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました'},
+  en:{logoSub:'Pedalboard SNS',backBtn:'← Home',tabLogin:'Login',tabRegister:'Sign Up',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email address',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Sign Up',rfSub:'You can post without registering, but signing up gives you a profile page.',rfLblName:'Username',rfLblEmail:'Email address',rfLblPw:'Password (6+ characters)',registerBtn:'Sign Up',registerBtnLoading:'Signing up...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:"We'll send a reset link to your registered email.",rstLblEmail:'Email address',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',avEditLbl:'Edit',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Your amp, genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Log Out',confirmLogout:'Log out?',tabPosts:'My Posts',tabLikes:'Liked Posts',tabNotif:'Notifications',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyNotif:'No notifications',loading:'Loading...',errEmailPw:'Please enter your email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email address',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email address is already registered',errResetEmail:'Please enter your email address',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastAvatarUploading:'📤 Uploading...',toastAvatarFail:'❌ Upload failed',toastAvatarDone:'✅ Avatar updated',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated'}
 };
 function tr(key){return(MP_I18N[lang]||MP_I18N.ja)[key]||MP_I18N.ja[key]||key;}
 function setTxt(id,text){const el=document.getElementById(id);if(el)el.textContent=text;}
-
 function applyLang(){
-  const label=document.getElementById('mp-lang-label');
-  if(label)label.textContent=lang==='ja'?'EN':'JA';
-  setTxt('mp-logo-sub',tr('logoSub'));
-  setTxt('mp-back-btn',tr('backBtn'));
-  setTxt('tab-login',tr('tabLogin'));
-  setTxt('tab-register',tr('tabRegister'));
-  // login form
-  setTxt('lf-title',tr('lfTitle'));
-  setTxt('lf-sub',tr('lfSub'));
-  setTxt('lf-lbl-email',tr('lfLblEmail'));
-  setTxt('lf-lbl-pw',tr('lfLblPw'));
-  const loginBtn=document.getElementById('login-btn');
-  if(loginBtn&&!loginBtn.disabled)loginBtn.textContent=tr('loginBtn');
-  setTxt('lf-reset-link',tr('resetLink'));
-  // register form
-  setTxt('rf-title',tr('rfTitle'));
-  setTxt('rf-sub',tr('rfSub'));
-  setTxt('rf-lbl-name',tr('rfLblName')+' *');
-  setTxt('rf-lbl-email',tr('rfLblEmail')+' *');
-  setTxt('rf-lbl-pw',tr('rfLblPw')+' *');
-  const regBtn=document.getElementById('register-btn');
-  if(regBtn&&!regBtn.disabled)regBtn.textContent=tr('registerBtn');
+  const label=document.getElementById('mp-lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
+  setTxt('mp-logo-sub',tr('logoSub'));setTxt('mp-back-btn',tr('backBtn'));setTxt('tab-login',tr('tabLogin'));setTxt('tab-register',tr('tabRegister'));
+  setTxt('lf-title',tr('lfTitle'));setTxt('lf-sub',tr('lfSub'));setTxt('lf-lbl-email',tr('lfLblEmail'));setTxt('lf-lbl-pw',tr('lfLblPw'));
+  const loginBtn=document.getElementById('login-btn');if(loginBtn&&!loginBtn.disabled)loginBtn.textContent=tr('loginBtn');
+  setTxt('lf-reset-link',tr('resetLink'));setTxt('rf-title',tr('rfTitle'));setTxt('rf-sub',tr('rfSub'));
+  setTxt('rf-lbl-name',tr('rfLblName')+' *');setTxt('rf-lbl-email',tr('rfLblEmail')+' *');setTxt('rf-lbl-pw',tr('rfLblPw')+' *');
+  const regBtn=document.getElementById('register-btn');if(regBtn&&!regBtn.disabled)regBtn.textContent=tr('registerBtn');
   setTxt('rf-note',tr('rfNote'));
-  // reset form
-  setTxt('rst-title',tr('rstTitle'));
-  setTxt('rst-sub',tr('rstSub'));
-  setTxt('rst-lbl-email',tr('rstLblEmail'));
-  const rstBtn=document.getElementById('reset-btn');
-  if(rstBtn&&!rstBtn.disabled)rstBtn.textContent=tr('resetBtn');
-  setTxt('rst-back-link',tr('rstBackLink'));
-  // mypage
-  setTxt('av-edit-lbl',tr('avEditLbl'));
-  setTxt('mp-section-profile',tr('sectionProfile'));
-  setTxt('mp-lbl-username',tr('lblUsername'));
-  setTxt('mp-lbl-bio',tr('lblBio'));
-  setTxt('mp-lbl-amp',tr('lblAmp'));
-  setTxt('mp-lbl-x',tr('lblX'));
-  setTxt('mp-lbl-ig',tr('lblIg'));
+  const regUsernameEl=document.getElementById('reg-username');if(regUsernameEl)regUsernameEl.placeholder=tr('regUsernamePh');
+  setTxt('rst-title',tr('rstTitle'));setTxt('rst-sub',tr('rstSub'));setTxt('rst-lbl-email',tr('rstLblEmail'));
+  const rstBtn=document.getElementById('reset-btn');if(rstBtn&&!rstBtn.disabled)rstBtn.textContent=tr('resetBtn');
+  setTxt('rst-back-link',tr('rstBackLink'));setTxt('av-edit-lbl',tr('avEditLbl'));setTxt('mp-section-profile',tr('sectionProfile'));
+  setTxt('mp-lbl-username',tr('lblUsername'));setTxt('mp-lbl-bio',tr('lblBio'));setTxt('mp-lbl-amp',tr('lblAmp'));setTxt('mp-lbl-x',tr('lblX'));setTxt('mp-lbl-ig',tr('lblIg'));
   const bioEl=document.getElementById('edit-bio');if(bioEl)bioEl.placeholder=tr('bioPh');
   const ampEl=document.getElementById('edit-amp');if(ampEl)ampEl.placeholder=tr('ampPh');
   const loginPwEl=document.getElementById('login-password');if(loginPwEl)loginPwEl.placeholder=tr('pwPh');
   const regPwEl=document.getElementById('reg-password');if(regPwEl)regPwEl.placeholder=tr('regPwPh');
-  setTxt('mp-save-btn',tr('saveBtn'));
-  setTxt('mp-logout-btn',tr('logoutBtn'));
-  setTxt('my-tab-posts',tr('tabPosts'));
-  setTxt('my-tab-likes',tr('tabLikes'));
-  // 通知タブはバッジを保持
+  setTxt('mp-save-btn',tr('saveBtn'));setTxt('mp-logout-btn',tr('logoutBtn'));setTxt('my-tab-posts',tr('tabPosts'));setTxt('my-tab-likes',tr('tabLikes'));
   const notifTab=document.getElementById('my-tab-notif');
-  if(notifTab){
-    const badge=document.getElementById('notif-badge');
-    notifTab.textContent=tr('tabNotif')+' ';
-    if(badge)notifTab.appendChild(badge);
-  }
+  if(notifTab){const badge=document.getElementById('notif-badge');notifTab.textContent=tr('tabNotif')+' ';if(badge)notifTab.appendChild(badge);}
 }
-
-function toggleLang(){
-  lang=lang==='ja'?'en':'ja';
-  localStorage.setItem('mgmb_lang',lang);
-  applyLang();
-}
-
+function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();}
 let currentUser=null;
-
 document.addEventListener('DOMContentLoaded',async()=>{
   applyLang();
   const hash=window.location.hash;
-  if(hash.includes('type=recovery')){
-    showResetPasswordForm();
-    return;
-  }
+  if(hash.includes('type=recovery')){showResetPasswordForm();return;}
   const{data:{session}}=await sb.auth.getSession();
-  if(session){currentUser=session.user;showMyPage();}
-  else{showAuthWrap();}
+  if(session){currentUser=session.user;showMyPage();}else{showAuthWrap();}
   sb.auth.onAuthStateChange((_event,session)=>{
-    if(session){currentUser=session.user;showMyPage();}
-    else{currentUser=null;showAuthWrap();}
+    if(session){currentUser=session.user;showMyPage();}else{currentUser=null;showAuthWrap();}
   });
 });
-
-function showAuthWrap(){
-  document.getElementById('auth-wrap').style.display='block';
-  document.getElementById('mypage-wrap').classList.remove('show');
-}
-function showMyPage(){
-  document.getElementById('auth-wrap').style.display='none';
-  document.getElementById('mypage-wrap').classList.add('show');
-  loadProfile();loadMyPosts();loadNotifCount();
-}
+function showAuthWrap(){document.getElementById('auth-wrap').style.display='block';document.getElementById('mypage-wrap').classList.remove('show');}
+function showMyPage(){document.getElementById('auth-wrap').style.display='none';document.getElementById('mypage-wrap').classList.add('show');loadProfile();loadMyPosts();loadNotifCount();}
 function switchAuthTab(tab){
-  document.getElementById('tab-login').classList.toggle('on',tab==='login');
-  document.getElementById('tab-register').classList.toggle('on',tab==='register');
-  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
-  document.getElementById('register-form').style.display=tab==='register'?'block':'none';
-  document.getElementById('reset-form').style.display='none';
+  document.getElementById('tab-login').classList.toggle('on',tab==='login');document.getElementById('tab-register').classList.toggle('on',tab==='register');
+  document.getElementById('login-form').style.display=tab==='login'?'block':'none';document.getElementById('register-form').style.display=tab==='register'?'block':'none';document.getElementById('reset-form').style.display='none';
 }
-function showResetForm(){
-  ['login-form','register-form'].forEach(id=>document.getElementById(id).style.display='none');
-  document.getElementById('reset-form').style.display='block';
-  document.getElementById('tab-login').classList.remove('on');
-  document.getElementById('tab-register').classList.remove('on');
-}
+function showResetForm(){['login-form','register-form'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('reset-form').style.display='block';document.getElementById('tab-login').classList.remove('on');document.getElementById('tab-register').classList.remove('on');}
 function showLoginForm(){switchAuthTab('login');}
-
 async function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const password=document.getElementById('login-password').value;
-  const err=document.getElementById('login-err');
-  const btn=document.getElementById('login-btn');
+  const email=document.getElementById('login-email').value.trim();const password=document.getElementById('login-password').value;
+  const err=document.getElementById('login-err');const btn=document.getElementById('login-btn');
   if(!email||!password){err.textContent=tr('errEmailPw');return;}
   btn.disabled=true;btn.textContent=tr('loginBtnLoading');
   const{error}=await sb.auth.signInWithPassword({email,password});
   btn.disabled=false;btn.textContent=tr('loginBtn');
-  if(error){
-    if(error.message.includes('Invalid login'))err.textContent=tr('errInvalidLogin');
-    else if(error.message.includes('Email not confirmed'))err.textContent=tr('errNotConfirmed');
-    else err.textContent='❌ '+error.message;
-    return;
-  }
+  if(error){if(error.message.includes('Invalid login'))err.textContent=tr('errInvalidLogin');else if(error.message.includes('Email not confirmed'))err.textContent=tr('errNotConfirmed');else err.textContent='❌ '+error.message;return;}
   err.textContent='';
 }
-
 async function doRegister(){
-  const username=document.getElementById('reg-username').value.trim();
-  const email=document.getElementById('reg-email').value.trim();
-  const password=document.getElementById('reg-password').value;
-  const err=document.getElementById('register-err');
-  const btn=document.getElementById('register-btn');
-  if(!username){err.textContent=tr('errUsername');return;}
-  if(!email){err.textContent=tr('errEmail');return;}
-  if(password.length<6){err.textContent=tr('errPwShort');return;}
+  const username=document.getElementById('reg-username').value.trim();const email=document.getElementById('reg-email').value.trim();const password=document.getElementById('reg-password').value;
+  const err=document.getElementById('register-err');const btn=document.getElementById('register-btn');
+  if(!username){err.textContent=tr('errUsername');return;}if(!email){err.textContent=tr('errEmail');return;}if(password.length<6){err.textContent=tr('errPwShort');return;}
   btn.disabled=true;btn.textContent=tr('registerBtnLoading');
   const{data,error}=await sb.auth.signUp({email,password,options:{data:{username}}});
   btn.disabled=false;btn.textContent=tr('registerBtn');
-  if(error){
-    if(error.message.includes('already registered'))err.textContent=tr('errAlreadyReg');
-    else err.textContent='❌ '+error.message;
-    return;
-  }
-  if(data.user){
-    await sb.from('users').upsert({id:data.user.id,email,username,password_hash:''},{onConflict:'id'});
-  }
-  err.textContent='';
-  showToast(tr('toastRegister'));
+  if(error){if(error.message.includes('already registered'))err.textContent=tr('errAlreadyReg');else err.textContent='❌ '+error.message;return;}
+  if(data.user){await sb.from('users').upsert({id:data.user.id,email,username,password_hash:''},{onConflict:'id'});}
+  err.textContent='';showToast(tr('toastRegister'));
   ['reg-username','reg-email','reg-password'].forEach(id=>document.getElementById(id).value='');
 }
-
 async function doReset(){
-  const email=document.getElementById('reset-email').value.trim();
-  const err=document.getElementById('reset-err');
-  const btn=document.getElementById('reset-btn');
+  const email=document.getElementById('reset-email').value.trim();const err=document.getElementById('reset-err');const btn=document.getElementById('reset-btn');
   if(!email){err.textContent=tr('errResetEmail');return;}
   btn.disabled=true;btn.textContent=tr('resetBtnLoading');
   const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://mygearmyboard.com/mypage'});
@@ -462,180 +287,90 @@ async function doReset(){
   if(error){err.textContent='❌ '+error.message;return;}
   err.textContent='';showToast(tr('toastReset'));
 }
-
 function showResetPasswordForm(){
-  document.getElementById('auth-wrap').innerHTML=`
-    <div class="form-box">
-      <div class="form-title">${tr('newPwTitle')}</div>
-      <div class="form-sub">${tr('newPwSub')}</div>
-      <div class="form-row">
-        <label class="form-lbl">${tr('newPwLbl')}</label>
-        <input class="form-input" id="new-password" type="password" placeholder="6+">
-      </div>
-      <div class="form-err" id="newpass-err"></div>
-      <button class="submit-btn" onclick="doUpdatePassword()">${tr('newPwBtn')}</button>
-    </div>
-  `;
+  document.getElementById('auth-wrap').innerHTML=`<div class="form-box"><div class="form-title">${tr('newPwTitle')}</div><div class="form-sub">${tr('newPwSub')}</div><div class="form-row"><label class="form-lbl">${tr('newPwLbl')}</label><input class="form-input" id="new-password" type="password" placeholder="6+"></div><div class="form-err" id="newpass-err"></div><button class="submit-btn" onclick="doUpdatePassword()">${tr('newPwBtn')}</button></div>`;
 }
 async function doUpdatePassword(){
-  const password=document.getElementById('new-password').value;
-  const err=document.getElementById('newpass-err');
+  const password=document.getElementById('new-password').value;const err=document.getElementById('newpass-err');
   if(password.length<6){err.textContent=tr('newPwShort');return;}
   const{error}=await sb.auth.updateUser({password});
   if(error){err.textContent='❌ '+error.message;return;}
-  showToast(tr('toastPwDone'));
-  setTimeout(()=>location.href='/mypage',1500);
+  showToast(tr('toastPwDone'));setTimeout(()=>location.href='/mypage',1500);
 }
-
-async function doLogout(){
-  if(!confirm(tr('confirmLogout')))return;
-  await sb.auth.signOut();
-  showToast(tr('toastLogout'));
-}
-
+async function doLogout(){if(!confirm(tr('confirmLogout')))return;await sb.auth.signOut();showToast(tr('toastLogout'));}
 async function loadProfile(){
   if(!currentUser)return;
   const{data}=await sb.from('users').select('*').eq('id',currentUser.id).single();
   const username=data?.username||currentUser.user_metadata?.username||'User';
   const initial=username[0].toUpperCase();
-  document.getElementById('profile-name').textContent=username;
-  document.getElementById('profile-email').textContent=currentUser.email;
-  document.getElementById('avatar-initial').textContent=initial;
-  document.getElementById('edit-username').value=username;
-  document.getElementById('edit-bio').value=data?.bio||'';
-  document.getElementById('edit-amp').value=data?.amp||'';
-  document.getElementById('edit-x-url').value=data?.x_url||'';
-  document.getElementById('edit-instagram-url').value=data?.instagram_url||'';
-  if(data?.avatar_url){
-    const av=document.getElementById('profile-avatar');
-    av.innerHTML=`<img src="${data.avatar_url}" alt="avatar"><div class="profile-avatar-edit" id="av-edit-lbl">${tr('avEditLbl')}</div>`;
-    av.onclick=()=>document.getElementById('avatar-input').click();
-  }
+  document.getElementById('profile-name').textContent=username;document.getElementById('profile-email').textContent=currentUser.email;
+  document.getElementById('avatar-initial').textContent=initial;document.getElementById('edit-username').value=username;
+  document.getElementById('edit-bio').value=data?.bio||'';document.getElementById('edit-amp').value=data?.amp||'';
+  document.getElementById('edit-x-url').value=data?.x_url||'';document.getElementById('edit-instagram-url').value=data?.instagram_url||'';
+  if(data?.avatar_url){const av=document.getElementById('profile-avatar');av.innerHTML=`<img src="${data.avatar_url}" alt="avatar"><div class="profile-avatar-edit" id="av-edit-lbl">${tr('avEditLbl')}</div>`;av.onclick=()=>document.getElementById('avatar-input').click();}
 }
-
 async function handleAvatarChange(e){
   const file=e.target.files[0];if(!file)return;
   const MAX=512;
-  const compressed=await new Promise(resolve=>{
-    const r=new FileReader();
-    r.onload=ev=>{const img=new Image();img.onload=()=>{
-      let{width,height}=img;
-      if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}
-      const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
-      canvas.getContext('2d').drawImage(img,0,0,width,height);
-      resolve(canvas.toDataURL('image/jpeg',0.85));
-    };img.src=ev.target.result;};r.readAsDataURL(file);
-  });
+  const compressed=await new Promise(resolve=>{const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{let{width,height}=img;if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;canvas.getContext('2d').drawImage(img,0,0,width,height);resolve(canvas.toDataURL('image/jpeg',0.85));};img.src=ev.target.result;};r.readAsDataURL(file);});
   showToast(tr('toastAvatarUploading'));
-  const byteStr=atob(compressed.split(',')[1]);const mime='image/jpeg';
-  const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);
-  for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
-  const blob=new Blob([ab],{type:mime});
-  const fn='avatars/'+currentUser.id+'_'+Date.now()+'.jpg';
+  const byteStr=atob(compressed.split(',')[1]);const mime='image/jpeg';const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+  const blob=new Blob([ab],{type:mime});const fn='avatars/'+currentUser.id+'_'+Date.now()+'.jpg';
   const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime,upsert:true});
   if(error){showToast(tr('toastAvatarFail'));return;}
   const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);
   await sb.from('users').update({avatar_url:u.publicUrl}).eq('id',currentUser.id);
-  const av=document.getElementById('profile-avatar');
-  av.innerHTML=`<img src="${u.publicUrl}" alt="avatar"><div class="profile-avatar-edit" id="av-edit-lbl">${tr('avEditLbl')}</div>`;
-  av.onclick=()=>document.getElementById('avatar-input').click();
-  showToast(tr('toastAvatarDone'));
-  e.target.value='';
+  const av=document.getElementById('profile-avatar');av.innerHTML=`<img src="${u.publicUrl}" alt="avatar"><div class="profile-avatar-edit" id="av-edit-lbl">${tr('avEditLbl')}</div>`;av.onclick=()=>document.getElementById('avatar-input').click();
+  showToast(tr('toastAvatarDone'));e.target.value='';
 }
-
 async function saveProfile(){
   if(!currentUser)return;
-  const username=document.getElementById('edit-username').value.trim();
-  if(!username){showToast(tr('toastUsernameReq'));return;}
-  const bio=document.getElementById('edit-bio').value.trim();
-  const amp=document.getElementById('edit-amp').value.trim();
-  const x_url=document.getElementById('edit-x-url').value.trim();
-  const instagram_url=document.getElementById('edit-instagram-url').value.trim();
-  const{error}=await sb.from('users').upsert({
-    id:currentUser.id,email:currentUser.email,username,bio,amp,x_url,instagram_url,password_hash:''
-  },{onConflict:'id'});
+  const username=document.getElementById('edit-username').value.trim();if(!username){showToast(tr('toastUsernameReq'));return;}
+  const bio=document.getElementById('edit-bio').value.trim();const amp=document.getElementById('edit-amp').value.trim();const x_url=document.getElementById('edit-x-url').value.trim();const instagram_url=document.getElementById('edit-instagram-url').value.trim();
+  const{error}=await sb.from('users').upsert({id:currentUser.id,email:currentUser.email,username,bio,amp,x_url,instagram_url,password_hash:''},{onConflict:'id'});
   if(error){showToast(tr('toastSaveFail'));return;}
   await sb.auth.updateUser({data:{username}});
-  document.getElementById('profile-name').textContent=username;
-  document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
+  document.getElementById('profile-name').textContent=username;document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
   showToast(tr('toastSaveDone'));
 }
-
 function switchMyTab(tab){
-  ['posts','likes','notif'].forEach(t2=>{
-    document.getElementById('my-tab-'+t2).classList.toggle('on',t2===tab);
-    document.getElementById('my-panel-'+t2).style.display=t2===tab?'block':'none';
-  });
-  if(tab==='likes')loadLikedPosts();
-  if(tab==='notif')loadNotifications();
+  ['posts','likes','notif'].forEach(t2=>{document.getElementById('my-tab-'+t2).classList.toggle('on',t2===tab);document.getElementById('my-panel-'+t2).style.display=t2===tab?'block':'none';});
+  if(tab==='likes')loadLikedPosts();if(tab==='notif')loadNotifications();
 }
-
 async function loadMyPosts(){
-  if(!currentUser)return;
-  const el=document.getElementById('my-panel-posts');
-  el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
+  if(!currentUser)return;const el=document.getElementById('my-panel-posts');el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
   const{data}=await sb.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   if(!data||!data.length){el.innerHTML=`<div class="empty-msg">${tr('emptyPosts')}</div>`;return;}
   el.innerHTML=data.map(p=>postItemHTML(p)).join('');
 }
-
 async function loadLikedPosts(){
-  if(!currentUser)return;
-  const el=document.getElementById('my-panel-likes');
-  el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
-  const sid=localStorage.getItem('mgmb_sid');
-  const{data:likes}=await sb.from('likes').select('post_id').eq('session_id',sid);
+  if(!currentUser)return;const el=document.getElementById('my-panel-likes');el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
+  const sid=localStorage.getItem('mgmb_sid');const{data:likes}=await sb.from('likes').select('post_id').eq('session_id',sid);
   if(!likes||!likes.length){el.innerHTML=`<div class="empty-msg">${tr('emptyLikes')}</div>`;return;}
-  const ids=likes.map(l=>l.post_id);
-  const{data:posts}=await sb.from('posts').select('*').in('id',ids).order('created_at',{ascending:false});
+  const ids=likes.map(l=>l.post_id);const{data:posts}=await sb.from('posts').select('*').in('id',ids).order('created_at',{ascending:false});
   if(!posts||!posts.length){el.innerHTML=`<div class="empty-msg">${tr('emptyLikes')}</div>`;return;}
   el.innerHTML=posts.map(p=>postItemHTML(p)).join('');
 }
-
 function postItemHTML(p){
-  const thumb=p.image_urls&&p.image_urls[0]
-    ?`<img class="post-thumb" src="${p.image_urls[0]}" loading="lazy">`
-    :`<div class="post-thumb-empty">${p.post_type==='gear'?'🎸':'🎛'}</div>`;
-  return`<div class="post-item" onclick="location.href='/post?id=${p.id}'">
-    ${thumb}
-    <div class="post-info">
-      <div class="post-item-title">${escHtml(p.title)}</div>
-      <div class="post-item-meta">${timeAgo(p.created_at)}</div>
-      <div class="post-item-likes">❤️ ${p.likes||0}</div>
-    </div>
-  </div>`;
+  const thumb=p.image_urls&&p.image_urls[0]?`<img class="post-thumb" src="${p.image_urls[0]}" loading="lazy">`:`<div class="post-thumb-empty">${p.post_type==='gear'?'🎸':'🎛'}</div>`;
+  return`<div class="post-item" onclick="location.href='/post?id=${p.id}'">${thumb}<div class="post-info"><div class="post-item-title">${escHtml(p.title)}</div><div class="post-item-meta">${timeAgo(p.created_at)}</div><div class="post-item-likes">❤️ ${p.likes||0}</div></div></div>`;
 }
-
 async function loadNotifCount(){
   if(!currentUser)return;
   const{count}=await sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id).eq('is_read',false);
   const badge=document.getElementById('notif-badge');
-  if(count&&count>0){badge.textContent=count;badge.style.display='inline-flex';}
-  else{badge.style.display='none';}
+  if(count&&count>0){badge.textContent=count;badge.style.display='inline-flex';}else{badge.style.display='none';}
 }
-
 async function loadNotifications(){
-  if(!currentUser)return;
-  const el=document.getElementById('my-panel-notif');
-  el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
+  if(!currentUser)return;const el=document.getElementById('my-panel-notif');el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
   const{data}=await sb.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
   await sb.from('notifications').update({is_read:true}).eq('user_id',currentUser.id).eq('is_read',false);
   document.getElementById('notif-badge').style.display='none';
   if(!data||!data.length){el.innerHTML=`<div class="empty-msg">${tr('emptyNotif')}</div>`;return;}
-  el.innerHTML=data.map(n=>`
-    <div style="padding:14px;background:${n.is_read?'var(--sf)':'rgba(232,85,45,.06)'};border:1px solid ${n.is_read?'var(--bd)':'rgba(232,85,45,.2)'};border-radius:6px;margin-bottom:8px;cursor:pointer" onclick="${n.post_id?`location.href='/post?id=${n.post_id}'`:''}">
-      <div style="font-size:13px;margin-bottom:4px">${escHtml(n.message)}</div>
-      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${timeAgo(n.created_at)}</div>
-    </div>
-  `).join('');
+  el.innerHTML=data.map(n=>`<div style="padding:14px;background:${n.is_read?'var(--sf)':'rgba(232,85,45,.06)'};border:1px solid ${n.is_read?'var(--bd)':'rgba(232,85,45,.2)'};border-radius:6px;margin-bottom:8px;cursor:pointer" onclick="${n.post_id?`location.href='/post?id=${n.post_id}'`:''}"><div style="font-size:13px;margin-bottom:4px">${escHtml(n.message)}</div><div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${timeAgo(n.created_at)}</div></div>`).join('');
 }
-
 function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function timeAgo(ts){
-  const d=Math.floor((Date.now()-new Date(ts))/1000);
-  if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
-  if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';
-}
+function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';}
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000);}
 </script>
 </body>
