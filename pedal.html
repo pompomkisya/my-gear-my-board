@@ -75,6 +75,26 @@
       white-space: nowrap;
     }
 
+    /* パンくずリスト */
+    .breadcrumb {
+      background: #0a0a0a;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .breadcrumb a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb .sep { color: #555; }
+    .breadcrumb .current { color: var(--text); }
+
     /* メインコンテンツ */
     .container {
       max-width: 720px;
@@ -314,6 +334,14 @@
   <a href="/" class="header-home">🏠 ホーム</a>
 </header>
 
+<div class="breadcrumb">
+  <a href="/">ホーム</a>
+  <span class="sep">›</span>
+  <span id="breadcrumb-brand"></span>
+  <span class="sep" id="breadcrumb-sep2" style="display:none">›</span>
+  <span id="breadcrumb-model" class="current"></span>
+</div>
+
 <div class="container">
   <div id="content">
     <div class="loading">読み込み中...</div>
@@ -399,6 +427,11 @@ async function loadPedal() {
 }
 
 function renderPedal(pedal, boards) {
+  // パンくずリスト更新
+  document.getElementById('breadcrumb-brand').textContent = pedal.brand;
+  document.getElementById('breadcrumb-model').textContent = pedal.model;
+  document.getElementById('breadcrumb-sep2').style.display = 'inline';
+
   // 購入リンク生成
   const soundhouseUrl = pedal.soundhouse_url ||
     `https://www.soundhouse.co.jp/search/index?searchkey=${encodeURIComponent(pedal.full_name)}`;
