@@ -4,21 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ペダル詳細 | My Gear My Board</title>
-  <meta name="description" content="エフェクターペダルの詳細情報と、実際のボードでの使用例">
+  <meta name="description" content="">
   <link rel="icon" href="/IMG_0206.PNG">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
+    :root {
+      --bg: #111;
+      --card: #1a1a1a;
+      --card2: #222;
+      --border: #333;
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #e05a00;
+      --accent2: #1a73e8;
+      --amazon: #f0a500;
+      --sweetwater: #1a73e8;
+      --soundhouse: #e05a00;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #111;
-      color: #eee;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
       min-height: 100vh;
     }
 
     /* ヘッダー */
     header {
-      background: #1a1a1a;
-      border-bottom: 1px solid #333;
+      background: #0a0a0a;
+      border-bottom: 1px solid var(--border);
       padding: 12px 16px;
       display: flex;
       align-items: center;
@@ -32,152 +46,152 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
-      color: #eee;
     }
     .header-logo img {
       width: 40px;
       height: 40px;
-      border-radius: 8px;
+      border-radius: 50%;
     }
     .header-title {
       font-size: 13px;
       font-weight: 700;
-      line-height: 1.2;
+      color: var(--text);
       letter-spacing: 0.05em;
+      line-height: 1.2;
     }
-    .header-subtitle {
+    .header-sub {
       font-size: 10px;
-      color: #aaa;
+      color: var(--muted);
     }
-    .header-spacer { flex: 1; }
-    .header-home-btn {
-      background: #333;
-      color: #eee;
-      border: none;
-      padding: 6px 12px;
+    .header-home {
+      margin-left: auto;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
       border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
+      font-size: 13px;
       text-decoration: none;
+      white-space: nowrap;
     }
-
-    /* パンくず */
-    .breadcrumb {
-      padding: 12px 16px;
-      font-size: 12px;
-      color: #888;
-    }
-    .breadcrumb a { color: #f60; text-decoration: none; }
-    .breadcrumb span { margin: 0 6px; }
 
     /* メインコンテンツ */
     .container {
-      max-width: 800px;
+      max-width: 720px;
       margin: 0 auto;
-      padding: 0 16px 40px;
+      padding: 20px 16px 60px;
     }
 
-    /* ペダル情報カード */
-    .pedal-card {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-      border: 1px solid #2a2a2a;
+    /* ローディング */
+    .loading {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
     }
-    .pedal-header {
+
+    /* エラー */
+    .error-box {
+      background: var(--card);
+      border: 1px solid #c0392b;
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    /* ペダルメインカード */
+    .pedal-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .pedal-top {
       display: flex;
       gap: 20px;
       align-items: flex-start;
       margin-bottom: 20px;
     }
     .pedal-image {
-      width: 140px;
-      height: 140px;
-      object-fit: contain;
-      background: #2a2a2a;
-      border-radius: 10px;
+      width: 120px;
+      height: 120px;
       flex-shrink: 0;
-    }
-    .pedal-image-placeholder {
-      width: 140px;
-      height: 140px;
-      background: #2a2a2a;
-      border-radius: 10px;
+      background: var(--card2);
+      border-radius: 12px;
+      border: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 40px;
-      flex-shrink: 0;
-      color: #555;
+      overflow: hidden;
     }
-    .pedal-info { flex: 1; }
+    .pedal-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .pedal-image-placeholder {
+      font-size: 40px;
+      opacity: 0.3;
+    }
+    .pedal-info {
+      flex: 1;
+      min-width: 0;
+    }
     .pedal-brand {
-      font-size: 13px;
-      color: #f60;
-      font-weight: 600;
-      margin-bottom: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      margin-bottom: 6px;
     }
     .pedal-name {
       font-size: 22px;
       font-weight: 700;
-      margin-bottom: 10px;
       line-height: 1.3;
+      margin-bottom: 10px;
+      word-break: break-word;
     }
-    .pedal-types {
+    .type-badges {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 12px;
     }
     .type-badge {
-      background: #2a2a2a;
-      border: 1px solid #444;
-      color: #ccc;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--muted);
       font-size: 11px;
-      padding: 3px 8px;
+      padding: 3px 10px;
       border-radius: 20px;
     }
-    .pedal-price {
-      font-size: 20px;
-      font-weight: 700;
-      color: #f60;
-    }
-    .pedal-price-label {
-      font-size: 11px;
-      color: #888;
-      margin-bottom: 2px;
-    }
-
-    /* 説明文 */
     .pedal-description {
+      margin-top: 16px;
       font-size: 14px;
-      line-height: 1.7;
       color: #ccc;
-      border-top: 1px solid #2a2a2a;
+      line-height: 1.7;
       padding-top: 16px;
+      border-top: 1px solid var(--border);
     }
-    .no-description {
-      font-size: 13px;
-      color: #666;
+    .pedal-description.empty {
+      color: var(--muted);
       font-style: italic;
     }
 
-    /* 購入ボタン */
-    .buy-section {
-      background: #1e1e1e;
-      border-radius: 12px;
+    /* 購入ボタンカード */
+    .buy-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       padding: 20px;
-      margin-bottom: 24px;
-      border: 1px solid #2a2a2a;
+      margin-bottom: 16px;
     }
-    .buy-section h2 {
-      font-size: 14px;
-      color: #aaa;
+    .buy-card h3 {
+      font-size: 13px;
+      color: var(--muted);
       margin-bottom: 12px;
-      font-weight: 600;
+      text-align: center;
     }
     .buy-buttons {
       display: flex;
@@ -185,184 +199,149 @@
       gap: 10px;
     }
     .buy-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
       text-decoration: none;
-      cursor: pointer;
       border: none;
+      cursor: pointer;
       transition: opacity 0.2s;
     }
     .buy-btn:hover { opacity: 0.85; }
-    .buy-btn-soundhouse {
-      background: #e8380d;
-      color: #fff;
-    }
-    .buy-btn-sweetwater {
-      background: #0066cc;
-      color: #fff;
-    }
-    .buy-btn-amazon {
-      background: #ff9900;
-      color: #111;
-    }
-    .buy-btn-search {
-      background: #333;
-      color: #eee;
-      border: 1px solid #555;
-    }
+    .buy-btn.soundhouse { background: var(--soundhouse); color: #fff; }
+    .buy-btn.sweetwater { background: var(--sweetwater); color: #fff; }
+    .buy-btn.amazon { background: var(--amazon); color: #111; }
 
-    /* 使用ボード */
-    .boards-section {
-      margin-bottom: 24px;
+    /* 使用ボードセクション */
+    .boards-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
     }
-    .section-title {
-      font-size: 16px;
+    .boards-card h3 {
+      font-size: 15px;
       font-weight: 700;
       margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .section-title-count {
-      background: #f60;
-      color: #fff;
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 20px;
-    }
     .boards-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
     }
-    @media (min-width: 600px) {
-      .boards-grid { grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 480px) {
+      .boards-grid { grid-template-columns: 1fr 1fr; }
     }
-    .board-card {
-      background: #1e1e1e;
+    .board-item {
+      background: var(--card2);
+      border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
-      border: 1px solid #2a2a2a;
-      cursor: pointer;
       text-decoration: none;
+      color: var(--text);
       display: block;
       transition: border-color 0.2s;
     }
-    .board-card:hover { border-color: #f60; }
-    .board-card img {
+    .board-item:hover { border-color: var(--accent); }
+    .board-thumb {
       width: 100%;
       aspect-ratio: 4/3;
-      object-fit: cover;
-      display: block;
       background: #2a2a2a;
+      overflow: hidden;
     }
-    .board-card-info {
-      padding: 8px 10px;
+    .board-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
-    .board-card-title {
+    .board-thumb-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--border);
+    }
+    .board-meta {
+      padding: 10px;
+    }
+    .board-title {
       font-size: 12px;
       font-weight: 600;
-      color: #eee;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      margin-bottom: 4px;
     }
-    .board-card-user {
+    .board-user {
       font-size: 11px;
-      color: #888;
-      margin-top: 2px;
+      color: var(--muted);
     }
     .no-boards {
-      background: #1e1e1e;
-      border-radius: 12px;
-      padding: 32px;
       text-align: center;
-      color: #666;
+      padding: 30px;
+      color: var(--muted);
       font-size: 14px;
-      border: 1px solid #2a2a2a;
     }
     .no-boards a {
-      color: #f60;
+      color: var(--accent);
       text-decoration: none;
-    }
-
-    /* 同ブランド */
-    .related-section { margin-bottom: 24px; }
-    .related-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .related-item {
-      background: #1e1e1e;
-      border-radius: 8px;
-      padding: 12px 16px;
-      text-decoration: none;
-      color: #eee;
-      border: 1px solid #2a2a2a;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: border-color 0.2s;
-    }
-    .related-item:hover { border-color: #f60; }
-    .related-item-name { font-size: 13px; font-weight: 600; }
-    .related-item-types { font-size: 11px; color: #888; margin-top: 2px; }
-    .related-item-arrow { color: #555; font-size: 16px; }
-
-    /* ローディング */
-    .loading {
-      text-align: center;
-      padding: 60px 20px;
-      color: #666;
-      font-size: 14px;
-    }
-    .error-msg {
-      text-align: center;
-      padding: 60px 20px;
-      color: #e55;
-      font-size: 14px;
+      display: block;
+      margin-top: 10px;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
 
-<!-- ヘッダー -->
 <header>
   <a href="/" class="header-logo">
     <img src="/IMG_0206.PNG" alt="MGMB">
     <div>
       <div class="header-title">MY GEAR MY BOARD</div>
-      <div class="header-subtitle">ペダルボードSNS</div>
+      <div class="header-sub">ペダルボードSNS</div>
     </div>
   </a>
-  <div class="header-spacer"></div>
-  <a href="/" class="header-home-btn">🏠 ホーム</a>
+  <a href="/" class="header-home">🏠 ホーム</a>
 </header>
 
-<!-- パンくず -->
-<div class="breadcrumb">
-  <a href="/">ホーム</a>
-  <span>›</span>
-  <a href="/pedals.html">ペダル一覧</a>
-  <span>›</span>
-  <span id="breadcrumb-name">読み込み中...</span>
-</div>
-
-<!-- メイン -->
 <div class="container">
-  <div id="main-content" class="loading">読み込み中...</div>
+  <div id="content">
+    <div class="loading">読み込み中...</div>
+  </div>
 </div>
 
 <script>
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// タイプ表示名マッピング
+const TYPE_LABELS = {
+  'overdrive': 'OD', 'od': 'OD', 'distortion': 'Dist', 'dist': 'Dist',
+  'fuzz': 'Fuzz', 'boost': 'Boost', 'reverb': 'Reverb', 'delay': 'Delay',
+  'chorus': 'Chorus', 'flanger': 'Flanger', 'phaser': 'Phaser',
+  'modulation': 'Mod', 'mod': 'Mod', 'tremolo': 'Tremolo', 'vibrato': 'Vibrato',
+  'pitch': 'Pitch', 'wah': 'Wah', 'compressor': 'Comp', 'comp': 'Comp',
+  'eq': 'EQ', 'noise_gate': 'Noise Gate', 'looper': 'Looper',
+  'volume': 'Volume', 'tuner': 'Tuner', 'multi': 'Multi FX',
+  'preamp': 'Preamp', 'switcher': 'Switcher', 'buffer': 'Buffer',
+  'junction_box': 'Junction Box', 'pre': 'Preamp'
+};
+
+function getTypeLabel(t) {
+  return TYPE_LABELS[t?.toLowerCase()] || t;
+}
 
 // URLからslugを取得
 function getSlug() {
@@ -370,207 +349,143 @@ function getSlug() {
   return params.get('slug');
 }
 
-// Supabase fetch
-async function supabaseFetch(endpoint) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`
-    }
-  });
-  if (!res.ok) throw new Error('fetch error');
-  return res.json();
-}
-
-// タイプ表示名
-const TYPE_LABELS = {
-  'overdrive': 'OD', 'distortion': 'Dist', 'fuzz': 'Fuzz', 'boost': 'Boost',
-  'reverb': 'Reverb', 'delay': 'Delay', 'chorus': 'Chorus', 'flanger': 'Flanger',
-  'phaser': 'Phaser', 'tremolo': 'Tremolo', 'vibrato': 'Vibrato', 'pitch': 'Pitch',
-  'wah': 'Wah', 'comp': 'Comp', 'eq': 'EQ', 'noise_gate': 'Noise Gate',
-  'looper': 'Looper', 'volume': 'Volume', 'tuner': 'Tuner', 'multi': 'Multi FX',
-  'preamp': 'Preamp', 'switcher': 'Switcher', 'buffer': 'Buffer',
-  'mod': 'Mod', 'pre': 'Preamp', 'boost': 'Boost'
-};
-
-function formatType(t) {
-  return TYPE_LABELS[t] || t;
-}
-
-// 価格フォーマット
-function formatPrice(price) {
-  if (!price) return null;
-  return '¥' + price.toLocaleString();
-}
-
-// メイン処理
-async function init() {
+async function loadPedal() {
   const slug = getSlug();
-  const container = document.getElementById('main-content');
-
   if (!slug) {
-    container.innerHTML = '<div class="error-msg">ペダルが見つかりません。<br><a href="/" style="color:#f60">ホームに戻る</a></div>';
+    showError('ペダルが指定されていません。');
     return;
   }
 
-  try {
-    // ペダル情報取得
-    const pedals = await supabaseFetch(`pedals?slug=eq.${encodeURIComponent(slug)}&limit=1`);
-    if (!pedals || pedals.length === 0) {
-      container.innerHTML = '<div class="error-msg">ペダルが見つかりません。<br><a href="/" style="color:#f60">ホームに戻る</a></div>';
-      return;
-    }
-    const pedal = pedals[0];
+  // ペダル情報取得
+  const { data: pedal, error } = await db
+    .from('pedals')
+    .select('*')
+    .eq('slug', slug)
+    .single();
 
-    // ページタイトル・メタ更新
-    document.title = `${pedal.full_name} | My Gear My Board`;
-    document.querySelector('meta[name="description"]').content =
-      `${pedal.full_name}の情報と、実際のボードでの使用例をチェック。`;
-    document.getElementById('breadcrumb-name').textContent = pedal.full_name;
-
-    // このペダルを使っているpostを取得
-    // postsテーブルのgear_listにfull_nameが含まれるものを検索
-    const posts = await supabaseFetch(
-      `posts?select=id,title,username,image_urls,gear_list&gear_list=cs.["${pedal.full_name}"]&limit=12&order=created_at.desc`
-    );
-
-    // 同ブランドの他ペダル
-    const related = await supabaseFetch(
-      `pedals?brand=eq.${encodeURIComponent(pedal.brand)}&slug=neq.${encodeURIComponent(slug)}&limit=6&order=model.asc`
-    );
-
-    // HTML構築
-    container.innerHTML = buildHTML(pedal, posts || [], related || []);
-
-  } catch (e) {
-    console.error(e);
-    container.innerHTML = '<div class="error-msg">読み込みに失敗しました。<br><a href="/" style="color:#f60">ホームに戻る</a></div>';
+  if (error || !pedal) {
+    showError('ペダルが見つかりませんでした。');
+    return;
   }
+
+  // ページタイトル・description更新
+  document.title = `${pedal.full_name} | My Gear My Board`;
+  document.querySelector('meta[name="description"]').setAttribute(
+    'content',
+    `${pedal.full_name}のペダル情報と、実際のエフェクターボードでの使用例をチェック。`
+  );
+
+  // 使用ボード取得（gear_list jsonbの中でfull_nameが一致するもの）
+  const { data: posts } = await db
+    .from('posts')
+    .select('id, title, username, image_urls, gear_list')
+    .contains('gear_list', JSON.stringify([{name: pedal.full_name}]))
+    .order('created_at', { ascending: false })
+    .limit(6);
+
+  // もしcontainsで取れない場合はILIKEで再試行
+  let boards = posts || [];
+  if (boards.length === 0) {
+    const { data: posts2 } = await db
+      .from('posts')
+      .select('id, title, username, image_urls, gear_list')
+      .filter('gear_list', 'cs', `[{"name":"${pedal.full_name}"}]`)
+      .order('created_at', { ascending: false })
+      .limit(6);
+    boards = posts2 || [];
+  }
+
+  renderPedal(pedal, boards);
 }
 
-function buildHTML(pedal, posts, related) {
-  const types = pedal.types || [];
-  const price = formatPrice(pedal.price_jpy);
-
-  // 購入ボタン
+function renderPedal(pedal, boards) {
+  // 購入リンク生成
   const soundhouseUrl = pedal.soundhouse_url ||
-    `https://www.soundhouse.co.jp/search/index?s.searchWord=${encodeURIComponent(pedal.full_name)}`;
+    `https://www.soundhouse.co.jp/search/index?searchkey=${encodeURIComponent(pedal.full_name)}`;
   const sweetwaterUrl =
-    `https://www.sweetwater.com/store/search.php?s=${encodeURIComponent(pedal.full_name)}`;
+    `https://www.sweetwater.com/store/search.php?q=${encodeURIComponent(pedal.full_name)}`;
   const amazonUrl = pedal.amazon_url ||
     `https://www.amazon.co.jp/s?k=${encodeURIComponent(pedal.full_name)}`;
 
-  // 使用ボード
-  let boardsHTML = '';
-  if (posts.length > 0) {
-    const cards = posts.map(p => {
-      const img = p.image_urls && p.image_urls.length > 0
-        ? `<img src="${p.image_urls[0]}" alt="${p.title || 'ボード'}" loading="lazy">`
-        : `<div style="width:100%;aspect-ratio:4/3;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-size:28px;">🎛</div>`;
-      const title = p.title || '無題のボード';
-      const user = p.username ? `@${p.username}` : '匿名ユーザー';
+  // タイプバッジ
+  const typesHtml = (pedal.types || []).map(t =>
+    `<span class="type-badge">${getTypeLabel(t)}</span>`
+  ).join('');
+
+  // 画像
+  const imageHtml = pedal.image_url
+    ? `<img src="${pedal.image_url}" alt="${pedal.full_name}" loading="lazy">`
+    : `<span class="pedal-image-placeholder">🎛</span>`;
+
+  // 説明文
+  const descHtml = pedal.description
+    ? `<div class="pedal-description">${pedal.description}</div>`
+    : `<div class="pedal-description empty">説明文は準備中です。</div>`;
+
+  // ボード一覧
+  let boardsHtml = '';
+  if (boards.length > 0) {
+    boardsHtml = boards.map(post => {
+      const thumb = (post.image_urls && post.image_urls.length > 0)
+        ? `<img src="${post.image_urls[0]}" alt="${post.title || ''}" loading="lazy">`
+        : `<div class="board-thumb-placeholder">🎸</div>`;
+      const user = post.username ? `@${post.username}` : '匿名';
+      const title = post.title || '無題のボード';
       return `
-        <a href="/post.html?id=${p.id}" class="board-card">
-          ${img}
-          <div class="board-card-info">
-            <div class="board-card-title">${title}</div>
-            <div class="board-card-user">${user}</div>
+        <a href="/post?id=${post.id}" class="board-item">
+          <div class="board-thumb">${thumb}</div>
+          <div class="board-meta">
+            <div class="board-title">${title}</div>
+            <div class="board-user">${user}</div>
           </div>
         </a>`;
     }).join('');
-    boardsHTML = `<div class="boards-grid">${cards}</div>`;
   } else {
-    boardsHTML = `
+    boardsHtml = `
       <div class="no-boards">
         このペダルを使ったボードはまだありません。<br>
         <a href="/">あなたのボードを投稿する →</a>
       </div>`;
   }
 
-  // 同ブランド
-  let relatedHTML = '';
-  if (related.length > 0) {
-    relatedHTML = related.map(r => {
-      const rtypes = (r.types || []).map(formatType).join(' · ');
-      return `
-        <a href="/pedal.html?slug=${r.slug}" class="related-item">
-          <div>
-            <div class="related-item-name">${r.model}</div>
-            <div class="related-item-types">${rtypes}</div>
-          </div>
-          <div class="related-item-arrow">›</div>
-        </a>`;
-    }).join('');
-  }
-
-  return `
-    <!-- ペダル情報 -->
+  document.getElementById('content').innerHTML = `
     <div class="pedal-card">
-      <div class="pedal-header">
-        ${pedal.image_url
-          ? `<img src="${pedal.image_url}" alt="${pedal.full_name}" class="pedal-image">`
-          : `<div class="pedal-image-placeholder">🎛</div>`
-        }
+      <div class="pedal-top">
+        <div class="pedal-image">${imageHtml}</div>
         <div class="pedal-info">
           <div class="pedal-brand">${pedal.brand}</div>
           <div class="pedal-name">${pedal.model}</div>
-          <div class="pedal-types">
-            ${types.map(t => `<span class="type-badge">${formatType(t)}</span>`).join('')}
-          </div>
-          ${price ? `
-            <div class="pedal-price-label">参考価格</div>
-            <div class="pedal-price">${price}</div>
-          ` : ''}
+          <div class="type-badges">${typesHtml}</div>
         </div>
       </div>
-      <div class="pedal-description">
-        ${pedal.description
-          ? pedal.description
-          : `<span class="no-description">説明文は準備中です。</span>`
-        }
-      </div>
+      ${descHtml}
     </div>
 
-    <!-- 購入 -->
-    <div class="buy-section">
-      <h2>🛒 購入・価格をチェック</h2>
+    <div class="buy-card">
+      <h3>🛒 購入・価格をチェック</h3>
       <div class="buy-buttons">
-        <a href="${soundhouseUrl}" target="_blank" rel="noopener" class="buy-btn buy-btn-soundhouse">
-          🎸 サウンドハウスで探す
-        </a>
-        <a href="${sweetwaterUrl}" target="_blank" rel="noopener" class="buy-btn buy-btn-sweetwater">
-          🎵 Sweetwaterで探す
-        </a>
-        <a href="${amazonUrl}" target="_blank" rel="noopener" class="buy-btn buy-btn-amazon">
-          📦 Amazonで探す
-        </a>
+        <a href="${soundhouseUrl}" target="_blank" rel="noopener" class="buy-btn soundhouse">🎸 サウンドハウスで探す</a>
+        <a href="${sweetwaterUrl}" target="_blank" rel="noopener" class="buy-btn sweetwater">🎵 Sweetwaterで探す</a>
+        <a href="${amazonUrl}" target="_blank" rel="noopener" class="buy-btn amazon">📦 Amazonで探す</a>
       </div>
     </div>
 
-    <!-- 使用ボード -->
-    <div class="boards-section">
-      <div class="section-title">
-        🎛 このペダルを使ったボード
-        ${posts.length > 0 ? `<span class="section-title-count">${posts.length}件</span>` : ''}
-      </div>
-      ${boardsHTML}
+    <div class="boards-card">
+      <h3>🎛 このペダルを使ったボード</h3>
+      <div class="boards-grid">${boardsHtml}</div>
     </div>
-
-    <!-- 同ブランド -->
-    ${related.length > 0 ? `
-    <div class="related-section">
-      <div class="section-title">
-        🏷 ${pedal.brand}の他のペダル
-      </div>
-      <div class="related-list">
-        ${relatedHTML}
-      </div>
-    </div>
-    ` : ''}
   `;
 }
 
-init();
+function showError(msg) {
+  document.getElementById('content').innerHTML = `
+    <div class="error-box">
+      <p>${msg}</p>
+      <a href="/" style="color:var(--accent);margin-top:16px;display:block;">← ホームに戻る</a>
+    </div>`;
+}
+
+loadPedal();
 </script>
 </body>
 </html>
