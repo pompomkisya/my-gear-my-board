@@ -1046,6 +1046,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
 document.addEventListener('DOMContentLoaded',()=>{
   checkMobile();
   initSwipe();
+  // モバイルで確実に中央パネル（フィード）から表示する
+  setTimeout(()=>goPanel(1),50);
   loadPostsFromDB();
   loadBrandsDropdown();
   applyLangUI();
