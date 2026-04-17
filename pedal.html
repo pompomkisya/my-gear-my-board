@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ペダル詳細 | My Gear My Board</title>
-  <meta name="description" content="">
+  <title>エフェクターペダル一覧 | My Gear My Board</title>
+  <meta name="description" content="エフェクターペダルをブランド・タイプ・キーワードで検索。実際のボードでの使用例も確認できます。">
   <link rel="icon" href="/IMG_0206.PNG">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -16,10 +16,6 @@
       --text: #f0f0f0;
       --muted: #888;
       --accent: #e05a00;
-      --accent2: #1a73e8;
-      --amazon: #f0a500;
-      --sweetwater: #1a73e8;
-      --soundhouse: #e05a00;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -47,22 +43,9 @@
       gap: 10px;
       text-decoration: none;
     }
-    .header-logo img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-    }
-    .header-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: 0.05em;
-      line-height: 1.2;
-    }
-    .header-sub {
-      font-size: 10px;
-      color: var(--muted);
-    }
+    .header-logo img { width: 40px; height: 40px; border-radius: 50%; }
+    .header-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.05em; line-height: 1.2; }
+    .header-sub { font-size: 10px; color: var(--muted); }
     .header-home {
       margin-left: auto;
       background: var(--card2);
@@ -75,7 +58,7 @@
       white-space: nowrap;
     }
 
-    /* パンくずリスト */
+    /* パンくず */
     .breadcrumb {
       background: #1e1e1e;
       border-bottom: 1px solid var(--border);
@@ -86,240 +69,190 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      flex-wrap: wrap;
     }
-    .breadcrumb a {
-      color: var(--muted);
-      text-decoration: none;
-    }
+    .breadcrumb a { color: #aaa; text-decoration: none; }
     .breadcrumb a:hover { color: var(--text); }
     .breadcrumb .sep { color: #555; }
     .breadcrumb .current { color: var(--text); }
 
-    /* メインコンテンツ */
+    /* 検索エリア */
+    .search-area {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 16px;
+      position: sticky;
+      top: 65px;
+      z-index: 90;
+    }
+    .search-input-wrap {
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 12px 12px 38px;
+      color: var(--text);
+      font-size: 16px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--muted); }
+
+    .filter-row {
+      display: flex;
+      gap: 8px;
+    }
+    .filter-select {
+      flex: 1;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .filter-select:focus { border-color: var(--accent); }
+
+    /* コンテンツ */
     .container {
       max-width: 720px;
       margin: 0 auto;
       padding: 20px 16px 60px;
     }
 
-    /* ローディング */
-    .loading {
-      text-align: center;
-      padding: 60px 20px;
+    .result-count {
+      font-size: 12px;
       color: var(--muted);
+      margin-bottom: 14px;
+    }
+    .result-count span { color: var(--accent); font-weight: 700; }
+
+    /* ペダルグリッド */
+    .pedal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 480px) {
+      .pedal-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    /* エラー */
-    .error-box {
-      background: var(--card);
-      border: 1px solid #c0392b;
-      border-radius: 12px;
-      padding: 40px 20px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    /* ペダルメインカード */
     .pedal-card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 16px;
-    }
-    .pedal-top {
-      display: flex;
-      gap: 20px;
-      align-items: flex-start;
-      margin-bottom: 20px;
-    }
-    .pedal-image {
-      width: 120px;
-      height: 120px;
-      flex-shrink: 0;
-      background: var(--card2);
       border-radius: 12px;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    .pedal-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .pedal-image-placeholder {
-      font-size: 40px;
-      opacity: 0.3;
-    }
-    .pedal-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .pedal-brand {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .pedal-name {
-      font-size: 22px;
-      font-weight: 700;
-      line-height: 1.3;
-      margin-bottom: 10px;
-      word-break: break-word;
-    }
-    .type-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .type-badge {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
-    .pedal-description {
-      margin-top: 16px;
-      font-size: 14px;
-      color: #ccc;
-      line-height: 1.7;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-    .pedal-description.empty {
-      color: var(--muted);
-      font-style: italic;
-    }
-
-    /* 購入ボタンカード */
-    .buy-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .buy-card h3 {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 12px;
-      text-align: center;
-    }
-    .buy-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .buy-btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      text-align: center;
-      font-size: 15px;
-      font-weight: 700;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    .buy-btn:hover { opacity: 0.85; }
-    .buy-btn.soundhouse { background: var(--soundhouse); color: #fff; }
-    .buy-btn.sweetwater { background: var(--sweetwater); color: #fff; }
-    .buy-btn.amazon { background: var(--amazon); color: #111; }
-
-    /* 使用ボードセクション */
-    .boards-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .boards-card h3 {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .boards-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-    @media (max-width: 480px) {
-      .boards-grid { grid-template-columns: 1fr 1fr; }
-    }
-    .board-item {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
       overflow: hidden;
       text-decoration: none;
       color: var(--text);
       display: block;
       transition: border-color 0.2s;
     }
-    .board-item:hover { border-color: var(--accent); }
-    .board-thumb {
+    .pedal-card:hover { border-color: var(--accent); }
+
+    .pedal-card-image {
       width: 100%;
-      aspect-ratio: 4/3;
-      background: #2a2a2a;
-      overflow: hidden;
-    }
-    .board-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .board-thumb-placeholder {
-      width: 100%;
-      height: 100%;
+      aspect-ratio: 1;
+      background: var(--card2);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
-      color: var(--border);
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
     }
-    .board-meta {
+    .pedal-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .pedal-card-image-placeholder {
+      font-size: 32px;
+      opacity: 0.2;
+    }
+
+    .pedal-card-body {
       padding: 10px;
     }
-    .board-title {
-      font-size: 12px;
-      font-weight: 600;
+    .pedal-card-brand {
+      font-size: 10px;
+      color: var(--accent);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin-bottom: 4px;
     }
-    .board-user {
-      font-size: 11px;
+    .pedal-card-name {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.3;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .pedal-card-types {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+    .type-badge {
+      background: var(--card2);
+      border: 1px solid var(--border);
       color: var(--muted);
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 20px;
+      white-space: nowrap;
     }
-    .no-boards {
+
+    /* ローディング・空状態 */
+    .loading { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-state {
       text-align: center;
-      padding: 30px;
+      padding: 60px 20px;
       color: var(--muted);
       font-size: 14px;
     }
-    .no-boards a {
-      color: var(--accent);
-      text-decoration: none;
-      display: block;
-      margin-top: 10px;
-      font-weight: 600;
+
+    /* もっと見るボタン */
+    .load-more {
+      width: 100%;
+      padding: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
     }
+    .load-more:hover { color: var(--text); border-color: var(--accent); }
+    .load-more:disabled { opacity: 0.4; cursor: default; }
   </style>
 </head>
 <body>
@@ -338,15 +271,52 @@
 <div class="breadcrumb">
   <a href="/">ホーム</a>
   <span class="sep">›</span>
-  <span id="breadcrumb-brand"></span>
-  <span class="sep" id="breadcrumb-sep2" style="display:none">›</span>
-  <span id="breadcrumb-model" class="current"></span>
+  <span class="current">ペダル一覧</span>
+</div>
+
+<div class="search-area">
+  <div class="search-input-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" id="search-input" placeholder="ペダルを検索..." autocomplete="off">
+  </div>
+  <div class="filter-row">
+    <select class="filter-select" id="brand-select">
+      <option value="">ブランド：すべて</option>
+    </select>
+    <select class="filter-select" id="type-select">
+      <option value="">タイプ：すべて</option>
+      <option value="overdrive">OD（オーバードライブ）</option>
+      <option value="distortion">Dist（ディストーション）</option>
+      <option value="fuzz">Fuzz（ファズ）</option>
+      <option value="boost">Boost（ブースター）</option>
+      <option value="reverb">Reverb（リバーブ）</option>
+      <option value="delay">Delay（ディレイ）</option>
+      <option value="chorus">Chorus（コーラス）</option>
+      <option value="flanger">Flanger（フランジャー）</option>
+      <option value="phaser">Phaser（フェイザー）</option>
+      <option value="tremolo">Tremolo（トレモロ）</option>
+      <option value="vibrato">Vibrato（ビブラート）</option>
+      <option value="pitch">Pitch（ピッチ）</option>
+      <option value="wah">Wah（ワウ）</option>
+      <option value="comp">Comp（コンプレッサー）</option>
+      <option value="eq">EQ（イコライザー）</option>
+      <option value="noise_gate">Noise Gate</option>
+      <option value="looper">Looper（ルーパー）</option>
+      <option value="volume">Volume（ボリューム）</option>
+      <option value="tuner">Tuner（チューナー）</option>
+      <option value="multi">Multi FX（マルチ）</option>
+      <option value="preamp">Preamp（プリアンプ）</option>
+      <option value="switcher">Switcher（スイッチャー）</option>
+      <option value="buffer">Buffer（バッファー）</option>
+    </select>
+  </div>
 </div>
 
 <div class="container">
-  <div id="content">
-    <div class="loading">読み込み中...</div>
-  </div>
+  <div class="result-count" id="result-count"></div>
+  <div id="pedal-grid" class="pedal-grid"></div>
+  <div id="loading" class="loading">読み込み中...</div>
+  <button class="load-more" id="load-more" style="display:none" onclick="loadMore()">さらに読み込む</button>
 </div>
 
 <script>
@@ -355,7 +325,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// タイプ表示名マッピング
 const TYPE_LABELS = {
   'overdrive': 'OD', 'od': 'OD', 'distortion': 'Dist', 'dist': 'Dist',
   'fuzz': 'Fuzz', 'boost': 'Boost', 'reverb': 'Reverb', 'delay': 'Delay',
@@ -365,162 +334,156 @@ const TYPE_LABELS = {
   'eq': 'EQ', 'noise_gate': 'Noise Gate', 'looper': 'Looper',
   'volume': 'Volume', 'tuner': 'Tuner', 'multi': 'Multi FX',
   'preamp': 'Preamp', 'switcher': 'Switcher', 'buffer': 'Buffer',
-  'junction_box': 'Junction Box', 'pre': 'Preamp'
+  'junction_box': 'Junction Box', 'pre': 'Preamp', 'acoustic': 'Acoustic',
+  'other': 'Other'
 };
+function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()] || t; }
 
-function getTypeLabel(t) {
-  return TYPE_LABELS[t?.toLowerCase()] || t;
-}
+const LIMIT = 24;
+let offset = 0;
+let total = 0;
+let searchTimer = null;
+let currentSearch = '';
+let currentBrand = '';
+let currentType = '';
 
-// URLからslugを取得
-function getSlug() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('slug');
-}
-
-async function loadPedal() {
-  const slug = getSlug();
-  if (!slug) {
-    showError('ペダルが指定されていません。');
-    return;
-  }
-
-  // ペダル情報取得
-  const { data: pedal, error } = await db
+// ブランド一覧を取得してドロップダウンに追加
+async function loadBrands() {
+  const { data } = await db
     .from('pedals')
-    .select('*')
-    .eq('slug', slug)
-    .single();
+    .select('brand')
+    .order('brand', { ascending: true });
 
-  if (error || !pedal) {
-    showError('ペダルが見つかりませんでした。');
+  if (!data) return;
+  const brands = [...new Set(data.map(d => d.brand))].filter(Boolean).sort();
+  const select = document.getElementById('brand-select');
+  brands.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b;
+    opt.textContent = b;
+    select.appendChild(opt);
+  });
+}
+
+// ペダル取得
+async function fetchPedals(reset = false) {
+  if (reset) {
+    offset = 0;
+    document.getElementById('pedal-grid').innerHTML = '';
+    document.getElementById('load-more').style.display = 'none';
+  }
+
+  document.getElementById('loading').style.display = 'block';
+
+  let query = db
+    .from('pedals')
+    .select('id, brand, model, slug, types, image_url', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(offset, offset + LIMIT - 1);
+
+  if (currentSearch) {
+    query = query.ilike('full_name', `%${currentSearch}%`);
+  }
+  if (currentBrand) {
+    query = query.eq('brand', currentBrand);
+  }
+  if (currentType) {
+    query = query.contains('types', [currentType]);
+  }
+
+  const { data, count, error } = await query;
+
+  document.getElementById('loading').style.display = 'none';
+
+  if (error || !data) return;
+
+  if (reset) total = count || 0;
+
+  // 結果件数表示
+  document.getElementById('result-count').innerHTML =
+    total > 0 ? `<span>${total}</span> 件のペダルが見つかりました` : '';
+
+  if (data.length === 0 && offset === 0) {
+    document.getElementById('pedal-grid').innerHTML =
+      '<div class="empty-state" style="grid-column:1/-1">ペダルが見つかりませんでした。</div>';
     return;
   }
 
-  // ページタイトル・description更新
-  document.title = `${pedal.full_name} | My Gear My Board`;
-  document.querySelector('meta[name="description"]').setAttribute(
-    'content',
-    `${pedal.full_name}のペダル情報と、実際のエフェクターボードでの使用例をチェック。`
-  );
+  renderPedals(data);
+  offset += LIMIT;
 
-  // 使用ボード取得（gear_list jsonbの中でfull_nameが一致するもの）
-  const { data: posts } = await db
-    .from('posts')
-    .select('id, title, username, image_urls, gear_list')
-    .contains('gear_list', JSON.stringify([{name: pedal.full_name}]))
-    .order('created_at', { ascending: false })
-    .limit(6);
-
-  // もしcontainsで取れない場合はILIKEで再試行
-  let boards = posts || [];
-  if (boards.length === 0) {
-    const { data: posts2 } = await db
-      .from('posts')
-      .select('id, title, username, image_urls, gear_list')
-      .filter('gear_list', 'cs', `[{"name":"${pedal.full_name}"}]`)
-      .order('created_at', { ascending: false })
-      .limit(6);
-    boards = posts2 || [];
-  }
-
-  renderPedal(pedal, boards);
-}
-
-function renderPedal(pedal, boards) {
-  // パンくずリスト更新
-  document.getElementById('breadcrumb-brand').innerHTML =
-    `<a href="/brand?name=${encodeURIComponent(pedal.brand)}" style="color:#aaa;text-decoration:none;">${pedal.brand}</a>`;
-  document.getElementById('breadcrumb-model').textContent = pedal.model;
-  document.getElementById('breadcrumb-sep2').style.display = 'inline';
-
-  // 購入リンク生成
-  const soundhouseUrl = pedal.soundhouse_url ||
-    `https://www.soundhouse.co.jp/search/index?searchkey=${encodeURIComponent(pedal.full_name)}`;
-  const sweetwaterUrl =
-    `https://www.sweetwater.com/store/search.php?q=${encodeURIComponent(pedal.full_name)}`;
-  const amazonUrl = pedal.amazon_url ||
-    `https://www.amazon.co.jp/s?k=${encodeURIComponent(pedal.full_name)}`;
-
-  // タイプバッジ
-  const typesHtml = (pedal.types || []).map(t =>
-    `<span class="type-badge">${getTypeLabel(t)}</span>`
-  ).join('');
-
-  // 画像
-  const imageHtml = pedal.image_url
-    ? `<img src="${pedal.image_url}" alt="${pedal.full_name}" loading="lazy">`
-    : `<span class="pedal-image-placeholder">🎛</span>`;
-
-  // 説明文
-  const descHtml = pedal.description
-    ? `<div class="pedal-description">${pedal.description}</div>`
-    : `<div class="pedal-description empty">説明文は準備中です。</div>`;
-
-  // ボード一覧
-  let boardsHtml = '';
-  if (boards.length > 0) {
-    boardsHtml = boards.map(post => {
-      const thumb = (post.image_urls && post.image_urls.length > 0)
-        ? `<img src="${post.image_urls[0]}" alt="${post.title || ''}" loading="lazy">`
-        : `<div class="board-thumb-placeholder">🎸</div>`;
-      const user = post.username ? `@${post.username}` : '匿名';
-      const title = post.title || '無題のボード';
-      return `
-        <a href="/post?id=${post.id}" class="board-item">
-          <div class="board-thumb">${thumb}</div>
-          <div class="board-meta">
-            <div class="board-title">${title}</div>
-            <div class="board-user">${user}</div>
-          </div>
-        </a>`;
-    }).join('');
+  // もっと見るボタン
+  const btn = document.getElementById('load-more');
+  if (offset < total) {
+    btn.style.display = 'block';
+    btn.textContent = `さらに読み込む（残り ${total - offset} 件）`;
   } else {
-    boardsHtml = `
-      <div class="no-boards">
-        このペダルを使ったボードはまだありません。<br>
-        <a href="/">あなたのボードを投稿する →</a>
-      </div>`;
+    btn.style.display = 'none';
   }
-
-  document.getElementById('content').innerHTML = `
-    <div class="pedal-card">
-      <div class="pedal-top">
-        <div class="pedal-image">${imageHtml}</div>
-        <div class="pedal-info">
-          <div class="pedal-brand">${pedal.brand}</div>
-          <div class="pedal-name">${pedal.model}</div>
-          <div class="type-badges">${typesHtml}</div>
-        </div>
-      </div>
-      ${descHtml}
-    </div>
-
-    <div class="buy-card">
-      <h3>🛒 購入・価格をチェック</h3>
-      <div class="buy-buttons">
-        <a href="${soundhouseUrl}" target="_blank" rel="noopener" class="buy-btn soundhouse">🎸 サウンドハウスで探す</a>
-        <a href="${sweetwaterUrl}" target="_blank" rel="noopener" class="buy-btn sweetwater">🎵 Sweetwaterで探す</a>
-        <a href="${amazonUrl}" target="_blank" rel="noopener" class="buy-btn amazon">📦 Amazonで探す</a>
-      </div>
-    </div>
-
-    <div class="boards-card">
-      <h3>🎛 このペダルを使ったボード</h3>
-      <div class="boards-grid">${boardsHtml}</div>
-    </div>
-  `;
 }
 
-function showError(msg) {
-  document.getElementById('content').innerHTML = `
-    <div class="error-box">
-      <p>${msg}</p>
-      <a href="/" style="color:var(--accent);margin-top:16px;display:block;">← ホームに戻る</a>
-    </div>`;
+function renderPedals(pedals) {
+  const grid = document.getElementById('pedal-grid');
+  pedals.forEach(p => {
+    const typesHtml = (p.types || []).slice(0, 2).map(t =>
+      `<span class="type-badge">${getTypeLabel(t)}</span>`
+    ).join('');
+    const imageHtml = p.image_url
+      ? `<img src="${p.image_url}" alt="${p.model}" loading="lazy">`
+      : `<span class="pedal-card-image-placeholder">🎛</span>`;
+
+    const card = document.createElement('a');
+    card.href = `/pedal?slug=${p.slug}`;
+    card.className = 'pedal-card';
+    card.innerHTML = `
+      <div class="pedal-card-image">${imageHtml}</div>
+      <div class="pedal-card-body">
+        <div class="pedal-card-brand">${p.brand}</div>
+        <div class="pedal-card-name">${p.model}</div>
+        <div class="pedal-card-types">${typesHtml}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
 }
 
-loadPedal();
+function loadMore() {
+  fetchPedals(false);
+}
+
+// イベント：検索（入力から300ms後に実行）
+document.getElementById('search-input').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    currentSearch = e.target.value.trim();
+    fetchPedals(true);
+  }, 300);
+});
+
+// イベント：ブランド選択 → ブランドページへ遷移
+document.getElementById('brand-select').addEventListener('change', e => {
+  const val = e.target.value;
+  if (val) {
+    window.location.href = `/brand?name=${encodeURIComponent(val)}`;
+  } else {
+    currentBrand = '';
+    fetchPedals(true);
+  }
+});
+
+// イベント：タイプ選択 → タイプページへ遷移
+document.getElementById('type-select').addEventListener('change', e => {
+  const val = e.target.value;
+  if (val) {
+    window.location.href = `/type?name=${encodeURIComponent(val)}`;
+  } else {
+    currentType = '';
+    fetchPedals(true);
+  }
+});
+
+// 初期化
+loadBrands();
+fetchPedals(true);
 </script>
 </body>
 </html>
