@@ -28,7 +28,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .h-search-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:7px 12px 7px 34px;font-size:13px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
 .h-search-input:focus{border-color:var(--ac)}
 .h-search-input::placeholder{color:var(--td);font-size:13px}
-.h-search-icon{position:absolute;left:10px;font-size:13px;color:var(--td);pointer-events:none}
 .h-search-clear{position:absolute;right:8px;width:18px;height:18px;background:var(--td);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:var(--bg);cursor:pointer;border:none;touch-action:manipulation}
 .h-search-clear.show{display:flex}
 .search-results-badge{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:6px 12px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);display:none;z-index:10}
@@ -37,7 +36,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .mob-search-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:10px 12px 10px 36px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
 .mob-search-input:focus{border-color:var(--ac)}
 .mob-search-input::placeholder{color:var(--td)}
-.mob-search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--td);pointer-events:none}
 .mob-search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:20px;height:20px;background:var(--td);border-radius:50%;display:none;align-items:center;justify-content:center;font-size:10px;color:var(--bg);cursor:pointer;border:none;touch-action:manipulation}
 .mob-search-clear.show{display:flex}
 .mob-search-badge{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);margin-top:6px;display:none}
@@ -67,17 +65,19 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .wrap{display:grid;grid-template-columns:200px 1fr 260px;max-width:1280px;margin:0 auto}
 .sl{border-right:1px solid var(--bd);padding:20px 12px;position:sticky;top:86px;height:calc(100vh - 86px);overflow-y:auto}
 .sl-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:none;color:#c0bcb4;padding:0 8px;margin-bottom:7px}
-.sl-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;font-size:13px;color:var(--tm);cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:1px}
+.sl-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;font-size:13px;color:var(--tm);cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:1px;text-decoration:none}
 .sl-item:hover{background:var(--sf);color:var(--tx);border-color:var(--bd)}
 .sl-item.on{background:rgba(232,85,45,.1);color:var(--ac);border-color:rgba(232,85,45,.25)}
 .sl-div{height:1px;background:var(--bd);margin:14px 0}
+
+/* ★ ドロップダウン共通スタイル */
+.sl-select{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:8px 28px 8px 10px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);cursor:pointer;outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;margin-bottom:6px}
+.sl-select:focus{border-color:var(--ac)}
+.sl-select option{background:var(--sf);color:var(--tx)}
+
 .tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 2px}
 .tag{padding:4px 10px;border:1px solid var(--bd);border-radius:2px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:var(--tm);cursor:pointer;transition:all .15s;touch-action:manipulation}
 .tag:hover,.tag.on{border-color:var(--ac);color:var(--ac);background:rgba(232,85,45,.07)}
-.brand-more-btn{margin-top:8px;padding:6px 8px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:var(--tm);cursor:pointer;border:1px solid var(--bd);border-radius:3px;background:transparent;width:100%;display:flex;justify-content:center;align-items:center;gap:4px;transition:all .15s;touch-action:manipulation}
-.brand-more-btn:hover{color:var(--ac);border-color:var(--ac)}
-.brands-extra{display:none;margin-top:10px}
-.brands-extra.open{display:block}
 .brand-group-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:#c0bcb4;margin:12px 0 5px 2px;border-bottom:1px solid var(--bd);padding-bottom:4px}
 .brand-group-lbl:first-child{margin-top:0}
 .feed{padding:20px 22px;border-right:1px solid var(--bd);min-height:calc(100vh - 86px);background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%)}
@@ -317,6 +317,11 @@ header{padding:0 14px;height:54px}
 footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;display:flex!important}.footer-links{gap:12px}
 .pform{padding:20px 16px;margin:8px auto}
 .img-editor-toolbar{gap:6px;padding:8px}.editor-tool-btn{padding:8px 10px;min-width:58px}
+/* モバイル用ドロップダウン */
+.mob-select-wrap{margin-bottom:12px}
+.mob-sl-select{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:10px 28px 10px 10px;font-family:Noto Sans JP,sans-serif;font-size:14px;color:var(--tx);cursor:pointer;outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.mob-sl-select:focus{border-color:var(--ac)}
+.mob-sl-select option{background:var(--sf);color:var(--tx)}
 }
 </style>
 <!-- Google tag (gtag.js) -->
@@ -351,13 +356,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
       🌐 <span id="lang-label">EN</span>
     </div>
-    <div id="mypage-btn" onclick="location.href='/mypage'" title="マイページ"
-      style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;cursor:pointer;transition:all .15s;touch-action:manipulation;font-size:12px;font-weight:600;color:var(--tm);position:relative"
-      onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'"
-      onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
-      👤 <span id="mypage-btn-label">MY PAGE</span>
-      <span id="header-notif-badge" style="display:none;position:absolute;top:-4px;right:-4px;width:14px;height:14px;background:var(--ac);border-radius:50%;font-size:8px;font-family:JetBrains Mono,monospace;color:#fff;display:none;align-items:center;justify-content:center"></span>
-    </div>
     <div style="position:relative">
       <button class="h-btn" onclick="togglePostDropdown(event)">＋ &nbsp;投稿する ▾</button>
       <div class="post-dropdown" id="post-dropdown">
@@ -371,6 +369,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <div class="ticker-lbl">NEW</div>
   <div class="ticker-wrap"><div class="ticker-inner" id="ticker-inner"><span class="ti">読み込み中...</span></div></div>
 </div>
+
+<!-- ===== モバイル スワイプUI ===== -->
 <div id="swipe-ui" style="display:none">
   <div class="swipe-indicator">
     <div class="swipe-dot" onclick="goPanel(0)"></div>
@@ -378,6 +378,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="swipe-dot" onclick="goPanel(2)"></div>
   </div>
   <div class="swipe-container" id="swipe-container">
+
+    <!-- モバイル 左パネル -->
     <div class="swipe-panel mob-left-panel">
       <div class="mob-search-wrap">
         <span class="mob-search-icon">🔍</span>
@@ -386,9 +388,25 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <button class="mob-search-clear" id="mob-search-clear" onclick="clearSearchMob()">✕</button>
       </div>
       <div class="mob-search-badge" id="mob-search-badge"></div>
+
+      <!-- エフェクター図鑑リンク（モバイル） -->
+      <div class="mob-panel-title" id="mob-title-encyclopedia">エフェクター図鑑</div>
+      <a href="/pedals" class="sl-item" style="display:flex;margin-bottom:14px;font-size:14px;font-weight:500;color:var(--ac);border-color:rgba(232,85,45,.25);background:rgba(232,85,45,.07)">
+        🎛 &nbsp;<span id="mob-encyclopedia-link-text">2,300件以上のペダルを見る</span>
+      </a>
+
+      <!-- ブランドで絞る（モバイル） -->
+      <div class="mob-panel-title" id="mob-title-brand">ブランド</div>
+      <div class="mob-select-wrap">
+        <select class="mob-sl-select" id="mob-brand-select" onchange="if(this.value)location.href='/brand?name='+encodeURIComponent(this.value)">
+          <option value="" id="mob-brand-select-default">ブランドを選択...</option>
+        </select>
+      </div>
+
+      <!-- ジャンル -->
       <div class="mob-panel-title" id="mob-title-genre">ジャンル</div>
       <div class="tags" style="margin-bottom:10px"><div class="tag on" data-genre="ALL" onclick="filterGenreMob(this,'ALL')">ALL</div></div>
-      <div class="brand-group-lbl">定番</div>
+      <div class="brand-group-lbl" id="mob-lbl-standard">定番</div>
       <div class="tags" style="margin-bottom:6px">
         <div class="tag" data-genre="ROCK" onclick="filterGenreMob(this,'ROCK')">ROCK</div>
         <div class="tag" data-genre="BLUES" onclick="filterGenreMob(this,'BLUES')">BLUES</div>
@@ -398,78 +416,55 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div class="tag" data-genre="宅録" onclick="filterGenreMob(this,'宅録')" id="tag-tagroku-mob">宅録</div>
         <div class="tag" data-genre="初心者相談" onclick="filterGenreMob(this,'初心者相談')" id="tag-shoshinsha-mob">初心者相談</div>
       </div>
-      <div class="brand-group-lbl">空間系</div>
+      <div class="brand-group-lbl" id="mob-lbl-ambient">空間系</div>
       <div class="tags" style="margin-bottom:6px">
         <div class="tag" data-genre="AMBIENT" onclick="filterGenreMob(this,'AMBIENT')">AMBIENT</div>
         <div class="tag" data-genre="SHOEGAZE" onclick="filterGenreMob(this,'SHOEGAZE')">SHOEGAZE</div>
         <div class="tag" data-genre="POST ROCK" onclick="filterGenreMob(this,'POST ROCK')">POST ROCK</div>
       </div>
-      <div class="brand-group-lbl">オルタナ系</div>
+      <div class="brand-group-lbl" id="mob-lbl-alterna">オルタナ系</div>
       <div class="tags" style="margin-bottom:16px">
         <div class="tag" data-genre="INDIE" onclick="filterGenreMob(this,'INDIE')">INDIE</div>
         <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenreMob(this,'ALTERNATIVE')">ALTERNATIVE</div>
         <div class="tag" data-genre="PUNK" onclick="filterGenreMob(this,'PUNK')">PUNK</div>
       </div>
-      <div class="mob-panel-title" id="mob-title-brand" style="margin-top:4px">ブランド</div>
-      <div class="tags" style="margin-bottom:6px">
-        <div class="tag" onclick="filterBrandMob(this,'BOSS')">BOSS</div>
-        <div class="tag" onclick="filterBrandMob(this,'DigiTech')">DigiTech</div>
-        <div class="tag" onclick="filterBrandMob(this,'Electro-Harmonix')">EHX</div>
-        <div class="tag" onclick="filterBrandMob(this,'Free The Tone')">Free The Tone</div>
-        <div class="tag" onclick="filterBrandMob(this,'Ibanez')">Ibanez</div>
-        <div class="tag" onclick="filterBrandMob(this,'Jim Dunlop')">Jim Dunlop</div>
-        <div class="tag" onclick="filterBrandMob(this,'Maxon')">Maxon</div>
-        <div class="tag" onclick="filterBrandMob(this,'MXR')">MXR</div>
-        <div class="tag" onclick="filterBrandMob(this,'Strymon')">Strymon</div>
-        <div class="tag" onclick="filterBrandMob(this,'TC Electronic')">TC Electronic</div>
+
+      <!-- エフェクタータイプ（モバイル） -->
+      <div class="mob-panel-title" id="mob-title-fxtype">エフェクタータイプ</div>
+      <div class="mob-select-wrap">
+        <select class="mob-sl-select" id="mob-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
+          <option value="" id="mob-type-select-default">タイプを選択...</option>
+          <option value="overdrive">OD（オーバードライブ）</option>
+          <option value="distortion">Dist（ディストーション）</option>
+          <option value="fuzz">Fuzz（ファズ）</option>
+          <option value="boost">Boost（ブースター）</option>
+          <option value="reverb">Reverb（リバーブ）</option>
+          <option value="delay">Delay（ディレイ）</option>
+          <option value="chorus">Chorus（コーラス）</option>
+          <option value="flanger">Flanger（フランジャー）</option>
+          <option value="phaser">Phaser（フェイザー）</option>
+          <option value="tremolo">Tremolo（トレモロ）</option>
+          <option value="vibrato">Vibrato（ビブラート）</option>
+          <option value="pitch">Pitch（ピッチ）</option>
+          <option value="wah">Wah（ワウ）</option>
+          <option value="comp">Comp（コンプレッサー）</option>
+          <option value="eq">EQ（イコライザー）</option>
+          <option value="noise_gate">Noise Gate</option>
+          <option value="looper">Looper（ルーパー）</option>
+          <option value="volume">Volume（ボリューム）</option>
+          <option value="tuner">Tuner（チューナー）</option>
+          <option value="multi">Multi FX（マルチ）</option>
+          <option value="preamp">Preamp（プリアンプ）</option>
+          <option value="switcher">Switcher（スイッチャー）</option>
+          <option value="buffer">Buffer（バッファー）</option>
+        </select>
       </div>
-      <div class="brand-more-btn" id="mob-brand-toggle" onclick="toggleBrandsMob()"><span id="mob-brand-toggle-label">▼ もっと見る（A–Z）</span></div>
-      <div class="brands-extra" id="mob-brands-extra">
-        <div class="tags" style="margin-bottom:6px">
-          <div class="tag" onclick="filterBrandMob(this,'Aguilar')">Aguilar</div><div class="tag" onclick="filterBrandMob(this,'Alexander Pedals')">Alexander</div><div class="tag" onclick="filterBrandMob(this,'Ammoon')">Ammoon</div><div class="tag" onclick="filterBrandMob(this,'Analogman')">Analogman</div><div class="tag" onclick="filterBrandMob(this,'Anasounds')">Anasounds</div><div class="tag" onclick="filterBrandMob(this,'Animals Pedal')">Animals Pedal</div><div class="tag" onclick="filterBrandMob(this,'Arc Effects')">Arc Effects</div><div class="tag" onclick="filterBrandMob(this,'Arion')">Arion</div><div class="tag" onclick="filterBrandMob(this,'Atomic')">Atomic</div><div class="tag" onclick="filterBrandMob(this,'Azor')">Azor</div><div class="tag" onclick="filterBrandMob(this,'Bananana Effects')">Bananana</div><div class="tag" onclick="filterBrandMob(this,'Beetronics')">Beetronics</div><div class="tag" onclick="filterBrandMob(this,'Behringer')">Behringer</div><div class="tag" onclick="filterBrandMob(this,'Benson')">Benson</div><div class="tag" onclick="filterBrandMob(this,'BJFE')">BJFE</div><div class="tag" onclick="filterBrandMob(this,'Black Mass Electronics')">Black Mass</div><div class="tag" onclick="filterBrandMob(this,'Bogner')">Bogner</div><div class="tag" onclick="filterBrandMob(this,'Caline')">Caline</div><div class="tag" onclick="filterBrandMob(this,'Carl Martin')">Carl Martin</div><div class="tag" onclick="filterBrandMob(this,'Caroline Guitar Co.')">Caroline</div><div class="tag" onclick="filterBrandMob(this,'Catalinbread')">Catalinbread</div><div class="tag" onclick="filterBrandMob(this,'Champion Leccy')">Champion Leccy</div><div class="tag" onclick="filterBrandMob(this,'Chase Bliss Audio')">Chase Bliss</div><div class="tag" onclick="filterBrandMob(this,'Chase Tone')">Chase Tone</div><div class="tag" onclick="filterBrandMob(this,'Cioks')">Cioks</div><div class="tag" onclick="filterBrandMob(this,'Circuitous FX')">Circuitous FX</div><div class="tag" onclick="filterBrandMob(this,'Cooper FX')">Cooper FX</div><div class="tag" onclick="filterBrandMob(this,'Cornerstone')">Cornerstone</div><div class="tag" onclick="filterBrandMob(this,'Crazy Tube Circuits')">Crazy Tube</div><div class="tag" onclick="filterBrandMob(this,'Critter & Guitari')">Critter</div><div class="tag" onclick="filterBrandMob(this,'D\'Addario')">D'Addario</div><div class="tag" onclick="filterBrandMob(this,'Darkglass Electronics')">Darkglass</div><div class="tag" onclick="filterBrandMob(this,'Death By Audio')">Death By Audio</div><div class="tag" onclick="filterBrandMob(this,'Diezel')">Diezel</div><div class="tag" onclick="filterBrandMob(this,'Disaster Area')">Disaster Area</div><div class="tag" onclick="filterBrandMob(this,'DOD')">DOD</div><div class="tag" onclick="filterBrandMob(this,'Donner')">Donner</div><div class="tag" onclick="filterBrandMob(this,'Dr Scientist')">Dr Scientist</div><div class="tag" onclick="filterBrandMob(this,'DSM & Humboldt')">DSM</div><div class="tag" onclick="filterBrandMob(this,'Dwarfcraft Devices')">Dwarfcraft</div><div class="tag" onclick="filterBrandMob(this,'EarthQuaker Devices')">EarthQuaker</div><div class="tag" onclick="filterBrandMob(this,'Effects Bakery')">Effects Bakery</div><div class="tag" onclick="filterBrandMob(this,'Electro-Harmonix')">EHX</div><div class="tag" onclick="filterBrandMob(this,'Empress Effects')">Empress</div><div class="tag" onclick="filterBrandMob(this,'ENO')">ENO</div><div class="tag" onclick="filterBrandMob(this,'Eventide')">Eventide</div><div class="tag" onclick="filterBrandMob(this,'Fairfield Circuitry')">Fairfield</div><div class="tag" onclick="filterBrandMob(this,'Fender')">Fender</div><div class="tag" onclick="filterBrandMob(this,'Finegear')">Finegear</div><div class="tag" onclick="filterBrandMob(this,'Fjord Fuzz')">Fjord Fuzz</div><div class="tag" onclick="filterBrandMob(this,'FLAMMA')">FLAMMA</div><div class="tag" onclick="filterBrandMob(this,'Foxpedal')">Foxpedal</div><div class="tag" onclick="filterBrandMob(this,'Fractal Audio')">Fractal</div><div class="tag" onclick="filterBrandMob(this,'Free The Tone')">Free The Tone</div><div class="tag" onclick="filterBrandMob(this,'Friedman')">Friedman</div><div class="tag" onclick="filterBrandMob(this,'Fulltone')">Fulltone</div><div class="tag" onclick="filterBrandMob(this,'Gamechanger Audio')">Gamechanger</div><div class="tag" onclick="filterBrandMob(this,'GFI System')">GFI System</div><div class="tag" onclick="filterBrandMob(this,'GigRig')">GigRig</div><div class="tag" onclick="filterBrandMob(this,'Headrush')">Headrush</div><div class="tag" onclick="filterBrandMob(this,'Hologram Electronics')">Hologram</div><div class="tag" onclick="filterBrandMob(this,'Hotone')">Hotone</div><div class="tag" onclick="filterBrandMob(this,'Hudson Electronics')">Hudson</div><div class="tag" onclick="filterBrandMob(this,'IK Multimedia')">IK Multimedia</div><div class="tag" onclick="filterBrandMob(this,'Industrialectric')">Industrialectric</div><div class="tag" onclick="filterBrandMob(this,'J. Rockett')">J. Rockett</div><div class="tag" onclick="filterBrandMob(this,'JAM Pedals')">JAM Pedals</div><div class="tag" onclick="filterBrandMob(this,'JHS Pedals')">JHS</div><div class="tag" onclick="filterBrandMob(this,'Joyo')">Joyo</div><div class="tag" onclick="filterBrandMob(this,'KarDiaN')">KarDiaN</div><div class="tag" onclick="filterBrandMob(this,'Keeley')">Keeley</div><div class="tag" onclick="filterBrandMob(this,'Kemper')">Kemper</div><div class="tag" onclick="filterBrandMob(this,'KLIQ')">KLIQ</div><div class="tag" onclick="filterBrandMob(this,'Klon')">Klon</div><div class="tag" onclick="filterBrandMob(this,'KMA Machines')">KMA</div><div class="tag" onclick="filterBrandMob(this,'Kmise')">Kmise</div><div class="tag" onclick="filterBrandMob(this,'Korg')">Korg</div><div class="tag" onclick="filterBrandMob(this,'Leqtique')">Leqtique</div><div class="tag" onclick="filterBrandMob(this,'Limetone Audio')">Limetone</div><div class="tag" onclick="filterBrandMob(this,'Line 6')">Line 6</div><div class="tag" onclick="filterBrandMob(this,'Mad Professor')">Mad Professor</div><div class="tag" onclick="filterBrandMob(this,'Malekko Heavy Industry')">Malekko</div><div class="tag" onclick="filterBrandMob(this,'MASF Pedals')">MASF</div><div class="tag" onclick="filterBrandMob(this,'Mastro Valvola')">Mastro Valvola</div><div class="tag" onclick="filterBrandMob(this,'Meris')">Meris</div><div class="tag" onclick="filterBrandMob(this,'Minimichine')">Minimichine</div><div class="tag" onclick="filterBrandMob(this,'Mission Engineering')">Mission</div><div class="tag" onclick="filterBrandMob(this,'Montreal Assembly')">Montreal</div><div class="tag" onclick="filterBrandMob(this,'Mooer')">Mooer</div><div class="tag" onclick="filterBrandMob(this,'Morningstar')">Morningstar</div><div class="tag" onclick="filterBrandMob(this,'Mosky')">Mosky</div><div class="tag" onclick="filterBrandMob(this,'Neural DSP')">Neural DSP</div><div class="tag" onclick="filterBrandMob(this,'Neunaber')">Neunaber</div><div class="tag" onclick="filterBrandMob(this,'NUX')">NUX</div><div class="tag" onclick="filterBrandMob(this,'Old Blood Noise Endeavors')">OBNE</div><div class="tag" onclick="filterBrandMob(this,'One Control')">One Control</div><div class="tag" onclick="filterBrandMob(this,'Organic Sounds')">Organic Sounds</div><div class="tag" onclick="filterBrandMob(this,'Origin Effects')">Origin Effects</div><div class="tag" onclick="filterBrandMob(this,'Pedaltrain')">Pedaltrain</div><div class="tag" onclick="filterBrandMob(this,'Peterson')">Peterson</div><div class="tag" onclick="filterBrandMob(this,'Pigtronix')">Pigtronix</div><div class="tag" onclick="filterBrandMob(this,'Pladask Elektrisk')">Pladask</div><div class="tag" onclick="filterBrandMob(this,'Providence')">Providence</div><div class="tag" onclick="filterBrandMob(this,'ProCo')">ProCo</div><div class="tag" onclick="filterBrandMob(this,'Rainger FX')">Rainger FX</div><div class="tag" onclick="filterBrandMob(this,'Red Panda')">Red Panda</div><div class="tag" onclick="filterBrandMob(this,'Revv')">Revv</div><div class="tag" onclick="filterBrandMob(this,'RJM')">RJM</div><div class="tag" onclick="filterBrandMob(this,'Rockboard')">Rockboard</div><div class="tag" onclick="filterBrandMob(this,'Rocktron')">Rocktron</div><div class="tag" onclick="filterBrandMob(this,'RoShi Pedals')">RoShi</div><div class="tag" onclick="filterBrandMob(this,'Rowin')">Rowin</div><div class="tag" onclick="filterBrandMob(this,'Seymour Duncan')">Seymour Duncan</div><div class="tag" onclick="filterBrandMob(this,'Shin\'s Music')">Shin's Music</div><div class="tag" onclick="filterBrandMob(this,'Sketchy Sounds')">Sketchy Sounds</div><div class="tag" onclick="filterBrandMob(this,'Sonic Research')">Sonic Research</div><div class="tag" onclick="filterBrandMob(this,'Source Audio')">Source Audio</div><div class="tag" onclick="filterBrandMob(this,'Spaceman')">Spaceman</div><div class="tag" onclick="filterBrandMob(this,'Stellar Pedals')">Stellar</div><div class="tag" onclick="filterBrandMob(this,'Stone Deaf FX')">Stone Deaf</div><div class="tag" onclick="filterBrandMob(this,'Subdecay')">Subdecay</div><div class="tag" onclick="filterBrandMob(this,'Suhr')">Suhr</div><div class="tag" onclick="filterBrandMob(this,'Tech 21')">Tech 21</div><div class="tag" onclick="filterBrandMob(this,'ThorpyFX')">ThorpyFX</div><div class="tag" onclick="filterBrandMob(this,'Truetone')">Truetone</div><div class="tag" onclick="filterBrandMob(this,'Two Notes')">Two Notes</div><div class="tag" onclick="filterBrandMob(this,'Umbrella Company')">Umbrella Co.</div><div class="tag" onclick="filterBrandMob(this,'Valeton')">Valeton</div><div class="tag" onclick="filterBrandMob(this,'Vemuram')">Vemuram</div><div class="tag" onclick="filterBrandMob(this,'Victory')">Victory</div><div class="tag" onclick="filterBrandMob(this,'Vital Audio')">Vital Audio</div><div class="tag" onclick="filterBrandMob(this,'Vivie')">Vivie</div><div class="tag" onclick="filterBrandMob(this,'Voodoo Lab')">Voodoo Lab</div><div class="tag" onclick="filterBrandMob(this,'Vox')">Vox</div><div class="tag" onclick="filterBrandMob(this,'Walrus Audio')">Walrus Audio</div><div class="tag" onclick="filterBrandMob(this,'Wampler')">Wampler</div><div class="tag" onclick="filterBrandMob(this,'Way Huge')">Way Huge</div><div class="tag" onclick="filterBrandMob(this,'WMD')">WMD</div><div class="tag" onclick="filterBrandMob(this,'Xotic')">Xotic</div><div class="tag" onclick="filterBrandMob(this,'Zoom')">Zoom</div><div class="tag" onclick="filterBrandMob(this,'ZVEX')">ZVEX</div><div class="tag" onclick="filterBrandMob(this,'Others')">Others</div>
-        </div>
-      </div>
-      <div class="mob-panel-title" id="mob-title-fxtype" style="margin-top:16px">エフェクタータイプ</div>
-      <div class="brand-group-lbl">歪み系</div>
-      <div class="tags" style="margin-bottom:6px">
-        <div class="tag" data-fx="overdrive" onclick="filterFxMob(this,'overdrive')">OD</div>
-        <div class="tag" data-fx="distortion" onclick="filterFxMob(this,'distortion')">Dist</div>
-        <div class="tag" data-fx="fuzz" onclick="filterFxMob(this,'fuzz')">Fuzz</div>
-        <div class="tag" data-fx="boost" onclick="filterFxMob(this,'boost')">Boost</div>
-      </div>
-      <div class="brand-group-lbl">空間系</div>
-      <div class="tags" style="margin-bottom:6px">
-        <div class="tag" data-fx="reverb" onclick="filterFxMob(this,'reverb')">Reverb</div>
-        <div class="tag" data-fx="delay" onclick="filterFxMob(this,'delay')">Delay</div>
-        <div class="tag" data-fx="chorus" onclick="filterFxMob(this,'chorus')">Chorus</div>
-        <div class="tag" data-fx="flanger" onclick="filterFxMob(this,'flanger')">Flanger</div>
-        <div class="tag" data-fx="phaser" onclick="filterFxMob(this,'phaser')">Phaser</div>
-      </div>
-      <div class="brand-group-lbl">モジュレーション</div>
-      <div class="tags" style="margin-bottom:6px">
-        <div class="tag" data-fx="modulation" onclick="filterFxMob(this,'modulation')">Mod</div>
-        <div class="tag" data-fx="tremolo" onclick="filterFxMob(this,'tremolo')">Tremolo</div>
-        <div class="tag" data-fx="vibrato" onclick="filterFxMob(this,'vibrato')">Vibrato</div>
-        <div class="tag" data-fx="pitch" onclick="filterFxMob(this,'pitch')">Pitch</div>
-        <div class="tag" data-fx="wah" onclick="filterFxMob(this,'wah')">Wah</div>
-      </div>
-      <div class="brand-group-lbl">その他</div>
-      <div class="tags" style="margin-bottom:6px">
-        <div class="tag" data-fx="compressor" onclick="filterFxMob(this,'compressor')">Comp</div>
-        <div class="tag" data-fx="eq" onclick="filterFxMob(this,'eq')">EQ</div>
-        <div class="tag" data-fx="noise-gate" onclick="filterFxMob(this,'noise-gate')">Noise Gate</div>
-        <div class="tag" data-fx="looper" onclick="filterFxMob(this,'looper')">Looper</div>
-        <div class="tag" data-fx="volume" onclick="filterFxMob(this,'volume')">Volume</div>
-        <div class="tag" data-fx="tuner" onclick="filterFxMob(this,'tuner')">Tuner</div>
-        <div class="tag" data-fx="multi-effects" onclick="filterFxMob(this,'multi-effects')">Multi FX</div>
-        <div class="tag" data-fx="preamp" onclick="filterFxMob(this,'preamp')">Preamp</div>
-        <div class="tag" data-fx="switcher" onclick="filterFxMob(this,'switcher')">Switcher</div>
-        <div class="tag" data-fx="buffer" onclick="filterFxMob(this,'buffer')">Buffer</div>
-        <div class="tag" data-fx="junction box" onclick="filterFxMob(this,'junction box')">Junction Box</div>
-      </div>
+
       <div class="ad-slot" style="height:100px;margin-top:14px;border-radius:4px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">Google AdSense</div></div>
       <div style="height:40px"></div>
     </div>
+
+    <!-- モバイル フィードパネル -->
     <div class="swipe-panel" id="mob-feed-panel">
       <div class="mob-feed-inner">
         <div class="post-banner">
@@ -498,6 +493,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div class="grid" id="card-grid-mob"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)">読み込み中...</div></div>
       </div>
     </div>
+
+    <!-- モバイル 右パネル -->
     <div class="swipe-panel mob-right-panel">
       <div class="mob-panel-title">今月の人気ボード</div>
       <div class="widget"><div id="ranking-widget-mob"></div></div>
@@ -514,64 +511,91 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </div>
   </div>
 </div>
+
+<!-- ===== PC レイアウト ===== -->
 <div class="wrap">
 <aside class="sl">
+  <!-- メニュー -->
   <div style="margin-bottom:20px">
-    <div class="sl-lbl">メニュー</div>
-    <div class="sl-item on">🏠 &nbsp;ホーム</div>
+    <div class="sl-lbl" id="sl-lbl-menu">メニュー</div>
+    <div class="sl-item on">🏠 &nbsp;<span id="sl-home-text">ホーム</span></div>
+    <a href="/pedals" class="sl-item" style="color:var(--ac);border-color:rgba(232,85,45,.25);background:rgba(232,85,45,.07);margin-top:4px">
+      🎛 &nbsp;<span id="sl-encyclopedia-text">エフェクター図鑑</span>
+    </a>
   </div>
   <div class="sl-div"></div>
+
+  <!-- ジャンル -->
   <div style="margin-bottom:20px">
-    <div class="sl-lbl">ジャンル</div>
+    <div class="sl-lbl" id="sl-lbl-genre">ジャンル</div>
     <div class="tags"><div class="tag on" data-genre="ALL" onclick="filterGenre(this,'ALL')">ALL</div></div>
-    <div class="brand-group-lbl" style="margin-top:10px">定番</div>
+    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-standard">定番</div>
     <div class="tags">
-      <div class="tag" data-genre="ROCK" onclick="filterGenre(this,'ROCK')">ROCK</div><div class="tag" data-genre="BLUES" onclick="filterGenre(this,'BLUES')">BLUES</div><div class="tag" data-genre="JAZZ" onclick="filterGenre(this,'JAZZ')">JAZZ</div><div class="tag" data-genre="METAL" onclick="filterGenre(this,'METAL')">METAL</div><div class="tag" data-genre="FUNK" onclick="filterGenre(this,'FUNK')">FUNK</div><div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')" id="tag-tagroku-pc">宅録</div><div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')" id="tag-shoshinsha-pc">初心者相談</div>
+      <div class="tag" data-genre="ROCK" onclick="filterGenre(this,'ROCK')">ROCK</div>
+      <div class="tag" data-genre="BLUES" onclick="filterGenre(this,'BLUES')">BLUES</div>
+      <div class="tag" data-genre="JAZZ" onclick="filterGenre(this,'JAZZ')">JAZZ</div>
+      <div class="tag" data-genre="METAL" onclick="filterGenre(this,'METAL')">METAL</div>
+      <div class="tag" data-genre="FUNK" onclick="filterGenre(this,'FUNK')">FUNK</div>
+      <div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')" id="tag-tagroku-pc">宅録</div>
+      <div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')" id="tag-shoshinsha-pc">初心者相談</div>
     </div>
-    <div class="brand-group-lbl" style="margin-top:10px">空間系</div>
+    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-ambient">空間系</div>
     <div class="tags">
-      <div class="tag" data-genre="AMBIENT" onclick="filterGenre(this,'AMBIENT')">AMBIENT</div><div class="tag" data-genre="SHOEGAZE" onclick="filterGenre(this,'SHOEGAZE')">SHOEGAZE</div><div class="tag" data-genre="POST ROCK" onclick="filterGenre(this,'POST ROCK')">POST ROCK</div>
+      <div class="tag" data-genre="AMBIENT" onclick="filterGenre(this,'AMBIENT')">AMBIENT</div>
+      <div class="tag" data-genre="SHOEGAZE" onclick="filterGenre(this,'SHOEGAZE')">SHOEGAZE</div>
+      <div class="tag" data-genre="POST ROCK" onclick="filterGenre(this,'POST ROCK')">POST ROCK</div>
     </div>
-    <div class="brand-group-lbl" style="margin-top:10px">オルタナ系</div>
+    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-alterna">オルタナ系</div>
     <div class="tags">
-      <div class="tag" data-genre="INDIE" onclick="filterGenre(this,'INDIE')">INDIE</div><div class="tag" data-genre="ALTERNATIVE" onclick="filterGenre(this,'ALTERNATIVE')">ALTERNATIVE</div><div class="tag" data-genre="PUNK" onclick="filterGenre(this,'PUNK')">PUNK</div>
+      <div class="tag" data-genre="INDIE" onclick="filterGenre(this,'INDIE')">INDIE</div>
+      <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenre(this,'ALTERNATIVE')">ALTERNATIVE</div>
+      <div class="tag" data-genre="PUNK" onclick="filterGenre(this,'PUNK')">PUNK</div>
     </div>
   </div>
   <div class="sl-div"></div>
-  <div>
-    <div class="sl-lbl">ブランドで絞る</div>
-    <div class="tags">
-      <div class="tag" onclick="filterBrand(this,'BOSS')">BOSS</div><div class="tag" onclick="filterBrand(this,'DigiTech')">DigiTech</div><div class="tag" onclick="filterBrand(this,'Electro-Harmonix')">EHX</div><div class="tag" onclick="filterBrand(this,'Free The Tone')">Free The Tone</div><div class="tag" onclick="filterBrand(this,'Ibanez')">Ibanez</div><div class="tag" onclick="filterBrand(this,'Jim Dunlop')">Jim Dunlop</div><div class="tag" onclick="filterBrand(this,'Maxon')">Maxon</div><div class="tag" onclick="filterBrand(this,'MXR')">MXR</div><div class="tag" onclick="filterBrand(this,'Strymon')">Strymon</div><div class="tag" onclick="filterBrand(this,'TC Electronic')">TC Electronic</div>
-    </div>
-    <div class="brand-more-btn" id="brand-toggle" onclick="toggleBrands()"><span id="brand-toggle-label">▼ もっと見る（A–Z）</span></div>
-    <div class="brands-extra" id="brands-extra">
-      <div class="tags">
-        <div class="tag" onclick="filterBrand(this,'Aguilar')">Aguilar</div><div class="tag" onclick="filterBrand(this,'Alexander Pedals')">Alexander</div><div class="tag" onclick="filterBrand(this,'Ammoon')">Ammoon</div><div class="tag" onclick="filterBrand(this,'Analogman')">Analogman</div><div class="tag" onclick="filterBrand(this,'Anasounds')">Anasounds</div><div class="tag" onclick="filterBrand(this,'Animals Pedal')">Animals Pedal</div><div class="tag" onclick="filterBrand(this,'Arc Effects')">Arc Effects</div><div class="tag" onclick="filterBrand(this,'Arion')">Arion</div><div class="tag" onclick="filterBrand(this,'Atomic')">Atomic</div><div class="tag" onclick="filterBrand(this,'Azor')">Azor</div><div class="tag" onclick="filterBrand(this,'Bananana Effects')">Bananana</div><div class="tag" onclick="filterBrand(this,'Beetronics')">Beetronics</div><div class="tag" onclick="filterBrand(this,'Behringer')">Behringer</div><div class="tag" onclick="filterBrand(this,'Benson')">Benson</div><div class="tag" onclick="filterBrand(this,'BJFE')">BJFE</div><div class="tag" onclick="filterBrand(this,'Black Mass Electronics')">Black Mass</div><div class="tag" onclick="filterBrand(this,'Bogner')">Bogner</div><div class="tag" onclick="filterBrand(this,'Caline')">Caline</div><div class="tag" onclick="filterBrand(this,'Carl Martin')">Carl Martin</div><div class="tag" onclick="filterBrand(this,'Caroline Guitar Co.')">Caroline</div><div class="tag" onclick="filterBrand(this,'Catalinbread')">Catalinbread</div><div class="tag" onclick="filterBrand(this,'Champion Leccy')">Champion Leccy</div><div class="tag" onclick="filterBrand(this,'Chase Bliss Audio')">Chase Bliss</div><div class="tag" onclick="filterBrand(this,'Chase Tone')">Chase Tone</div><div class="tag" onclick="filterBrand(this,'Cioks')">Cioks</div><div class="tag" onclick="filterBrand(this,'Circuitous FX')">Circuitous FX</div><div class="tag" onclick="filterBrand(this,'Cooper FX')">Cooper FX</div><div class="tag" onclick="filterBrand(this,'Cornerstone')">Cornerstone</div><div class="tag" onclick="filterBrand(this,'Crazy Tube Circuits')">Crazy Tube</div><div class="tag" onclick="filterBrand(this,'Critter & Guitari')">Critter</div><div class="tag" onclick="filterBrand(this,'D\'Addario')">D'Addario</div><div class="tag" onclick="filterBrand(this,'Darkglass Electronics')">Darkglass</div><div class="tag" onclick="filterBrand(this,'Death By Audio')">Death By Audio</div><div class="tag" onclick="filterBrand(this,'Diezel')">Diezel</div><div class="tag" onclick="filterBrand(this,'Disaster Area')">Disaster Area</div><div class="tag" onclick="filterBrand(this,'DOD')">DOD</div><div class="tag" onclick="filterBrand(this,'Donner')">Donner</div><div class="tag" onclick="filterBrand(this,'Dr Scientist')">Dr Scientist</div><div class="tag" onclick="filterBrand(this,'DSM & Humboldt')">DSM</div><div class="tag" onclick="filterBrand(this,'Dwarfcraft Devices')">Dwarfcraft</div><div class="tag" onclick="filterBrand(this,'EarthQuaker Devices')">EarthQuaker</div><div class="tag" onclick="filterBrand(this,'Effects Bakery')">Effects Bakery</div><div class="tag" onclick="filterBrand(this,'Electro-Harmonix')">EHX</div><div class="tag" onclick="filterBrand(this,'Empress Effects')">Empress</div><div class="tag" onclick="filterBrand(this,'ENO')">ENO</div><div class="tag" onclick="filterBrand(this,'Eventide')">Eventide</div><div class="tag" onclick="filterBrand(this,'Fairfield Circuitry')">Fairfield</div><div class="tag" onclick="filterBrand(this,'Fender')">Fender</div><div class="tag" onclick="filterBrand(this,'Finegear')">Finegear</div><div class="tag" onclick="filterBrand(this,'Fjord Fuzz')">Fjord Fuzz</div><div class="tag" onclick="filterBrand(this,'FLAMMA')">FLAMMA</div><div class="tag" onclick="filterBrand(this,'Foxpedal')">Foxpedal</div><div class="tag" onclick="filterBrand(this,'Fractal Audio')">Fractal</div><div class="tag" onclick="filterBrand(this,'Free The Tone')">Free The Tone</div><div class="tag" onclick="filterBrand(this,'Friedman')">Friedman</div><div class="tag" onclick="filterBrand(this,'Fulltone')">Fulltone</div><div class="tag" onclick="filterBrand(this,'Gamechanger Audio')">Gamechanger</div><div class="tag" onclick="filterBrand(this,'GFI System')">GFI System</div><div class="tag" onclick="filterBrand(this,'GigRig')">GigRig</div><div class="tag" onclick="filterBrand(this,'Headrush')">Headrush</div><div class="tag" onclick="filterBrand(this,'Hologram Electronics')">Hologram</div><div class="tag" onclick="filterBrand(this,'Hotone')">Hotone</div><div class="tag" onclick="filterBrand(this,'Hudson Electronics')">Hudson</div><div class="tag" onclick="filterBrand(this,'IK Multimedia')">IK Multimedia</div><div class="tag" onclick="filterBrand(this,'Industrialectric')">Industrialectric</div><div class="tag" onclick="filterBrand(this,'J. Rockett')">J. Rockett</div><div class="tag" onclick="filterBrand(this,'JAM Pedals')">JAM Pedals</div><div class="tag" onclick="filterBrand(this,'JHS Pedals')">JHS</div><div class="tag" onclick="filterBrand(this,'Joyo')">Joyo</div><div class="tag" onclick="filterBrand(this,'KarDiaN')">KarDiaN</div><div class="tag" onclick="filterBrand(this,'Keeley')">Keeley</div><div class="tag" onclick="filterBrand(this,'Kemper')">Kemper</div><div class="tag" onclick="filterBrand(this,'KLIQ')">KLIQ</div><div class="tag" onclick="filterBrand(this,'Klon')">Klon</div><div class="tag" onclick="filterBrand(this,'KMA Machines')">KMA</div><div class="tag" onclick="filterBrand(this,'Kmise')">Kmise</div><div class="tag" onclick="filterBrand(this,'Korg')">Korg</div><div class="tag" onclick="filterBrand(this,'Leqtique')">Leqtique</div><div class="tag" onclick="filterBrand(this,'Limetone Audio')">Limetone</div><div class="tag" onclick="filterBrand(this,'Line 6')">Line 6</div><div class="tag" onclick="filterBrand(this,'Mad Professor')">Mad Professor</div><div class="tag" onclick="filterBrand(this,'Malekko Heavy Industry')">Malekko</div><div class="tag" onclick="filterBrand(this,'MASF Pedals')">MASF</div><div class="tag" onclick="filterBrand(this,'Mastro Valvola')">Mastro Valvola</div><div class="tag" onclick="filterBrand(this,'Meris')">Meris</div><div class="tag" onclick="filterBrand(this,'Minimichine')">Minimichine</div><div class="tag" onclick="filterBrand(this,'Mission Engineering')">Mission</div><div class="tag" onclick="filterBrand(this,'Montreal Assembly')">Montreal</div><div class="tag" onclick="filterBrand(this,'Mooer')">Mooer</div><div class="tag" onclick="filterBrand(this,'Morningstar')">Morningstar</div><div class="tag" onclick="filterBrand(this,'Mosky')">Mosky</div><div class="tag" onclick="filterBrand(this,'Neural DSP')">Neural DSP</div><div class="tag" onclick="filterBrand(this,'Neunaber')">Neunaber</div><div class="tag" onclick="filterBrand(this,'NUX')">NUX</div><div class="tag" onclick="filterBrand(this,'Old Blood Noise Endeavors')">OBNE</div><div class="tag" onclick="filterBrand(this,'One Control')">One Control</div><div class="tag" onclick="filterBrand(this,'Organic Sounds')">Organic Sounds</div><div class="tag" onclick="filterBrand(this,'Origin Effects')">Origin Effects</div><div class="tag" onclick="filterBrand(this,'Pedaltrain')">Pedaltrain</div><div class="tag" onclick="filterBrand(this,'Peterson')">Peterson</div><div class="tag" onclick="filterBrand(this,'Pigtronix')">Pigtronix</div><div class="tag" onclick="filterBrand(this,'Pladask Elektrisk')">Pladask</div><div class="tag" onclick="filterBrand(this,'Providence')">Providence</div><div class="tag" onclick="filterBrand(this,'ProCo')">ProCo</div><div class="tag" onclick="filterBrand(this,'Rainger FX')">Rainger FX</div><div class="tag" onclick="filterBrand(this,'Red Panda')">Red Panda</div><div class="tag" onclick="filterBrand(this,'Revv')">Revv</div><div class="tag" onclick="filterBrand(this,'RJM')">RJM</div><div class="tag" onclick="filterBrand(this,'Rockboard')">Rockboard</div><div class="tag" onclick="filterBrand(this,'Rocktron')">Rocktron</div><div class="tag" onclick="filterBrand(this,'RoShi Pedals')">RoShi</div><div class="tag" onclick="filterBrand(this,'Rowin')">Rowin</div><div class="tag" onclick="filterBrand(this,'Seymour Duncan')">Seymour Duncan</div><div class="tag" onclick="filterBrand(this,'Shin\'s Music')">Shin's Music</div><div class="tag" onclick="filterBrand(this,'Sketchy Sounds')">Sketchy Sounds</div><div class="tag" onclick="filterBrand(this,'Sonic Research')">Sonic Research</div><div class="tag" onclick="filterBrand(this,'Source Audio')">Source Audio</div><div class="tag" onclick="filterBrand(this,'Spaceman')">Spaceman</div><div class="tag" onclick="filterBrand(this,'Stellar Pedals')">Stellar</div><div class="tag" onclick="filterBrand(this,'Stone Deaf FX')">Stone Deaf</div><div class="tag" onclick="filterBrand(this,'Subdecay')">Subdecay</div><div class="tag" onclick="filterBrand(this,'Suhr')">Suhr</div><div class="tag" onclick="filterBrand(this,'Tech 21')">Tech 21</div><div class="tag" onclick="filterBrand(this,'ThorpyFX')">ThorpyFX</div><div class="tag" onclick="filterBrand(this,'Truetone')">Truetone</div><div class="tag" onclick="filterBrand(this,'Two Notes')">Two Notes</div><div class="tag" onclick="filterBrand(this,'Umbrella Company')">Umbrella Co.</div><div class="tag" onclick="filterBrand(this,'Valeton')">Valeton</div><div class="tag" onclick="filterBrand(this,'Vemuram')">Vemuram</div><div class="tag" onclick="filterBrand(this,'Victory')">Victory</div><div class="tag" onclick="filterBrand(this,'Vital Audio')">Vital Audio</div><div class="tag" onclick="filterBrand(this,'Vivie')">Vivie</div><div class="tag" onclick="filterBrand(this,'Voodoo Lab')">Voodoo Lab</div><div class="tag" onclick="filterBrand(this,'Vox')">Vox</div><div class="tag" onclick="filterBrand(this,'Walrus Audio')">Walrus Audio</div><div class="tag" onclick="filterBrand(this,'Wampler')">Wampler</div><div class="tag" onclick="filterBrand(this,'Way Huge')">Way Huge</div><div class="tag" onclick="filterBrand(this,'WMD')">WMD</div><div class="tag" onclick="filterBrand(this,'Xotic')">Xotic</div><div class="tag" onclick="filterBrand(this,'Zoom')">Zoom</div><div class="tag" onclick="filterBrand(this,'ZVEX')">ZVEX</div><div class="tag" onclick="filterBrand(this,'Others')">Others</div>
-      </div>
-    </div>
+
+  <!-- ブランドで絞る（PC） -->
+  <div style="margin-bottom:20px">
+    <div class="sl-lbl" id="sl-lbl-brand">ブランドで絞る</div>
+    <select class="sl-select" id="pc-brand-select" onchange="if(this.value)location.href='/brand?name='+encodeURIComponent(this.value)">
+      <option value="" id="pc-brand-select-default">ブランドを選択...</option>
+    </select>
   </div>
   <div class="sl-div"></div>
+
+  <!-- エフェクタータイプ（PC） -->
   <div>
-    <div class="sl-lbl">エフェクタータイプ</div>
-    <div class="brand-group-lbl">歪み系</div>
-    <div class="tags">
-      <div class="tag" data-fx="overdrive" onclick="filterFx(this,'overdrive')">OD</div><div class="tag" data-fx="distortion" onclick="filterFx(this,'distortion')">Dist</div><div class="tag" data-fx="fuzz" onclick="filterFx(this,'fuzz')">Fuzz</div><div class="tag" data-fx="boost" onclick="filterFx(this,'boost')">Boost</div>
-    </div>
-    <div class="brand-group-lbl" style="margin-top:8px">空間系</div>
-    <div class="tags">
-      <div class="tag" data-fx="reverb" onclick="filterFx(this,'reverb')">Reverb</div><div class="tag" data-fx="delay" onclick="filterFx(this,'delay')">Delay</div><div class="tag" data-fx="chorus" onclick="filterFx(this,'chorus')">Chorus</div><div class="tag" data-fx="flanger" onclick="filterFx(this,'flanger')">Flanger</div><div class="tag" data-fx="phaser" onclick="filterFx(this,'phaser')">Phaser</div>
-    </div>
-    <div class="brand-group-lbl" style="margin-top:8px">モジュレーション</div>
-    <div class="tags">
-      <div class="tag" data-fx="modulation" onclick="filterFx(this,'modulation')">Mod</div><div class="tag" data-fx="tremolo" onclick="filterFx(this,'tremolo')">Tremolo</div><div class="tag" data-fx="vibrato" onclick="filterFx(this,'vibrato')">Vibrato</div><div class="tag" data-fx="pitch" onclick="filterFx(this,'pitch')">Pitch</div><div class="tag" data-fx="wah" onclick="filterFx(this,'wah')">Wah</div>
-    </div>
-    <div class="brand-group-lbl" style="margin-top:8px">その他</div>
-    <div class="tags">
-      <div class="tag" data-fx="compressor" onclick="filterFx(this,'compressor')">Comp</div><div class="tag" data-fx="eq" onclick="filterFx(this,'eq')">EQ</div><div class="tag" data-fx="noise-gate" onclick="filterFx(this,'noise-gate')">Noise Gate</div><div class="tag" data-fx="looper" onclick="filterFx(this,'looper')">Looper</div><div class="tag" data-fx="volume" onclick="filterFx(this,'volume')">Volume</div><div class="tag" data-fx="tuner" onclick="filterFx(this,'tuner')">Tuner</div><div class="tag" data-fx="multi-effects" onclick="filterFx(this,'multi-effects')">Multi FX</div><div class="tag" data-fx="preamp" onclick="filterFx(this,'preamp')">Preamp</div><div class="tag" data-fx="switcher" onclick="filterFx(this,'switcher')">Switcher</div><div class="tag" data-fx="buffer" onclick="filterFx(this,'buffer')">Buffer</div><div class="tag" data-fx="junction box" onclick="filterFx(this,'junction box')">Junction Box</div>
-    </div>
+    <div class="sl-lbl" id="sl-lbl-fxtype">エフェクタータイプ</div>
+    <select class="sl-select" id="pc-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
+      <option value="" id="pc-type-select-default">タイプを選択...</option>
+      <option value="overdrive">OD（オーバードライブ）</option>
+      <option value="distortion">Dist（ディストーション）</option>
+      <option value="fuzz">Fuzz（ファズ）</option>
+      <option value="boost">Boost（ブースター）</option>
+      <option value="reverb">Reverb（リバーブ）</option>
+      <option value="delay">Delay（ディレイ）</option>
+      <option value="chorus">Chorus（コーラス）</option>
+      <option value="flanger">Flanger（フランジャー）</option>
+      <option value="phaser">Phaser（フェイザー）</option>
+      <option value="tremolo">Tremolo（トレモロ）</option>
+      <option value="vibrato">Vibrato（ビブラート）</option>
+      <option value="pitch">Pitch（ピッチ）</option>
+      <option value="wah">Wah（ワウ）</option>
+      <option value="comp">Comp（コンプレッサー）</option>
+      <option value="eq">EQ（イコライザー）</option>
+      <option value="noise_gate">Noise Gate</option>
+      <option value="looper">Looper（ルーパー）</option>
+      <option value="volume">Volume（ボリューム）</option>
+      <option value="tuner">Tuner（チューナー）</option>
+      <option value="multi">Multi FX（マルチ）</option>
+      <option value="preamp">Preamp（プリアンプ）</option>
+      <option value="switcher">Switcher（スイッチャー）</option>
+      <option value="buffer">Buffer（バッファー）</option>
+    </select>
     <div class="ad-slot" style="height:100px;margin-top:14px;border-radius:4px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">広告</div></div>
   </div>
 </aside>
+
 <main class="feed">
   <div class="post-banner">
     <div class="post-banner-text"><strong>🎸 あなたのボードや機材を投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。</div>
@@ -594,6 +618,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   </div>
   <div class="grid" id="card-grid"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)">読み込み中...</div></div>
 </main>
+
 <aside class="sr">
   <div class="widget"><div class="wt">🔥 今月の人気ボード</div><div id="ranking-widget"></div></div>
   <div class="widget"><div class="wt">🎛 よく使われている機材</div><div id="gear-widget"></div></div>
@@ -605,6 +630,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <div class="ad-slot ad-side"></div>
 </aside>
 </div>
+
 <footer>
   <img class="footer-logo" src="IMG_2107.PNG" alt="MY GEAR MY BOARD" onerror="this.style.display='none'">
   <div class="footer-links">
@@ -688,12 +714,19 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <div class="form-row">
         <label class="form-lbl" id="lbl-genre">ジャンル（複数選択OK）</label>
         <div class="genre-select" id="post-genre-select">
-          <div style="width:100%;font-family:Noto Sans JP,sans-serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin-bottom:4px">定番</div>
-          <div class="gs" data-val="ROCK" onclick="toggleGenre(this)">ROCK</div><div class="gs" data-val="BLUES" onclick="toggleGenre(this)">BLUES</div><div class="gs" data-val="JAZZ" onclick="toggleGenre(this)">JAZZ</div><div class="gs" data-val="METAL" onclick="toggleGenre(this)">METAL</div><div class="gs" data-val="FUNK" onclick="toggleGenre(this)">FUNK</div><div class="gs" data-val="宅録" onclick="toggleGenre(this)" id="gs-tagroku">宅録</div><div class="gs" data-val="初心者相談" onclick="toggleGenre(this)" id="gs-shoshinsha">初心者相談</div>
-          <div style="width:100%;font-family:Noto Sans JP,sans-serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:8px 0 4px">空間系</div>
-          <div class="gs" data-val="AMBIENT" onclick="toggleGenre(this)">AMBIENT</div><div class="gs" data-val="SHOEGAZE" onclick="toggleGenre(this)">SHOEGAZE</div><div class="gs" data-val="POST ROCK" onclick="toggleGenre(this)">POST ROCK</div>
-          <div style="width:100%;font-family:Noto Sans JP,sans-serif;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--td);margin:8px 0 4px">オルタナ系</div>
-          <div class="gs" data-val="INDIE" onclick="toggleGenre(this)">INDIE</div><div class="gs" data-val="ALTERNATIVE" onclick="toggleGenre(this)">ALTERNATIVE</div><div class="gs" data-val="PUNK" onclick="toggleGenre(this)">PUNK</div>
+          <div class="gs" data-val="ROCK" onclick="toggleGenre(this)">ROCK</div>
+          <div class="gs" data-val="BLUES" onclick="toggleGenre(this)">BLUES</div>
+          <div class="gs" data-val="JAZZ" onclick="toggleGenre(this)">JAZZ</div>
+          <div class="gs" data-val="METAL" onclick="toggleGenre(this)">METAL</div>
+          <div class="gs" data-val="FUNK" onclick="toggleGenre(this)">FUNK</div>
+          <div class="gs" data-val="AMBIENT" onclick="toggleGenre(this)">AMBIENT</div>
+          <div class="gs" data-val="SHOEGAZE" onclick="toggleGenre(this)">SHOEGAZE</div>
+          <div class="gs" data-val="POST ROCK" onclick="toggleGenre(this)">POST ROCK</div>
+          <div class="gs" data-val="INDIE" onclick="toggleGenre(this)">INDIE</div>
+          <div class="gs" data-val="ALTERNATIVE" onclick="toggleGenre(this)">ALTERNATIVE</div>
+          <div class="gs" data-val="PUNK" onclick="toggleGenre(this)">PUNK</div>
+          <div class="gs" data-val="宅録" onclick="toggleGenre(this)" id="gs-tagroku">宅録</div>
+          <div class="gs" data-val="初心者相談" onclick="toggleGenre(this)" id="gs-shoshinsha">初心者相談</div>
         </div>
       </div>
       <div class="form-row">
@@ -710,34 +743,23 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <div class="pass-box">
         <div class="pass-box-title" id="pass-box-title">🔑 編集用4桁パスワードを設定</div>
         <div class="pass-warn" id="pass-warn">投稿後に<strong>編集・削除</strong>するときに必要です。<strong>忘れると変更できません。</strong></div>
-        <div class="pass-digits" style="margin-top:12px">
-          <input class="pass-digit" id="pd1" type="password" inputmode="numeric" maxlength="1">
-          <input class="pass-digit" id="pd2" type="password" inputmode="numeric" maxlength="1">
-          <input class="pass-digit" id="pd3" type="password" inputmode="numeric" maxlength="1">
-          <input class="pass-digit" id="pd4" type="password" inputmode="numeric" maxlength="1">
+        <div class="pass-digits">
+          <input class="pass-digit" id="pd1" type="number" min="0" max="9" maxlength="1">
+          <input class="pass-digit" id="pd2" type="number" min="0" max="9" maxlength="1">
+          <input class="pass-digit" id="pd3" type="number" min="0" max="9" maxlength="1">
+          <input class="pass-digit" id="pd4" type="number" min="0" max="9" maxlength="1">
         </div>
+        <div class="anon-note" id="anon-note">※ 登録不要・名前は任意です</div>
       </div>
       <div class="upload-progress-wrap" id="upload-progress-wrap">
         <div class="upload-progress-bar-bg"><div class="upload-progress-bar" id="upload-progress-bar"></div></div>
-        <div class="upload-progress-msg" id="upload-progress-msg">アップロード中...</div>
+        <div class="upload-progress-msg" id="upload-progress-msg"></div>
       </div>
       <div class="step-nav">
         <button class="step-btn back" onclick="goStep(4)">← 戻る</button>
-        <button class="step-btn submit-s" id="submit-btn" onclick="submitPostToDB()">🚀 投稿する</button>
+        <button class="step-btn next submit-s" id="submit-btn" onclick="submitPostToDB()">🚀 投稿する</button>
       </div>
-      <div class="anon-note" id="anon-note">※ 登録不要・名前は任意です</div>
     </div>
-  </div>
-</div>
-
-<!-- 機材0件リマインドモーダル -->
-<div id="gear-remind-bd" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:16px">
-  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;max-width:320px;width:100%;padding:24px;text-align:center">
-    <div style="font-size:28px;margin-bottom:10px">🎸</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:10px">機材を追加しませんか？</div>
-    <div style="font-size:13px;color:var(--tm);line-height:1.6;margin-bottom:18px">機材を追加すると、より多くの人に見てもらえます</div>
-    <button onclick="closeGearRemind();goStep(3)" style="width:100%;padding:11px;background:var(--ac);border:none;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;margin-bottom:8px;touch-action:manipulation">機材を追加する</button>
-    <button onclick="doSubmitPost()" style="width:100%;padding:10px;background:transparent;border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;touch-action:manipulation">そのまま投稿</button>
   </div>
 </div>
 
@@ -745,73 +767,94 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 <div class="ebd" id="edit-bd" onclick="closeOnBd(event,'edit-bd')">
   <div class="eform">
     <div class="eform-close" onclick="closeModal('edit-bd')">✕</div>
+    <div class="eform-title">EDIT POST</div>
+    <div class="eform-sub">投稿を編集</div>
     <div id="edit-step1">
-      <div class="eform-title">記事を編集・削除</div>
-      <div class="eform-sub">投稿時に設定した4桁パスワードを入力してください</div>
       <div class="pin-row">
-        <input class="pin-d" id="pin1" type="password" inputmode="numeric" maxlength="1">
-        <input class="pin-d" id="pin2" type="password" inputmode="numeric" maxlength="1">
-        <input class="pin-d" id="pin3" type="password" inputmode="numeric" maxlength="1">
-        <input class="pin-d" id="pin4" type="password" inputmode="numeric" maxlength="1">
+        <input class="pin-d" id="pin1" type="number" min="0" max="9" maxlength="1">
+        <input class="pin-d" id="pin2" type="number" min="0" max="9" maxlength="1">
+        <input class="pin-d" id="pin3" type="number" min="0" max="9" maxlength="1">
+        <input class="pin-d" id="pin4" type="number" min="0" max="9" maxlength="1">
       </div>
       <div class="pin-err" id="pin-err"></div>
-      <button class="submit-btn" onclick="verifyPin()">確認する</button>
+      <button class="submit-btn" onclick="verifyPin()">確認</button>
     </div>
     <div id="edit-step2" style="display:none">
-      <div class="eform-title">記事を編集</div>
-      <div class="eform-sub" style="color:#4caf50">✅ パスワード認証が完了しました</div>
-      <div class="form-row" style="margin-top:16px">
+      <div class="form-row">
         <label class="form-lbl">タイトル</label>
         <input class="form-input" id="edit-title" type="text">
       </div>
       <div class="form-row">
-        <label class="form-lbl">使用機材（ドラッグで並び替え可）</label>
-        <div id="edit-gear-sort-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:6px"></div>
+        <label class="form-lbl">使用機材</label>
+        <div id="edit-gear-sort-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
         <div style="display:flex;gap:6px;margin-top:4px">
-          <input class="form-input" id="edit-pedals-add" type="text" placeholder="機材名を追加..." style="flex:1">
-          <button type="button" onclick="addEditGearItem()" style="padding:8px 14px;background:var(--ac);border:none;border-radius:3px;font-size:13px;color:#fff;cursor:pointer;white-space:nowrap;font-family:Noto Sans JP,sans-serif">追加</button>
+          <input class="form-input" id="edit-pedals-add" type="text" placeholder="機材を追加..." style="flex:1">
+          <button onclick="addEditGearItem()" style="padding:9px 14px;background:var(--ac);border:none;border-radius:3px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;touch-action:manipulation">追加</button>
         </div>
       </div>
       <div class="form-row">
-        <label class="form-lbl">コメント・説明</label>
+        <label class="form-lbl">説明</label>
         <textarea class="form-input" id="edit-desc"></textarea>
       </div>
       <div class="form-row">
         <label class="form-lbl">YouTube URL</label>
-        <div class="yt-input-wrap">
-          <span class="yt-icon">▶️</span>
-          <input class="form-input" id="edit-youtube" type="url" placeholder="https://www.youtube.com/watch?v=...">
-        </div>
+        <input class="form-input" id="edit-youtube" type="url" placeholder="https://...">
       </div>
-      <button class="submit-btn" onclick="saveEdit()">変更を保存する</button>
-      <button class="del-btn" onclick="confirmDelete()">🗑 この投稿を削除する</button>
+      <button class="submit-btn" onclick="saveEdit()">保存する</button>
+      <button class="del-btn" onclick="confirmDelete()">この投稿を削除する</button>
     </div>
   </div>
 </div>
+
+<!-- DONE -->
 <div class="done-bd" id="done-bd">
   <div class="done-box">
     <div class="done-icon">🎉</div>
     <div class="done-title">投稿完了！</div>
     <div class="done-sub" id="done-sub">あなたのボードが公開されました！</div>
-    <button class="done-close-btn" onclick="document.getElementById('done-bd').classList.remove('open')">閉じる</button>
+    <button class="done-close-btn" onclick="document.getElementById('done-bd').classList.remove('open');document.body.style.overflow=''">閉じる</button>
   </div>
 </div>
-<div class="toast" id="toast"></div>
-<div class="img-editor-bd" id="img-editor-bd">
-  <div class="img-editor-header">
-    <div><div class="img-editor-title">画像編集</div><div class="img-editor-subtitle">ステッカー・トリミング・回転（任意）</div></div>
+
+<!-- GEAR REMIND -->
+<div id="gear-remind-bd" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:800;align-items:center;justify-content:center;padding:16px">
+  <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;max-width:340px;width:100%;padding:28px 24px;text-align:center">
+    <div style="font-size:32px;margin-bottom:12px">🎛</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:8px">機材を追加しませんか？</div>
+    <div style="font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm);margin-bottom:20px">機材を追加すると、より多くの人に見てもらえます</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button onclick="closeGearRemind();goStep(3);" style="padding:11px;background:var(--ac);border:none;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:13px;font-weight:600;color:#fff;cursor:pointer;touch-action:manipulation">機材を追加する</button>
+      <button onclick="doSubmitPost()" style="padding:11px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:13px;font-weight:600;color:var(--tm);cursor:pointer;touch-action:manipulation">そのまま投稿</button>
+    </div>
   </div>
-  <div class="img-tab-bar" id="img-tab-bar"></div>
-  <div class="img-editor-canvas-wrap" id="canvas-wrap"><canvas id="editor-canvas"></canvas></div>
-  <div class="img-editor-hint" id="editor-hint">「番号を追加」で機材に番号をつけられます</div>
-  <div class="img-editor-toolbar" id="img-editor-toolbar"></div>
 </div>
+
+<!-- LIGHTBOX -->
 <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <img class="lightbox-img" id="lightbox-img" src="" alt="">
 </div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- IMAGE EDITOR -->
+<div class="img-editor-bd" id="img-editor-bd">
+  <div class="img-editor-header">
+    <div>
+      <div class="img-editor-title">EDIT PHOTO</div>
+      <div class="img-editor-subtitle">番号を追加・トリミング・回転</div>
+    </div>
+  </div>
+  <div class="img-tab-bar" id="img-tab-bar"></div>
+  <div class="img-editor-canvas-wrap" id="canvas-wrap">
+    <canvas id="editor-canvas"></canvas>
+  </div>
+  <div class="img-editor-hint" id="editor-hint"></div>
+  <div class="img-editor-toolbar" id="img-editor-toolbar"></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="index.js"></script>
 </body>
 </html>
-<!-- update -->
