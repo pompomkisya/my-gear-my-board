@@ -303,8 +303,8 @@ header{padding:0 14px;height:54px}
 .swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
 .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block;touch-action:manipulation}
 .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
-.swipe-container{display:flex;width:300%;transition:transform .3s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start;overflow:hidden}
-.swipe-panel{width:33.333%;flex-shrink:0;min-height:100vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;max-width:33.333vw}
+.swipe-container{display:flex;width:300%;transition:transform .3s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start}
+.swipe-panel{width:33.333%;flex-shrink:0;min-height:100vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .mob-left-panel{padding:16px 14px}
 .mob-panel-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:14px;color:var(--tx);display:flex;align-items:center;gap:8px}
 .mob-panel-title::after{content:'';flex:1;height:1px;background:var(--bd)}
@@ -380,7 +380,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <div class="swipe-container" id="swipe-container">
 
     <!-- モバイル 左パネル -->
-    <div class="swipe-panel mob-left-panel" style="overflow-x:hidden">
+    <div class="swipe-panel mob-left-panel">
       <div class="mob-search-wrap">
         <span class="mob-search-icon">🔍</span>
         <input class="mob-search-input" id="mob-search" type="text" placeholder="フリーワード検索..."
