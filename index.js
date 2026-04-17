@@ -61,6 +61,7 @@ const I18N={
     panelGenre:'ジャンル',panelBrand:'ブランド',panelFxType:'エフェクタータイプ',
     slMenu:'メニュー',slHome:'ホーム',slEncyclopedia:'エフェクター図鑑',
     slBrand:'ブランドで絞る',slFxType:'エフェクタータイプ',slGenre:'ジャンル',
+    slBoardGenre:'投稿ボードジャンル',slMypage:'マイページ / 登録・ログイン',
     brandSelectDefault:'ブランドを選択...',typeSelectDefault:'タイプを選択...',
     encyclopediaLinkText:'2,300件以上のペダルを見る',
     subStandard:'定番',subAmbient:'空間系',subAlterna:'オルタナ系',
@@ -115,6 +116,7 @@ const I18N={
     panelGenre:'Genre',panelBrand:'Brand',panelFxType:'Effect Type',
     slMenu:'Menu',slHome:'Home',slEncyclopedia:'Pedal Encyclopedia',
     slBrand:'Filter by Brand',slFxType:'Effect Type',slGenre:'Genre',
+    slBoardGenre:'Board Genre',slMypage:'My Page / Sign Up',
     brandSelectDefault:'Select a brand...',typeSelectDefault:'Select a type...',
     encyclopediaLinkText:'Browse 2,300+ pedals',
     subStandard:'Classics',subAmbient:'Ambient',subAlterna:'Alternative',
@@ -199,11 +201,15 @@ function applyLangUI(){
   const fcopy=document.querySelector('.footer-copy');if(fcopy)fcopy.textContent=tr('footerCopy');
 
   // PC サイドバー
+  const slMypage=document.getElementById('sl-mypage-text');if(slMypage)slMypage.textContent=tr('slMypage');
+  const mobMypage=document.getElementById('mob-mypage-text');if(mobMypage)mobMypage.textContent=tr('slMypage');
   const slMenu=document.getElementById('sl-lbl-menu');if(slMenu)slMenu.textContent=tr('slMenu');
   const slHome=document.getElementById('sl-home-text');if(slHome)slHome.textContent=tr('slHome');
   const slEnc=document.getElementById('sl-encyclopedia-text');if(slEnc)slEnc.textContent=tr('slEncyclopedia');
-  const slGenre=document.getElementById('sl-lbl-genre');if(slGenre)slGenre.textContent=tr('slGenre');
+  const slEncLink=document.getElementById('sl-encyclopedia-link-text');if(slEncLink)slEncLink.textContent=tr('encyclopediaLinkText');
+  const slGenre=document.getElementById('sl-lbl-genre');if(slGenre)slGenre.textContent=tr('slBoardGenre');
   const slBrand=document.getElementById('sl-lbl-brand');if(slBrand)slBrand.textContent=tr('slBrand');
+  const mobBoardGenre=document.getElementById('mob-title-board-genre');if(mobBoardGenre)mobBoardGenre.textContent=tr('slBoardGenre');
   const slFx=document.getElementById('sl-lbl-fxtype');if(slFx)slFx.textContent=tr('slFxType');
   const slStd=document.getElementById('sl-sub-standard');if(slStd)slStd.textContent=tr('subStandard');
   const slAmb=document.getElementById('sl-sub-ambient');if(slAmb)slAmb.textContent=tr('subAmbient');
