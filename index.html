@@ -389,49 +389,25 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </div>
       <div class="mob-search-badge" id="mob-search-badge"></div>
 
-      <!-- エフェクター図鑑リンク（モバイル） -->
-      <div class="mob-panel-title" id="mob-title-encyclopedia">エフェクター図鑑</div>
-      <a href="/pedals" class="sl-item" style="display:flex;margin-bottom:14px;font-size:14px;font-weight:500;color:var(--ac);border-color:rgba(232,85,45,.25);background:rgba(232,85,45,.07)">
+      <!-- マイページボタン（モバイル） -->
+      <a href="/mypage" class="sl-item" style="display:flex;margin-bottom:16px;font-size:14px;font-weight:500;color:var(--tx);border-color:var(--bd)">
+        👤 &nbsp;<span id="mob-mypage-text">マイページ / 登録・ログイン</span>
+      </a>
+      <div style="height:1px;background:var(--bd);margin-bottom:16px"></div>
+
+      <!-- エフェクター図鑑セクション（モバイル） -->
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:10px;color:var(--ac);display:flex;align-items:center;gap:8px" id="mob-title-encyclopedia">エフェクター図鑑<span style="flex:1;height:1px;background:var(--bd);display:inline-block;vertical-align:middle"></span></div>
+      <a href="/pedals" class="sl-item" style="display:flex;margin-bottom:10px;font-size:13px;font-weight:500;color:var(--tx)">
         🎛 &nbsp;<span id="mob-encyclopedia-link-text">2,300件以上のペダルを見る</span>
       </a>
-
-      <!-- ブランドで絞る（モバイル） -->
-      <div class="mob-panel-title" id="mob-title-brand">ブランド</div>
+      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px" id="mob-title-brand">ブランドで絞る</div>
       <div class="mob-select-wrap">
         <select class="mob-sl-select" id="mob-brand-select" onchange="if(this.value)location.href='/brand?name='+encodeURIComponent(this.value)">
           <option value="" id="mob-brand-select-default">ブランドを選択...</option>
         </select>
       </div>
-
-      <!-- ジャンル -->
-      <div class="mob-panel-title" id="mob-title-genre">ジャンル</div>
-      <div class="tags" style="margin-bottom:10px"><div class="tag on" data-genre="ALL" onclick="filterGenreMob(this,'ALL')">ALL</div></div>
-      <div class="brand-group-lbl" id="mob-lbl-standard">定番</div>
-      <div class="tags" style="margin-bottom:6px">
-        <div class="tag" data-genre="ROCK" onclick="filterGenreMob(this,'ROCK')">ROCK</div>
-        <div class="tag" data-genre="BLUES" onclick="filterGenreMob(this,'BLUES')">BLUES</div>
-        <div class="tag" data-genre="JAZZ" onclick="filterGenreMob(this,'JAZZ')">JAZZ</div>
-        <div class="tag" data-genre="METAL" onclick="filterGenreMob(this,'METAL')">METAL</div>
-        <div class="tag" data-genre="FUNK" onclick="filterGenreMob(this,'FUNK')">FUNK</div>
-        <div class="tag" data-genre="宅録" onclick="filterGenreMob(this,'宅録')" id="tag-tagroku-mob">宅録</div>
-        <div class="tag" data-genre="初心者相談" onclick="filterGenreMob(this,'初心者相談')" id="tag-shoshinsha-mob">初心者相談</div>
-      </div>
-      <div class="brand-group-lbl" id="mob-lbl-ambient">空間系</div>
-      <div class="tags" style="margin-bottom:6px">
-        <div class="tag" data-genre="AMBIENT" onclick="filterGenreMob(this,'AMBIENT')">AMBIENT</div>
-        <div class="tag" data-genre="SHOEGAZE" onclick="filterGenreMob(this,'SHOEGAZE')">SHOEGAZE</div>
-        <div class="tag" data-genre="POST ROCK" onclick="filterGenreMob(this,'POST ROCK')">POST ROCK</div>
-      </div>
-      <div class="brand-group-lbl" id="mob-lbl-alterna">オルタナ系</div>
-      <div class="tags" style="margin-bottom:16px">
-        <div class="tag" data-genre="INDIE" onclick="filterGenreMob(this,'INDIE')">INDIE</div>
-        <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenreMob(this,'ALTERNATIVE')">ALTERNATIVE</div>
-        <div class="tag" data-genre="PUNK" onclick="filterGenreMob(this,'PUNK')">PUNK</div>
-      </div>
-
-      <!-- エフェクタータイプ（モバイル） -->
-      <div class="mob-panel-title" id="mob-title-fxtype">エフェクタータイプ</div>
-      <div class="mob-select-wrap">
+      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px" id="mob-title-fxtype">エフェクタータイプ</div>
+      <div class="mob-select-wrap" style="margin-bottom:20px">
         <select class="mob-sl-select" id="mob-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
           <option value="" id="mob-type-select-default">タイプを選択...</option>
           <option value="overdrive">OD（オーバードライブ）</option>
@@ -460,9 +436,38 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         </select>
       </div>
 
+      <!-- 投稿ボードジャンルセクション（モバイル） -->
+      <div style="height:1px;background:var(--bd);margin-bottom:16px"></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:10px;color:var(--tm);display:flex;align-items:center;gap:8px" id="mob-title-board-genre">投稿ボードジャンル<span style="flex:1;height:1px;background:var(--bd);display:inline-block;vertical-align:middle"></span></div>
+      <div class="tags" style="margin-bottom:10px"><div class="tag on" data-genre="ALL" onclick="filterGenreMob(this,'ALL')">ALL</div></div>
+      <div class="brand-group-lbl" id="mob-lbl-standard">定番</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" data-genre="ROCK" onclick="filterGenreMob(this,'ROCK')">ROCK</div>
+        <div class="tag" data-genre="BLUES" onclick="filterGenreMob(this,'BLUES')">BLUES</div>
+        <div class="tag" data-genre="JAZZ" onclick="filterGenreMob(this,'JAZZ')">JAZZ</div>
+        <div class="tag" data-genre="METAL" onclick="filterGenreMob(this,'METAL')">METAL</div>
+        <div class="tag" data-genre="FUNK" onclick="filterGenreMob(this,'FUNK')">FUNK</div>
+        <div class="tag" data-genre="宅録" onclick="filterGenreMob(this,'宅録')" id="tag-tagroku-mob">宅録</div>
+        <div class="tag" data-genre="初心者相談" onclick="filterGenreMob(this,'初心者相談')" id="tag-shoshinsha-mob">初心者相談</div>
+      </div>
+      <div class="brand-group-lbl" id="mob-lbl-ambient">空間系</div>
+      <div class="tags" style="margin-bottom:6px">
+        <div class="tag" data-genre="AMBIENT" onclick="filterGenreMob(this,'AMBIENT')">AMBIENT</div>
+        <div class="tag" data-genre="SHOEGAZE" onclick="filterGenreMob(this,'SHOEGAZE')">SHOEGAZE</div>
+        <div class="tag" data-genre="POST ROCK" onclick="filterGenreMob(this,'POST ROCK')">POST ROCK</div>
+      </div>
+      <div class="brand-group-lbl" id="mob-lbl-alterna">オルタナ系</div>
+      <div class="tags" style="margin-bottom:16px">
+        <div class="tag" data-genre="INDIE" onclick="filterGenreMob(this,'INDIE')">INDIE</div>
+        <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenreMob(this,'ALTERNATIVE')">ALTERNATIVE</div>
+        <div class="tag" data-genre="PUNK" onclick="filterGenreMob(this,'PUNK')">PUNK</div>
+      </div>
+
       <div class="ad-slot" style="height:100px;margin-top:14px;border-radius:4px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">Google AdSense</div></div>
       <div style="height:40px"></div>
     </div>
+
+      <div class="tags" style="margin-bottom:10px"><div class="tag on" data-genre="ALL" onclick="filterGenreMob(this,'ALL')">ALL</div></div>
 
     <!-- モバイル フィードパネル -->
     <div class="swipe-panel" id="mob-feed-panel">
@@ -515,57 +520,25 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 <!-- ===== PC レイアウト ===== -->
 <div class="wrap">
 <aside class="sl">
-  <!-- メニュー -->
-  <div style="margin-bottom:20px">
-    <div class="sl-lbl" id="sl-lbl-menu">メニュー</div>
-    <div class="sl-item on">🏠 &nbsp;<span id="sl-home-text">ホーム</span></div>
-    <a href="/pedals" class="sl-item" style="color:var(--ac);border-color:rgba(232,85,45,.25);background:rgba(232,85,45,.07);margin-top:4px">
-      🎛 &nbsp;<span id="sl-encyclopedia-text">エフェクター図鑑</span>
+  <!-- マイページボタン（PC） -->
+  <div style="margin-bottom:16px">
+    <a href="/mypage" class="sl-item" style="font-size:13px;font-weight:500;color:var(--tx);border-color:var(--bd)">
+      👤 &nbsp;<span id="sl-mypage-text">マイページ / 登録・ログイン</span>
     </a>
   </div>
   <div class="sl-div"></div>
 
-  <!-- ジャンル -->
-  <div style="margin-bottom:20px">
-    <div class="sl-lbl" id="sl-lbl-genre">ジャンル</div>
-    <div class="tags"><div class="tag on" data-genre="ALL" onclick="filterGenre(this,'ALL')">ALL</div></div>
-    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-standard">定番</div>
-    <div class="tags">
-      <div class="tag" data-genre="ROCK" onclick="filterGenre(this,'ROCK')">ROCK</div>
-      <div class="tag" data-genre="BLUES" onclick="filterGenre(this,'BLUES')">BLUES</div>
-      <div class="tag" data-genre="JAZZ" onclick="filterGenre(this,'JAZZ')">JAZZ</div>
-      <div class="tag" data-genre="METAL" onclick="filterGenre(this,'METAL')">METAL</div>
-      <div class="tag" data-genre="FUNK" onclick="filterGenre(this,'FUNK')">FUNK</div>
-      <div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')" id="tag-tagroku-pc">宅録</div>
-      <div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')" id="tag-shoshinsha-pc">初心者相談</div>
-    </div>
-    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-ambient">空間系</div>
-    <div class="tags">
-      <div class="tag" data-genre="AMBIENT" onclick="filterGenre(this,'AMBIENT')">AMBIENT</div>
-      <div class="tag" data-genre="SHOEGAZE" onclick="filterGenre(this,'SHOEGAZE')">SHOEGAZE</div>
-      <div class="tag" data-genre="POST ROCK" onclick="filterGenre(this,'POST ROCK')">POST ROCK</div>
-    </div>
-    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-alterna">オルタナ系</div>
-    <div class="tags">
-      <div class="tag" data-genre="INDIE" onclick="filterGenre(this,'INDIE')">INDIE</div>
-      <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenre(this,'ALTERNATIVE')">ALTERNATIVE</div>
-      <div class="tag" data-genre="PUNK" onclick="filterGenre(this,'PUNK')">PUNK</div>
-    </div>
-  </div>
-  <div class="sl-div"></div>
-
-  <!-- ブランドで絞る（PC） -->
-  <div style="margin-bottom:20px">
-    <div class="sl-lbl" id="sl-lbl-brand">ブランドで絞る</div>
+  <!-- エフェクター図鑑セクション -->
+  <div style="margin:16px 0">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ac);padding:0 8px;margin-bottom:8px" id="sl-encyclopedia-text">エフェクター図鑑</div>
+    <a href="/pedals" class="sl-item" style="color:var(--tx);margin-bottom:8px;font-size:12px">
+      🎛 &nbsp;<span id="sl-encyclopedia-link-text">2,300件以上のペダルを見る</span>
+    </a>
+    <div class="sl-lbl" id="sl-lbl-brand" style="margin-top:10px">ブランドで絞る</div>
     <select class="sl-select" id="pc-brand-select" onchange="if(this.value)location.href='/brand?name='+encodeURIComponent(this.value)">
       <option value="" id="pc-brand-select-default">ブランドを選択...</option>
     </select>
-  </div>
-  <div class="sl-div"></div>
-
-  <!-- エフェクタータイプ（PC） -->
-  <div>
-    <div class="sl-lbl" id="sl-lbl-fxtype">エフェクタータイプ</div>
+    <div class="sl-lbl" id="sl-lbl-fxtype" style="margin-top:8px">エフェクタータイプ</div>
     <select class="sl-select" id="pc-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
       <option value="" id="pc-type-select-default">タイプを選択...</option>
       <option value="overdrive">OD（オーバードライブ）</option>
@@ -592,6 +565,35 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <option value="switcher">Switcher（スイッチャー）</option>
       <option value="buffer">Buffer（バッファー）</option>
     </select>
+  </div>
+  <div class="sl-div"></div>
+
+  <!-- 投稿ボードジャンルセクション -->
+  <div style="margin-top:16px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--tm);padding:0 8px;margin-bottom:8px" id="sl-lbl-genre">投稿ボードジャンル</div>
+    <div class="tags"><div class="tag on" data-genre="ALL" onclick="filterGenre(this,'ALL')">ALL</div></div>
+    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-standard">定番</div>
+    <div class="tags">
+      <div class="tag" data-genre="ROCK" onclick="filterGenre(this,'ROCK')">ROCK</div>
+      <div class="tag" data-genre="BLUES" onclick="filterGenre(this,'BLUES')">BLUES</div>
+      <div class="tag" data-genre="JAZZ" onclick="filterGenre(this,'JAZZ')">JAZZ</div>
+      <div class="tag" data-genre="METAL" onclick="filterGenre(this,'METAL')">METAL</div>
+      <div class="tag" data-genre="FUNK" onclick="filterGenre(this,'FUNK')">FUNK</div>
+      <div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')" id="tag-tagroku-pc">宅録</div>
+      <div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')" id="tag-shoshinsha-pc">初心者相談</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-ambient">空間系</div>
+    <div class="tags">
+      <div class="tag" data-genre="AMBIENT" onclick="filterGenre(this,'AMBIENT')">AMBIENT</div>
+      <div class="tag" data-genre="SHOEGAZE" onclick="filterGenre(this,'SHOEGAZE')">SHOEGAZE</div>
+      <div class="tag" data-genre="POST ROCK" onclick="filterGenre(this,'POST ROCK')">POST ROCK</div>
+    </div>
+    <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-alterna">オルタナ系</div>
+    <div class="tags">
+      <div class="tag" data-genre="INDIE" onclick="filterGenre(this,'INDIE')">INDIE</div>
+      <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenre(this,'ALTERNATIVE')">ALTERNATIVE</div>
+      <div class="tag" data-genre="PUNK" onclick="filterGenre(this,'PUNK')">PUNK</div>
+    </div>
     <div class="ad-slot" style="height:100px;margin-top:14px;border-radius:4px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">広告</div></div>
   </div>
 </aside>
