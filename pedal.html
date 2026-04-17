@@ -429,7 +429,8 @@ async function loadPedal() {
 
 function renderPedal(pedal, boards) {
   // パンくずリスト更新
-  document.getElementById('breadcrumb-brand').textContent = pedal.brand;
+  document.getElementById('breadcrumb-brand').innerHTML =
+    `<a href="/brand?name=${encodeURIComponent(pedal.brand)}" style="color:#aaa;text-decoration:none;">${pedal.brand}</a>`;
   document.getElementById('breadcrumb-model').textContent = pedal.model;
   document.getElementById('breadcrumb-sep2').style.display = 'inline';
 
