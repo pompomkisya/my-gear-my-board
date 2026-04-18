@@ -7,196 +7,127 @@
   <meta name="description" content="">
   <link rel="icon" href="/IMG_0206.PNG">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #111;
-      --card: #1a1a1a;
-      --card2: #222;
-      --border: #333;
-      --text: #f0f0f0;
-      --muted: #888;
-      --accent: #e05a00;
+      --bg: #0d0d0e; --sf: #151517; --sf2: #1c1c1f;
+      --bd: #272729; --ac: #e8552d; --tx: #eae8e2; --tm: #9a9890; --td: #6e6c68;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-      min-height: 100vh;
-    }
+    body { background: var(--bg); color: var(--tx); font-family: 'Noto Sans JP', sans-serif; font-weight: 300; min-height: 100vh; }
     header {
-      background: #0a0a0a;
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      background: rgba(13,13,14,.96); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--bd); padding: 0 20px; height: 58px;
+      display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100;
     }
-    .header-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .header-logo img { width: 40px; height: 40px; border-radius: 50%; }
-    .header-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.05em; line-height: 1.2; }
-    .header-sub { font-size: 10px; color: var(--muted); }
-    .header-home {
-      margin-left: auto;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      text-decoration: none;
-      white-space: nowrap;
+    .header-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex: 1; }
+    .header-logo img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--tx); }
+    .header-sub { font-size: 9px; letter-spacing: 2px; color: var(--ac); text-transform: uppercase; margin-top: 1px; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .lang-btn {
+      display: flex; align-items: center; gap: 4px; padding: 6px 10px;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600;
+      color: var(--tm); cursor: pointer; transition: all .15s; touch-action: manipulation;
     }
+    .lang-btn:hover { border-color: var(--ac); color: var(--ac); }
+    .home-btn {
+      display: flex; align-items: center; gap: 6px; padding: 7px 14px;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 600;
+      color: var(--tm); cursor: pointer; transition: all .15s; text-decoration: none; white-space: nowrap;
+    }
+    .home-btn:hover { border-color: var(--ac); color: var(--ac); }
     .breadcrumb {
-      background: #1e1e1e;
-      border-bottom: 1px solid var(--border);
-      border-top: 1px solid var(--border);
-      padding: 10px 16px;
-      font-size: 12px;
-      color: #aaa;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
+      background: var(--sf); border-bottom: 1px solid var(--bd);
+      padding: 10px 16px; font-size: 12px; color: var(--tm);
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
     }
-    .breadcrumb a { color: #aaa; text-decoration: none; }
-    .breadcrumb a:hover { color: var(--text); }
-    .breadcrumb .sep { color: #555; }
-    .breadcrumb .current { color: var(--text); }
+    .breadcrumb a { color: var(--tm); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--tx); }
+    .breadcrumb .sep { color: var(--bd); }
+    .breadcrumb .current { color: var(--tx); }
     .container { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
-    .loading { text-align: center; padding: 60px 20px; color: var(--muted); }
-    .error-box {
-      background: var(--card);
-      border: 1px solid #c0392b;
-      border-radius: 12px;
-      padding: 40px 20px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    /* タイプヘッダー */
+    .loading { text-align: center; padding: 60px 20px; color: var(--tm); font-family: 'Noto Sans JP', sans-serif; }
+    .error-box { background: var(--sf); border: 1px solid #c0392b; border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--tm); }
     .type-header {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px 24px;
-      margin-bottom: 16px;
-      text-align: center;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 16px;
+      padding: 28px 24px; margin-bottom: 16px; text-align: center;
     }
-    .type-name {
-      font-size: 30px;
-      font-weight: 800;
-      margin-bottom: 8px;
-    }
-    .type-count { font-size: 13px; color: var(--muted); }
-    .type-count span { color: var(--accent); font-weight: 700; }
-
-    /* ペダルグリッド */
-    .section-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-    .section-card h3 {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 16px;
-    }
+    .type-name { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 3px; margin-bottom: 8px; }
+    .type-count { font-size: 13px; color: var(--tm); font-family: 'Noto Sans JP', sans-serif; }
+    .type-count span { color: var(--ac); font-weight: 700; }
+    .section-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+    .section-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 16px; }
     .pedal-list { display: flex; flex-direction: column; gap: 8px; }
     .pedal-item {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      color: var(--text);
-      transition: border-color 0.2s;
+      background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
+      padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+      text-decoration: none; color: var(--tx); transition: border-color .2s;
     }
-    .pedal-item:hover { border-color: var(--accent); }
-    .pedal-item-brand {
-      font-size: 10px;
-      color: var(--accent);
-      font-weight: 700;
-      text-transform: uppercase;
-      width: 80px;
-      flex-shrink: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .pedal-item:hover { border-color: var(--ac); }
+    .pedal-item-brand { font-size: 10px; color: var(--ac); font-weight: 700; text-transform: uppercase; width: 80px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .pedal-item-name { flex: 1; font-size: 14px; font-weight: 600; }
-    .pedal-item-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; }
-
-    /* 使用ボード */
+    .pedal-item-arrow { color: var(--tm); font-size: 14px; flex-shrink: 0; }
     .boards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .board-item {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      text-decoration: none;
-      color: var(--text);
-      display: block;
-      transition: border-color 0.2s;
+      background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
+      overflow: hidden; text-decoration: none; color: var(--tx); display: block; transition: border-color .2s;
     }
-    .board-item:hover { border-color: var(--accent); }
-    .board-thumb { width: 100%; aspect-ratio: 4/3; background: #2a2a2a; overflow: hidden; }
+    .board-item:hover { border-color: var(--ac); }
+    .board-thumb { width: 100%; aspect-ratio: 4/3; background: var(--sf); overflow: hidden; }
     .board-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .board-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--border); }
+    .board-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--bd); }
     .board-meta { padding: 10px; }
     .board-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
-    .board-user { font-size: 11px; color: var(--muted); }
-    .no-content { text-align: center; padding: 30px; color: var(--muted); font-size: 14px; }
-    .no-content a { color: var(--accent); text-decoration: none; display: block; margin-top: 10px; font-weight: 600; }
-
-    .load-more {
-      width: 100%;
-      margin-top: 12px;
-      padding: 12px;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--muted);
-      font-size: 13px;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
+    .board-user { font-size: 11px; color: var(--tm); font-family: 'Noto Sans JP', sans-serif; }
+    /* 空状態 */
+    .empty-state { text-align: center; padding: 40px 20px; }
+    .empty-state-icon { font-size: 36px; margin-bottom: 12px; opacity: .4; }
+    .empty-state-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--tm); margin-bottom: 8px; }
+    .empty-state-text { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--td); line-height: 1.6; margin-bottom: 16px; }
+    .empty-state-btn {
+      display: inline-block; padding: 10px 24px;
+      background: var(--ac); border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600;
+      color: #fff; text-decoration: none; transition: background .15s;
     }
-    .load-more:hover { color: var(--text); border-color: var(--accent); }
+    .empty-state-btn:hover { background: #cf4c26; }
+    .load-more {
+      width: 100%; margin-top: 12px; padding: 12px;
+      background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
+      color: var(--tm); font-size: 13px; font-family: 'Noto Sans JP', sans-serif;
+      cursor: pointer; transition: color .2s, border-color .2s;
+    }
+    .load-more:hover { color: var(--tx); border-color: var(--ac); }
   </style>
 </head>
 <body>
-
 <header>
   <a href="/" class="header-logo">
-    <img src="/IMG_0206.PNG" alt="MGMB">
+    <img src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
     <div>
       <div class="header-title">MY GEAR MY BOARD</div>
-      <div class="header-sub">ペダルボードSNS</div>
+      <div class="header-sub" id="header-sub">ペダルボードSNS</div>
     </div>
   </a>
-  <a href="/" class="header-home">🏠 ホーム</a>
+  <div class="header-right">
+    <div class="lang-btn" id="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
+    <a href="/" class="home-btn">🏠 <span id="home-text">ホーム</span></a>
+  </div>
 </header>
 
 <div class="breadcrumb">
-  <a href="/">ホーム</a>
+  <a href="/" id="bc-home">ホーム</a>
   <span class="sep">›</span>
-  <a href="/pedals">ペダル一覧</a>
+  <a href="/pedals" id="bc-pedals">ペダル一覧</a>
   <span class="sep">›</span>
-  <span id="breadcrumb-type" class="current">読み込み中...</span>
+  <span id="bc-type" class="current">読み込み中...</span>
 </div>
 
 <div class="container">
-  <div id="content">
-    <div class="loading">読み込み中...</div>
-  </div>
+  <div id="content"><div class="loading" id="loading-msg">読み込み中...</div></div>
 </div>
 
 <script>
@@ -205,98 +136,132 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const TYPE_LABELS = {
-  'overdrive': 'オーバードライブ (OD)',
-  'od': 'オーバードライブ (OD)',
-  'distortion': 'ディストーション',
-  'dist': 'ディストーション',
-  'fuzz': 'ファズ',
-  'boost': 'ブースター',
-  'reverb': 'リバーブ',
-  'delay': 'ディレイ',
-  'chorus': 'コーラス',
-  'flanger': 'フランジャー',
-  'phaser': 'フェイザー',
-  'modulation': 'モジュレーション',
-  'mod': 'モジュレーション',
-  'tremolo': 'トレモロ',
-  'vibrato': 'ビブラート',
-  'pitch': 'ピッチシフター',
-  'wah': 'ワウ',
-  'comp': 'コンプレッサー',
-  'compressor': 'コンプレッサー',
-  'eq': 'イコライザー',
-  'noise_gate': 'ノイズゲート',
-  'looper': 'ルーパー',
-  'volume': 'ボリューム',
-  'tuner': 'チューナー',
-  'multi': 'マルチエフェクター',
-  'preamp': 'プリアンプ',
-  'pre': 'プリアンプ',
-  'switcher': 'スイッチャー',
-  'buffer': 'バッファー',
-  'junction_box': 'ジャンクションボックス',
-  'acoustic': 'アコースティック用',
-  'other': 'その他'
+function detectLang() {
+  const saved = localStorage.getItem('mgmb_lang');
+  if (saved) return saved;
+  const bl = navigator.language || navigator.userLanguage || 'ja';
+  return bl.toLowerCase().startsWith('ja') ? 'ja' : 'en';
+}
+let lang = detectLang();
+
+const TYPE_LABELS_JA = {
+  'overdrive':'オーバードライブ (OD)','od':'オーバードライブ (OD)',
+  'distortion':'ディストーション','dist':'ディストーション',
+  'fuzz':'ファズ','boost':'ブースター','reverb':'リバーブ','delay':'ディレイ',
+  'chorus':'コーラス','flanger':'フランジャー','phaser':'フェイザー',
+  'modulation':'モジュレーション','mod':'モジュレーション',
+  'tremolo':'トレモロ','vibrato':'ビブラート','pitch':'ピッチシフター',
+  'wah':'ワウ','comp':'コンプレッサー','compressor':'コンプレッサー',
+  'eq':'イコライザー','noise_gate':'ノイズゲート','looper':'ルーパー',
+  'volume':'ボリューム','tuner':'チューナー','multi':'マルチエフェクター',
+  'preamp':'プリアンプ','pre':'プリアンプ','switcher':'スイッチャー',
+  'buffer':'バッファー','junction_box':'ジャンクションボックス','other':'その他'
 };
+const TYPE_LABELS_EN = {
+  'overdrive':'Overdrive (OD)','od':'Overdrive (OD)',
+  'distortion':'Distortion','dist':'Distortion',
+  'fuzz':'Fuzz','boost':'Boost','reverb':'Reverb','delay':'Delay',
+  'chorus':'Chorus','flanger':'Flanger','phaser':'Phaser',
+  'modulation':'Modulation','mod':'Modulation',
+  'tremolo':'Tremolo','vibrato':'Vibrato','pitch':'Pitch Shifter',
+  'wah':'Wah','comp':'Compressor','compressor':'Compressor',
+  'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
+  'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
+  'preamp':'Preamp','pre':'Preamp','switcher':'Switcher',
+  'buffer':'Buffer','junction_box':'Junction Box','other':'Other'
+};
+function getTypeDisplayName(t) {
+  const map = lang === 'ja' ? TYPE_LABELS_JA : TYPE_LABELS_EN;
+  return map[t?.toLowerCase()] || t;
+}
 
 const TYPE_BADGES = {
-  'overdrive': 'OD', 'od': 'OD', 'distortion': 'Dist', 'dist': 'Dist',
-  'fuzz': 'Fuzz', 'boost': 'Boost', 'reverb': 'Reverb', 'delay': 'Delay',
-  'chorus': 'Chorus', 'flanger': 'Flanger', 'phaser': 'Phaser',
-  'modulation': 'Mod', 'mod': 'Mod', 'tremolo': 'Tremolo', 'vibrato': 'Vibrato',
-  'pitch': 'Pitch', 'wah': 'Wah', 'compressor': 'Comp', 'comp': 'Comp',
-  'eq': 'EQ', 'noise_gate': 'Noise Gate', 'looper': 'Looper',
-  'volume': 'Volume', 'tuner': 'Tuner', 'multi': 'Multi FX',
-  'preamp': 'Preamp', 'pre': 'Preamp', 'switcher': 'Switcher',
-  'buffer': 'Buffer', 'junction_box': 'Junction Box',
-  'acoustic': 'Acoustic', 'other': 'Other'
+  'overdrive':'OD','od':'OD','distortion':'Dist','dist':'Dist',
+  'fuzz':'Fuzz','boost':'Boost','reverb':'Reverb','delay':'Delay',
+  'chorus':'Chorus','flanger':'Flanger','phaser':'Phaser',
+  'modulation':'Mod','mod':'Mod','tremolo':'Tremolo','vibrato':'Vibrato',
+  'pitch':'Pitch','wah':'Wah','compressor':'Comp','comp':'Comp',
+  'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
+  'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
+  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer'
 };
 function getTypeBadge(t) { return TYPE_BADGES[t?.toLowerCase()] || t; }
+
+const I18N = {
+  ja: {
+    headerSub:'ペダルボードSNS', home:'ホーム', langLabel:'EN',
+    bcHome:'ホーム', bcPedals:'ペダル一覧',
+    pedalCount:'ペダル', pedalCountUnit:'件',
+    sectionPedals:'🎛 ペダル一覧', sectionBoards:'📸 最新のボード',
+    emptyBoardTitle:'まだ投稿がありません',
+    emptyBoardText:'このエフェクタータイプを使ったボードをあなたが最初に投稿しましょう！',
+    emptyBoardBtn:'投稿する →',
+    loadMore:'さらに読み込む', remaining:'残り',
+    loading:'読み込み中...', notFound:'タイプが指定されていません。',
+    backHome:'← ホームに戻る', anonUser:'匿名',
+  },
+  en: {
+    headerSub:'Pedalboard SNS', home:'Home', langLabel:'JA',
+    bcHome:'Home', bcPedals:'Pedal List',
+    pedalCount:'', pedalCountUnit:' pedals',
+    sectionPedals:'🎛 Pedals', sectionBoards:'📸 Latest Boards',
+    emptyBoardTitle:'No boards yet',
+    emptyBoardText:'Be the first to post a board featuring this effect type!',
+    emptyBoardBtn:'Post your board →',
+    loadMore:'Load more', remaining:'remaining',
+    loading:'Loading...', notFound:'Type not specified.',
+    backHome:'← Back to Home', anonUser:'Anonymous',
+  }
+};
+function tr(key) { return (I18N[lang] || I18N.ja)[key] || I18N.ja[key] || key; }
+
+function applyLang() {
+  document.getElementById('header-sub').textContent = tr('headerSub');
+  document.getElementById('home-text').textContent = tr('home');
+  document.getElementById('lang-label').textContent = tr('langLabel');
+  document.getElementById('bc-home').textContent = tr('bcHome');
+  document.getElementById('bc-pedals').textContent = tr('bcPedals');
+}
+
+function toggleLang() {
+  lang = lang === 'ja' ? 'en' : 'ja';
+  localStorage.setItem('mgmb_lang', lang);
+  applyLang();
+  if (currentTypeName) renderType(getTypeDisplayName(currentTypeName), cachedPedals, cachedPosts, total);
+}
 
 const LIMIT = 20;
 let offset = 0;
 let total = 0;
 let currentTypeName = '';
+let cachedPedals = [];
+let cachedPosts = [];
 
 async function loadType() {
   const params = new URLSearchParams(window.location.search);
   const typeName = params.get('name');
-  if (!typeName) { showError('タイプが指定されていません。'); return; }
-
+  if (!typeName) { showError(tr('notFound')); return; }
   currentTypeName = decodeURIComponent(typeName).toLowerCase();
-  const displayName = TYPE_LABELS[currentTypeName] || currentTypeName;
-
-  document.getElementById('breadcrumb-type').textContent = displayName;
+  const displayName = getTypeDisplayName(currentTypeName);
+  document.getElementById('bc-type').textContent = displayName;
   document.title = `${displayName} | My Gear My Board`;
-  document.querySelector('meta[name="description"]').setAttribute(
-    'content', `${displayName}エフェクターの一覧と実際のボードでの使用例。`
-  );
 
-  // 総数取得
-  const { count } = await db
-    .from('pedals')
-    .select('*', { count: 'exact', head: true })
-    .contains('types', [currentTypeName]);
+  const { count } = await db.from('pedals').select('*', { count: 'exact', head: true }).contains('types', [currentTypeName]);
   total = count || 0;
 
-  // ペダル一覧
-  const { data: pedals } = await db
-    .from('pedals')
+  const { data: pedals } = await db.from('pedals')
     .select('id, brand, model, slug, types')
     .contains('types', [currentTypeName])
-    .order('brand', { ascending: true })
-    .range(0, LIMIT - 1);
+    .order('brand', { ascending: true }).range(0, LIMIT - 1);
   offset = LIMIT;
+  cachedPedals = pedals || [];
 
-  // 使用ボード
-  const { data: posts } = await db
-    .from('posts')
+  const { data: posts } = await db.from('posts')
     .select('id, title, username, image_urls')
-    .order('created_at', { ascending: false })
-    .limit(6);
+    .order('created_at', { ascending: false }).limit(6);
+  cachedPosts = posts || [];
 
-  renderType(displayName, pedals || [], posts || [], total);
+  renderType(displayName, cachedPedals, cachedPosts, total);
 }
 
 function renderType(displayName, pedals, posts, total) {
@@ -307,64 +272,70 @@ function renderType(displayName, pedals, posts, total) {
       <span class="pedal-item-arrow">›</span>
     </a>`).join('');
 
+  const remaining = total - offset;
   const loadMoreBtn = total > LIMIT
-    ? `<button class="load-more" id="load-more-btn" onclick="loadMorePedals()">さらに読み込む（残り ${total - LIMIT} 件）</button>`
-    : '';
+    ? `<button class="load-more" id="load-more-btn" onclick="loadMorePedals()">
+        ${tr('loadMore')}（${tr('remaining')} ${remaining > 0 ? remaining : total - cachedPedals.length} 件）
+       </button>` : '';
 
   const pedalsSection = pedals.length > 0
     ? `<div class="pedal-list" id="pedal-list">${pedalItemsHtml}</div>${loadMoreBtn}`
-    : `<div class="no-content">このタイプのペダルデータはまだありません。</div>`;
+    : `<div class="empty-state"><div class="empty-state-title">${tr('emptyBoardTitle')}</div></div>`;
 
-  const boardsHtml = posts.length > 0
-    ? posts.map(post => {
-        const thumb = (post.image_urls?.length > 0)
-          ? `<img src="${post.image_urls[0]}" alt="" loading="lazy">`
-          : `<div class="board-thumb-placeholder">🎸</div>`;
-        return `
-          <a href="/post?id=${post.id}" class="board-item">
-            <div class="board-thumb">${thumb}</div>
-            <div class="board-meta">
-              <div class="board-title">${post.title || '無題のボード'}</div>
-              <div class="board-user">${post.username ? '@' + post.username : '匿名'}</div>
-            </div>
-          </a>`;
-      }).join('')
-    : `<div class="no-content">ボードの投稿はまだありません。<a href="/">投稿する →</a></div>`;
+  let boardsHtml = '';
+  if (posts.length > 0) {
+    boardsHtml = posts.map(post => {
+      const thumb = (post.image_urls?.length > 0)
+        ? `<img src="${post.image_urls[0]}" alt="" loading="lazy">`
+        : `<div class="board-thumb-placeholder">🎸</div>`;
+      return `<a href="/post?id=${post.id}" class="board-item">
+        <div class="board-thumb">${thumb}</div>
+        <div class="board-meta">
+          <div class="board-title">${post.title || (lang === 'ja' ? '無題のボード' : 'Untitled Board')}</div>
+          <div class="board-user">${post.username ? '@' + post.username : tr('anonUser')}</div>
+        </div>
+      </a>`;
+    }).join('');
+  } else {
+    boardsHtml = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🎛</div>
+        <div class="empty-state-title">${tr('emptyBoardTitle')}</div>
+        <div class="empty-state-text">${tr('emptyBoardText')}</div>
+        <a href="/" class="empty-state-btn">${tr('emptyBoardBtn')}</a>
+      </div>`;
+  }
 
   document.getElementById('content').innerHTML = `
     <div class="type-header">
       <div class="type-name">${displayName}</div>
-      <div class="type-count">ペダル <span>${total}</span> 件</div>
+      <div class="type-count">${tr('pedalCount')} <span>${total}</span>${tr('pedalCountUnit')}</div>
     </div>
     <div class="section-card">
-      <h3>🎛 ペダル一覧</h3>
+      <h3>${tr('sectionPedals')}</h3>
       ${pedalsSection}
     </div>
     <div class="section-card">
-      <h3>📸 最新のボード</h3>
+      <h3>${tr('sectionBoards')}</h3>
       <div class="boards-grid">${boardsHtml}</div>
     </div>`;
 }
 
 async function loadMorePedals() {
-  const { data: pedals } = await db
-    .from('pedals')
+  const { data: pedals } = await db.from('pedals')
     .select('id, brand, model, slug, types')
     .contains('types', [currentTypeName])
     .order('brand', { ascending: true })
     .range(offset, offset + LIMIT - 1);
-
   offset += LIMIT;
+  cachedPedals = [...cachedPedals, ...(pedals || [])];
   const list = document.getElementById('pedal-list');
   if (list && pedals) {
     pedals.forEach(p => {
       const item = document.createElement('a');
       item.href = `/pedal?slug=${p.slug}`;
       item.className = 'pedal-item';
-      item.innerHTML = `
-        <span class="pedal-item-brand">${p.brand}</span>
-        <span class="pedal-item-name">${p.model}</span>
-        <span class="pedal-item-arrow">›</span>`;
+      item.innerHTML = `<span class="pedal-item-brand">${p.brand}</span><span class="pedal-item-name">${p.model}</span><span class="pedal-item-arrow">›</span>`;
       list.appendChild(item);
     });
   }
@@ -372,7 +343,7 @@ async function loadMorePedals() {
   const btn = document.getElementById('load-more-btn');
   if (btn) {
     if (remaining <= 0) btn.remove();
-    else btn.textContent = `さらに読み込む（残り ${remaining} 件）`;
+    else btn.textContent = `${tr('loadMore')}（${tr('remaining')} ${remaining} 件）`;
   }
 }
 
@@ -380,10 +351,11 @@ function showError(msg) {
   document.getElementById('content').innerHTML = `
     <div class="error-box">
       <p>${msg}</p>
-      <a href="/pedals" style="color:var(--accent);margin-top:16px;display:block;">← ペダル一覧に戻る</a>
+      <a href="/pedals" style="color:var(--ac);margin-top:16px;display:block;">${tr('backHome')}</a>
     </div>`;
 }
 
+applyLang();
 loadType();
 </script>
 </body>
