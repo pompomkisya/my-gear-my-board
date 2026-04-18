@@ -166,7 +166,6 @@
 <script>
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
-const YT_API_KEY = 'AIzaSyCfP5zo8XjDHC7AOrnLTLzEby8tTJp1tCk';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -251,17 +250,15 @@ function toggleLang() {
 let cachedPedal = null;
 let cachedPosts = [];
 
-// YouTube Data APIで動画IDを検索
+// Netlify Function経由でYouTube動画IDを取得（APIキーはサーバー側で保持）
 async function fetchVideoId(pedalName) {
   try {
-    const q = encodeURIComponent(pedalName + ' pedal demo');
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${q}&type=video&maxResults=1&key=${YT_API_KEY}`;
-    const res = await fetch(url);
+    const res = await fetch(`/.netlify/functions/youtube?q=${encodeURIComponent(pedalName)}`);
     if (!res.ok) return null;
     const data = await res.json();
-    return data.items?.[0]?.id?.videoId || null;
+    return data.videoId || null;
   } catch(e) {
-    console.error('YT API error:', e);
+    console.error('YT Function error:', e);
     return null;
   }
 }
