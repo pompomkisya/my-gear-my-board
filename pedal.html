@@ -251,9 +251,10 @@ let cachedPedal = null;
 let cachedPosts = [];
 
 // Netlify Function経由でYouTube動画IDを取得（APIキーはサーバー側で保持）
-async function fetchVideoId(pedalName) {
+async function fetchVideoId(brand, model) {
   try {
-    const res = await fetch(`/.netlify/functions/youtube?q=${encodeURIComponent(pedalName)}`);
+    const query = `${brand} ${model} demo`;
+    const res = await fetch(`/.netlify/functions/youtube?q=${encodeURIComponent(query)}`);
     if (!res.ok) return null;
     const data = await res.json();
     return data.videoId || null;
@@ -303,7 +304,7 @@ async function handleYouTube(pedal) {
     return;
   }
   // 未取得 → APIで検索
-  const videoId = await fetchVideoId(pedal.full_name);
+  const videoId = await fetchVideoId(pedal.brand, pedal.model);
   if (videoId) {
     cacheVideoId(pedal.id, videoId); // 非同期で保存（待たない）
     cachedPedal.youtube_video_id = videoId;
