@@ -7,29 +7,32 @@
   <meta name="description" content="エフェクターペダルをブランド・タイプ・キーワードで検索。実際のボードでの使用例も確認できます。">
   <link rel="icon" href="/IMG_0206.PNG">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #111;
-      --card: #1a1a1a;
-      --card2: #222;
-      --border: #333;
-      --text: #f0f0f0;
-      --muted: #888;
-      --accent: #e05a00;
+      --bg: #0d0d0e;
+      --sf: #151517;
+      --sf2: #1c1c1f;
+      --bd: #272729;
+      --ac: #e8552d;
+      --tx: #eae8e2;
+      --tm: #9a9890;
+      --td: #6e6c68;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--bg);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+      color: var(--tx);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-weight: 300;
       min-height: 100vh;
     }
-
-    /* ヘッダー */
     header {
-      background: #0a0a0a;
-      border-bottom: 1px solid var(--border);
-      padding: 12px 16px;
+      background: rgba(13,13,14,.96);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--bd);
+      padding: 0 20px;
+      height: 58px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -42,272 +45,179 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
+      flex: 1;
     }
-    .header-logo img { width: 40px; height: 40px; border-radius: 50%; }
-    .header-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.05em; line-height: 1.2; }
-    .header-sub { font-size: 10px; color: var(--muted); }
-    .header-home {
-      margin-left: auto;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      text-decoration: none;
+    .header-logo img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+    .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--tx); }
+    .header-sub { font-size: 9px; letter-spacing: 2px; color: var(--ac); text-transform: uppercase; margin-top: 1px; }
+    .header-right { display: flex; align-items: center; gap: 8px; }
+    .lang-btn {
+      display: flex; align-items: center; gap: 4px;
+      padding: 6px 10px;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600;
+      color: var(--tm); cursor: pointer; transition: all .15s; touch-action: manipulation;
+    }
+    .lang-btn:hover { border-color: var(--ac); color: var(--ac); }
+    .home-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 600;
+      color: var(--tm); cursor: pointer; transition: all .15s; text-decoration: none;
       white-space: nowrap;
     }
-
-    /* パンくず */
+    .home-btn:hover { border-color: var(--ac); color: var(--ac); }
     .breadcrumb {
-      background: #1e1e1e;
-      border-bottom: 1px solid var(--border);
-      border-top: 1px solid var(--border);
+      background: var(--sf);
+      border-bottom: 1px solid var(--bd);
       padding: 10px 16px;
-      font-size: 12px;
-      color: #aaa;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 12px; color: var(--tm);
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
     }
-    .breadcrumb a { color: #aaa; text-decoration: none; }
-    .breadcrumb a:hover { color: var(--text); }
-    .breadcrumb .sep { color: #555; }
-    .breadcrumb .current { color: var(--text); }
-
-    /* 検索エリア */
+    .breadcrumb a { color: var(--tm); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--tx); }
+    .breadcrumb .sep { color: var(--bd); }
+    .breadcrumb .current { color: var(--tx); }
     .search-area {
-      background: var(--card);
-      border-bottom: 1px solid var(--border);
+      background: var(--sf);
+      border-bottom: 1px solid var(--bd);
       padding: 16px;
       position: sticky;
-      top: 65px;
+      top: 58px;
       z-index: 90;
     }
-    .search-input-wrap {
-      position: relative;
-      margin-bottom: 10px;
-    }
+    .search-input-wrap { position: relative; margin-bottom: 10px; }
     .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 16px;
-      pointer-events: none;
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      color: var(--tm); font-size: 16px; pointer-events: none;
     }
     .search-input {
       width: 100%;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
       padding: 12px 12px 12px 38px;
-      color: var(--text);
-      font-size: 16px;
-      outline: none;
-      -webkit-appearance: none;
+      color: var(--tx); font-size: 16px; font-family: 'Noto Sans JP', sans-serif;
+      outline: none; -webkit-appearance: none;
     }
-    .search-input:focus { border-color: var(--accent); }
-    .search-input::placeholder { color: var(--muted); }
-
-    .filter-row {
-      display: flex;
-      gap: 8px;
-    }
+    .search-input:focus { border-color: var(--ac); }
+    .search-input::placeholder { color: var(--td); }
+    .filter-row { display: flex; gap: 8px; }
     .filter-select {
       flex: 1;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      color: var(--text);
-      font-size: 14px;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      cursor: pointer;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 32px;
+      background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
+      padding: 10px 32px 10px 12px;
+      color: var(--tx); font-size: 14px; font-family: 'Noto Sans JP', sans-serif;
+      outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
     }
-    .filter-select:focus { border-color: var(--accent); }
-
-    /* コンテンツ */
-    .container {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 20px 16px 60px;
-    }
-
-    .result-count {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-    .result-count span { color: var(--accent); font-weight: 700; }
-
-    /* ペダルグリッド */
+    .filter-select:focus { border-color: var(--ac); }
+    .filter-select option { background: var(--sf); color: var(--tx); }
+    .container { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+    .result-count { font-size: 12px; color: var(--tm); margin-bottom: 14px; }
+    .result-count span { color: var(--ac); font-weight: 700; }
     .pedal-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 10px; margin-bottom: 20px;
     }
-    @media (max-width: 480px) {
-      .pedal-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
+    @media (max-width: 480px) { .pedal-grid { grid-template-columns: repeat(2, 1fr); } }
     .pedal-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      text-decoration: none;
-      color: var(--text);
-      display: block;
-      transition: border-color 0.2s;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 12px;
+      overflow: hidden; text-decoration: none; color: var(--tx);
+      display: block; transition: border-color .2s;
     }
-    .pedal-card:hover { border-color: var(--accent); }
-
+    .pedal-card:hover { border-color: var(--ac); }
     .pedal-card-image {
-      width: 100%;
-      aspect-ratio: 1;
-      background: var(--card2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border);
+      width: 100%; aspect-ratio: 1;
+      background: var(--sf2);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; border-bottom: 1px solid var(--bd);
     }
-    .pedal-card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-    .pedal-card-image-placeholder {
-      font-size: 32px;
-      opacity: 0.2;
-    }
-
-    .pedal-card-body {
-      padding: 10px;
-    }
+    .pedal-card-image img { width: 100%; height: 100%; object-fit: contain; }
+    .pedal-card-image-placeholder { font-size: 32px; opacity: .2; }
+    .pedal-card-body { padding: 10px; }
     .pedal-card-brand {
-      font-size: 10px;
-      color: var(--accent);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 3px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 10px; color: var(--ac); font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+      margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .pedal-card-name {
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1.3;
-      margin-bottom: 6px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      font-size: 12px; font-weight: 600; line-height: 1.3; margin-bottom: 6px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
     }
-    .pedal-card-types {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 3px;
-    }
+    .pedal-card-types { display: flex; flex-wrap: wrap; gap: 3px; }
     .type-badge {
-      background: var(--card2);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 9px;
-      padding: 2px 6px;
-      border-radius: 20px;
-      white-space: nowrap;
+      background: var(--sf2); border: 1px solid var(--bd); color: var(--tm);
+      font-size: 9px; padding: 2px 6px; border-radius: 20px; white-space: nowrap;
     }
-
-    /* ローディング・空状態 */
-    .loading { text-align: center; padding: 60px 20px; color: var(--muted); }
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    /* もっと見るボタン */
+    .loading { text-align: center; padding: 60px 20px; color: var(--tm); }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--tm); font-size: 14px; }
     .load-more {
-      width: 100%;
-      padding: 14px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      color: var(--muted);
-      font-size: 14px;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
+      width: 100%; padding: 14px;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 10px;
+      color: var(--tm); font-size: 14px; font-family: 'Noto Sans JP', sans-serif;
+      cursor: pointer; transition: color .2s, border-color .2s;
     }
-    .load-more:hover { color: var(--text); border-color: var(--accent); }
-    .load-more:disabled { opacity: 0.4; cursor: default; }
+    .load-more:hover { color: var(--tx); border-color: var(--ac); }
+    .load-more:disabled { opacity: .4; cursor: default; }
   </style>
 </head>
 <body>
-
 <header>
   <a href="/" class="header-logo">
-    <img src="/IMG_0206.PNG" alt="MGMB">
+    <img src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
     <div>
       <div class="header-title">MY GEAR MY BOARD</div>
-      <div class="header-sub">ペダルボードSNS</div>
+      <div class="header-sub" id="header-sub">ペダルボードSNS</div>
     </div>
   </a>
-  <a href="/" class="header-home">🏠 ホーム</a>
+  <div class="header-right">
+    <div class="lang-btn" id="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
+    <a href="/" class="home-btn" id="home-btn">🏠 <span id="home-text">ホーム</span></a>
+  </div>
 </header>
 
 <div class="breadcrumb">
-  <a href="/">ホーム</a>
+  <a href="/" id="bc-home">ホーム</a>
   <span class="sep">›</span>
-  <span class="current">ペダル一覧</span>
+  <span class="current" id="bc-current">ペダル一覧</span>
 </div>
 
 <div class="search-area">
   <div class="search-input-wrap">
     <span class="search-icon">🔍</span>
-    <input type="text" class="search-input" id="search-input" placeholder="ペダルを検索..." autocomplete="off">
+    <input type="text" class="search-input" id="search-input" placeholder="ペダルを検索...">
   </div>
   <div class="filter-row">
     <select class="filter-select" id="brand-select">
-      <option value="">ブランド：すべて</option>
+      <option value="" id="brand-all">ブランド：すべて</option>
     </select>
     <select class="filter-select" id="type-select">
-      <option value="">タイプ：すべて</option>
-      <option value="overdrive">OD（オーバードライブ）</option>
-      <option value="distortion">Dist（ディストーション）</option>
-      <option value="fuzz">Fuzz（ファズ）</option>
-      <option value="boost">Boost（ブースター）</option>
-      <option value="reverb">Reverb（リバーブ）</option>
-      <option value="delay">Delay（ディレイ）</option>
-      <option value="chorus">Chorus（コーラス）</option>
-      <option value="flanger">Flanger（フランジャー）</option>
-      <option value="phaser">Phaser（フェイザー）</option>
-      <option value="tremolo">Tremolo（トレモロ）</option>
-      <option value="vibrato">Vibrato（ビブラート）</option>
-      <option value="pitch">Pitch（ピッチ）</option>
-      <option value="wah">Wah（ワウ）</option>
-      <option value="comp">Comp（コンプレッサー）</option>
-      <option value="eq">EQ（イコライザー）</option>
-      <option value="noise_gate">Noise Gate</option>
-      <option value="looper">Looper（ルーパー）</option>
-      <option value="volume">Volume（ボリューム）</option>
-      <option value="tuner">Tuner（チューナー）</option>
-      <option value="multi">Multi FX（マルチ）</option>
-      <option value="preamp">Preamp（プリアンプ）</option>
-      <option value="switcher">Switcher（スイッチャー）</option>
-      <option value="buffer">Buffer（バッファー）</option>
+      <option value="" id="type-all">タイプ：すべて</option>
+      <option value="overdrive" id="type-overdrive">OD（オーバードライブ）</option>
+      <option value="distortion" id="type-distortion">Dist（ディストーション）</option>
+      <option value="fuzz" id="type-fuzz">Fuzz（ファズ）</option>
+      <option value="boost" id="type-boost">Boost（ブースター）</option>
+      <option value="reverb" id="type-reverb">Reverb（リバーブ）</option>
+      <option value="delay" id="type-delay">Delay（ディレイ）</option>
+      <option value="chorus" id="type-chorus">Chorus（コーラス）</option>
+      <option value="flanger" id="type-flanger">Flanger（フランジャー）</option>
+      <option value="phaser" id="type-phaser">Phaser（フェイザー）</option>
+      <option value="tremolo" id="type-tremolo">Tremolo（トレモロ）</option>
+      <option value="vibrato" id="type-vibrato">Vibrato（ビブラート）</option>
+      <option value="pitch" id="type-pitch">Pitch（ピッチ）</option>
+      <option value="wah" id="type-wah">Wah（ワウ）</option>
+      <option value="comp" id="type-comp">Comp（コンプレッサー）</option>
+      <option value="eq" id="type-eq">EQ（イコライザー）</option>
+      <option value="noise_gate" id="type-noise_gate">Noise Gate</option>
+      <option value="looper" id="type-looper">Looper（ルーパー）</option>
+      <option value="volume" id="type-volume">Volume（ボリューム）</option>
+      <option value="tuner" id="type-tuner">Tuner（チューナー）</option>
+      <option value="multi" id="type-multi">Multi FX（マルチ）</option>
+      <option value="preamp" id="type-preamp">Preamp（プリアンプ）</option>
+      <option value="switcher" id="type-switcher">Switcher（スイッチャー）</option>
+      <option value="buffer" id="type-buffer">Buffer（バッファー）</option>
     </select>
   </div>
 </div>
@@ -325,17 +235,111 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ── 言語
+function detectLang() {
+  const saved = localStorage.getItem('mgmb_lang');
+  if (saved) return saved;
+  const bl = navigator.language || navigator.userLanguage || 'ja';
+  return bl.toLowerCase().startsWith('ja') ? 'ja' : 'en';
+}
+let lang = detectLang();
+
+const I18N = {
+  ja: {
+    headerSub: 'ペダルボードSNS', home: 'ホーム', langLabel: 'EN',
+    bcHome: 'ホーム', bcCurrent: 'ペダル一覧',
+    pageTitle: 'エフェクターペダル一覧 | My Gear My Board',
+    searchPlaceholder: 'ペダルを検索...',
+    brandAll: 'ブランド：すべて', typeAll: 'タイプ：すべて',
+    resultCount: '件のペダルが見つかりました',
+    loading: '読み込み中...', empty: 'ペダルが見つかりませんでした',
+    loadMore: 'さらに読み込む', loadMoreCount: '残り',
+    typeOptions: {
+      overdrive:'OD（オーバードライブ）', distortion:'Dist（ディストーション）',
+      fuzz:'Fuzz（ファズ）', boost:'Boost（ブースター）',
+      reverb:'Reverb（リバーブ）', delay:'Delay（ディレイ）',
+      chorus:'Chorus（コーラス）', flanger:'Flanger（フランジャー）',
+      phaser:'Phaser（フェイザー）', tremolo:'Tremolo（トレモロ）',
+      vibrato:'Vibrato（ビブラート）', pitch:'Pitch（ピッチ）',
+      wah:'Wah（ワウ）', comp:'Comp（コンプレッサー）', eq:'EQ（イコライザー）',
+      noise_gate:'Noise Gate', looper:'Looper（ルーパー）',
+      volume:'Volume（ボリューム）', tuner:'Tuner（チューナー）',
+      multi:'Multi FX（マルチ）', preamp:'Preamp（プリアンプ）',
+      switcher:'Switcher（スイッチャー）', buffer:'Buffer（バッファー）'
+    }
+  },
+  en: {
+    headerSub: 'Pedalboard SNS', home: 'Home', langLabel: 'JA',
+    bcHome: 'Home', bcCurrent: 'Pedal List',
+    pageTitle: 'Effect Pedals | My Gear My Board',
+    searchPlaceholder: 'Search pedals...',
+    brandAll: 'Brand: All', typeAll: 'Type: All',
+    resultCount: ' pedals found',
+    loading: 'Loading...', empty: 'No pedals found',
+    loadMore: 'Load more', loadMoreCount: 'remaining',
+    typeOptions: {
+      overdrive:'Overdrive (OD)', distortion:'Distortion',
+      fuzz:'Fuzz', boost:'Boost',
+      reverb:'Reverb', delay:'Delay',
+      chorus:'Chorus', flanger:'Flanger',
+      phaser:'Phaser', tremolo:'Tremolo',
+      vibrato:'Vibrato', pitch:'Pitch Shifter',
+      wah:'Wah', comp:'Compressor', eq:'EQ',
+      noise_gate:'Noise Gate', looper:'Looper',
+      volume:'Volume', tuner:'Tuner',
+      multi:'Multi FX', preamp:'Preamp',
+      switcher:'Switcher', buffer:'Buffer'
+    }
+  }
+};
+function tr(key) { return (I18N[lang] || I18N.ja)[key] || I18N.ja[key] || key; }
+
+function applyLang() {
+  document.title = tr('pageTitle');
+  document.getElementById('header-sub').textContent = tr('headerSub');
+  document.getElementById('home-text').textContent = tr('home');
+  document.getElementById('lang-label').textContent = tr('langLabel');
+  document.getElementById('bc-home').textContent = tr('bcHome');
+  document.getElementById('bc-current').textContent = tr('bcCurrent');
+  document.getElementById('search-input').placeholder = tr('searchPlaceholder');
+  document.getElementById('brand-all').textContent = tr('brandAll');
+  document.getElementById('type-all').textContent = tr('typeAll');
+  document.getElementById('loading').textContent = tr('loading');
+  // タイプoption翻訳
+  const opts = tr('typeOptions');
+  Object.keys(opts).forEach(k => {
+    const el = document.getElementById('type-' + k);
+    if (el) el.textContent = opts[k];
+  });
+  // もっと見るボタン
+  const lmBtn = document.getElementById('load-more');
+  if (lmBtn && lmBtn.style.display !== 'none') {
+    const remaining = total - offset;
+    lmBtn.textContent = tr('loadMore') + (remaining > 0 ? `（${tr('loadMoreCount')} ${remaining} 件）` : '');
+  }
+  // 件数表示更新
+  if (total > 0) {
+    document.getElementById('result-count').innerHTML = `<span>${total}</span> ${tr('resultCount')}`;
+  }
+}
+
+function toggleLang() {
+  lang = lang === 'ja' ? 'en' : 'ja';
+  localStorage.setItem('mgmb_lang', lang);
+  applyLang();
+}
+
+// ── TYPE LABELS（バッジ用）
 const TYPE_LABELS = {
-  'overdrive': 'OD', 'od': 'OD', 'distortion': 'Dist', 'dist': 'Dist',
-  'fuzz': 'Fuzz', 'boost': 'Boost', 'reverb': 'Reverb', 'delay': 'Delay',
-  'chorus': 'Chorus', 'flanger': 'Flanger', 'phaser': 'Phaser',
-  'modulation': 'Mod', 'mod': 'Mod', 'tremolo': 'Tremolo', 'vibrato': 'Vibrato',
-  'pitch': 'Pitch', 'wah': 'Wah', 'compressor': 'Comp', 'comp': 'Comp',
-  'eq': 'EQ', 'noise_gate': 'Noise Gate', 'looper': 'Looper',
-  'volume': 'Volume', 'tuner': 'Tuner', 'multi': 'Multi FX',
-  'preamp': 'Preamp', 'switcher': 'Switcher', 'buffer': 'Buffer',
-  'junction_box': 'Junction Box', 'pre': 'Preamp', 'acoustic': 'Acoustic',
-  'other': 'Other'
+  'overdrive':'OD','od':'OD','distortion':'Dist','dist':'Dist',
+  'fuzz':'Fuzz','boost':'Boost','reverb':'Reverb','delay':'Delay',
+  'chorus':'Chorus','flanger':'Flanger','phaser':'Phaser',
+  'modulation':'Mod','mod':'Mod','tremolo':'Tremolo','vibrato':'Vibrato',
+  'pitch':'Pitch','wah':'Wah','compressor':'Comp','comp':'Comp',
+  'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
+  'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
+  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer',
+  'junction_box':'Junction Box','pre':'Preamp','acoustic':'Acoustic','other':'Other'
 };
 function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()] || t; }
 
@@ -347,76 +351,49 @@ let currentSearch = '';
 let currentBrand = '';
 let currentType = '';
 
-// ブランド一覧を取得してドロップダウンに追加
 async function loadBrands() {
-  const { data } = await db
-    .from('pedals')
-    .select('brand')
-    .order('brand', { ascending: true });
-
+  const { data } = await db.from('pedals').select('brand').order('brand', { ascending: true });
   if (!data) return;
   const brands = [...new Set(data.map(d => d.brand))].filter(Boolean).sort();
   const select = document.getElementById('brand-select');
   brands.forEach(b => {
     const opt = document.createElement('option');
-    opt.value = b;
-    opt.textContent = b;
+    opt.value = b; opt.textContent = b;
     select.appendChild(opt);
   });
 }
 
-// ペダル取得
 async function fetchPedals(reset = false) {
   if (reset) {
     offset = 0;
     document.getElementById('pedal-grid').innerHTML = '';
     document.getElementById('load-more').style.display = 'none';
   }
-
   document.getElementById('loading').style.display = 'block';
-
-  let query = db
-    .from('pedals')
+  let query = db.from('pedals')
     .select('id, brand, model, slug, types, image_url', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + LIMIT - 1);
-
-  if (currentSearch) {
-    query = query.ilike('full_name', `%${currentSearch}%`);
-  }
-  if (currentBrand) {
-    query = query.eq('brand', currentBrand);
-  }
-  if (currentType) {
-    query = query.contains('types', [currentType]);
-  }
-
+  if (currentSearch) query = query.ilike('full_name', `%${currentSearch}%`);
+  if (currentBrand) query = query.eq('brand', currentBrand);
+  if (currentType) query = query.contains('types', [currentType]);
   const { data, count, error } = await query;
-
   document.getElementById('loading').style.display = 'none';
-
   if (error || !data) return;
-
   if (reset) total = count || 0;
-
-  // 結果件数表示
   document.getElementById('result-count').innerHTML =
-    total > 0 ? `<span>${total}</span> 件のペダルが見つかりました` : '';
-
+    total > 0 ? `<span>${total}</span> ${tr('resultCount')}` : '';
   if (data.length === 0 && offset === 0) {
     document.getElementById('pedal-grid').innerHTML =
-      '<div class="empty-state" style="grid-column:1/-1">ペダルが見つかりませんでした。</div>';
+      `<div class="empty-state" style="grid-column:1/-1">${tr('empty')}</div>`;
     return;
   }
-
   renderPedals(data);
   offset += LIMIT;
-
-  // もっと見るボタン
   const btn = document.getElementById('load-more');
   if (offset < total) {
     btn.style.display = 'block';
-    btn.textContent = `さらに読み込む（残り ${total - offset} 件）`;
+    btn.textContent = `${tr('loadMore')}（${tr('loadMoreCount')} ${total - offset} 件）`;
   } else {
     btn.style.display = 'none';
   }
@@ -431,7 +408,6 @@ function renderPedals(pedals) {
     const imageHtml = p.image_url
       ? `<img src="${p.image_url}" alt="${p.model}" loading="lazy">`
       : `<span class="pedal-card-image-placeholder">🎛</span>`;
-
     const card = document.createElement('a');
     card.href = `/pedal?slug=${p.slug}`;
     card.className = 'pedal-card';
@@ -446,11 +422,8 @@ function renderPedals(pedals) {
   });
 }
 
-function loadMore() {
-  fetchPedals(false);
-}
+function loadMore() { fetchPedals(false); }
 
-// イベント：検索（入力から300ms後に実行）
 document.getElementById('search-input').addEventListener('input', e => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
@@ -459,7 +432,6 @@ document.getElementById('search-input').addEventListener('input', e => {
   }, 300);
 });
 
-// イベント：ブランド選択 → ブランドページへ遷移
 document.getElementById('brand-select').addEventListener('change', e => {
   const val = e.target.value;
   if (val) {
@@ -470,7 +442,6 @@ document.getElementById('brand-select').addEventListener('change', e => {
   }
 });
 
-// イベント：タイプ選択 → タイプページへ遷移
 document.getElementById('type-select').addEventListener('change', e => {
   const val = e.target.value;
   if (val) {
@@ -481,7 +452,7 @@ document.getElementById('type-select').addEventListener('change', e => {
   }
 });
 
-// 初期化
+applyLang();
 loadBrands();
 fetchPedals(true);
 </script>
