@@ -264,14 +264,28 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="pedal-edit-box">
     <h3>🎛 ペダルを編集</h3>
     <div id="pedal-edit-name" style="font-size:14px;font-weight:600;color:var(--tm);margin-bottom:4px"></div>
-    <label class="pedal-edit-label">画像URL</label>
+
+    <label class="pedal-edit-label">画像をアップロード（iPhoneから選択可）</label>
+    <input type="file" id="edit-image-file" accept="image/*" style="display:none" onchange="handlePedalImageFile(this)">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <button class="fetch-btn" onclick="document.getElementById('edit-image-file').click()">📷 写真を選択</button>
+      <span style="font-size:11px;color:var(--td)">長辺600px・JPEG80%に自動変換</span>
+    </div>
+    <img id="pedal-img-preview" class="pedal-img-preview" alt="プレビュー">
+    <div id="upload-progress-msg" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac);min-height:16px;margin-top:4px"></div>
+
+    <label class="pedal-edit-label">または画像URLを直接入力</label>
     <input class="form-input" id="edit-image-url" type="url" placeholder="https://..." style="width:100%"
       oninput="previewPedalImg(this.value)">
-    <img id="pedal-img-preview" class="pedal-img-preview" alt="プレビュー">
+
+    <label class="pedal-edit-label">出典（例: BOSS公式・Strymon公式）</label>
+    <input class="form-input" id="edit-image-source" type="text" placeholder="BOSS公式" style="width:100%">
+
     <label class="pedal-edit-label">説明文（日本語）</label>
     <textarea class="form-textarea" id="edit-desc-ja" placeholder="日本語の説明文を入力..."></textarea>
     <label class="pedal-edit-label">説明文（英語）</label>
     <textarea class="form-textarea" id="edit-desc-en" placeholder="Enter description in English..."></textarea>
+
     <label class="pedal-edit-label">YouTube動画IDをリセット</label>
     <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
       <input type="checkbox" id="reset-youtube" style="width:16px;height:16px;cursor:pointer">
@@ -593,9 +607,13 @@ function openPedalEdit(pedalId){
   editingPedalId=pedal.id;
   document.getElementById('pedal-edit-name').textContent=pedal.full_name;
   document.getElementById('edit-image-url').value=pedal.image_url||'';
+  document.getElementById('edit-image-source').value=pedal.image_source||'';
   document.getElementById('edit-desc-ja').value=pedal.description||'';
   document.getElementById('edit-desc-en').value=pedal.description_en||'';
   document.getElementById('reset-youtube').checked=false;
+  document.getElementById('upload-progress-msg').textContent='';
+  // ファイル入力リセット
+  document.getElementById('edit-image-file').value='';
   const preview=document.getElementById('pedal-img-preview');
   if(pedal.image_url){preview.src=pedal.image_url;preview.classList.add('show');}
   else{preview.src='';preview.classList.remove('show');}
@@ -613,13 +631,90 @@ function previewPedalImg(url){
   else{preview.src='';preview.classList.remove('show');}
 }
 
+// 画像ファイルを選択したときの処理
+async function handlePedalImageFile(input){
+  const file=input.files[0];
+  if(!file)return;
+  const msg=document.getElementById('upload-progress-msg');
+  msg.textContent='🔄 画像を変換中...';
+  try{
+    const compressed=await compressPedalImage(file);
+    // プレビュー表示
+    const preview=document.getElementById('pedal-img-preview');
+    preview.src=compressed;
+    preview.classList.add('show');
+    // URLフィールドは一時的にbase64を持たせる（保存時にSupabaseへアップ）
+    document.getElementById('edit-image-url').value='__pending__';
+    // base64をグローバル変数に保持
+    window._pendingPedalImageB64=compressed;
+    msg.textContent='✅ 変換完了。「保存」を押すとアップロードします。';
+  }catch(e){
+    msg.textContent='❌ 変換に失敗しました';
+  }
+}
+
+// ペダル画像を長辺600px・JPEG80%に圧縮
+function compressPedalImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=600;
+        let{width,height}=img;
+        if(width>MAX||height>MAX){
+          const ratio=Math.min(MAX/width,MAX/height);
+          width=Math.round(width*ratio);
+          height=Math.round(height*ratio);
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=width;canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        resolve(canvas.toDataURL('image/jpeg',0.80));
+      };
+      img.onerror=reject;
+      img.src=ev.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// base64をSupabase Storage（pedal-images）にアップロードしてURLを返す
+async function uploadPedalImage(b64,pedalId){
+  const byteStr=atob(b64.split(',')[1]);
+  const ab=new ArrayBuffer(byteStr.length);
+  const ia=new Uint8Array(ab);
+  for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+  const blob=new Blob([ab],{type:'image/jpeg'});
+  const filename=`pedal_${pedalId}_${Date.now()}.jpg`;
+  const{error}=await sb.storage.from('pedal-images').upload(filename,blob,{contentType:'image/jpeg',upsert:true});
+  if(error)throw error;
+  const{data}=sb.storage.from('pedal-images').getPublicUrl(filename);
+  return data.publicUrl;
+}
+
 async function savePedalEdit(){
   if(!editingPedalId)return;
-  const image_url=document.getElementById('edit-image-url').value.trim()||null;
+  const msg=document.getElementById('upload-progress-msg');
+  let image_url=document.getElementById('edit-image-url').value.trim()||null;
+  // ファイルアップロード保留中の場合
+  if(image_url==='__pending__'&&window._pendingPedalImageB64){
+    msg.textContent='📤 アップロード中...';
+    try{
+      image_url=await uploadPedalImage(window._pendingPedalImageB64,editingPedalId);
+      window._pendingPedalImageB64=null;
+      msg.textContent='✅ アップロード完了';
+    }catch(e){
+      msg.textContent='❌ アップロードに失敗しました';
+      return;
+    }
+  }
+  const image_source=document.getElementById('edit-image-source').value.trim()||null;
   const description=document.getElementById('edit-desc-ja').value.trim()||null;
   const description_en=document.getElementById('edit-desc-en').value.trim()||null;
   const resetYt=document.getElementById('reset-youtube').checked;
-  const updates={image_url,description,description_en};
+  const updates={image_url,image_source,description,description_en};
   if(resetYt)updates.youtube_video_id=null;
   const{error}=await sb.from('pedals').update(updates).eq('id',editingPedalId);
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
