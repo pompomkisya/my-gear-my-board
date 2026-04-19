@@ -698,18 +698,23 @@ async function savePedalEdit(){
   if(!editingPedalId)return;
   const msg=document.getElementById('upload-progress-msg');
   let image_url=document.getElementById('edit-image-url').value.trim()||null;
-  // ファイルアップロード保留中の場合
-  if(image_url==='__pending__'&&window._pendingPedalImageB64){
-    msg.textContent='📤 アップロード中...';
-    try{
-      image_url=await uploadPedalImage(window._pendingPedalImageB64,editingPedalId);
-      window._pendingPedalImageB64=null;
-      msg.textContent='✅ アップロード完了';
-    }catch(e){
-      const detail=e?.message||e?.statusCode||JSON.stringify(e)||'不明なエラー';
-      msg.textContent='❌ '+detail;
-      console.error('upload error:',e);
-      return;
+  // __pending__のまま保存しないようにチェック
+  if(image_url==='__pending__'){
+    if(window._pendingPedalImageB64){
+      msg.textContent='📤 アップロード中...';
+      try{
+        image_url=await uploadPedalImage(window._pendingPedalImageB64,editingPedalId);
+        window._pendingPedalImageB64=null;
+        msg.textContent='✅ アップロード完了';
+      }catch(e){
+        const detail=e?.message||e?.statusCode||JSON.stringify(e)||'不明なエラー';
+        msg.textContent='❌ '+detail;
+        console.error('upload error:',e);
+        return;
+      }
+    } else {
+      // pendingのまま画像データが消えている場合はnullに戻す
+      image_url=null;
     }
   }
   const image_source=document.getElementById('edit-image-source').value.trim()||null;
