@@ -96,6 +96,19 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .pedal-edit-actions{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
 .pedal-img-preview{width:80px;height:80px;border-radius:8px;border:1px solid var(--bd);object-fit:contain;background:var(--sf2);margin-top:8px;display:none}
 .pedal-img-preview.show{display:block}
+/* リッチエディタ */
+.rich-toolbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
+.rich-btn{padding:4px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;user-select:none}
+.rich-btn:hover{border-color:var(--ac);color:var(--ac)}
+.rich-editor{width:100%;min-height:100px;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 3px 3px;padding:8px 12px;font-size:14px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s;line-height:1.7}
+.rich-editor:focus{border-color:var(--ac)}
+.rich-editor h2{font-size:18px;font-weight:700;margin:8px 0 4px;color:var(--tx)}
+.rich-editor h3{font-size:15px;font-weight:600;margin:6px 0 4px;color:var(--tm)}
+/* ペダルDBフィルター */
+.pedal-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.pf-btn{padding:6px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s}
+.pf-btn:hover{border-color:var(--ac);color:var(--ac)}
+.pf-btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
 /* 統計カード */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
 .stat-card{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:16px}
@@ -235,8 +248,15 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
       <button class="submit-btn" onclick="addPedal()">＋ DBに追加</button>
     </div>
-    <div style="margin-bottom:12px">
-      <input class="form-input" id="pedal-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="filterPedals(this.value)" style="max-width:360px">
+    <div style="margin-bottom:8px">
+      <input class="form-input" id="pedal-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="applyPedalFilter()" style="max-width:360px">
+    </div>
+    <div class="pedal-filter-bar">
+      <button class="pf-btn on" id="pf-all" onclick="setPedalFilter('all')">すべて</button>
+      <button class="pf-btn" id="pf-no-image" onclick="setPedalFilter('no-image')">🖼 画像なし</button>
+      <button class="pf-btn" id="pf-no-desc" onclick="setPedalFilter('no-desc')">📝 説明文なし</button>
+      <button class="pf-btn" id="pf-no-yt" onclick="setPedalFilter('no-yt')">▶ YouTube動画なし</button>
+      <button class="pf-btn" id="pf-complete" onclick="setPedalFilter('complete')">✅ すべて入力済み</button>
     </div>
     <div id="pedals-list" class="loading">読み込み中...</div>
   </div>
@@ -282,9 +302,21 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <input class="form-input" id="edit-image-source" type="text" placeholder="BOSS公式" style="width:100%">
 
     <label class="pedal-edit-label">説明文（日本語）</label>
-    <textarea class="form-textarea" id="edit-desc-ja" placeholder="日本語の説明文を入力..."></textarea>
+    <div class="rich-toolbar">
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','h2')">見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','h3')">小見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','b')"><b>太字</b></button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','br')">改行</button>
+    </div>
+    <div class="rich-editor" id="edit-desc-ja" contenteditable="true" data-placeholder="日本語の説明文を入力..."></div>
     <label class="pedal-edit-label">説明文（英語）</label>
-    <textarea class="form-textarea" id="edit-desc-en" placeholder="Enter description in English..."></textarea>
+    <div class="rich-toolbar">
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','h2')">見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','h3')">小見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','b')"><b>Bold</b></button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','br')">改行</button>
+    </div>
+    <div class="rich-editor" id="edit-desc-en" contenteditable="true" data-placeholder="Enter description in English..."></div>
 
     <label class="pedal-edit-label">YouTube動画IDをリセット</label>
     <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
@@ -558,28 +590,81 @@ function addPedalFromUnknown(name){
   showToast('モデル名を入力しました。ブランド名とタイプを追加してください。');
 }
 
-// ── ペダルDB
-function renderPedals(filter=''){
+// ── ペダルDB フィルター
+let pedalFilterMode='all';
+
+function setPedalFilter(mode){
+  pedalFilterMode=mode;
+  document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('on'));
+  const btn=document.getElementById('pf-'+mode);
+  if(btn)btn.classList.add('on');
+  applyPedalFilter();
+}
+
+function applyPedalFilter(){
+  const search=(document.getElementById('pedal-search').value||'').toLowerCase();
   const el=document.getElementById('pedals-list');
-  const filtered=filter
-    ?allPedals.filter(p=>(p.brand+' '+p.model+' '+p.full_name).toLowerCase().includes(filter.toLowerCase()))
-    :allPedals;
+  let filtered=allPedals;
+  // テキスト検索
+  if(search) filtered=filtered.filter(p=>(p.brand+' '+p.model+' '+p.full_name).toLowerCase().includes(search));
+  // モードフィルター
+  if(pedalFilterMode==='no-image') filtered=filtered.filter(p=>!p.image_url);
+  else if(pedalFilterMode==='no-desc') filtered=filtered.filter(p=>!p.description);
+  else if(pedalFilterMode==='no-yt') filtered=filtered.filter(p=>!p.youtube_video_id);
+  else if(pedalFilterMode==='complete') filtered=filtered.filter(p=>p.image_url&&p.description&&p.youtube_video_id);
   if(!filtered.length){el.innerHTML='<div class="empty-msg">ペダルが見つかりません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
-    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>YouTube</th><th>操作</th></tr></thead>'
+    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>操作</th></tr></thead>'
     +'<tbody>'
     +filtered.map(p=>'<tr>'
       +'<td style="font-size:12px;font-weight:600;color:var(--ac)">'+escHtml(p.brand)+'</td>'
       +'<td style="font-size:13px">'+escHtml(p.model)+'</td>'
       +'<td>'+(p.types||[]).map(t=>'<span class="tag-chip">'+t+'</span>').join('')+'</td>'
-      +'<td>'+(p.image_url?'<img src="'+p.image_url+'" style="width:40px;height:40px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">':'<span style="font-size:10px;color:var(--td)">なし</span>')+'</td>'
-      +'<td style="font-size:10px;color:var(--td)">'+(p.youtube_video_id?'✅ '+p.youtube_video_id.slice(0,8)+'...':'—')+'</td>'
+      +'<td>'+(p.image_url?'<img src="'+p.image_url+'" style="width:40px;height:40px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">':'<span style="font-size:10px;color:#e05050">なし</span>')+'</td>'
+      +'<td style="font-size:10px">'+(p.description?'<span style="color:#4ade80">✅</span>':'<span style="color:#e05050">なし</span>')+'</td>'
+      +'<td style="font-size:10px;color:var(--td)">'+(p.youtube_video_id?'<span style="color:#4ade80">✅</span>':'<span style="color:var(--td)">—</span>')+'</td>'
       +'<td><button class="approve-btn" onclick="openPedalEdit(\''+p.id+'\')">✏️ 編集</button></td>'
       +'</tr>').join('')
     +'</tbody></table></div>';
 }
 
-function filterPedals(val){renderPedals(val);}
+function renderPedals(){ applyPedalFilter(); }
+function filterPedals(){ applyPedalFilter(); }
+
+// ── リッチエディタ
+function richCmd(editorId, tag){
+  const editor=document.getElementById(editorId);
+  if(!editor)return;
+  editor.focus();
+  const sel=window.getSelection();
+  if(!sel||sel.rangeCount===0)return;
+  const range=sel.getRangeAt(0);
+  if(tag==='br'){
+    // 改行
+    const br=document.createElement('br');
+    range.deleteContents();
+    range.insertNode(br);
+    range.setStartAfter(br);
+    range.setEndAfter(br);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    // 選択テキストをタグで囲む（または空のタグを挿入）
+    const selectedText=range.toString();
+    const el=document.createElement(tag);
+    if(selectedText){
+      range.deleteContents();
+      el.textContent=selectedText;
+    } else {
+      el.textContent=tag==='h2'?'見出し':tag==='h3'?'小見出し':'テキスト';
+    }
+    range.insertNode(el);
+    range.setStartAfter(el);
+    range.setEndAfter(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+}
 
 async function addPedal(){
   const brand=document.getElementById('new-brand').value.trim();
@@ -608,8 +693,8 @@ function openPedalEdit(pedalId){
   document.getElementById('pedal-edit-name').textContent=pedal.full_name;
   document.getElementById('edit-image-url').value=pedal.image_url||'';
   document.getElementById('edit-image-source').value=pedal.image_source||'';
-  document.getElementById('edit-desc-ja').value=pedal.description||'';
-  document.getElementById('edit-desc-en').value=pedal.description_en||'';
+  document.getElementById('edit-desc-ja').innerHTML=pedal.description||'';
+  document.getElementById('edit-desc-en').innerHTML=pedal.description_en||'';
   document.getElementById('reset-youtube').checked=false;
   document.getElementById('upload-progress-msg').textContent='';
   // ファイル入力リセット
@@ -718,8 +803,8 @@ async function savePedalEdit(){
     }
   }
   const image_source=document.getElementById('edit-image-source').value.trim()||null;
-  const description=document.getElementById('edit-desc-ja').value.trim()||null;
-  const description_en=document.getElementById('edit-desc-en').value.trim()||null;
+  const description=document.getElementById('edit-desc-ja').innerHTML.trim()||null;
+  const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
   const resetYt=document.getElementById('reset-youtube').checked;
   const updates={image_url,image_source,description,description_en};
   if(resetYt)updates.youtube_video_id=null;
