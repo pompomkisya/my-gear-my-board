@@ -7,160 +7,130 @@
   <meta name="description" content="">
   <link rel="icon" href="/IMG_0206.PNG">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0d0d0e; --sf: #151517; --sf2: #1c1c1f;
-      --bd: #272729; --ac: #e8552d; --tx: #eae8e2; --tm: #9a9890; --td: #6e6c68;
-      --amazon: #f0a500; --sweetwater: #1a73e8; --soundhouse: #e8552d;
+      --bg: #111;
+      --card: #1a1a1a;
+      --card2: #222;
+      --border: #333;
+      --text: #f0f0f0;
+      --muted: #888;
+      --accent: #e05a00;
+      --amazon: #f0a500;
+      --sweetwater: #1a73e8;
+      --soundhouse: #e05a00;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--tx); font-family: 'Noto Sans JP', sans-serif; font-weight: 300; min-height: 100vh; }
-    header {
-      background: rgba(13,13,14,.96); backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--bd); padding: 0 20px; height: 58px;
-      display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100;
-    }
-    .header-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex: 1; }
-    .header-logo img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-    .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: var(--tx); }
-    .header-sub { font-size: 9px; letter-spacing: 2px; color: var(--ac); text-transform: uppercase; margin-top: 1px; }
-    .header-right { display: flex; align-items: center; gap: 8px; }
-    .lang-btn {
-      display: flex; align-items: center; gap: 4px; padding: 6px 10px;
-      background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
-      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600;
-      color: var(--tm); cursor: pointer; transition: all .15s; touch-action: manipulation;
-    }
-    .lang-btn:hover { border-color: var(--ac); color: var(--ac); }
-    .home-btn {
-      display: flex; align-items: center; gap: 6px; padding: 7px 14px;
-      background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
-      font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 600;
-      color: var(--tm); cursor: pointer; transition: all .15s; text-decoration: none; white-space: nowrap;
-    }
-    .home-btn:hover { border-color: var(--ac); color: var(--ac); }
-    .breadcrumb {
-      background: var(--sf); border-bottom: 1px solid var(--bd);
-      padding: 10px 16px; font-size: 12px; color: var(--tm);
-      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-    }
-    .breadcrumb a { color: var(--tm); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--tx); }
-    .breadcrumb .sep { color: var(--bd); }
-    .breadcrumb .current { color: var(--tx); }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; min-height: 100vh; }
+    header { background: #0a0a0a; border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100; }
+    .header-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .header-logo img { width: 40px; height: 40px; border-radius: 50%; }
+    .header-title { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: 0.05em; line-height: 1.2; }
+    .header-sub { font-size: 10px; color: var(--muted); }
+    .header-home { margin-left: auto; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 6px 14px; border-radius: 6px; font-size: 13px; text-decoration: none; white-space: nowrap; }
+    .breadcrumb { background: #1e1e1e; border-bottom: 1px solid var(--border); border-top: 1px solid var(--border); padding: 10px 16px; font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb .sep { color: #555; }
+    .breadcrumb .current { color: var(--text); }
     .container { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
-    .loading { text-align: center; padding: 60px 20px; color: var(--tm); font-family: 'Noto Sans JP', sans-serif; }
-    .error-box { background: var(--sf); border: 1px solid #c0392b; border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--tm); }
-    .pedal-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+    .loading { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .error-box { background: var(--card); border: 1px solid #c0392b; border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--muted); }
+    .pedal-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
     .pedal-top { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+
+    /* 画像ブロック：画像＋出典をひとまとめ */
+    .pedal-image-block { width: 120px; flex-shrink: 0; }
     .pedal-image {
-      width: 120px; height: 120px; flex-shrink: 0;
-      background: var(--sf2); border-radius: 12px; border: 1px solid var(--bd);
-      display: flex; align-items: center; justify-content: center; overflow: hidden;
+      width: 120px;
+      height: 120px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
+    /* 出典あり：画像の下角丸なし */
+    .pedal-image.has-source { border-radius: 12px 12px 0 0; border-bottom-color: #2a2a2a; }
+    /* 出典なし：全角丸 */
+    .pedal-image.no-source { border-radius: 12px; }
     .pedal-image img { width: 100%; height: 100%; object-fit: contain; }
-    .pedal-image-placeholder { font-size: 40px; opacity: .3; }
+    .pedal-image-placeholder { font-size: 40px; opacity: 0.3; }
+
+    /* 出典テキスト */
+    .image-source {
+      width: 120px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 12px 12px;
+      padding: 4px 8px;
+      text-align: right;
+      font-size: 9px;
+      color: #555;
+      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     .pedal-info { flex: 1; min-width: 0; }
-    .pedal-brand { font-size: 12px; font-weight: 700; color: var(--ac); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
-    .pedal-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; line-height: 1.2; margin-bottom: 10px; word-break: break-word; }
+    .pedal-brand { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 6px; }
+    .pedal-name { font-size: 22px; font-weight: 700; line-height: 1.3; margin-bottom: 10px; word-break: break-word; }
     .type-badges { display: flex; flex-wrap: wrap; gap: 6px; }
-    .type-badge { background: var(--sf2); border: 1px solid var(--bd); color: var(--tm); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
-    .pedal-description { margin-top: 16px; font-size: 14px; color: var(--tm); line-height: 1.7; padding-top: 16px; border-top: 1px solid var(--bd); font-family: 'Noto Sans JP', sans-serif; }
-    .pedal-description.empty { font-style: italic; color: var(--td); }
-    /* YouTube */
-    .yt-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-    .yt-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 14px; }
-    .yt-embed-wrap {
-      position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
-      border-radius: 10px; background: #000;
-    }
-    .yt-embed-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 10px; }
-    .yt-loading {
-      aspect-ratio: 16/9; background: var(--sf2); border-radius: 10px; border: 1px solid var(--bd);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-    }
-    .yt-loading-icon { font-size: 32px; opacity: .3; animation: pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:.6} }
-    .yt-loading-text { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; color: var(--td); }
-    .yt-fallback {
-      aspect-ratio: 16/9; background: var(--sf2); border-radius: 10px; border: 1px solid var(--bd);
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px;
-    }
-    .yt-fallback-icon { font-size: 36px; opacity: .25; }
-    .yt-fallback-text { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--td); text-align: center; line-height: 1.6; }
-    .yt-fallback-btn {
-      display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
-      background: #ff0000; border-radius: 6px;
-      font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 600;
-      color: #fff; text-decoration: none; transition: opacity .15s;
-    }
-    .yt-fallback-btn:hover { opacity: .85; }
-    /* 購入 */
-    .buy-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-    .buy-card-title { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--td); margin-bottom: 12px; text-align: center; letter-spacing: 1px; }
+    .type-badge { background: var(--card2); border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+    .pedal-description { margin-top: 16px; font-size: 14px; color: #ccc; line-height: 1.7; padding-top: 16px; border-top: 1px solid var(--border); }
+    .pedal-description.empty { color: var(--muted); font-style: italic; }
+    .buy-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+    .buy-card h3 { font-size: 13px; color: var(--muted); margin-bottom: 12px; text-align: center; }
     .buy-buttons { display: flex; flex-direction: column; gap: 10px; }
-    .buy-btn {
-      display: block; width: 100%; padding: 14px; border-radius: 10px;
-      text-align: center; font-size: 15px; font-weight: 700; text-decoration: none;
-      border: none; cursor: pointer; transition: opacity .2s; font-family: 'Noto Sans JP', sans-serif;
-    }
-    .buy-btn:hover { opacity: .85; }
+    .buy-btn { display: block; width: 100%; padding: 14px; border-radius: 10px; text-align: center; font-size: 15px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; transition: opacity 0.2s; }
+    .buy-btn:hover { opacity: 0.85; }
     .buy-btn.soundhouse { background: var(--soundhouse); color: #fff; }
     .buy-btn.sweetwater { background: var(--sweetwater); color: #fff; }
     .buy-btn.amazon { background: var(--amazon); color: #111; }
-    /* ボード */
-    .boards-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-    .boards-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 16px; }
+    .boards-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+    .boards-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     .boards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .board-item {
-      background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
-      overflow: hidden; text-decoration: none; color: var(--tx); display: block; transition: border-color .2s;
-    }
-    .board-item:hover { border-color: var(--ac); }
-    .board-thumb { width: 100%; aspect-ratio: 4/3; background: var(--sf); overflow: hidden; }
+    @media (max-width: 480px) { .boards-grid { grid-template-columns: 1fr 1fr; } }
+    .board-item { background: var(--card2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; text-decoration: none; color: var(--text); display: block; transition: border-color 0.2s; }
+    .board-item:hover { border-color: var(--accent); }
+    .board-thumb { width: 100%; aspect-ratio: 4/3; background: #2a2a2a; overflow: hidden; }
     .board-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .board-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--bd); }
+    .board-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--border); }
     .board-meta { padding: 10px; }
     .board-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
-    .board-user { font-size: 11px; color: var(--tm); font-family: 'Noto Sans JP', sans-serif; }
-    .empty-state { text-align: center; padding: 36px 20px; }
-    .empty-state-icon { font-size: 36px; margin-bottom: 12px; opacity: .4; }
-    .empty-state-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--tm); margin-bottom: 8px; }
-    .empty-state-text { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--td); line-height: 1.6; margin-bottom: 16px; }
-    .empty-state-btn {
-      display: inline-block; padding: 10px 24px; background: var(--ac); border-radius: 4px;
-      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600;
-      color: #fff; text-decoration: none; transition: background .15s;
-    }
-    .empty-state-btn:hover { background: #cf4c26; }
+    .board-user { font-size: 11px; color: var(--muted); }
+    .no-boards { text-align: center; padding: 30px; color: var(--muted); font-size: 14px; }
+    .no-boards a { color: var(--accent); text-decoration: none; display: block; margin-top: 10px; font-weight: 600; }
   </style>
 </head>
 <body>
+
 <header>
   <a href="/" class="header-logo">
-    <img src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
+    <img src="/IMG_0206.PNG" alt="MGMB">
     <div>
       <div class="header-title">MY GEAR MY BOARD</div>
-      <div class="header-sub" id="header-sub">ペダルボードSNS</div>
+      <div class="header-sub">ペダルボードSNS</div>
     </div>
   </a>
-  <div class="header-right">
-    <div class="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
-    <a href="/" class="home-btn">🏠 <span id="home-text">ホーム</span></a>
-  </div>
+  <a href="/" class="header-home">🏠 ホーム</a>
 </header>
 
 <div class="breadcrumb">
-  <a href="/" id="bc-home">ホーム</a>
+  <a href="/">ホーム</a>
   <span class="sep">›</span>
-  <a href="#" id="bc-brand">...</a>
-  <span class="sep">›</span>
-  <span id="bc-pedal" class="current">読み込み中...</span>
+  <span id="breadcrumb-brand"></span>
+  <span class="sep" id="breadcrumb-sep2" style="display:none">›</span>
+  <span id="breadcrumb-model" class="current"></span>
 </div>
 
 <div class="container">
-  <div id="content"><div class="loading">読み込み中...</div></div>
+  <div id="content">
+    <div class="loading">読み込み中...</div>
+  </div>
 </div>
 
 <script>
@@ -169,221 +139,103 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function detectLang() {
-  const saved = localStorage.getItem('mgmb_lang');
-  if (saved) return saved;
-  const bl = navigator.language || navigator.userLanguage || 'ja';
-  return bl.toLowerCase().startsWith('ja') ? 'ja' : 'en';
-}
-let lang = detectLang();
-
-const I18N = {
-  ja: {
-    headerSub:'ペダルボードSNS', home:'ホーム', langLabel:'EN', bcHome:'ホーム',
-    descEmpty:'説明文は準備中です。',
-    buyTitle:'🛒 購入・価格をチェック',
-    btnSoundhouse:'🎸 サウンドハウスで探す',
-    btnSweetwater:'🎵 Sweetwaterで探す',
-    btnAmazon:'📦 Amazonで探す',
-    ytTitle:'▶ デモ動画',
-    ytLoading:'動画を取得中...',
-    ytFallbackText:'動画を自動取得できませんでした。YouTubeで検索してみましょう。',
-    ytFallbackBtn:'YouTubeで探す',
-    sectionBoards:'このペダルを使ったボード',
-    emptyBoardTitle:'まだ投稿がありません',
-    emptyBoardText:'このペダルを使ったボードをあなたが最初に投稿しましょう！',
-    emptyBoardBtn:'ボードを投稿する →',
-    loading:'読み込み中...', notFound:'ペダルが見つかりませんでした。',
-    backHome:'← ホームに戻る', anonUser:'匿名', untitled:'無題のボード',
-  },
-  en: {
-    headerSub:'Pedalboard SNS', home:'Home', langLabel:'JA', bcHome:'Home',
-    descEmpty:'Description coming soon.',
-    buyTitle:'🛒 Check Prices',
-    btnSoundhouse:'🎸 Find on Soundhouse',
-    btnSweetwater:'🎵 Find on Sweetwater',
-    btnAmazon:'📦 Find on Amazon',
-    ytTitle:'▶ Demo Video',
-    ytLoading:'Fetching video...',
-    ytFallbackText:'Could not fetch a video automatically. Try searching on YouTube.',
-    ytFallbackBtn:'Search on YouTube',
-    sectionBoards:'Boards using this pedal',
-    emptyBoardTitle:'No boards yet',
-    emptyBoardText:"Be the first to post a board featuring this pedal!",
-    emptyBoardBtn:'Post your board →',
-    loading:'Loading...', notFound:'Pedal not found.',
-    backHome:'← Back to Home', anonUser:'Anonymous', untitled:'Untitled Board',
-  }
-};
-function tr(key) { return (I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key; }
-
 const TYPE_LABELS = {
-  'overdrive':'OD','od':'OD','distortion':'Dist','dist':'Dist','fuzz':'Fuzz',
-  'boost':'Boost','reverb':'Reverb','delay':'Delay','chorus':'Chorus',
-  'flanger':'Flanger','phaser':'Phaser','modulation':'Mod','mod':'Mod',
-  'tremolo':'Tremolo','vibrato':'Vibrato','pitch':'Pitch','wah':'Wah',
-  'compressor':'Comp','comp':'Comp','eq':'EQ','noise_gate':'Noise Gate',
-  'looper':'Looper','volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer','pre':'Preamp'
+  'overdrive':'OD','od':'OD','distortion':'Dist','dist':'Dist',
+  'fuzz':'Fuzz','boost':'Boost','reverb':'Reverb','delay':'Delay',
+  'chorus':'Chorus','flanger':'Flanger','phaser':'Phaser',
+  'modulation':'Mod','mod':'Mod','tremolo':'Tremolo','vibrato':'Vibrato',
+  'pitch':'Pitch','wah':'Wah','compressor':'Comp','comp':'Comp',
+  'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
+  'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
+  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer',
+  'junction_box':'Junction Box','pre':'Preamp'
 };
-function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()]||t; }
+function getTypeLabel(t){ return TYPE_LABELS[t?.toLowerCase()]||t; }
+function getSlug(){ return new URLSearchParams(window.location.search).get('slug'); }
 
-function soundhouseUrl(n) { return 'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(n); }
-function sweetwaterUrl(n) { return 'https://www.sweetwater.com/store/search.php?s='+encodeURIComponent(n); }
-function amazonUrl(n) { return 'https://www.amazon.co.jp/s?k='+encodeURIComponent(n); }
-function ytSearchUrl(n) { return 'https://www.youtube.com/results?search_query='+encodeURIComponent(n+' demo'); }
+async function loadPedal(){
+  const slug=getSlug();
+  if(!slug){ showError('ペダルが指定されていません。'); return; }
 
-function applyLang() {
-  document.getElementById('header-sub').textContent = tr('headerSub');
-  document.getElementById('home-text').textContent = tr('home');
-  document.getElementById('lang-label').textContent = tr('langLabel');
-  document.getElementById('bc-home').textContent = tr('bcHome');
-}
+  const{data:pedal,error}=await db.from('pedals').select('*').eq('slug',slug).single();
+  if(error||!pedal){ showError('ペダルが見つかりませんでした。'); return; }
 
-function toggleLang() {
-  lang = lang==='ja'?'en':'ja';
-  localStorage.setItem('mgmb_lang', lang);
-  applyLang();
-  if (cachedPedal) renderPedal(cachedPedal, cachedPosts);
-}
+  document.title=`${pedal.full_name} | My Gear My Board`;
+  document.querySelector('meta[name="description"]').setAttribute('content',
+    `${pedal.full_name}のペダル情報と、実際のエフェクターボードでの使用例をチェック。`);
 
-let cachedPedal = null;
-let cachedPosts = [];
+  const{data:posts}=await db.from('posts').select('id,title,username,image_urls,gear_list')
+    .contains('gear_list',JSON.stringify([{name:pedal.full_name}]))
+    .order('created_at',{ascending:false}).limit(6);
 
-// Netlify Function経由でYouTube動画IDを取得（APIキーはサーバー側で保持）
-async function fetchVideoId(brand, model) {
-  try {
-    const query = `${brand} ${model} demo`;
-    const res = await fetch(`/.netlify/functions/youtube?q=${encodeURIComponent(query)}`);
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.videoId || null;
-  } catch(e) {
-    console.error('YT Function error:', e);
-    return null;
+  let boards=posts||[];
+  if(boards.length===0){
+    const{data:posts2}=await db.from('posts').select('id,title,username,image_urls,gear_list')
+      .filter('gear_list','cs',`[{"name":"${pedal.full_name}"}]`)
+      .order('created_at',{ascending:false}).limit(6);
+    boards=posts2||[];
   }
+  renderPedal(pedal,boards);
 }
 
-// Supabaseに保存（キャッシュ）
-async function cacheVideoId(pedalId, videoId) {
-  await db.from('pedals').update({ youtube_video_id: videoId }).eq('id', pedalId);
-}
+function renderPedal(pedal,boards){
+  document.getElementById('breadcrumb-brand').innerHTML=
+    `<a href="/brand?name=${encodeURIComponent(pedal.brand)}" style="color:#aaa;text-decoration:none;">${pedal.brand}</a>`;
+  document.getElementById('breadcrumb-model').textContent=pedal.model;
+  document.getElementById('breadcrumb-sep2').style.display='inline';
 
-// YouTube表示を更新
-function renderYouTube(pedalId, pedalName, videoId) {
-  const el = document.getElementById('yt-section');
-  if (!el) return;
-  if (videoId) {
-    el.innerHTML = `
-      <div class="yt-card">
-        <div class="yt-card-title">${tr('ytTitle')}</div>
-        <div class="yt-embed-wrap">
-          <iframe src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen loading="lazy" title="${pedalName} demo"></iframe>
+  const soundhouseUrl=pedal.soundhouse_url||`https://www.soundhouse.co.jp/search/index?searchkey=${encodeURIComponent(pedal.full_name)}`;
+  const sweetwaterUrl=`https://www.sweetwater.com/store/search.php?q=${encodeURIComponent(pedal.full_name)}`;
+  const amazonUrl=pedal.amazon_url||`https://www.amazon.co.jp/s?k=${encodeURIComponent(pedal.full_name)}`;
+
+  const typesHtml=(pedal.types||[]).map(t=>`<span class="type-badge">${getTypeLabel(t)}</span>`).join('');
+
+  // 画像ブロック（画像＋出典）
+  let imageBlockHtml='';
+  if(pedal.image_url){
+    const hasSource=!!pedal.image_source;
+    imageBlockHtml=`
+      <div class="pedal-image-block">
+        <div class="pedal-image ${hasSource?'has-source':'no-source'}">
+          <img src="${pedal.image_url}" alt="${pedal.full_name}" loading="lazy">
         </div>
+        ${hasSource?`<div class="image-source">出典: ${pedal.image_source}</div>`:''}
       </div>`;
   } else {
-    el.innerHTML = `
-      <div class="yt-card">
-        <div class="yt-card-title">${tr('ytTitle')}</div>
-        <div class="yt-fallback">
-          <div class="yt-fallback-icon">▶</div>
-          <div class="yt-fallback-text">${tr('ytFallbackText')}</div>
-          <a href="${ytSearchUrl(pedalName)}" target="_blank" rel="noopener" class="yt-fallback-btn">▶ ${tr('ytFallbackBtn')}</a>
+    imageBlockHtml=`
+      <div class="pedal-image-block">
+        <div class="pedal-image no-source">
+          <span class="pedal-image-placeholder">🎛</span>
         </div>
       </div>`;
   }
-}
 
-// YouTube処理（ページ描画をブロックしない）
-async function handleYouTube(pedal) {
-  if (pedal.youtube_video_id) {
-    // キャッシュ済み → 即表示
-    renderYouTube(pedal.id, pedal.full_name, pedal.youtube_video_id);
-    return;
-  }
-  // 未取得 → APIで検索
-  const videoId = await fetchVideoId(pedal.brand, pedal.model);
-  if (videoId) {
-    cacheVideoId(pedal.id, videoId); // 非同期で保存（待たない）
-    cachedPedal.youtube_video_id = videoId;
-  }
-  renderYouTube(pedal.id, pedal.full_name, videoId);
-}
+  const descHtml=pedal.description
+    ?`<div class="pedal-description">${pedal.description}</div>`
+    :`<div class="pedal-description empty">説明文は準備中です。</div>`;
 
-async function loadPedal() {
-  const params = new URLSearchParams(window.location.search);
-  const slug = params.get('slug');
-  if (!slug) { showError(tr('notFound')); return; }
-
-  const { data: pedals } = await db.from('pedals')
-    .select('id, brand, model, full_name, slug, types, image_url, description, youtube_video_id')
-    .eq('slug', decodeURIComponent(slug)).limit(1);
-
-  if (!pedals?.length) { showError(tr('notFound')); return; }
-  const pedal = pedals[0];
-  cachedPedal = pedal;
-
-  document.getElementById('bc-brand').textContent = pedal.brand;
-  document.getElementById('bc-brand').href = `/brand?name=${encodeURIComponent(pedal.brand)}`;
-  document.getElementById('bc-pedal').textContent = pedal.model;
-  document.title = `${pedal.full_name} | My Gear My Board`;
-
-  // 投稿の逆引き
-  const { data: allPosts } = await db.from('posts')
-    .select('id, title, username, image_urls, gear_list')
-    .order('created_at', { ascending: false });
-  const posts = (allPosts||[]).filter(p => {
-    const gear = Array.isArray(p.gear_list) ? p.gear_list : [];
-    return gear.some(g => (g.name||'').toLowerCase() === pedal.full_name.toLowerCase());
-  }).slice(0, 6);
-  cachedPosts = posts;
-
-  // ページ描画（YouTube部分はローディング状態）
-  renderPedal(pedal, posts);
-
-  // YouTube非同期処理（描画をブロックしない）
-  handleYouTube(pedal);
-}
-
-function renderPedal(pedal, posts) {
-  const typesHtml = (pedal.types||[]).map(t => `<span class="type-badge">${getTypeLabel(t)}</span>`).join('');
-  const imageHtml = pedal.image_url
-    ? `<img src="${pedal.image_url}" alt="${pedal.model}" loading="lazy">`
-    : `<span class="pedal-image-placeholder">🎛</span>`;
-  const descHtml = pedal.description
-    ? `<div class="pedal-description">${pedal.description}</div>`
-    : `<div class="pedal-description empty">${tr('descEmpty')}</div>`;
-
-  let boardsHtml = '';
-  if (posts.length > 0) {
-    boardsHtml = posts.map(post => {
-      const thumb = post.image_urls?.length > 0
-        ? `<img src="${post.image_urls[0]}" alt="" loading="lazy">`
-        : `<div class="board-thumb-placeholder">🎸</div>`;
-      return `<a href="/post?id=${post.id}" class="board-item">
+  let boardsHtml='';
+  if(boards.length>0){
+    boardsHtml=boards.map(post=>{
+      const thumb=(post.image_urls&&post.image_urls.length>0)
+        ?`<img src="${post.image_urls[0]}" alt="${post.title||''}" loading="lazy">`
+        :`<div class="board-thumb-placeholder">🎸</div>`;
+      return`<a href="/post?id=${post.id}" class="board-item">
         <div class="board-thumb">${thumb}</div>
         <div class="board-meta">
-          <div class="board-title">${post.title||tr('untitled')}</div>
-          <div class="board-user">${post.username?'@'+post.username:tr('anonUser')}</div>
+          <div class="board-title">${post.title||'無題のボード'}</div>
+          <div class="board-user">${post.username?'@'+post.username:'匿名'}</div>
         </div>
       </a>`;
     }).join('');
   } else {
-    boardsHtml = `
-      <div class="empty-state">
-        <div class="empty-state-icon">🎸</div>
-        <div class="empty-state-title">${tr('emptyBoardTitle')}</div>
-        <div class="empty-state-text">${tr('emptyBoardText')}</div>
-        <a href="/" class="empty-state-btn">${tr('emptyBoardBtn')}</a>
-      </div>`;
+    boardsHtml=`<div class="no-boards">このペダルを使ったボードはまだありません。<br><a href="/">あなたのボードを投稿する →</a></div>`;
   }
 
-  document.getElementById('content').innerHTML = `
+  document.getElementById('content').innerHTML=`
     <div class="pedal-card">
       <div class="pedal-top">
-        <div class="pedal-image">${imageHtml}</div>
+        ${imageBlockHtml}
         <div class="pedal-info">
           <div class="pedal-brand">${pedal.brand}</div>
           <div class="pedal-name">${pedal.model}</div>
@@ -392,41 +244,24 @@ function renderPedal(pedal, posts) {
       </div>
       ${descHtml}
     </div>
-
     <div class="buy-card">
-      <div class="buy-card-title">${tr('buyTitle')}</div>
+      <h3>🛒 購入・価格をチェック</h3>
       <div class="buy-buttons">
-        <a href="${soundhouseUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn soundhouse">${tr('btnSoundhouse')}</a>
-        <a href="${sweetwaterUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn sweetwater">${tr('btnSweetwater')}</a>
-        <a href="${amazonUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazon')}</a>
+        <a href="${soundhouseUrl}" target="_blank" rel="noopener" class="buy-btn soundhouse">🎸 サウンドハウスで探す</a>
+        <a href="${sweetwaterUrl}" target="_blank" rel="noopener" class="buy-btn sweetwater">🎵 Sweetwaterで探す</a>
+        <a href="${amazonUrl}" target="_blank" rel="noopener" class="buy-btn amazon">📦 Amazonで探す</a>
       </div>
     </div>
-
-    <div id="yt-section">
-      <div class="yt-card">
-        <div class="yt-card-title">${tr('ytTitle')}</div>
-        <div class="yt-loading">
-          <div class="yt-loading-icon">▶</div>
-          <div class="yt-loading-text">${tr('ytLoading')}</div>
-        </div>
-      </div>
-    </div>
-
     <div class="boards-card">
-      <h3>🎛 ${tr('sectionBoards')}</h3>
+      <h3>🎛 このペダルを使ったボード</h3>
       <div class="boards-grid">${boardsHtml}</div>
     </div>`;
 }
 
-function showError(msg) {
-  document.getElementById('content').innerHTML = `
-    <div class="error-box">
-      <p>${msg}</p>
-      <a href="/" style="color:var(--ac);margin-top:16px;display:block;">${tr('backHome')}</a>
-    </div>`;
+function showError(msg){
+  document.getElementById('content').innerHTML=`<div class="error-box"><p>${msg}</p><a href="/" style="color:var(--accent);margin-top:16px;display:block;">← ホームに戻る</a></div>`;
 }
 
-applyLang();
 loadPedal();
 </script>
 </body>
