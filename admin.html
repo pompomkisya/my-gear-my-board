@@ -706,7 +706,9 @@ async function savePedalEdit(){
       window._pendingPedalImageB64=null;
       msg.textContent='✅ アップロード完了';
     }catch(e){
-      msg.textContent='❌ アップロードに失敗しました';
+      const detail=e?.message||e?.statusCode||JSON.stringify(e)||'不明なエラー';
+      msg.textContent='❌ '+detail;
+      console.error('upload error:',e);
       return;
     }
   }
