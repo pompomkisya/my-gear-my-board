@@ -80,6 +80,9 @@
     .type-badge { background: var(--sf2); border: 1px solid var(--bd); color: var(--tm); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
     .pedal-description { margin-top: 16px; font-size: 14px; color: var(--tm); line-height: 1.7; padding-top: 16px; border-top: 1px solid var(--bd); font-family: 'Noto Sans JP', sans-serif; }
     .pedal-description.empty { font-style: italic; color: var(--td); }
+    .pedal-description h2 { font-size: 17px; font-weight: 700; color: var(--tx); margin: 14px 0 6px; }
+    .pedal-description h3 { font-size: 14px; font-weight: 600; color: var(--tm); margin: 10px 0 4px; }
+    .pedal-description b { font-weight: 700; color: var(--tx); }
     /* YouTube */
     .yt-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
     .yt-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 14px; }
@@ -379,7 +382,7 @@ function renderPedal(pedal, posts) {
       </div>`;
   }
 
-  // 説明文（言語切り替え対応）
+  // 説明文（言語切り替え対応・HTMLとして表示）
   const desc = lang === 'en' ? (pedal.description_en || pedal.description) : pedal.description;
   const descHtml = desc
     ? `<div class="pedal-description">${desc}</div>`
@@ -422,15 +425,6 @@ function renderPedal(pedal, posts) {
       ${descHtml}
     </div>
 
-    <div class="buy-card">
-      <div class="buy-card-title">${tr('buyTitle')}</div>
-      <div class="buy-buttons">
-        <a href="${soundhouseUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn soundhouse">${tr('btnSoundhouse')}</a>
-        <a href="${sweetwaterUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn sweetwater">${tr('btnSweetwater')}</a>
-        <a href="${amazonUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazon')}</a>
-      </div>
-    </div>
-
     <div id="yt-section">
       <div class="yt-card">
         <div class="yt-card-title">${tr('ytTitle')}</div>
@@ -438,6 +432,15 @@ function renderPedal(pedal, posts) {
           <div class="yt-loading-icon">▶</div>
           <div class="yt-loading-text">${tr('ytLoading')}</div>
         </div>
+      </div>
+    </div>
+
+    <div class="buy-card">
+      <div class="buy-card-title">${tr('buyTitle')}</div>
+      <div class="buy-buttons">
+        <a href="${soundhouseUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn soundhouse">${tr('btnSoundhouse')}</a>
+        <a href="${sweetwaterUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn sweetwater">${tr('btnSweetwater')}</a>
+        <a href="${amazonUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazon')}</a>
       </div>
     </div>
 
