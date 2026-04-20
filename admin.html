@@ -303,6 +303,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <label class="pedal-edit-label">説明文（日本語）</label>
     <div class="rich-toolbar">
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','p')">標準</button>
       <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','h2')">見出し</button>
       <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','h3')">小見出し</button>
       <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','b')"><b>太字</b></button>
@@ -311,6 +312,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="rich-editor" id="edit-desc-ja" contenteditable="true" data-placeholder="日本語の説明文を入力..."></div>
     <label class="pedal-edit-label">説明文（英語）</label>
     <div class="rich-toolbar">
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','p')">Normal</button>
       <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','h2')">見出し</button>
       <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','h3')">小見出し</button>
       <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','b')"><b>Bold</b></button>
@@ -646,6 +648,16 @@ function richCmd(editorId, tag){
     range.insertNode(br);
     range.setStartAfter(br);
     range.setEndAfter(br);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else if(tag==='p'){
+    // 標準テキスト：選択範囲をプレーンテキストに戻す
+    const selectedText=range.toString();
+    range.deleteContents();
+    const textNode=document.createTextNode(selectedText||'テキスト');
+    range.insertNode(textNode);
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
     sel.removeAllRanges();
     sel.addRange(range);
   } else {
