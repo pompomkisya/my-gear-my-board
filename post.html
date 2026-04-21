@@ -78,7 +78,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .comment-input::placeholder{color:var(--td)}
 .comment-submit{padding:10px 16px;background:var(--ac);border:none;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;touch-action:manipulation;min-height:44px;flex-shrink:0}
 .comment-submit:hover{background:#cf4c26}
-.comment-submit:disabled{opacity:.5;cursor:not-allowed}
 .comment{padding:14px 0;border-bottom:1px solid var(--bd);word-break:break-word;overflow-wrap:break-word}
 .comment:last-child{border-bottom:none}
 .c-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
@@ -99,7 +98,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .reply-input{flex:1;min-width:0;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 3px 3px;padding:7px 10px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s;resize:none;min-height:44px;overflow-y:hidden}
 .reply-input:focus{border-color:var(--ac)}
 .reply-submit{padding:7px 12px;background:var(--ac);border:none;border-radius:3px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation;white-space:nowrap;flex-shrink:0}
-.reply-submit:disabled{opacity:.5;cursor:not-allowed}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .ebd{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s}
@@ -137,10 +135,18 @@ textarea.form-input{resize:vertical;min-height:80px}
 .report-submit{width:100%;background:#c03030;border:none;border-radius:4px;padding:10px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation}
 .report-close{position:absolute;top:14px;right:14px;width:26px;height:26px;background:var(--sf2);border:1px solid var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--tm)}
 .report-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+/* 編集モーダル 画像サムネイル */
 .edit-img-small{position:relative;width:90px;height:90px;border-radius:4px;overflow:hidden;border:1px solid var(--bd);flex-shrink:0;background:#000}
 .edit-img-small img{width:100%;height:100%;object-fit:contain}
 .edit-img-edit-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(232,85,45,.85);border:none;color:#fff;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;padding:4px;cursor:pointer;text-align:center;touch-action:manipulation}
 /* サジェスト入力（機材） */
+.gear-input-wrap{position:relative}
+.gear-tags{display:flex;flex-wrap:wrap;gap:5px;min-height:36px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:6px 8px;cursor:text;transition:border-color .15s}
+.gear-tags:focus-within{border-color:var(--ac)}
+.gear-tag{display:flex;align-items:center;gap:4px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:2px;padding:2px 7px;font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--ac);white-space:nowrap}
+.gear-tag-x{cursor:pointer;font-size:12px;color:var(--ac);opacity:.7;background:none;border:none;padding:0}
+.gear-text-input{background:transparent;border:none;outline:none;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;min-width:140px;flex:1;padding:1px 2px}
+.gear-text-input::placeholder{color:var(--td)}
 .ac-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:700;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .ac-dropdown.open{display:block}
 .ac-item{padding:8px 12px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .12s;border-bottom:1px solid var(--bd)}
@@ -198,7 +204,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <img class="logo-img" src="IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
     <div class="logo-text">
       <div class="logo-main">My Gear My Board</div>
-      <div class="logo-sub" id="post-logo-sub">ペダルボードSNS</div>
+      <div class="logo-sub">ペダルボードSNS</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
@@ -207,7 +213,7 @@ textarea.form-input{resize:vertical;min-height:80px}
       style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;cursor:pointer;transition:all .15s;touch-action:manipulation;font-size:12px;font-weight:600;color:var(--tm)"
       onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'"
       onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
-      🌐 <span id="post-lang-label">EN</span>
+      🌐 <span id="post-lang-label">JA</span>
     </div>
   </div>
 </header>
@@ -221,9 +227,8 @@ textarea.form-input{resize:vertical;min-height:80px}
   <div class="eform">
     <div class="eform-close" onclick="closeModal('edit-bd')">✕</div>
     <div id="edit-step1">
-      <!-- ④ パスワード確認画面：翻訳対応（JS側でテキストを動的に設定） -->
-      <div class="eform-title" id="edit-pw-title">記事を編集・削除</div>
-      <div class="eform-sub" id="edit-pw-sub">投稿時に設定した4桁パスワードを入力してください</div>
+      <div class="eform-title">記事を編集・削除</div>
+      <div class="eform-sub">投稿時に設定した4桁パスワードを入力してください</div>
       <div class="pin-row">
         <input class="pin-d" id="pin1" type="password" inputmode="numeric" maxlength="1">
         <input class="pin-d" id="pin2" type="password" inputmode="numeric" maxlength="1">
@@ -231,55 +236,48 @@ textarea.form-input{resize:vertical;min-height:80px}
         <input class="pin-d" id="pin4" type="password" inputmode="numeric" maxlength="1">
       </div>
       <div class="pin-err" id="pin-err"></div>
-      <button class="submit-btn" id="verify-btn" onclick="verifyPin()">確認する</button>
+      <button class="submit-btn" onclick="verifyPin()">確認する</button>
     </div>
     <div id="edit-step2" style="display:none">
-      <!-- ⑤ 編集画面：翻訳対応 -->
-      <div class="eform-title" id="edit-form-title">記事を編集</div>
-      <div class="eform-sub" style="color:#4caf50" id="edit-form-sub">✅ パスワード認証が完了しました</div>
+      <div class="eform-title">記事を編集</div>
+      <div class="eform-sub" style="color:#4caf50">✅ パスワード認証が完了しました</div>
+      <!-- 画像編集セクション -->
       <div class="form-row" style="margin-top:16px">
-        <label class="form-lbl" id="edit-lbl-photo">画像を編集・差し替え</label>
+        <label class="form-lbl">画像を編集・差し替え</label>
         <div id="edit-photo-previews" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
         <input type="file" id="edit-photo-input" accept="image/*" multiple style="display:none" onchange="handleEditPhotos(event)">
-        <button type="button" id="edit-add-photo-btn" onclick="document.getElementById('edit-photo-input').click()"
+        <button type="button" onclick="document.getElementById('edit-photo-input').click()"
           style="width:100%;padding:8px;border:1.5px dashed var(--bd);border-radius:4px;background:transparent;color:var(--td);font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;cursor:pointer;touch-action:manipulation">
           ＋ 写真を追加・変更（最大3枚）
         </button>
-        <div id="edit-photo-note" style="font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--td);margin-top:4px">※ 既存の写真はサムネイルをタップして削除できます</div>
+        <div style="font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--td);margin-top:4px">※ 既存の写真はサムネイルをタップして削除できます</div>
       </div>
       <div class="form-row">
-        <label class="form-lbl" id="edit-lbl-title">タイトル</label>
+        <label class="form-lbl">タイトル</label>
         <input class="form-input" id="edit-title" type="text">
       </div>
-      <!-- ③⑤ 機材並び替えUI + サジェスト対応 -->
+      <!-- 機材並び替えUI -->
       <div class="form-row">
-        <label class="form-lbl" id="edit-lbl-gear">使用機材（↑↓で並び替え可）</label>
+        <label class="form-lbl">使用機材（↑↓で並び替え可）</label>
         <div id="post-edit-gear-sort-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
-        <div style="display:flex;gap:6px;margin-top:4px;position:relative">
-          <div style="flex:1;position:relative">
-            <input class="form-input" id="post-edit-gear-add" type="text" placeholder="機材名を追加..."
-              oninput="editGearSuggest(this.value)"
-              onkeydown="editGearKeyDown(event)"
-              onblur="setTimeout(()=>closeEditGearAC(),180)"
-              autocomplete="off">
-            <div class="ac-dropdown" id="edit-gear-ac-dropdown"></div>
-          </div>
-          <button type="button" id="edit-gear-add-btn" onclick="addPostEditGearItem()" style="padding:8px 14px;background:var(--ac);border:none;border-radius:3px;font-size:13px;color:#fff;cursor:pointer;white-space:nowrap;font-family:Noto Sans JP,sans-serif">追加</button>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <input class="form-input" id="post-edit-gear-add" type="text" placeholder="機材名を追加..." style="flex:1">
+          <button type="button" onclick="addPostEditGearItem()" style="padding:8px 14px;background:var(--ac);border:none;border-radius:3px;font-size:13px;color:#fff;cursor:pointer;white-space:nowrap;font-family:Noto Sans JP,sans-serif">追加</button>
         </div>
       </div>
       <div class="form-row">
-        <label class="form-lbl" id="edit-lbl-desc">コメント・説明</label>
+        <label class="form-lbl">コメント・説明</label>
         <textarea class="form-input" id="edit-desc"></textarea>
       </div>
       <div class="form-row">
-        <label class="form-lbl" id="edit-lbl-yt">YouTube URL</label>
+        <label class="form-lbl">YouTube URL</label>
         <div class="yt-input-wrap">
           <span class="yt-icon">▶️</span>
           <input class="form-input" id="edit-youtube" type="url" placeholder="https://www.youtube.com/watch?v=...">
         </div>
       </div>
-      <button class="submit-btn" id="save-edit-btn" onclick="saveEdit()">変更を保存する</button>
-      <button class="del-btn" id="del-post-btn" onclick="confirmDelete()">🗑 この投稿を削除する</button>
+      <button class="submit-btn" onclick="saveEdit()">変更を保存する</button>
+      <button class="del-btn" onclick="confirmDelete()">🗑 この投稿を削除する</button>
     </div>
   </div>
 </div>
@@ -327,6 +325,7 @@ const SESSION_ID=getSessionId();
 const params=new URLSearchParams(location.search);
 const POST_ID=params.get('id');
 
+// 言語自動判定
 function detectPostLang(){
   const urlLang=new URLSearchParams(location.search).get('lang');
   if(urlLang)return urlLang;
@@ -338,61 +337,8 @@ function detectPostLang(){
 let lang=detectPostLang();
 let currentPost=null,allComments=[];
 
-// ④⑤ 編集モーダルのラベルを言語に合わせて更新
-function applyEditModalLang(){
-  const pwTitle=document.getElementById('edit-pw-title');
-  const pwSub=document.getElementById('edit-pw-sub');
-  const verifyBtn=document.getElementById('verify-btn');
-  const formTitle=document.getElementById('edit-form-title');
-  const formSub=document.getElementById('edit-form-sub');
-  const lblPhoto=document.getElementById('edit-lbl-photo');
-  const addPhotoBtn=document.getElementById('edit-add-photo-btn');
-  const photoNote=document.getElementById('edit-photo-note');
-  const lblTitle=document.getElementById('edit-lbl-title');
-  const lblGear=document.getElementById('edit-lbl-gear');
-  const gearAdd=document.getElementById('post-edit-gear-add');
-  const gearAddBtn=document.getElementById('edit-gear-add-btn');
-  const lblDesc=document.getElementById('edit-lbl-desc');
-  const lblYt=document.getElementById('edit-lbl-yt');
-  const saveBtn=document.getElementById('save-edit-btn');
-  const delBtn=document.getElementById('del-post-btn');
-
-  if(lang==='en'){
-    if(pwTitle)pwTitle.textContent='Edit / Delete Post';
-    if(pwSub)pwSub.textContent='Enter the 4-digit password you set when posting';
-    if(verifyBtn)verifyBtn.textContent='Confirm';
-    if(formTitle)formTitle.textContent='Edit Post';
-    if(formSub)formSub.textContent='✅ Password verified';
-    if(lblPhoto)lblPhoto.textContent='Edit / Replace Photos';
-    if(addPhotoBtn)addPhotoBtn.textContent='＋ Add / Change Photos (max 3)';
-    if(photoNote)photoNote.textContent='※ Tap a thumbnail to remove existing photos';
-    if(lblTitle)lblTitle.textContent='Title';
-    if(lblGear)lblGear.textContent='Gear (drag ↑↓ to reorder)';
-    if(gearAdd)gearAdd.placeholder='Add gear name...';
-    if(gearAddBtn)gearAddBtn.textContent='Add';
-    if(lblDesc)lblDesc.textContent='Description';
-    if(lblYt)lblYt.textContent='YouTube URL';
-    if(saveBtn)saveBtn.textContent='Save Changes';
-    if(delBtn)delBtn.textContent='🗑 Delete This Post';
-  }else{
-    if(pwTitle)pwTitle.textContent='記事を編集・削除';
-    if(pwSub)pwSub.textContent='投稿時に設定した4桁パスワードを入力してください';
-    if(verifyBtn)verifyBtn.textContent='確認する';
-    if(formTitle)formTitle.textContent='記事を編集';
-    if(formSub)formSub.textContent='✅ パスワード認証が完了しました';
-    if(lblPhoto)lblPhoto.textContent='画像を編集・差し替え';
-    if(addPhotoBtn)addPhotoBtn.textContent='＋ 写真を追加・変更（最大3枚）';
-    if(photoNote)photoNote.textContent='※ 既存の写真はサムネイルをタップして削除できます';
-    if(lblTitle)lblTitle.textContent='タイトル';
-    if(lblGear)lblGear.textContent='使用機材（↑↓で並び替え可）';
-    if(gearAdd)gearAdd.placeholder='機材名を追加...';
-    if(gearAddBtn)gearAddBtn.textContent='追加';
-    if(lblDesc)lblDesc.textContent='コメント・説明';
-    if(lblYt)lblYt.textContent='YouTube URL';
-    if(saveBtn)saveBtn.textContent='変更を保存する';
-    if(delBtn)delBtn.textContent='🗑 この投稿を削除する';
-  }
-}
+// ── ペダルslugマップ（full_name → slug）
+let pedalSlugMap={};
 
 function toggleLang(){
   lang=lang==='ja'?'en':'ja';
@@ -401,16 +347,21 @@ function toggleLang(){
   if(label)label.textContent=lang==='ja'?'EN':'JA';
   const backBtn=document.getElementById('back-btn');
   if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧へ';
-  const logosub=document.getElementById('post-logo-sub');
+  const logosub=document.querySelector('.logo-sub');
   if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
-  applyEditModalLang();
   if(currentPost)renderPost(currentPost);
 }
 function goBack(){location.href='/';}
 
 const SWEETWATER_TAG='';
 
+// ── 機材リンク生成
+// DBに登録済みならMGMBのペダルページへ、未登録ならSweetwater(EN) or サウンドハウス(JA)へ
 function gearUrl(gearItem){
+  const name=(gearItem&&typeof gearItem==='object')?gearItem.name||'':gearItem||'';
+  const slug=pedalSlugMap[name];
+  if(slug)return'/pedal?slug='+slug;
+  // 未登録の場合は外部検索
   let q;
   if(gearItem&&typeof gearItem==='object'){
     q=gearItem.search_query||gearItem.name||'';
@@ -427,6 +378,22 @@ function gearUrl(gearItem){
   }
   return'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(q);
 }
+
+// 機材リンクのラベル生成
+function gearLinkLabel(gearItem){
+  const name=(gearItem&&typeof gearItem==='object')?gearItem.name||'':gearItem||'';
+  const slug=pedalSlugMap[name];
+  if(slug)return lang==='en'?'View Pedal Page →':'機材詳細ページへ →';
+  return lang==='en'?'View on Sweetwater →':'サウンドハウスで見る →';
+}
+
+// 機材リンクがMGMB内かどうか
+function isInternalGearLink(gearItem){
+  const name=(gearItem&&typeof gearItem==='object')?gearItem.name||'':gearItem||'';
+  return!!pedalSlugMap[name];
+}
+
+// 後方互換
 function soundhouseUrl(gearItem){return gearUrl(gearItem);}
 
 function parseGenre(genre){
@@ -434,12 +401,6 @@ function parseGenre(genre){
   if(Array.isArray(genre))return genre;
   if(typeof genre==='string'){try{const p=JSON.parse(genre);return Array.isArray(p)?p:[genre];}catch(e){return[genre];}}
   return[];
-}
-
-function translateGenre(g){
-  if(lang!=='en')return g;
-  const map={'初心者相談':'Beginner','宅録':'Home Rec','ROCK':'ROCK','BLUES':'BLUES','JAZZ':'JAZZ','METAL':'METAL','FUNK':'FUNK','AMBIENT':'AMBIENT','SHOEGAZE':'SHOEGAZE','POST ROCK':'POST ROCK','INDIE':'INDIE','ALTERNATIVE':'ALTERNATIVE','PUNK':'PUNK'};
-  return map[g]||g;
 }
 
 function getYouTubeId(url){
@@ -454,6 +415,11 @@ function getYouTubeId(url){
 
 async function loadPost(){
   if(!POST_ID){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:Noto Sans JP,sans-serif">投稿が見つかりません</div>';return;}
+  // ペダルslugマップを先に取得
+  const{data:pedals}=await sb.from('pedals').select('full_name,slug');
+  pedalSlugMap={};
+  if(pedals)pedals.forEach(p=>{if(p.slug)pedalSlugMap[p.full_name]=p.slug;});
+
   const{data,error}=await sb.from('posts').select('*').eq('id',POST_ID).single();
   if(error||!data){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:Noto Sans JP,sans-serif">投稿が見つかりません</div>';return;}
   currentPost=data;
@@ -477,6 +443,7 @@ function renderPost(p){
   const ytId=getYouTubeId(p.youtube_url);
   let html='';
 
+  // ① 画像スライダー
   if(imgs.length){
     html+='<div class="slider"><div class="slide-track" id="slide-track">';
     imgs.forEach(u=>html+='<div class="slide"><img src="'+u+'" loading="lazy" onclick="openPostLightbox(this.src)" style="cursor:zoom-in"></div>');
@@ -493,34 +460,42 @@ function renderPost(p){
     html+='<div class="no-img">'+(isGear?'🎸':'🎛')+'</div>';
   }
 
+  // ② タイプバッジ・タイトル・投稿者
   html+='<div class="type-badge '+(isGear?'gear':'board')+'">'+(isGear?(lang==='en'?'Gear':'機材'):(lang==='en'?'Pedalboard':'エフェクターボード'))+'</div>';
   html+='<div class="post-title">'+p.title+'</div>';
   html+='<div class="meta">'
     +'<div class="av">'+init+'</div>'
-    +'<div class="meta-info"><div class="meta-name">'+(p.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div>'
+    +'<div class="meta-info"><div class="meta-name">'+(p.username||'匿名ユーザー')+'</div>'
     +'<div class="meta-time">'+timeAgo(p.created_at)+'</div></div>'
     +'</div>';
 
+  // ③ アクションボタン
   html+='<div class="actions">'
     +'<div class="act-btn'+(liked?' liked':'')+'" id="like-btn" onclick="toggleLike()">'+(liked?'❤️':'🤍')+(lang==='en'?' Like ':' いいね ')+'<span id="like-count">'+(p.likes||0)+'</span></div>'
     +'<div class="act-btn" onclick="copyUrl()">🔗 '+(lang==='en'?'Copy URL':'URLをコピー')+'</div>'
-    +'<div class="act-btn x-act" onclick="postToX()">𝕏 '+(lang==='en'?'Post to X':'Xに投稿')+'</div>'
+    +'<div class="act-btn x-act" onclick="postToX()">𝕏 '+(lang=='en'?'Post to X':'Xに投稿')+'</div>'
     +'<div class="act-btn" onclick="openEditModal()">✏️ '+(lang==='en'?'Edit':'編集')+'</div>'
     +'<div class="act-btn" style="color:#e05050;border-color:rgba(224,80,80,.3)" onclick="openReport()">🚩 '+(lang==='en'?'Report':'通報')+'</div>'
     +'</div>';
 
-  if(genres.length){html+='<div class="genre-tags">'+genres.map(g=>'<span class="gtag">'+translateGenre(g)+'</span>').join('')+'</div>';}
+  // ④ タグ（ジャンル）
+  if(genres.length){html+='<div class="genre-tags">'+genres.map(g=>'<span class="gtag">'+g+'</span>').join('')+'</div>';}
 
+  // ⑤ 機材リスト
   if(gear.length){
     html+='<div class="section"><div class="section-lbl">'+(lang==='en'?'Gear List':'使用機材リスト')+'</div>';
     gear.forEach(g=>{
       const name=g.name||g;
+      const url=gearUrl(g);
+      const label=gearLinkLabel(g);
+      const internal=isInternalGearLink(g);
       html+='<div class="gear-item"><div class="gear-dot"></div><div class="gear-name">'+name+'</div>'
-        +'<a class="sh-link" href="'+gearUrl(g)+'" target="_blank" rel="noopener">'+(lang==='en'?'View on Sweetwater →':'サウンドハウスで見る →')+'</a></div>';
+        +'<a class="sh-link" href="'+url+'" '+(internal?'':'target="_blank" rel="noopener"')+'>'+label+'</a></div>';
     });
     html+='</div>';
   }
 
+  // ⑥ 本文
   if(p.description){
     const desc=p.description;const limit=200;
     html+='<div class="section">';
@@ -534,6 +509,7 @@ function renderPost(p){
     html+='</div>';
   }
 
+  // ⑦ YouTube
   if(ytId){
     html+='<div class="section yt-section">'
       +'<div class="section-lbl" style="margin-bottom:10px">▶ YouTube動画</div>'
@@ -542,7 +518,7 @@ function renderPost(p){
       +'</div></div>';
   }
 
-  // ⑧ コメント欄（送信ボタンにid付与）
+  // ⑧ コメント
   const _cL=lang==='en'?'Comments':'コメント',_cN=lang==='en'?'Name (optional)':'名前（任意）',_cP=lang==='en'?'Write a comment...':'コメントを投稿する...',_cB=lang==='en'?'Post':'投稿';
   html+='<div class="section" id="comment-section">'
     +'<div class="section-lbl">'+_cL+'</div>'
@@ -551,7 +527,7 @@ function renderPost(p){
     +'<input class="comment-name-input" id="comment-name" type="text" placeholder="'+_cN+'" maxlength="30">'
     +'<textarea class="comment-input" id="comment-input" placeholder="'+_cP+'" rows="2"></textarea>'
     +'</div>'
-    +'<button class="comment-submit" id="comment-submit-btn" onclick="postComment(null)">'+_cB+'</button>'
+    +'<button class="comment-submit" onclick="postComment(null)">'+_cB+'</button>'
     +'</div>'
     +'<div id="comments-list"></div>'
     +'</div>';
@@ -585,20 +561,20 @@ async function toggleLike(){
     await sb.from('likes').delete().eq('post_id',POST_ID).eq('session_id',SESSION_ID);
     const n=Math.max(0,currentLikes-1);
     await sb.from('posts').update({likes:n}).eq('id',POST_ID);
-    btn.innerHTML='🤍 '+(lang==='en'?'Like ':'いいね ')+'<span id="like-count">'+n+'</span>';
+    btn.innerHTML='🤍 いいね <span id="like-count">'+n+'</span>';
     btn.classList.remove('liked');localStorage.removeItem('liked_'+POST_ID);
   }else{
     await sb.from('likes').insert({post_id:POST_ID,session_id:SESSION_ID});
     const n=currentLikes+1;
     await sb.from('posts').update({likes:n}).eq('id',POST_ID);
-    btn.innerHTML='❤️ '+(lang==='en'?'Like ':'いいね ')+'<span id="like-count">'+n+'</span>';
-    btn.classList.add('liked');localStorage.setItem('liked_'+POST_ID,'1');showToast(lang==='en'?'❤️ Liked!':'❤️ いいねしました');
+    btn.innerHTML='❤️ いいね <span id="like-count">'+n+'</span>';
+    btn.classList.add('liked');localStorage.setItem('liked_'+POST_ID,'1');showToast('❤️ いいねしました');
   }
 }
 
 function copyUrl(){
-  navigator.clipboard.writeText(location.href).then(()=>showToast(lang==='en'?'🔗 URL copied!':'🔗 URLをコピーしました')).catch(()=>{
-    const el=document.createElement('textarea');el.value=location.href;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);showToast(lang==='en'?'🔗 URL copied!':'🔗 URLをコピーしました');
+  navigator.clipboard.writeText(location.href).then(()=>showToast('🔗 URLをコピーしました')).catch(()=>{
+    const el=document.createElement('textarea');el.value=location.href;document.body.appendChild(el);el.select();document.execCommand('copy');document.body.removeChild(el);showToast('🔗 URLをコピーしました');
   });
 }
 function postToX(){
@@ -632,7 +608,7 @@ function renderComment(c,depth){
     +'<input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30">'
     +'<div class="reply-row">'
     +'<textarea class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." rows="1" oninput="autoResize(this)"></textarea>'
-    +'<button class="reply-submit" id="rs-'+c.id+'" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button>'
+    +'<button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button>'
     +'</div></div>';
   if(children.length){html+='<div class="reply-indent">'+children.map(ch=>renderComment(ch,depth+1)).join('')+'</div>';}
   html+='</div>';
@@ -648,65 +624,18 @@ function autoResize(el){
   el.style.height=Math.min(el.scrollHeight,120)+'px';
 }
 
-// ⑧ コメント・返信の連打防止
-let _isPostingComment=false;
-
 async function postComment(parentId,replyToName){
-  // 連打防止
-  if(_isPostingComment)return;
   const nameEl=parentId?document.getElementById('rn-'+parentId):document.getElementById('comment-name');
   const inputEl=parentId?document.getElementById('ri-'+parentId):document.getElementById('comment-input');
-  const submitBtn=parentId?document.getElementById('rs-'+parentId):document.getElementById('comment-submit-btn');
-  const content=inputEl?inputEl.value.trim():'';
+  const content=inputEl.value.trim();
   const username=nameEl?nameEl.value.trim()||null:null;
   if(!content){showToast(lang==='en'?'❌ Please enter a comment':'❌ コメントを入力してください');return;}
-  _isPostingComment=true;
-  if(submitBtn){submitBtn.disabled=true;submitBtn.textContent=lang==='en'?'Posting...':'投稿中...';}
   const{error}=await sb.from('comments').insert({post_id:POST_ID,parent_id:parentId||null,username,content,reply_to_name:replyToName||null});
-  _isPostingComment=false;
-  if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=lang==='en'?'Post':'投稿';}
   if(error){showToast(lang==='en'?'❌ Failed to post':'❌ 投稿に失敗しました');console.error(error);return;}
-  if(inputEl){inputEl.value='';inputEl.style.height='';}if(nameEl)nameEl.value='';
+  inputEl.value='';inputEl.style.height='';if(nameEl)nameEl.value='';
   if(parentId){const form=document.getElementById('rf-'+parentId);if(form)form.classList.remove('open');}
   showToast(lang==='en'?'💬 Comment posted':'💬 コメントしました');
-  // 通知生成：投稿者またはコメント投稿者に通知
-  await generateCommentNotification(parentId,username,content,replyToName);
   await loadComments();
-}
-
-async function generateCommentNotification(parentId,commenterName,content,replyToName){
-  try{
-    const commenter=commenterName||(lang==='en'?'Anonymous':'匿名ユーザー');
-    const preview=content.length>30?content.slice(0,30)+'...':content;
-    if(parentId){
-      // 返信の場合：元コメントの投稿者に通知
-      const{data:parentComment}=await sb.from('comments').select('*').eq('id',parentId).single();
-      if(parentComment&&currentPost){
-        // 元コメントのuser_idがあれば通知
-        if(parentComment.user_id){
-          await sb.from('notifications').insert({
-            user_id:parentComment.user_id,
-            post_id:POST_ID,
-            message:`${commenter}さんがあなたのコメントに返信しました：「${preview}」`,
-            is_read:false
-          });
-        }
-      }
-    }else{
-      // 新規コメントの場合：投稿者に通知
-      if(currentPost&&currentPost.user_id){
-        await sb.from('notifications').insert({
-          user_id:currentPost.user_id,
-          post_id:POST_ID,
-          message:`${commenter}さんが「${currentPost.title}」にコメントしました：「${preview}」`,
-          is_read:false
-        });
-      }
-    }
-  }catch(e){
-    // 通知エラーはサイレントに無視
-    console.log('notification error:',e);
-  }
 }
 
 // ── 編集モーダル
@@ -715,14 +644,13 @@ function openEditModal(){
   document.getElementById('pin-err').textContent='';
   document.getElementById('edit-step1').style.display='block';
   document.getElementById('edit-step2').style.display='none';
-  applyEditModalLang();
   document.getElementById('edit-bd').classList.add('open');
   document.body.style.overflow='hidden';
   setTimeout(()=>document.getElementById('pin1').focus(),300);
 }
 function verifyPin(){
   const entered=['pin1','pin2','pin3','pin4'].map(id=>document.getElementById(id).value).join('');
-  if(entered.length<4){document.getElementById('pin-err').textContent=lang==='en'?'Enter all 4 digits':'4桁すべて入力してください';return;}
+  if(entered.length<4){document.getElementById('pin-err').textContent='4桁すべて入力してください';return;}
   const isMaster=entered.toUpperCase()===MASTER_KEY;
   if(currentPost&&(isMaster||entered===currentPost.pin_hash)){
     document.getElementById('pin-err').textContent='';
@@ -740,9 +668,9 @@ function verifyPin(){
     editNewPhotos=[];
     renderEditPhotoPreviews();
     document.getElementById('edit-step2').style.display='block';
-    if(isMaster)showToast(lang==='en'?'🔑 Logged in as admin':'🔑 管理者としてログインしました');
+    if(isMaster)showToast('🔑 管理者としてログインしました');
   }else{
-    document.getElementById('pin-err').textContent=lang==='en'?'❌ Incorrect password':'❌ パスワードが違います';
+    document.getElementById('pin-err').textContent='❌ パスワードが違います';
     ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
     document.getElementById('pin1').focus();
   }
@@ -761,7 +689,7 @@ function renderEditPhotoPreviews(){
     div.className='edit-img-small';
     div.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:contain">'
       +'<button onclick="removeEditUrlPhoto('+i+')" style="position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.75);border-radius:50%;border:none;color:#fff;font-size:10px;cursor:pointer;touch-action:manipulation;z-index:2">✕</button>'
-      +'<button class="edit-img-edit-btn" onclick="openEditImgEditor(\'url\','+i+')">✏️ '+(lang==='en'?'Edit':'編集')+'</button>';
+      +'<button class="edit-img-edit-btn" onclick="openEditImgEditor(\'url\','+i+')">✏️ 編集</button>';
     wrap.appendChild(div);
   });
   editNewPhotos.forEach((src,i)=>{
@@ -770,8 +698,8 @@ function renderEditPhotoPreviews(){
     div.style.border='1px solid rgba(232,85,45,.5)';
     div.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain">'
       +'<button onclick="removeEditNewPhoto('+i+')" style="position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.75);border-radius:50%;border:none;color:#fff;font-size:10px;cursor:pointer;touch-action:manipulation;z-index:2">✕</button>'
-      +'<button class="edit-img-edit-btn" onclick="openEditImgEditor(\'new\','+i+')">✏️ '+(lang==='en'?'Edit':'編集')+'</button>'
-      +'<div style="position:absolute;bottom:18px;left:0;right:0;background:rgba(232,85,45,.8);font-family:Noto Sans JP,sans-serif;font-size:9px;text-align:center;color:#fff;padding:2px;pointer-events:none">'+(lang==='en'?'New':'新規')+'</div>';
+      +'<button class="edit-img-edit-btn" onclick="openEditImgEditor(\'new\','+i+')">✏️ 編集</button>'
+      +'<div style="position:absolute;bottom:18px;left:0;right:0;background:rgba(232,85,45,.8);font-family:Noto Sans JP,sans-serif;font-size:9px;text-align:center;color:#fff;padding:2px;pointer-events:none">新規</div>';
     wrap.appendChild(div);
   });
 }
@@ -781,7 +709,7 @@ function removeEditNewPhoto(i){editNewPhotos.splice(i,1);renderEditPhotoPreviews
 async function handleEditPhotos(e){
   const files=Array.from(e.target.files);
   const max=3-(editPhotoUrls.length+editNewPhotos.length);
-  if(max<=0){showToast(lang==='en'?'⚠️ Max 3 photos':'⚠️ 最大3枚まで');e.target.value='';return;}
+  if(max<=0){showToast('⚠️ 最大3枚まで');e.target.value='';return;}
   for(const f of files.slice(0,max)){
     const compressed=await compressEditImage(f);
     editNewPhotos.push(compressed);
@@ -818,25 +746,25 @@ async function uploadEditPhoto(b64){
 }
 async function saveEdit(){
   const title=document.getElementById('edit-title').value.trim();
-  if(!title){showToast(lang==='en'?'Please enter a title':'タイトルを入力してください');return;}
+  if(!title){showToast('タイトルを入力してください');return;}
   const gear_list=postEditGearList.map(g=>({name:g.name,brand:g.brand||'',search_query:g.search_query||null}));
   const description=document.getElementById('edit-desc').value.trim();
   const youtube_url=document.getElementById('edit-youtube').value.trim()||null;
   let newUrls=[];
   if(editNewPhotos.length>0){
-    showToast(lang==='en'?'📤 Uploading...':'📤 画像をアップロード中...');
+    showToast('📤 画像をアップロード中...');
     for(const b64 of editNewPhotos){const url=await uploadEditPhoto(b64);if(url)newUrls.push(url);}
   }
   const image_urls=[...editPhotoUrls,...newUrls];
   const{error}=await sb.from('posts').update({title,gear_list,description,youtube_url,image_urls}).eq('id',POST_ID);
-  if(error){showToast(lang==='en'?'❌ Update failed':'❌ 更新に失敗しました');return;}
-  closeModal('edit-bd');showToast(lang==='en'?'✅ Post updated':'✅ 投稿を更新しました');await loadPost();
+  if(error){showToast('❌ 更新に失敗しました');return;}
+  closeModal('edit-bd');showToast('✅ 投稿を更新しました');await loadPost();
 }
 async function confirmDelete(){
-  if(!confirm(lang==='en'?'Delete this post? This cannot be undone.':'本当にこの投稿を削除しますか？\nこの操作は取り消せません。'))return;
+  if(!confirm('本当にこの投稿を削除しますか？\nこの操作は取り消せません。'))return;
   const{error}=await sb.from('posts').delete().eq('id',POST_ID);
-  if(error){showToast(lang==='en'?'❌ Delete failed':'❌ 削除に失敗しました');return;}
-  showToast(lang==='en'?'🗑 Post deleted':'🗑 投稿を削除しました');setTimeout(()=>location.href='/',1500);
+  if(error){showToast('❌ 削除に失敗しました');return;}
+  showToast('🗑 投稿を削除しました');setTimeout(()=>location.href='/',1500);
 }
 
 // ── 機材並び替え（編集モーダル用）
@@ -844,17 +772,14 @@ let postEditGearList=[];
 
 function renderPostEditGearSortList(){
   const wrap=document.getElementById('post-edit-gear-sort-list');if(!wrap)return;
-  const emptyMsg=lang==='en'?'No gear registered':'機材が登録されていません';
-  if(!postEditGearList.length){wrap.innerHTML='<div style="font-size:12px;color:var(--td);padding:4px 0">'+emptyMsg+'</div>';return;}
-  const upLbl=lang==='en'?'↑':'↑';const downLbl=lang==='en'?'↓':'↓';
-  const delLbl=lang==='en'?'Remove':'削除';
+  if(!postEditGearList.length){wrap.innerHTML='<div style="font-size:12px;color:var(--td);padding:4px 0">機材が登録されていません</div>';return;}
   wrap.innerHTML=postEditGearList.map((g,i)=>`
     <div style="display:flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:7px 10px">
       <span style="font-size:13px;color:var(--td);flex-shrink:0;min-width:20px;text-align:center;font-weight:600">${i+1}</span>
       <span style="flex:1;font-size:13px">${g.name}</span>
-      <button type="button" onclick="movePostEditGear(${i},-1)" ${i===0?'disabled':''} style="padding:3px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:12px;touch-action:manipulation">${upLbl}</button>
-      <button type="button" onclick="movePostEditGear(${i},1)" ${i===postEditGearList.length-1?'disabled':''} style="padding:3px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:12px;touch-action:manipulation">${downLbl}</button>
-      <button type="button" onclick="removePostEditGear(${i})" style="padding:3px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:3px;color:#e05050;cursor:pointer;font-size:12px;touch-action:manipulation">${delLbl}</button>
+      <button type="button" onclick="movePostEditGear(${i},-1)" ${i===0?'disabled':''} style="padding:3px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:12px;touch-action:manipulation">↑</button>
+      <button type="button" onclick="movePostEditGear(${i},1)" ${i===postEditGearList.length-1?'disabled':''} style="padding:3px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:3px;color:var(--tm);cursor:pointer;font-size:12px;touch-action:manipulation">↓</button>
+      <button type="button" onclick="removePostEditGear(${i})" style="padding:3px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:3px;color:#e05050;cursor:pointer;font-size:12px;touch-action:manipulation">削除</button>
     </div>
   `).join('');
 }
@@ -871,62 +796,59 @@ function removePostEditGear(idx){
 }
 function addPostEditGearItem(){
   const input=document.getElementById('post-edit-gear-add');if(!input)return;
-  const name=input.value.trim();
-  if(!name){showToast(lang==='en'?'Enter a gear name':'機材名を入力してください');return;}
-  postEditGearList.push({name,brand:'',search_query:editGearAcSelected?.search_query||null});
+  const name=input.value.trim();if(!name){showToast('機材名を入力してください');return;}
+  postEditGearList.push({name,brand:'',search_query:null});
   renderPostEditGearSortList();
   input.value='';
-  editGearAcSelected=null;
-  closeEditGearAC();
 }
 
-// ③ 機材サジェスト（編集モーダル機材追加input用）
-let editGearAcResults=[],editGearAcFocusIdx=-1,editGearAcSelected=null;
+// ── 機材サジェスト（編集モーダル用・未使用になったが残す）
+let editSelectedGears=[],editAcResults=[],editAcFocusIdx=-1;
 
-async function editGearSuggest(val){
-  const q=val.trim();closeEditGearAC();editGearAcSelected=null;if(!q)return;
-  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name,search_query')
+async function editSearchGear(val){
+  const q=val.trim();closeEditAC();if(!q)return;
+  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name')
     .or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%').limit(10);
   let results=prefixData||[];
   if(results.length<5){
-    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('full_name','%'+q+'%').limit(10);
+    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name').ilike('full_name','%'+q+'%').limit(10);
     if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
   }
-  results=results.slice(0,10);editGearAcResults=results;editGearAcFocusIdx=-1;
-  const dd=document.getElementById('edit-gear-ac-dropdown');
-  if(!dd)return;
-  if(!results.length){
-    dd.innerHTML='<div class="ac-empty">「'+q+'」— '+(lang==='en'?'No suggestions. Press Enter to add':'候補なし　Enterで追加')+'</div>';
-    dd.classList.add('open');return;
-  }
-  dd.innerHTML=results.map((x,i)=>'<div class="ac-item" onmousedown="selectEditGearAC('+i+')" onmouseover="setEditGearACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>').join('');
+  results=results.slice(0,10);editAcResults=results;editAcFocusIdx=-1;
+  const dd=document.getElementById('edit-ac-dropdown');
+  if(!results.length){dd.innerHTML='<div class="ac-empty">「'+q+'」— 候補なし　Enterで追加</div>';dd.classList.add('open');return;}
+  dd.innerHTML=results.map((x,i)=>'<div class="ac-item" onmousedown="selectEditGear('+i+')" onmouseover="setEditACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>').join('');
   dd.classList.add('open');
 }
-function setEditGearACFocus(i){
-  editGearAcFocusIdx=i;
-  document.querySelectorAll('#edit-gear-ac-dropdown .ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));
+function setEditACFocus(i){editAcFocusIdx=i;document.querySelectorAll('#edit-ac-dropdown .ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
+function selectEditGear(i){const x=editAcResults[i];if(!x)return;addEditGearTag({name:x.full_name,brand:x.brand});closeEditAC();}
+function addEditGearTag(g){
+  if(editSelectedGears.length>=20){showToast('⚠️ 最大20件まで');return;}
+  editSelectedGears.push(g);renderEditGearTags();document.getElementById('edit-gear-search').value='';
 }
-function selectEditGearAC(i){
-  const x=editGearAcResults[i];if(!x)return;
-  editGearAcSelected=x;
-  const input=document.getElementById('post-edit-gear-add');
-  if(input)input.value=x.full_name;
-  closeEditGearAC();
-  // 自動的に追加
-  postEditGearList.push({name:x.full_name,brand:x.brand||'',search_query:x.search_query||null});
-  renderPostEditGearSortList();
-  if(input)input.value='';
-  editGearAcSelected=null;
+function removeEditGearTag(i){editSelectedGears.splice(i,1);renderEditGearTags();}
+function renderEditGearTags(){
+  const wrap=document.getElementById('edit-gear-tags');if(!wrap)return;
+  const inp=document.getElementById('edit-gear-search');
+  wrap.querySelectorAll('.gear-tag').forEach(el=>el.remove());
+  editSelectedGears.forEach((g,i)=>{
+    const tag=document.createElement('div');tag.className='gear-tag';
+    tag.innerHTML=g.name+'<button class="gear-tag-x" onmousedown="event.preventDefault();removeEditGearTag('+i+')">✕</button>';
+    wrap.insertBefore(tag,inp);
+  });
 }
 function editGearKeyDown(e){
-  const dd=document.getElementById('edit-gear-ac-dropdown');
-  const open=dd&&dd.classList.contains('open');
-  if(e.key==='ArrowDown'){e.preventDefault();if(open)setEditGearACFocus(Math.min(editGearAcFocusIdx+1,editGearAcResults.length-1));}
-  else if(e.key==='ArrowUp'){e.preventDefault();setEditGearACFocus(Math.max(editGearAcFocusIdx-1,0));}
-  else if(e.key==='Enter'){e.preventDefault();if(open&&editGearAcFocusIdx>=0&&editGearAcResults[editGearAcFocusIdx]){selectEditGearAC(editGearAcFocusIdx);}else{addPostEditGearItem();}}
-  else if(e.key==='Escape')closeEditGearAC();
+  const dd=document.getElementById('edit-ac-dropdown');const open=dd.classList.contains('open');
+  if(e.key==='ArrowDown'){e.preventDefault();if(open)setEditACFocus(Math.min(editAcFocusIdx+1,editAcResults.length-1));}
+  else if(e.key==='ArrowUp'){e.preventDefault();setEditACFocus(Math.max(editAcFocusIdx-1,0));}
+  else if(e.key==='Enter'){
+    e.preventDefault();
+    if(open&&editAcFocusIdx>=0&&editAcResults[editAcFocusIdx])selectEditGear(editAcFocusIdx);
+    else{const v=e.target.value.trim();if(v){addEditGearTag({name:v,brand:''});const gs=document.getElementById('edit-gear-search');if(gs)gs.value='';closeEditAC();}}
+  }else if(e.key==='Backspace'&&!e.target.value&&editSelectedGears.length)removeEditGearTag(editSelectedGears.length-1);
+  else if(e.key==='Escape')closeEditAC();
 }
-function closeEditGearAC(){const dd=document.getElementById('edit-gear-ac-dropdown');if(dd)dd.classList.remove('open');}
+function closeEditAC(){const dd=document.getElementById('edit-ac-dropdown');if(dd)dd.classList.remove('open');}
 
 // ── 画像エディター（編集モーダル用）
 let editorCanvas=null,editorCtx=null,editorImage=null;
@@ -1202,6 +1124,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');doc
 function closeOnBd(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 
+// ── 投稿ページ ライトボックス
 function openPostLightbox(src){
   const lb=document.getElementById('post-lightbox');
   const img=document.getElementById('post-lightbox-img');
@@ -1232,14 +1155,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     c.addEventListener('touchmove',canvasPointerMove,{passive:false});
     c.addEventListener('touchend',canvasPointerUp,{passive:false});
   },500);
-  // 言語初期化
   const label=document.getElementById('post-lang-label');
   if(label)label.textContent=lang==='ja'?'EN':'JA';
   const backBtn=document.getElementById('back-btn');
   if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧へ';
-  const logosub=document.getElementById('post-logo-sub');
+  const logosub=document.querySelector('.logo-sub');
   if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
-  applyEditModalLang();
   loadPost();
 });
 </script>
