@@ -13,19 +13,16 @@ header{position:sticky;top:0;z-index:300;height:54px;display:flex;align-items:ce
 .logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--ac)}
 .back-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none}
 .back-btn:hover{border-color:var(--ac);color:var(--ac)}
-
 /* ログイン画面 */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 54px);padding:20px}
 .login-box{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:40px 32px;width:100%;max-width:360px;text-align:center}
 .login-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;margin-bottom:8px}
 .login-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:28px}
-.pin-row{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
-.pin-d{width:56px;height:62px;background:var(--sf2);border:2px solid var(--bd);border-radius:6px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:600;color:var(--tx);outline:none;transition:border-color .15s;caret-color:var(--ac)}
-.pin-d:focus{border-color:var(--ac)}
+.login-input{width:100%;background:var(--sf2);border:2px solid var(--bd);border-radius:6px;padding:14px 16px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:600;color:var(--tx);outline:none;transition:border-color .15s;caret-color:var(--ac);letter-spacing:4px;margin-bottom:16px}
+.login-input:focus{border-color:var(--ac)}
 .pin-err{font-family:'JetBrains Mono',monospace;font-size:11px;color:#e05050;min-height:18px;margin-bottom:10px}
 .login-btn{width:100%;background:var(--ac);border:none;border-radius:4px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .18s}
 .login-btn:hover{background:#cf4c26}
-
 /* メインレイアウト */
 .admin-wrap{display:none;max-width:1200px;margin:0 auto;padding:24px 20px}
 .admin-wrap.show{display:block}
@@ -36,7 +33,6 @@ header{position:sticky;top:0;z-index:300;height:54px;display:flex;align-items:ce
 .panel{display:none}.panel.on{display:block}
 .section-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
 .badge{background:var(--ac);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
-
 /* テーブル */
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
@@ -48,32 +44,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .post-link:hover{text-decoration:underline}
 .del-btn{padding:4px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s;white-space:nowrap}
 .del-btn:hover{background:rgba(224,80,80,.1);border-color:#e05050}
-.edit-btn{padding:4px 10px;background:transparent;border:1px solid rgba(232,85,45,.35);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--ac);cursor:pointer;transition:all .15s;white-space:nowrap}
-.edit-btn:hover{background:rgba(232,85,45,.1);border-color:var(--ac)}
 .approve-btn{padding:4px 10px;background:transparent;border:1px solid rgba(74,222,128,.3);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:#4ade80;cursor:pointer;transition:all .15s;white-space:nowrap}
 .approve-btn:hover{background:rgba(74,222,128,.1)}
 .tag-chip{display:inline-block;padding:2px 7px;background:var(--sf2);border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tm);margin:2px}
 .empty-msg{text-align:center;padding:40px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--td)}
-
-/* ペダル インライン編集行 */
-.pedal-edit-row{background:rgba(232,85,45,.05);border:1px solid rgba(232,85,45,.25);border-radius:4px;padding:12px 16px;margin:4px 0;display:none;gap:10px;flex-wrap:wrap;align-items:flex-end}
-.pedal-edit-row.open{display:flex}
-.pedal-edit-row .edit-field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
-.pedal-edit-row .edit-field label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--td)}
-.pedal-edit-row input{background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:7px 10px;font-size:13px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s;width:100%}
-.pedal-edit-row input:focus{border-color:var(--ac)}
-/* タイプタグ編集 */
-.type-tags-wrap{display:flex;flex-wrap:wrap;gap:5px;min-height:34px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:5px 8px;cursor:text;transition:border-color .15s;align-items:center}
-.type-tags-wrap:focus-within{border-color:var(--ac)}
-.type-tag{display:flex;align-items:center;gap:3px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:2px;padding:2px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);white-space:nowrap}
-.type-tag-x{cursor:pointer;font-size:11px;color:var(--ac);opacity:.7;background:none;border:none;padding:0;line-height:1}
-.type-tag-input{background:transparent;border:none;outline:none;font-size:12px;color:var(--tx);font-family:'JetBrains Mono',monospace;min-width:100px;flex:1;padding:1px 2px}
-.type-tag-hint{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td);margin-top:3px}
-.pedal-save-btn{padding:7px 18px;background:var(--ac);border:none;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap;align-self:flex-end;height:34px}
-.pedal-save-btn:hover{background:#cf4c26}
-.pedal-cancel-btn{padding:7px 14px;background:transparent;border:1px solid var(--bd);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;white-space:nowrap;align-self:flex-end;height:34px}
-.pedal-cancel-btn:hover{border-color:var(--tm);color:var(--tx)}
-
 /* 機材NEWS管理 */
 .news-item{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:14px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}
 .news-thumb{width:80px;height:60px;object-fit:cover;border-radius:4px;border:1px solid var(--bd);background:var(--sf2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--td)}
@@ -92,6 +66,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .form-input{flex:1;min-width:200px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:8px 12px;font-size:14px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
 .form-input:focus{border-color:var(--ac)}
 .form-input::placeholder{color:var(--td)}
+.form-textarea{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:8px 12px;font-size:13px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s;resize:vertical;min-height:80px}
+.form-textarea:focus{border-color:var(--ac)}
+.form-textarea::placeholder{color:var(--td)}
 .fetch-btn{padding:8px 14px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;white-space:nowrap;transition:all .15s}
 .fetch-btn:hover{border-color:var(--ac);color:var(--ac)}
 .add-btn{padding:8px 16px;background:var(--ac);border:none;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:#fff;cursor:pointer;white-space:nowrap;transition:all .15s}
@@ -104,20 +81,39 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .ogp-preview-url{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .drag-handle{color:var(--td);cursor:grab;font-size:18px;padding:0 4px;user-select:none;flex-shrink:0}
 .drag-handle:active{cursor:grabbing}
-
-/* pedals追加 */
+/* pedals */
 .pedal-form{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:16px;margin-bottom:16px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr 2fr;gap:8px;margin-bottom:8px}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr}}
 .submit-btn{padding:8px 20px;background:var(--ac);border:none;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#fff;cursor:pointer;transition:all .15s}
 .submit-btn:hover{background:#cf4c26}
-
+/* ペダル編集モーダル */
+.pedal-edit-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.pedal-edit-modal.open{display:flex}
+.pedal-edit-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
+.pedal-edit-box h3{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:20px;color:var(--ac)}
+.pedal-edit-label{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--td);margin-bottom:6px;margin-top:14px;display:block}
+.pedal-edit-actions{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.pedal-img-preview{width:80px;height:80px;border-radius:8px;border:1px solid var(--bd);object-fit:contain;background:var(--sf2);margin-top:8px;display:none}
+.pedal-img-preview.show{display:block}
+/* リッチエディタ */
+.rich-toolbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
+.rich-btn{padding:4px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;user-select:none}
+.rich-btn:hover{border-color:var(--ac);color:var(--ac)}
+.rich-editor{width:100%;min-height:100px;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 3px 3px;padding:8px 12px;font-size:14px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s;line-height:1.7}
+.rich-editor:focus{border-color:var(--ac)}
+.rich-editor h2{font-size:18px;font-weight:700;margin:8px 0 4px;color:var(--tx)}
+.rich-editor h3{font-size:15px;font-weight:600;margin:6px 0 4px;color:var(--tm)}
+/* ペダルDBフィルター */
+.pedal-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.pf-btn{padding:6px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s}
+.pf-btn:hover{border-color:var(--ac);color:var(--ac)}
+.pf-btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
 /* 統計カード */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
 .stat-card{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:16px}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--ac);line-height:1}
 .stat-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
-
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .loading{text-align:center;padding:40px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--td)}
@@ -134,13 +130,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <div class="login-wrap" id="login-wrap">
   <div class="login-box">
     <div class="login-title">管理者ログイン</div>
-    <div class="login-sub">ADMIN PIN を入力してください</div>
-    <div class="pin-row">
-      <input class="pin-d" id="p1" type="password" inputmode="text" maxlength="1">
-      <input class="pin-d" id="p2" type="password" inputmode="text" maxlength="1">
-      <input class="pin-d" id="p3" type="password" inputmode="text" maxlength="1">
-      <input class="pin-d" id="p4" type="password" inputmode="text" maxlength="1">
-    </div>
+    <div class="login-sub">ADMIN パスワードを入力してください</div>
+    <input class="login-input" id="login-input" type="password" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')doLogin()" autocomplete="off">
     <div class="pin-err" id="pin-err"></div>
     <button class="login-btn" onclick="doLogin()">ログイン</button>
   </div>
@@ -163,7 +155,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <!-- ダッシュボード -->
   <div class="panel on" id="tab-dashboard">
     <div class="section-title">📊 ダッシュボード</div>
-    <div class="stats-grid" id="stats-grid">
+    <div class="stats-grid">
       <div class="stat-card"><div class="stat-num" id="stat-posts">-</div><div class="stat-lbl">総投稿数</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-comments">-</div><div class="stat-lbl">総コメント数</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-likes">-</div><div class="stat-lbl">総いいね数</div></div>
@@ -218,7 +210,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="panel" id="tab-news">
     <div class="section-title">📰 機材NEWS管理</div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">URLを入力するとOGP情報（タイトル・サムネイル）を自動取得してトップページのNEWSに表示します。</p>
-
     <div class="add-news-form">
       <div class="add-news-title">＋ NEWSを追加</div>
       <div class="form-row">
@@ -240,18 +231,14 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <button class="add-btn" onclick="addNewsItem()">＋ 追加する</button>
       </div>
     </div>
-
     <div class="section-title" style="font-size:14px;margin-bottom:10px">現在のNEWS一覧</div>
-    <div id="news-list">
-      <div class="loading">読み込み中...</div>
-    </div>
+    <div id="news-list"><div class="loading">読み込み中...</div></div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#4ade80;margin-top:12px">✅ 追加・削除・並び替えは即時サイトに反映されます。GitHubの更新は不要です。</p>
   </div>
 
   <!-- ペダルDB -->
   <div class="panel" id="tab-pedals">
     <div class="section-title">🎛 ペダルDB管理 <span class="badge" id="pedals-count">-</span></div>
-
     <div class="pedal-form">
       <div class="add-news-title">＋ ペダルを追加</div>
       <div class="form-grid">
@@ -261,18 +248,23 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
       <button class="submit-btn" onclick="addPedal()">＋ DBに追加</button>
     </div>
-
-    <div style="margin-bottom:12px">
-      <input class="form-input" id="pedal-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="filterPedals(this.value)" style="max-width:360px">
+    <div style="margin-bottom:8px">
+      <input class="form-input" id="pedal-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="applyPedalFilter()" style="max-width:360px">
     </div>
-    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:12px">✏️ 編集ボタンで機材名・ブランド名・タイプを変更できます。変更はSupabaseに即時反映されます。</p>
+    <div class="pedal-filter-bar">
+      <button class="pf-btn on" id="pf-all" onclick="setPedalFilter('all')">すべて</button>
+      <button class="pf-btn" id="pf-no-image" onclick="setPedalFilter('no-image')">🖼 画像なし</button>
+      <button class="pf-btn" id="pf-no-desc" onclick="setPedalFilter('no-desc')">📝 説明文なし</button>
+      <button class="pf-btn" id="pf-no-yt" onclick="setPedalFilter('no-yt')">▶ YouTube動画なし</button>
+      <button class="pf-btn" id="pf-complete" onclick="setPedalFilter('complete')">✅ すべて入力済み</button>
+    </div>
     <div id="pedals-list" class="loading">読み込み中...</div>
   </div>
 
   <!-- 言語圏別投稿 -->
   <div class="panel" id="tab-regions">
     <div class="section-title">🌍 言語圏別 投稿一覧</div>
-    <p style="font-size:12px;color:var(--td);margin-bottom:16px">ブラウザ言語設定から判定した投稿者の言語圏を表示します。※ユーザーが手動で言語を変更している場合は正確でない場合があります。</p>
+    <p style="font-size:12px;color:var(--td);margin-bottom:16px">ブラウザ言語設定から判定した投稿者の言語圏を表示します。</p>
     <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <button class="submit-btn" onclick="filterRegion('all')" id="region-btn-all" style="background:var(--ac)">すべて</button>
       <button class="submit-btn" onclick="filterRegion('ja')" id="region-btn-ja" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tm)">🇯🇵 日本語</button>
@@ -287,6 +279,60 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 </div>
 
+<!-- ペダル編集モーダル -->
+<div class="pedal-edit-modal" id="pedal-edit-modal" onclick="if(event.target===this)closePedalEdit()">
+  <div class="pedal-edit-box">
+    <h3>🎛 ペダルを編集</h3>
+    <div id="pedal-edit-name" style="font-size:14px;font-weight:600;color:var(--tm);margin-bottom:4px"></div>
+
+    <label class="pedal-edit-label">画像をアップロード（iPhoneから選択可）</label>
+    <input type="file" id="edit-image-file" accept="image/*" style="display:none" onchange="handlePedalImageFile(this)">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+      <button class="fetch-btn" onclick="document.getElementById('edit-image-file').click()">📷 写真を選択</button>
+      <span style="font-size:11px;color:var(--td)">長辺600px・JPEG80%に自動変換</span>
+    </div>
+    <img id="pedal-img-preview" class="pedal-img-preview" alt="プレビュー">
+    <div id="upload-progress-msg" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac);min-height:16px;margin-top:4px"></div>
+
+    <label class="pedal-edit-label">または画像URLを直接入力</label>
+    <input class="form-input" id="edit-image-url" type="url" placeholder="https://..." style="width:100%"
+      oninput="previewPedalImg(this.value)">
+
+    <label class="pedal-edit-label">出典（例: BOSS公式・Strymon公式）</label>
+    <input class="form-input" id="edit-image-source" type="text" placeholder="BOSS公式" style="width:100%">
+
+    <label class="pedal-edit-label">説明文（日本語）</label>
+    <div class="rich-toolbar">
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','p')">標準</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','h2')">見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','h3')">小見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','b')"><b>太字</b></button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-ja','br')">改行</button>
+    </div>
+    <div class="rich-editor" id="edit-desc-ja" contenteditable="true" data-placeholder="日本語の説明文を入力..."></div>
+    <label class="pedal-edit-label">説明文（英語）</label>
+    <div class="rich-toolbar">
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','p')">Normal</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','h2')">見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','h3')">小見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','b')"><b>Bold</b></button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','br')">改行</button>
+    </div>
+    <div class="rich-editor" id="edit-desc-en" contenteditable="true" data-placeholder="Enter description in English..."></div>
+
+    <label class="pedal-edit-label">YouTube動画IDをリセット</label>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+      <input type="checkbox" id="reset-youtube" style="width:16px;height:16px;cursor:pointer">
+      <span style="font-size:12px;color:var(--td)">チェックするとYouTube動画IDをNULLにします（次回アクセス時に再取得）</span>
+    </div>
+    <div class="pedal-edit-actions">
+      <button class="submit-btn" onclick="savePedalEdit()">💾 保存</button>
+      <button class="del-btn" onclick="deletePedalFromEdit()">🗑 このペダルを削除</button>
+      <button class="fetch-btn" onclick="closePedalEdit()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -294,29 +340,32 @@ tr:hover td{background:rgba(255,255,255,.02)}
 const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const MASTER_PIN='MSTR';
+const MASTER_PIN='MSTR0198';
+const SESSION_KEY='mgmb_admin_auth';
+
+// ── sessionStorage認証
+function checkSession(){
+  return sessionStorage.getItem(SESSION_KEY)==='1';
+}
+function setSession(){
+  sessionStorage.setItem(SESSION_KEY,'1');
+}
 
 // ── ログイン
 function doLogin(){
-  const pin=['p1','p2','p3','p4'].map(id=>document.getElementById(id).value).join('').toUpperCase();
-  if(pin===MASTER_PIN){
+  const input=document.getElementById('login-input');
+  const val=input.value.trim().toUpperCase();
+  if(val===MASTER_PIN){
+    setSession();
     document.getElementById('login-wrap').style.display='none';
     document.getElementById('admin-wrap').classList.add('show');
     loadAll();
   }else{
-    document.getElementById('pin-err').textContent='❌ PINが違います';
-    ['p1','p2','p3','p4'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('p1').focus();
+    document.getElementById('pin-err').textContent='❌ パスワードが違います';
+    input.value='';
+    input.focus();
   }
 }
-['p1','p2','p3','p4'].forEach((id,i,arr)=>{
-  const el=document.getElementById(id);
-  el.addEventListener('input',()=>{
-    if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();
-    if(el.value&&i===arr.length-1)doLogin();
-  });
-  el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
-});
 
 // ── タブ切り替え
 function switchTab(el,tabId){
@@ -348,6 +397,7 @@ async function loadPosts(){
   renderRegionStats();
   renderRegionPosts();
 }
+
 async function loadPedals(){
   const countRes=await sb.from('pedals').select('id',{count:'exact',head:true});
   const total=countRes.count||0;
@@ -357,6 +407,7 @@ async function loadPedals(){
   allPedals=data||[];
   renderPedals();
 }
+
 async function loadComments(){
   const{data}=await sb.from('comments').select('*').order('created_at',{ascending:false});
   allComments=data||[];
@@ -416,17 +467,13 @@ function renderLikesList(){
     +allPosts.map(p=>'<tr>'
       +'<td><a class="post-link" href="/post?id='+p.id+'" target="_blank">'+escHtml(p.title)+'</a></td>'
       +'<td style="font-size:12px;color:var(--tm)">'+(p.username||'匿名')+'</td>'
-      +'<td style="text-align:center">'
-        +'<span id="likes-val-'+p.id+'" style="font-size:18px;font-weight:700;color:var(--ac)">'+(p.likes||0)+'</span>'
-      +'</td>'
-      +'<td>'
-        +'<div style="display:flex;align-items:center;gap:6px">'
-          +'<button onclick="adjustLikes(\''+p.id+'\',-1)" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:18px;cursor:pointer;touch-action:manipulation">−</button>'
-          +'<button onclick="adjustLikes(\''+p.id+'\',1)" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(232,85,45,.4);background:rgba(232,85,45,.1);color:var(--ac);font-size:18px;cursor:pointer;touch-action:manipulation">＋</button>'
-          +'<input type="number" id="likes-input-'+p.id+'" value="'+(p.likes||0)+'" min="0" style="width:60px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:5px 8px;font-size:13px;color:var(--tx);text-align:center">'
-          +'<button onclick="setLikes(\''+p.id+'\')" style="padding:5px 10px;background:var(--ac);border:none;border-radius:3px;color:#fff;font-size:12px;cursor:pointer;touch-action:manipulation">SET</button>'
-        +'</div>'
-      +'</td>'
+      +'<td style="text-align:center"><span id="likes-val-'+p.id+'" style="font-size:18px;font-weight:700;color:var(--ac)">'+(p.likes||0)+'</span></td>'
+      +'<td><div style="display:flex;align-items:center;gap:6px">'
+        +'<button onclick="adjustLikes(\''+p.id+'\',-1)" style="width:32px;height:32px;border-radius:50%;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:18px;cursor:pointer">−</button>'
+        +'<button onclick="adjustLikes(\''+p.id+'\',1)" style="width:32px;height:32px;border-radius:50%;border:1px solid rgba(232,85,45,.4);background:rgba(232,85,45,.1);color:var(--ac);font-size:18px;cursor:pointer">＋</button>'
+        +'<input type="number" id="likes-input-'+p.id+'" value="'+(p.likes||0)+'" min="0" style="width:60px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:5px 8px;font-size:13px;color:var(--tx);text-align:center">'
+        +'<button onclick="setLikes(\''+p.id+'\')" style="padding:5px 10px;background:var(--ac);border:none;border-radius:3px;color:#fff;font-size:12px;cursor:pointer">SET</button>'
+      +'</div></td>'
       +'</tr>').join('')
     +'</tbody></table></div>';
 }
@@ -437,382 +484,422 @@ async function adjustLikes(postId,delta){
   await updateLikes(postId,newVal);
 }
 async function setLikes(postId){
-  const input=document.getElementById('likes-input-'+postId);
-  if(!input)return;
-  const newVal=Math.max(0,parseInt(input.value)||0);
-  await updateLikes(postId,newVal);
+  const val=parseInt(document.getElementById('likes-input-'+postId).value)||0;
+  await updateLikes(postId,Math.max(0,val));
 }
 async function updateLikes(postId,newVal){
   const{error}=await sb.from('posts').update({likes:newVal}).eq('id',postId);
   if(error){showToast('❌ 更新に失敗しました');return;}
-  const post=allPosts.find(p=>p.id===postId);
-  if(post)post.likes=newVal;
-  const valEl=document.getElementById('likes-val-'+postId);
-  const inputEl=document.getElementById('likes-input-'+postId);
-  if(valEl)valEl.textContent=newVal;
-  if(inputEl)inputEl.value=newVal;
-  const totalLikes=allPosts.reduce((s,p)=>s+(p.likes||0),0);
-  document.getElementById('stat-likes').textContent=totalLikes;
-  showToast('❤️ いいね数を '+newVal+' に更新しました');
+  const post=allPosts.find(p=>p.id===postId);if(post)post.likes=newVal;
+  const valEl=document.getElementById('likes-val-'+postId);if(valEl)valEl.textContent=newVal;
+  const inputEl=document.getElementById('likes-input-'+postId);if(inputEl)inputEl.value=newVal;
+  showToast('✅ いいね数を '+newVal+' に更新しました');
 }
 
-function loadStats(){
+// ── 統計
+async function loadStats(){
   document.getElementById('stat-posts').textContent=allPosts.length;
   document.getElementById('stat-comments').textContent=allComments.length;
-  const likes=allPosts.reduce((s,p)=>s+(p.likes||0),0);
-  document.getElementById('stat-likes').textContent=likes;
-  document.getElementById('stat-reports').textContent='0';
-  document.getElementById('posts-count').textContent=allPosts.length;
+  const totalLikes=allPosts.reduce((s,p)=>s+(p.likes||0),0);
+  document.getElementById('stat-likes').textContent=totalLikes;
 }
 
-function timeAgo(ts){
-  const d=Math.floor((Date.now()-new Date(ts))/1000);
-  if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';
-  if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';
-}
-
-// ── 投稿管理
-function renderPosts(posts){
-  const list=posts||allPosts;
-  const el=document.getElementById('posts-list');
-  if(!list.length){el.innerHTML='<div class="empty-msg">投稿はありません</div>';return;}
+// ── 最新投稿
+function renderRecentPosts(){
+  const el=document.getElementById('recent-posts');
+  const recent=allPosts.slice(0,5);
+  if(!recent.length){el.innerHTML='<div class="empty-msg">投稿がありません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
-    +'<thead><tr><th>サムネ</th><th>タイトル</th><th>投稿者</th><th>タイプ</th><th>いいね</th><th>投稿日</th><th>操作</th></tr></thead>'
+    +'<thead><tr><th>サムネ</th><th>タイトル</th><th>投稿者</th><th>いいね</th><th>日時</th></tr></thead>'
     +'<tbody>'
-    +list.map(p=>{
-      const thumb=p.image_urls&&p.image_urls[0]?'<img class="post-thumb" src="'+p.image_urls[0]+'" loading="lazy">':'<div class="post-thumb" style="display:flex;align-items:center;justify-content:center;font-size:18px">'+(p.post_type==='gear'?'🎸':'🎛')+'</div>';
+    +recent.map(p=>'<tr>'
+      +'<td>'+(p.image_urls&&p.image_urls[0]?'<img class="post-thumb" src="'+p.image_urls[0]+'" alt="">':'<div class="post-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px">🎸</div>')+'</td>'
+      +'<td><a class="post-link" href="/post?id='+p.id+'" target="_blank">'+escHtml(p.title)+'</a></td>'
+      +'<td style="font-size:12px;color:var(--tm)">'+(p.username||'匿名')+'</td>'
+      +'<td style="text-align:center">❤️'+(p.likes||0)+'</td>'
+      +'<td style="font-size:11px;color:var(--td)">'+timeAgo(p.created_at)+'</td>'
+      +'</tr>').join('')
+    +'</tbody></table></div>';
+}
+
+// ── 投稿一覧
+function renderPosts(){
+  const el=document.getElementById('posts-list');
+  document.getElementById('posts-count').textContent=allPosts.length;
+  if(!allPosts.length){el.innerHTML='<div class="empty-msg">投稿がありません</div>';return;}
+  el.innerHTML='<div class="table-wrap"><table>'
+    +'<thead><tr><th>サムネ</th><th>タイトル</th><th>投稿者</th><th>ジャンル</th><th>いいね</th><th>日時</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +allPosts.map(p=>{
+      const genres=Array.isArray(p.genre)?p.genre:(p.genre?[p.genre]:[]);
       return '<tr>'
-        +'<td>'+thumb+'</td>'
+        +'<td>'+(p.image_urls&&p.image_urls[0]?'<img class="post-thumb" src="'+p.image_urls[0]+'" alt="">':'<div class="post-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px">🎸</div>')+'</td>'
         +'<td><a class="post-link" href="/post?id='+p.id+'" target="_blank">'+escHtml(p.title)+'</a></td>'
         +'<td style="font-size:12px;color:var(--tm)">'+(p.username||'匿名')+'</td>'
-        +'<td><span class="tag-chip">'+(p.post_type==='gear'?'機材':'ボード')+'</span></td>'
-        +'<td style="font-family:JetBrains Mono,monospace;font-size:12px">❤️ '+(p.likes||0)+'</td>'
-        +'<td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">'+timeAgo(p.created_at)+'</td>'
+        +'<td>'+genres.map(g=>'<span class="tag-chip">'+g+'</span>').join('')+'</td>'
+        +'<td style="text-align:center">❤️'+(p.likes||0)+'</td>'
+        +'<td style="font-size:11px;color:var(--td)">'+timeAgo(p.created_at)+'</td>'
         +'<td><button class="del-btn" onclick="deletePost(\''+p.id+'\')">🗑 削除</button></td>'
         +'</tr>';
     }).join('')
     +'</tbody></table></div>';
 }
 
-function renderRecentPosts(){
-  const el=document.getElementById('recent-posts');
-  const recent=allPosts.slice(0,5);
-  if(!recent.length){el.innerHTML='<div class="empty-msg">投稿はありません</div>';return;}
-  el.innerHTML='<div class="table-wrap"><table>'
-    +'<thead><tr><th>タイトル</th><th>投稿者</th><th>いいね</th><th>投稿日</th><th>操作</th></tr></thead>'
-    +'<tbody>'
-    +recent.map(p=>'<tr>'
-      +'<td><a class="post-link" href="/post?id='+p.id+'" target="_blank">'+escHtml(p.title)+'</a></td>'
-      +'<td style="font-size:12px;color:var(--tm)">'+(p.username||'匿名')+'</td>'
-      +'<td style="font-family:JetBrains Mono,monospace;font-size:12px">❤️ '+(p.likes||0)+'</td>'
-      +'<td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">'+timeAgo(p.created_at)+'</td>'
-      +'<td><button class="del-btn" onclick="deletePost(\''+p.id+'\')">🗑 削除</button></td>'
-      +'</tr>').join('')
-    +'</tbody></table></div>';
-}
-
-async function deletePost(id){
-  if(!confirm('この投稿を削除しますか？\n取り消せません。'))return;
-  const{error}=await sb.from('posts').delete().eq('id',id);
+async function deletePost(postId){
+  if(!confirm('この投稿を削除しますか？\nこの操作は取り消せません。'))return;
+  const{error}=await sb.from('posts').delete().eq('id',postId);
   if(error){showToast('❌ 削除に失敗しました');return;}
-  showToast('🗑 削除しました');
-  allPosts=allPosts.filter(p=>p.id!==id);
-  renderPosts();renderRecentPosts();loadStats();loadUnknownGear();
+  showToast('🗑 投稿を削除しました');
+  await loadPosts();
 }
 
 // ── 未登録機材
-function loadUnknownGear(){
-  const knownNames=new Set(allPedals.map(p=>p.full_name));
-  const unknownMap={};
-  allPosts.forEach(post=>{
-    const gear=Array.isArray(post.gear_list)?post.gear_list:[];
+async function loadUnknownGear(){
+  const{data:pedals}=await sb.from('pedals').select('full_name');
+  const pedalNames=new Set((pedals||[]).map(p=>p.full_name.toLowerCase()));
+  const gearCount={};
+  allPosts.forEach(p=>{
+    const gear=Array.isArray(p.gear_list)?p.gear_list:[];
     gear.forEach(g=>{
       const name=(g.name||g||'').trim();
-      if(name&&!knownNames.has(name)){
-        unknownMap[name]=(unknownMap[name]||0)+1;
+      if(name&&!pedalNames.has(name.toLowerCase())){
+        gearCount[name]=(gearCount[name]||0)+1;
       }
     });
   });
-  const sorted=Object.entries(unknownMap).sort((a,b)=>b[1]-a[1]);
+  const sorted=Object.entries(gearCount).sort((a,b)=>b[1]-a[1]);
   document.getElementById('unknown-count').textContent=sorted.length;
   document.getElementById('stat-unknown').textContent=sorted.length;
   const el=document.getElementById('unknown-list');
-  if(!sorted.length){el.innerHTML='<div class="empty-msg">未登録機材はありません 🎉</div>';return;}
+  if(!sorted.length){el.innerHTML='<div class="empty-msg">未登録機材はありません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
     +'<thead><tr><th>機材名</th><th>使用投稿数</th><th>操作</th></tr></thead>'
     +'<tbody>'
     +sorted.map(([name,count])=>'<tr>'
-      +'<td style="font-weight:500">'+escHtml(name)+'</td>'
-      +'<td style="font-family:JetBrains Mono,monospace;font-size:12px;color:var(--ac)">'+count+' 件</td>'
-      +'<td><button class="approve-btn" onclick="prefillPedal(\''+escHtml(name)+'\')">＋ DBに追加</button></td>'
+      +'<td style="font-size:13px;font-weight:500">'+escHtml(name)+'</td>'
+      +'<td style="text-align:center">'+count+' 件</td>'
+      +'<td><button class="approve-btn" onclick="addPedalFromUnknown(\''+escHtml(name).replace(/'/g,"\\'")+'\')">＋ DBに追加</button></td>'
       +'</tr>').join('')
     +'</tbody></table></div>';
 }
 
-function prefillPedal(name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tab')[7].classList.add('on');
-  document.getElementById('tab-pedals').classList.add('on');
-  const parts=name.split(' ');
-  document.getElementById('new-brand').value=parts[0]||'';
-  document.getElementById('new-model').value=parts.slice(1).join(' ')||'';
+function addPedalFromUnknown(name){
+  document.getElementById('new-brand').value='';
+  document.getElementById('new-model').value=name;
+  document.getElementById('new-types').value='';
+  switchTab(document.querySelector('.tab:nth-child(8)'),'tab-pedals');
   document.getElementById('new-brand').focus();
-  showToast('フォームに入力しました。内容を確認して追加してください');
+  showToast('モデル名を入力しました。ブランド名とタイプを追加してください。');
 }
 
-// ── ペダルDB管理
-let pedalFilter='';
-// タイプ編集用の一時データ（pedalId → string[]）
-let editingTypeMap={};
+// ── ペダルDB フィルター
+let pedalFilterMode='all';
 
-function filterPedals(val){
-  pedalFilter=val.toLowerCase();
-  renderPedals();
+function setPedalFilter(mode){
+  pedalFilterMode=mode;
+  document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('on'));
+  const btn=document.getElementById('pf-'+mode);
+  if(btn)btn.classList.add('on');
+  applyPedalFilter();
 }
 
-function renderPedals(){
+function applyPedalFilter(){
+  const search=(document.getElementById('pedal-search').value||'').toLowerCase();
   const el=document.getElementById('pedals-list');
-  const list=pedalFilter
-    ?allPedals.filter(p=>(p.brand+' '+p.model+' '+p.full_name).toLowerCase().includes(pedalFilter))
-    :allPedals;
-  if(!list.length){el.innerHTML='<div class="empty-msg">'+(pedalFilter?'該当なし':'データなし')+'</div>';return;}
-
-  const rows=list.slice(0,200).map(p=>{
-    const typesHtml=(p.types||[]).map(t=>'<span class="tag-chip">'+escHtml(t)+'</span>').join('');
-    return `
-      <tr id="row-${p.id}">
-        <td style="font-weight:500">${escHtml(p.brand)}</td>
-        <td>${escHtml(p.model)}</td>
-        <td>${typesHtml||'<span style="color:var(--td);font-size:11px">未設定</span>'}</td>
-        <td style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">${escHtml(p.search_query||'')}</td>
-        <td style="white-space:nowrap">
-          <button class="edit-btn" onclick="togglePedalEdit('${p.id}')">✏️ 編集</button>
-          <button class="del-btn" style="margin-left:4px" onclick="deletePedal('${p.id}')">削除</button>
-        </td>
-      </tr>
-      <tr id="edit-row-${p.id}" style="display:none">
-        <td colspan="5" style="padding:0;background:rgba(232,85,45,.04)">
-          <div class="pedal-edit-row" id="edit-form-${p.id}">
-            <div class="edit-field">
-              <label>機材名 (full_name)</label>
-              <input id="ef-fullname-${p.id}" type="text" value="${escHtml(p.full_name)}" placeholder="例: BOSS DS-1">
-            </div>
-            <div class="edit-field">
-              <label>ブランド名 (brand)</label>
-              <input id="ef-brand-${p.id}" type="text" value="${escHtml(p.brand)}" placeholder="例: BOSS">
-            </div>
-            <div class="edit-field" style="min-width:200px">
-              <label>タイプ (types)</label>
-              <div class="type-tags-wrap" id="ttw-${p.id}" onclick="document.getElementById('tt-input-${p.id}').focus()">
-                ${(p.types||[]).map((t,i)=>`<span class="type-tag">${escHtml(t)}<button class="type-tag-x" onclick="removeTypeTag('${p.id}',${i})">✕</button></span>`).join('')}
-                <input class="type-tag-input" id="tt-input-${p.id}" placeholder="タイプ追加..." onkeydown="typeTagKeyDown(event,'${p.id}')">
-              </div>
-              <div class="type-tag-hint">Enterまたはカンマで追加</div>
-            </div>
-            <button class="pedal-save-btn" onclick="savePedalEdit('${p.id}')">💾 保存</button>
-            <button class="pedal-cancel-btn" onclick="togglePedalEdit('${p.id}')">キャンセル</button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
+  let filtered=allPedals;
+  // テキスト検索
+  if(search) filtered=filtered.filter(p=>(p.brand+' '+p.model+' '+p.full_name).toLowerCase().includes(search));
+  // モードフィルター
+  if(pedalFilterMode==='no-image') filtered=filtered.filter(p=>!p.image_url);
+  else if(pedalFilterMode==='no-desc') filtered=filtered.filter(p=>!p.description);
+  else if(pedalFilterMode==='no-yt') filtered=filtered.filter(p=>!p.youtube_video_id);
+  else if(pedalFilterMode==='complete') filtered=filtered.filter(p=>p.image_url&&p.description&&p.youtube_video_id);
+  if(!filtered.length){el.innerHTML='<div class="empty-msg">ペダルが見つかりません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
-    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>search_query</th><th>操作</th></tr></thead>'
-    +'<tbody>'+rows+'</tbody></table></div>'
-    +(list.length>200?'<div style="text-align:center;padding:12px;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">先頭200件を表示中（全'+list.length+'件）</div>':'');
-
-  // タイプデータをメモリに初期化
-  list.slice(0,200).forEach(p=>{
-    editingTypeMap[p.id]=[...(p.types||[])];
-  });
+    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +filtered.map(p=>'<tr>'
+      +'<td style="font-size:12px;font-weight:600;color:var(--ac)">'+escHtml(p.brand)+'</td>'
+      +'<td style="font-size:13px">'+escHtml(p.model)+'</td>'
+      +'<td>'+(p.types||[]).map(t=>'<span class="tag-chip">'+t+'</span>').join('')+'</td>'
+      +'<td>'+(p.image_url?'<img src="'+p.image_url+'" style="width:40px;height:40px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">':'<span style="font-size:10px;color:#e05050">なし</span>')+'</td>'
+      +'<td style="font-size:10px">'+(p.description?'<span style="color:#4ade80">✅</span>':'<span style="color:#e05050">なし</span>')+'</td>'
+      +'<td style="font-size:10px;color:var(--td)">'+(p.youtube_video_id?'<span style="color:#4ade80">✅</span>':'<span style="color:var(--td)">—</span>')+'</td>'
+      +'<td><button class="approve-btn" onclick="openPedalEdit(\''+p.id+'\')">✏️ 編集</button></td>'
+      +'</tr>').join('')
+    +'</tbody></table></div>';
 }
 
-// 編集行の開閉トグル
-function togglePedalEdit(id){
-  const editRow=document.getElementById('edit-row-'+id);
-  const editForm=document.getElementById('edit-form-'+id);
-  if(!editRow||!editForm)return;
-  const isOpen=editForm.classList.contains('open');
-  if(isOpen){
-    editForm.classList.remove('open');
-    editRow.style.display='none';
-  }else{
-    // 他の編集行を閉じる
-    document.querySelectorAll('.pedal-edit-row.open').forEach(el=>{
-      el.classList.remove('open');
-      el.closest('tr').style.display='none';
-    });
-    editForm.classList.add('open');
-    editRow.style.display='table-row';
-    // タイプをメモリから再描画
-    const pedal=allPedals.find(p=>p.id===id);
-    if(pedal)editingTypeMap[id]=[...(pedal.types||[])];
-    renderTypeTagsInForm(id);
-    // フォームに最新データをセット
-    if(pedal){
-      const fnEl=document.getElementById('ef-fullname-'+id);
-      const brEl=document.getElementById('ef-brand-'+id);
-      if(fnEl)fnEl.value=pedal.full_name||'';
-      if(brEl)brEl.value=pedal.brand||'';
+function renderPedals(){ applyPedalFilter(); }
+function filterPedals(){ applyPedalFilter(); }
+
+// ── リッチエディタ
+function richCmd(editorId, tag){
+  const editor=document.getElementById(editorId);
+  if(!editor)return;
+  editor.focus();
+  const sel=window.getSelection();
+  if(!sel||sel.rangeCount===0)return;
+  const range=sel.getRangeAt(0);
+  if(tag==='br'){
+    // 改行
+    const br=document.createElement('br');
+    range.deleteContents();
+    range.insertNode(br);
+    range.setStartAfter(br);
+    range.setEndAfter(br);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else if(tag==='p'){
+    // 標準テキスト：選択範囲をプレーンテキストに戻す
+    const selectedText=range.toString();
+    range.deleteContents();
+    const textNode=document.createTextNode(selectedText||'テキスト');
+    range.insertNode(textNode);
+    range.setStartAfter(textNode);
+    range.setEndAfter(textNode);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    // 選択テキストをタグで囲む（または空のタグを挿入）
+    const selectedText=range.toString();
+    const el=document.createElement(tag);
+    if(selectedText){
+      range.deleteContents();
+      el.textContent=selectedText;
+    } else {
+      el.textContent=tag==='h2'?'見出し':tag==='h3'?'小見出し':'テキスト';
     }
+    range.insertNode(el);
+    range.setStartAfter(el);
+    range.setEndAfter(el);
+    sel.removeAllRanges();
+    sel.addRange(range);
   }
-}
-
-// タイプタグの再描画（編集フォーム内）
-function renderTypeTagsInForm(id){
-  const wrap=document.getElementById('ttw-'+id);
-  if(!wrap)return;
-  const input=document.getElementById('tt-input-'+id);
-  const types=editingTypeMap[id]||[];
-  // 既存タグを削除して再描画
-  wrap.querySelectorAll('.type-tag').forEach(el=>el.remove());
-  types.forEach((t,i)=>{
-    const span=document.createElement('span');
-    span.className='type-tag';
-    span.innerHTML=escHtml(t)+'<button class="type-tag-x" onclick="removeTypeTag(\''+id+'\','+i+')">✕</button>';
-    wrap.insertBefore(span,input);
-  });
-}
-
-// タイプタグ削除
-function removeTypeTag(id,idx){
-  if(!editingTypeMap[id])return;
-  editingTypeMap[id].splice(idx,1);
-  renderTypeTagsInForm(id);
-}
-
-// タイプタグ入力キーハンドラ
-function typeTagKeyDown(e,id){
-  if(e.key==='Enter'||e.key===','){
-    e.preventDefault();
-    const val=e.target.value.trim().replace(/,$/,'');
-    if(val){
-      if(!editingTypeMap[id])editingTypeMap[id]=[];
-      editingTypeMap[id].push(val);
-      e.target.value='';
-      renderTypeTagsInForm(id);
-    }
-  }else if(e.key==='Backspace'&&!e.target.value&&editingTypeMap[id]&&editingTypeMap[id].length){
-    editingTypeMap[id].pop();
-    renderTypeTagsInForm(id);
-  }
-}
-
-// ペダル編集保存
-async function savePedalEdit(id){
-  const fnEl=document.getElementById('ef-fullname-'+id);
-  const brEl=document.getElementById('ef-brand-'+id);
-  // 入力中のタイプも確定させる
-  const typeInput=document.getElementById('tt-input-'+id);
-  if(typeInput&&typeInput.value.trim()){
-    const val=typeInput.value.trim();
-    if(!editingTypeMap[id])editingTypeMap[id]=[];
-    editingTypeMap[id].push(val);
-    typeInput.value='';
-    renderTypeTagsInForm(id);
-  }
-  const full_name=fnEl?fnEl.value.trim():'';
-  const brand=brEl?brEl.value.trim():'';
-  const types=editingTypeMap[id]||[];
-
-  if(!full_name||!brand){showToast('⚠️ 機材名とブランド名は必須です');return;}
-
-  // モデル名をfull_nameから再計算
-  const model=full_name.startsWith(brand+' ')?full_name.slice(brand.length+1).trim():full_name;
-  // slugを再生成
-  const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  // search_queryも更新
-  const search_query=full_name;
-
-  const{error}=await sb.from('pedals').update({full_name,brand,model,slug,types,search_query}).eq('id',id);
-  if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
-
-  // ローカルデータを更新
-  const idx=allPedals.findIndex(p=>p.id===id);
-  if(idx>=0)allPedals[idx]={...allPedals[idx],full_name,brand,model,slug,types,search_query};
-
-  showToast('✅ 保存しました: '+full_name);
-  togglePedalEdit(id);
-  renderPedals();// 一覧を再描画
 }
 
 async function addPedal(){
   const brand=document.getElementById('new-brand').value.trim();
   const model=document.getElementById('new-model').value.trim();
   const typesRaw=document.getElementById('new-types').value.trim();
-  if(!brand||!model){showToast('⚠️ ブランドとモデルは必須です');return;}
+  if(!brand||!model){showToast('❌ ブランド名とモデル名は必須です');return;}
+  const types=typesRaw?typesRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
   const full_name=brand+' '+model;
   const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  const types=typesRaw?typesRaw.split(',').map(s=>s.trim()).filter(Boolean):[];
-  const search_query=brand+' '+model;
-  const{error}=await sb.from('pedals').insert({brand,model,full_name,slug,types,search_query});
-  if(error){
-    if(error.code==='23505')showToast('⚠️ すでに登録済みです');
-    else showToast('❌ 追加に失敗しました: '+error.message);
-    return;
-  }
-  showToast('✅ 追加しました: '+full_name);
-  ['new-brand','new-model','new-types'].forEach(id=>document.getElementById(id).value='');
+  const{error}=await sb.from('pedals').insert({brand,model,full_name,slug,types});
+  if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
+  showToast('✅ ペダルを追加しました');
+  document.getElementById('new-brand').value='';
+  document.getElementById('new-model').value='';
+  document.getElementById('new-types').value='';
   await loadPedals();
 }
 
-async function deletePedal(id){
-  if(!confirm('このペダルをDBから削除しますか？'))return;
-  const{error}=await sb.from('pedals').delete().eq('id',id);
-  if(error){showToast('❌ 削除に失敗しました');return;}
-  showToast('🗑 削除しました');
-  allPedals=allPedals.filter(p=>p.id!==id);
-  renderPedals();
-  document.getElementById('pedals-count').textContent=allPedals.length;
-  document.getElementById('stat-pedals').textContent=allPedals.length;
+// ── ペダル編集モーダル
+let editingPedalId=null;
+
+function openPedalEdit(pedalId){
+  const pedal=allPedals.find(p=>p.id==pedalId);
+  if(!pedal)return;
+  editingPedalId=pedal.id;
+  document.getElementById('pedal-edit-name').textContent=pedal.full_name;
+  document.getElementById('edit-image-url').value=pedal.image_url||'';
+  document.getElementById('edit-image-source').value=pedal.image_source||'';
+  document.getElementById('edit-desc-ja').innerHTML=pedal.description||'';
+  document.getElementById('edit-desc-en').innerHTML=pedal.description_en||'';
+  document.getElementById('reset-youtube').checked=false;
+  document.getElementById('upload-progress-msg').textContent='';
+  // ファイル入力リセット
+  document.getElementById('edit-image-file').value='';
+  const preview=document.getElementById('pedal-img-preview');
+  if(pedal.image_url){preview.src=pedal.image_url;preview.classList.add('show');}
+  else{preview.src='';preview.classList.remove('show');}
+  document.getElementById('pedal-edit-modal').classList.add('open');
 }
 
-// ── 機材NEWS管理
+function closePedalEdit(){
+  document.getElementById('pedal-edit-modal').classList.remove('open');
+  editingPedalId=null;
+}
+
+function previewPedalImg(url){
+  const preview=document.getElementById('pedal-img-preview');
+  if(url){preview.src=url;preview.classList.add('show');}
+  else{preview.src='';preview.classList.remove('show');}
+}
+
+// 画像ファイルを選択したときの処理
+async function handlePedalImageFile(input){
+  const file=input.files[0];
+  if(!file)return;
+  const msg=document.getElementById('upload-progress-msg');
+  msg.textContent='🔄 画像を変換中...';
+  try{
+    const compressed=await compressPedalImage(file);
+    // プレビュー表示
+    const preview=document.getElementById('pedal-img-preview');
+    preview.src=compressed;
+    preview.classList.add('show');
+    // URLフィールドは一時的にbase64を持たせる（保存時にSupabaseへアップ）
+    document.getElementById('edit-image-url').value='__pending__';
+    // base64をグローバル変数に保持
+    window._pendingPedalImageB64=compressed;
+    msg.textContent='✅ 変換完了。「保存」を押すとアップロードします。';
+  }catch(e){
+    msg.textContent='❌ 変換に失敗しました';
+  }
+}
+
+// ペダル画像を長辺600px・JPEG80%に圧縮
+function compressPedalImage(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        const MAX=600;
+        let{width,height}=img;
+        if(width>MAX||height>MAX){
+          const ratio=Math.min(MAX/width,MAX/height);
+          width=Math.round(width*ratio);
+          height=Math.round(height*ratio);
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=width;canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        resolve(canvas.toDataURL('image/jpeg',0.80));
+      };
+      img.onerror=reject;
+      img.src=ev.target.result;
+    };
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// base64をSupabase Storage（pedal-images）にアップロードしてURLを返す
+async function uploadPedalImage(b64,pedalId){
+  const byteStr=atob(b64.split(',')[1]);
+  const ab=new ArrayBuffer(byteStr.length);
+  const ia=new Uint8Array(ab);
+  for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+  const blob=new Blob([ab],{type:'image/jpeg'});
+  const filename=`pedal_${pedalId}_${Date.now()}.jpg`;
+  const{error}=await sb.storage.from('pedal-images').upload(filename,blob,{contentType:'image/jpeg',upsert:true});
+  if(error)throw error;
+  const{data}=sb.storage.from('pedal-images').getPublicUrl(filename);
+  return data.publicUrl;
+}
+
+async function savePedalEdit(){
+  if(!editingPedalId)return;
+  const msg=document.getElementById('upload-progress-msg');
+  let image_url=document.getElementById('edit-image-url').value.trim()||null;
+  // __pending__のまま保存しないようにチェック
+  if(image_url==='__pending__'){
+    if(window._pendingPedalImageB64){
+      msg.textContent='📤 アップロード中...';
+      try{
+        image_url=await uploadPedalImage(window._pendingPedalImageB64,editingPedalId);
+        window._pendingPedalImageB64=null;
+        msg.textContent='✅ アップロード完了';
+      }catch(e){
+        const detail=e?.message||e?.statusCode||JSON.stringify(e)||'不明なエラー';
+        msg.textContent='❌ '+detail;
+        console.error('upload error:',e);
+        return;
+      }
+    } else {
+      // pendingのまま画像データが消えている場合はnullに戻す
+      image_url=null;
+    }
+  }
+  const image_source=document.getElementById('edit-image-source').value.trim()||null;
+  const description=document.getElementById('edit-desc-ja').innerHTML.trim()||null;
+  const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
+  const resetYt=document.getElementById('reset-youtube').checked;
+  const updates={image_url,image_source,description,description_en};
+  if(resetYt)updates.youtube_video_id=null;
+  const{error}=await sb.from('pedals').update(updates).eq('id',editingPedalId);
+  if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
+  showToast('✅ 保存しました');
+  closePedalEdit();
+  await loadPedals();
+}
+
+async function deletePedalFromEdit(){
+  if(!editingPedalId)return;
+  const pedal=allPedals.find(p=>p.id==editingPedalId);
+  if(!confirm('「'+(pedal?.full_name||'このペダル')+'」を削除しますか？\nこの操作は取り消せません。'))return;
+  const{error}=await sb.from('pedals').delete().eq('id',editingPedalId);
+  if(error){showToast('❌ 削除に失敗しました: '+error.message);return;}
+  showToast('🗑 ペダルを削除しました');
+  closePedalEdit();
+  await loadPedals();
+}
+
+// ── 機材NEWS
 async function loadNews(){
-  const el=document.getElementById('news-list');
-  el.innerHTML='<div class="loading">読み込み中...</div>';
-  const{data,error}=await sb.from('news').select('*').order('sort_order').order('created_at');
-  if(error){el.innerHTML='<div class="empty-msg">読み込みに失敗しました</div>';return;}
+  const{data}=await sb.from('news').select('*').order('sort_order').order('created_at');
   newsItems=data||[];
   renderNewsList();
 }
 
 function renderNewsList(){
   const el=document.getElementById('news-list');
-  if(!newsItems.length){el.innerHTML='<div class="empty-msg">NEWSアイテムがありません</div>';return;}
+  if(!newsItems.length){el.innerHTML='<div class="empty-msg">NEWSがありません</div>';return;}
   el.innerHTML=newsItems.map((item,i)=>`
-    <div class="news-item" data-idx="${i}">
+    <div class="news-item" draggable="true" data-idx="${i}">
       <div class="drag-handle">⠿</div>
-      <div class="news-thumb">
-        ${item.thumb_url?`<img src="${item.thumb_url}" onerror="this.style.display='none';this.parentElement.textContent='${item.emoji||'🔗'}'">`:item.emoji||'🔗'}
-      </div>
+      <div class="news-thumb">${item.thumb_url?`<img src="${item.thumb_url}" alt="">`:item.emoji||'🔗'}</div>
       <div class="news-info">
-        <div class="news-title-text">${escHtml(item.title)}</div>
-        <div class="news-url-text">${escHtml(item.url)}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:6px">${escHtml(item.subtitle||'')}</div>
+        <div class="news-title-text">${escHtml(item.title||'')}</div>
+        <div class="news-url-text">${escHtml(item.url||'')}</div>
         <div class="news-actions">
-          ${i>0?`<button class="news-action-btn" onclick="moveNews(${i},-1)">↑ 上へ</button>`:''}
-          ${i<newsItems.length-1?`<button class="news-action-btn" onclick="moveNews(${i},1)">↓ 下へ</button>`:''}
-          <button class="news-action-btn danger" onclick="removeNews('${item.id}',${i})">🗑 削除</button>
+          <button class="news-action-btn danger" onclick="deleteNews('${item.id}')">🗑 削除</button>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-async function moveNews(idx,dir){
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=newsItems.length)return;
-  const a=newsItems[idx],b=newsItems[newIdx];
-  const tmpOrder=a.sort_order;
-  await sb.from('news').update({sort_order:b.sort_order}).eq('id',a.id);
-  await sb.from('news').update({sort_order:tmpOrder}).eq('id',b.id);
+async function fetchOGP(){
+  const url=document.getElementById('news-url-input').value.trim();
+  if(!url){showToast('❌ URLを入力してください');return;}
+  showToast('🔍 情報を取得中...');
+  try{
+    const res=await fetch('/.netlify/functions/ogp?url='+encodeURIComponent(url));
+    const data=await res.json();
+    if(data.title)document.getElementById('news-title-input').value=data.title;
+    const preview=document.getElementById('ogp-preview');
+    const thumb=document.getElementById('ogp-thumb');
+    const titleEl=document.getElementById('ogp-title');
+    const urlEl=document.getElementById('ogp-url');
+    if(data.image){thumb.src=data.image;preview.classList.add('show');}
+    if(data.title)titleEl.textContent=data.title;
+    urlEl.textContent=url;
+    showToast('✅ 情報を取得しました');
+  }catch(e){showToast('❌ 取得に失敗しました');}
+}
+
+async function addNewsItem(){
+  const url=document.getElementById('news-url-input').value.trim();
+  const title=document.getElementById('news-title-input').value.trim();
+  const emoji=document.getElementById('news-emoji-input').value.trim();
+  if(!url||!title){showToast('❌ URLとタイトルは必須です');return;}
+  const thumb=document.getElementById('ogp-thumb').src;
+  const thumb_url=thumb&&thumb!==window.location.href?thumb:null;
+  const maxSort=newsItems.reduce((m,n)=>Math.max(m,n.sort_order||0),0);
+  const{error}=await sb.from('news').insert({url,title,emoji:emoji||'🔗',thumb_url,sort_order:maxSort+1});
+  if(error){showToast('❌ 追加に失敗しました');return;}
+  showToast('✅ NEWSを追加しました');
+  document.getElementById('news-url-input').value='';
+  document.getElementById('news-title-input').value='';
+  document.getElementById('news-emoji-input').value='';
+  document.getElementById('ogp-preview').classList.remove('show');
   await loadNews();
 }
 
-async function removeNews(id,idx){
+async function deleteNews(id){
   if(!confirm('このNEWSを削除しますか？'))return;
   const{error}=await sb.from('news').delete().eq('id',id);
   if(error){showToast('❌ 削除に失敗しました');return;}
@@ -820,95 +907,65 @@ async function removeNews(id,idx){
   await loadNews();
 }
 
-function fetchOGP(){
-  const url=document.getElementById('news-url-input').value.trim();
-  if(!url){showToast('⚠️ URLを入力してください');return;}
-  try{
-    const domain=new URL(url).hostname.replace('www.','');
-    document.getElementById('news-title-input').value=domain;
-    document.getElementById('ogp-title').textContent=domain;
-    document.getElementById('ogp-url').textContent=url;
-    document.getElementById('ogp-thumb').src='';
-    document.getElementById('ogp-preview').classList.add('show');
-    showToast('ℹ️ タイトルを手動で入力してください');
-  }catch(e){
-    showToast('❌ URL形式が正しくありません');
-  }
-}
-
-async function addNewsItem(){
-  const url=document.getElementById('news-url-input').value.trim();
-  const title=document.getElementById('news-title-input').value.trim();
-  const emoji=document.getElementById('news-emoji-input').value.trim()||'🔗';
-  if(!url||!title){showToast('⚠️ URLとタイトルは必須です');return;}
-  const maxOrder=newsItems.length?Math.max(...newsItems.map(n=>n.sort_order||0))+1:1;
-  const{error}=await sb.from('news').insert({url,title,subtitle:'',emoji,thumb_url:'',sort_order:maxOrder});
-  if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
-  document.getElementById('news-url-input').value='';
-  document.getElementById('news-title-input').value='';
-  document.getElementById('news-emoji-input').value='';
-  document.getElementById('ogp-preview').classList.remove('show');
-  showToast('✅ 追加してサイトに反映しました！');
-  await loadNews();
-}
-
 // ── 言語圏別
 let currentRegionFilter='all';
-
-function detectPostRegion(post){
-  if(post.user_lang)return post.user_lang;
-  const text=(post.title||'')+(post.description||'')+(post.username||'');
-  const hasJapanese=/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(text);
-  return hasJapanese?'ja':'en';
-}
-
 function renderRegionStats(){
-  const ja=allPosts.filter(p=>detectPostRegion(p)==='ja').length;
-  const en=allPosts.filter(p=>detectPostRegion(p)==='en').length;
-  document.getElementById('stat-region-all').textContent=allPosts.length;
+  const total=allPosts.length;
+  const ja=allPosts.filter(p=>p.user_lang==='ja'||!p.user_lang).length;
+  const en=allPosts.filter(p=>p.user_lang&&p.user_lang!=='ja').length;
+  document.getElementById('stat-region-all').textContent=total;
   document.getElementById('stat-region-ja').textContent=ja;
   document.getElementById('stat-region-en').textContent=en;
 }
-
 function filterRegion(region){
   currentRegionFilter=region;
   ['all','ja','en'].forEach(r=>{
     const btn=document.getElementById('region-btn-'+r);
-    if(!btn)return;
-    if(r===region){btn.style.background='var(--ac)';btn.style.color='#fff';btn.style.border='none';}
-    else{btn.style.background='var(--sf2)';btn.style.color='var(--tm)';btn.style.border='1px solid var(--bd)';}
+    if(btn){btn.style.background=r===region?'var(--ac)':'var(--sf2)';btn.style.color=r===region?'#fff':'var(--tm)';}
   });
   renderRegionPosts();
 }
-
 function renderRegionPosts(){
   const el=document.getElementById('region-posts-list');
-  if(!el)return;
-  const filtered=currentRegionFilter==='all'?allPosts:allPosts.filter(p=>detectPostRegion(p)===currentRegionFilter);
-  if(!filtered.length){el.innerHTML='<div class="empty-msg">投稿がありません</div>';return;}
+  let posts=allPosts;
+  if(currentRegionFilter==='ja')posts=allPosts.filter(p=>p.user_lang==='ja'||!p.user_lang);
+  else if(currentRegionFilter==='en')posts=allPosts.filter(p=>p.user_lang&&p.user_lang!=='ja');
+  if(!posts.length){el.innerHTML='<div class="empty-msg">投稿がありません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
-    +'<thead><tr><th>言語圏</th><th>タイトル</th><th>投稿者</th><th>いいね</th><th>投稿日</th><th>操作</th></tr></thead>'
+    +'<thead><tr><th>サムネ</th><th>タイトル</th><th>投稿者</th><th>言語</th><th>日時</th></tr></thead>'
     +'<tbody>'
-    +filtered.map(p=>{
-      const region=detectPostRegion(p);
-      const regionBadge=region==='ja'?'🇯🇵 日本語':'🌐 海外';
-      const badgeColor=region==='ja'?'color:#4ade80':'color:#60a5fa';
-      return '<tr>'
-        +'<td style="font-size:12px;font-weight:600;'+badgeColor+'">'+regionBadge+'</td>'
-        +'<td><a class="post-link" href="/post?id='+p.id+'" target="_blank">'+escHtml(p.title)+'</a></td>'
-        +'<td style="font-size:12px;color:var(--tm)">'+(p.username||'匿名')+'</td>'
-        +'<td style="font-size:12px">❤️ '+(p.likes||0)+'</td>'
-        +'<td style="font-size:11px;color:var(--td)">'+timeAgo(p.created_at)+'</td>'
-        +'<td><button class="del-btn" onclick="deletePost(\''+p.id+'\')">🗑</button></td>'
-        +'</tr>';
-    }).join('')
+    +posts.slice(0,50).map(p=>'<tr>'
+      +'<td>'+(p.image_urls&&p.image_urls[0]?'<img class="post-thumb" src="'+p.image_urls[0]+'" alt="">':'<div class="post-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px">🎸</div>')+'</td>'
+      +'<td><a class="post-link" href="/post?id='+p.id+'" target="_blank">'+escHtml(p.title)+'</a></td>'
+      +'<td style="font-size:12px;color:var(--tm)">'+(p.username||'匿名')+'</td>'
+      +'<td style="font-size:11px">'+(p.user_lang==='ja'||!p.user_lang?'🇯🇵 日本語':'🌐 海外')+'</td>'
+      +'<td style="font-size:11px;color:var(--td)">'+timeAgo(p.created_at)+'</td>'
+      +'</tr>').join('')
     +'</tbody></table></div>';
 }
 
-function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
-document.addEventListener('DOMContentLoaded',()=>document.getElementById('p1').focus());
+// ── ユーティリティ
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function timeAgo(ts){
+  const d=Math.floor((Date.now()-new Date(ts))/1000);
+  if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';
+  if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';
+}
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ── 初期化
+window.addEventListener('DOMContentLoaded',()=>{
+  if(checkSession()){
+    document.getElementById('login-wrap').style.display='none';
+    document.getElementById('admin-wrap').classList.add('show');
+    loadAll();
+  } else {
+    setTimeout(()=>document.getElementById('login-input').focus(),100);
+  }
+});
 </script>
 </body>
 </html>
-<!-- update -->
