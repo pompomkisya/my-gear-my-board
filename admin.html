@@ -285,6 +285,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <h3>🎛 ペダルを編集</h3>
     <div id="pedal-edit-name" style="font-size:14px;font-weight:600;color:var(--tm);margin-bottom:4px"></div>
 
+    <!-- ★追加：機材名・ブランド名・タイプ -->
+    <label class="pedal-edit-label">機材名（full_name）</label>
+    <input class="form-input" id="edit-full-name" type="text" placeholder="例: BOSS DS-1" style="width:100%">
+
+    <label class="pedal-edit-label">ブランド名（brand）</label>
+    <input class="form-input" id="edit-brand-name" type="text" placeholder="例: BOSS" style="width:100%">
+
+    <label class="pedal-edit-label">タイプ（types）― カンマ区切り</label>
+    <input class="form-input" id="edit-types-modal" type="text" placeholder="例: overdrive,boost" style="width:100%">
+
     <label class="pedal-edit-label">画像をアップロード（iPhoneから選択可）</label>
     <input type="file" id="edit-image-file" accept="image/*" style="display:none" onchange="handlePedalImageFile(this)">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
@@ -343,15 +353,9 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const MASTER_PIN='MSTR0198';
 const SESSION_KEY='mgmb_admin_auth';
 
-// ── sessionStorage認証
-function checkSession(){
-  return sessionStorage.getItem(SESSION_KEY)==='1';
-}
-function setSession(){
-  sessionStorage.setItem(SESSION_KEY,'1');
-}
+function checkSession(){return sessionStorage.getItem(SESSION_KEY)==='1';}
+function setSession(){sessionStorage.setItem(SESSION_KEY,'1');}
 
-// ── ログイン
 function doLogin(){
   const input=document.getElementById('login-input');
   const val=input.value.trim().toUpperCase();
@@ -362,12 +366,10 @@ function doLogin(){
     loadAll();
   }else{
     document.getElementById('pin-err').textContent='❌ パスワードが違います';
-    input.value='';
-    input.focus();
+    input.value='';input.focus();
   }
 }
 
-// ── タブ切り替え
 function switchTab(el,tabId){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
@@ -375,27 +377,18 @@ function switchTab(el,tabId){
   document.getElementById(tabId).classList.add('on');
 }
 
-// ── データ読み込み
 let allPosts=[],allPedals=[],allComments=[];
 let newsItems=[];
 
 async function loadAll(){
   await Promise.all([loadPosts(),loadPedals(),loadComments()]);
-  loadStats();
-  loadNews();
-  renderLikesList();
-  renderRegionStats();
-  renderRegionPosts();
+  loadStats();loadNews();renderLikesList();renderRegionStats();renderRegionPosts();
 }
 
 async function loadPosts(){
   const{data}=await sb.from('posts').select('*').order('created_at',{ascending:false});
   allPosts=data||[];
-  renderPosts();
-  renderRecentPosts();
-  loadUnknownGear();
-  renderRegionStats();
-  renderRegionPosts();
+  renderPosts();renderRecentPosts();loadUnknownGear();renderRegionStats();renderRegionPosts();
 }
 
 async function loadPedals(){
@@ -452,12 +445,10 @@ async function deleteComment(commentId,postId){
   if(error){showToast('❌ 削除に失敗しました');return;}
   showToast('🗑 コメントを削除しました');
   allComments=allComments.filter(c=>c.id!==commentId);
-  renderCommentPostSelect();
-  loadPostComments(postId);
+  renderCommentPostSelect();loadPostComments(postId);
   document.getElementById('stat-comments').textContent=allComments.length;
 }
 
-// ── いいね管理
 function renderLikesList(){
   const el=document.getElementById('likes-list');
   if(!allPosts.length){el.innerHTML='<div class="empty-msg">投稿がありません</div>';return;}
@@ -480,8 +471,7 @@ function renderLikesList(){
 
 async function adjustLikes(postId,delta){
   const post=allPosts.find(p=>p.id===postId);if(!post)return;
-  const newVal=Math.max(0,(post.likes||0)+delta);
-  await updateLikes(postId,newVal);
+  await updateLikes(postId,Math.max(0,(post.likes||0)+delta));
 }
 async function setLikes(postId){
   const val=parseInt(document.getElementById('likes-input-'+postId).value)||0;
@@ -496,15 +486,12 @@ async function updateLikes(postId,newVal){
   showToast('✅ いいね数を '+newVal+' に更新しました');
 }
 
-// ── 統計
 async function loadStats(){
   document.getElementById('stat-posts').textContent=allPosts.length;
   document.getElementById('stat-comments').textContent=allComments.length;
-  const totalLikes=allPosts.reduce((s,p)=>s+(p.likes||0),0);
-  document.getElementById('stat-likes').textContent=totalLikes;
+  document.getElementById('stat-likes').textContent=allPosts.reduce((s,p)=>s+(p.likes||0),0);
 }
 
-// ── 最新投稿
 function renderRecentPosts(){
   const el=document.getElementById('recent-posts');
   const recent=allPosts.slice(0,5);
@@ -522,7 +509,6 @@ function renderRecentPosts(){
     +'</tbody></table></div>';
 }
 
-// ── 投稿一覧
 function renderPosts(){
   const el=document.getElementById('posts-list');
   document.getElementById('posts-count').textContent=allPosts.length;
@@ -553,7 +539,6 @@ async function deletePost(postId){
   await loadPosts();
 }
 
-// ── 未登録機材
 async function loadUnknownGear(){
   const{data:pedals}=await sb.from('pedals').select('full_name');
   const pedalNames=new Set((pedals||[]).map(p=>p.full_name.toLowerCase()));
@@ -562,9 +547,7 @@ async function loadUnknownGear(){
     const gear=Array.isArray(p.gear_list)?p.gear_list:[];
     gear.forEach(g=>{
       const name=(g.name||g||'').trim();
-      if(name&&!pedalNames.has(name.toLowerCase())){
-        gearCount[name]=(gearCount[name]||0)+1;
-      }
+      if(name&&!pedalNames.has(name.toLowerCase())){gearCount[name]=(gearCount[name]||0)+1;}
     });
   });
   const sorted=Object.entries(gearCount).sort((a,b)=>b[1]-a[1]);
@@ -592,7 +575,6 @@ function addPedalFromUnknown(name){
   showToast('モデル名を入力しました。ブランド名とタイプを追加してください。');
 }
 
-// ── ペダルDB フィルター
 let pedalFilterMode='all';
 
 function setPedalFilter(mode){
@@ -607,13 +589,11 @@ function applyPedalFilter(){
   const search=(document.getElementById('pedal-search').value||'').toLowerCase();
   const el=document.getElementById('pedals-list');
   let filtered=allPedals;
-  // テキスト検索
-  if(search) filtered=filtered.filter(p=>(p.brand+' '+p.model+' '+p.full_name).toLowerCase().includes(search));
-  // モードフィルター
-  if(pedalFilterMode==='no-image') filtered=filtered.filter(p=>!p.image_url);
-  else if(pedalFilterMode==='no-desc') filtered=filtered.filter(p=>!p.description);
-  else if(pedalFilterMode==='no-yt') filtered=filtered.filter(p=>!p.youtube_video_id);
-  else if(pedalFilterMode==='complete') filtered=filtered.filter(p=>p.image_url&&p.description&&p.youtube_video_id);
+  if(search)filtered=filtered.filter(p=>(p.brand+' '+p.model+' '+p.full_name).toLowerCase().includes(search));
+  if(pedalFilterMode==='no-image')filtered=filtered.filter(p=>!p.image_url);
+  else if(pedalFilterMode==='no-desc')filtered=filtered.filter(p=>!p.description);
+  else if(pedalFilterMode==='no-yt')filtered=filtered.filter(p=>!p.youtube_video_id);
+  else if(pedalFilterMode==='complete')filtered=filtered.filter(p=>p.image_url&&p.description&&p.youtube_video_id);
   if(!filtered.length){el.innerHTML='<div class="empty-msg">ペダルが見つかりません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
     +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>操作</th></tr></thead>'
@@ -630,11 +610,10 @@ function applyPedalFilter(){
     +'</tbody></table></div>';
 }
 
-function renderPedals(){ applyPedalFilter(); }
-function filterPedals(){ applyPedalFilter(); }
+function renderPedals(){applyPedalFilter();}
+function filterPedals(){applyPedalFilter();}
 
-// ── リッチエディタ
-function richCmd(editorId, tag){
+function richCmd(editorId,tag){
   const editor=document.getElementById(editorId);
   if(!editor)return;
   editor.focus();
@@ -642,39 +621,25 @@ function richCmd(editorId, tag){
   if(!sel||sel.rangeCount===0)return;
   const range=sel.getRangeAt(0);
   if(tag==='br'){
-    // 改行
     const br=document.createElement('br');
-    range.deleteContents();
-    range.insertNode(br);
-    range.setStartAfter(br);
-    range.setEndAfter(br);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  } else if(tag==='p'){
-    // 標準テキスト：選択範囲をプレーンテキストに戻す
+    range.deleteContents();range.insertNode(br);
+    range.setStartAfter(br);range.setEndAfter(br);
+    sel.removeAllRanges();sel.addRange(range);
+  }else if(tag==='p'){
     const selectedText=range.toString();
     range.deleteContents();
     const textNode=document.createTextNode(selectedText||'テキスト');
     range.insertNode(textNode);
-    range.setStartAfter(textNode);
-    range.setEndAfter(textNode);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  } else {
-    // 選択テキストをタグで囲む（または空のタグを挿入）
+    range.setStartAfter(textNode);range.setEndAfter(textNode);
+    sel.removeAllRanges();sel.addRange(range);
+  }else{
     const selectedText=range.toString();
     const el=document.createElement(tag);
-    if(selectedText){
-      range.deleteContents();
-      el.textContent=selectedText;
-    } else {
-      el.textContent=tag==='h2'?'見出し':tag==='h3'?'小見出し':'テキスト';
-    }
+    if(selectedText){range.deleteContents();el.textContent=selectedText;}
+    else{el.textContent=tag==='h2'?'見出し':tag==='h3'?'小見出し':'テキスト';}
     range.insertNode(el);
-    range.setStartAfter(el);
-    range.setEndAfter(el);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    range.setStartAfter(el);range.setEndAfter(el);
+    sel.removeAllRanges();sel.addRange(range);
   }
 }
 
@@ -703,13 +668,17 @@ function openPedalEdit(pedalId){
   if(!pedal)return;
   editingPedalId=pedal.id;
   document.getElementById('pedal-edit-name').textContent=pedal.full_name;
+  // ★追加：機材名・ブランド・タイプをセット
+  document.getElementById('edit-full-name').value=pedal.full_name||'';
+  document.getElementById('edit-brand-name').value=pedal.brand||'';
+  document.getElementById('edit-types-modal').value=(pedal.types||[]).join(',');
+  // 既存フィールド
   document.getElementById('edit-image-url').value=pedal.image_url||'';
   document.getElementById('edit-image-source').value=pedal.image_source||'';
   document.getElementById('edit-desc-ja').innerHTML=pedal.description||'';
   document.getElementById('edit-desc-en').innerHTML=pedal.description_en||'';
   document.getElementById('reset-youtube').checked=false;
   document.getElementById('upload-progress-msg').textContent='';
-  // ファイル入力リセット
   document.getElementById('edit-image-file').value='';
   const preview=document.getElementById('pedal-img-preview');
   if(pedal.image_url){preview.src=pedal.image_url;preview.classList.add('show');}
@@ -728,7 +697,6 @@ function previewPedalImg(url){
   else{preview.src='';preview.classList.remove('show');}
 }
 
-// 画像ファイルを選択したときの処理
 async function handlePedalImageFile(input){
   const file=input.files[0];
   if(!file)return;
@@ -736,21 +704,14 @@ async function handlePedalImageFile(input){
   msg.textContent='🔄 画像を変換中...';
   try{
     const compressed=await compressPedalImage(file);
-    // プレビュー表示
     const preview=document.getElementById('pedal-img-preview');
-    preview.src=compressed;
-    preview.classList.add('show');
-    // URLフィールドは一時的にbase64を持たせる（保存時にSupabaseへアップ）
+    preview.src=compressed;preview.classList.add('show');
     document.getElementById('edit-image-url').value='__pending__';
-    // base64をグローバル変数に保持
     window._pendingPedalImageB64=compressed;
     msg.textContent='✅ 変換完了。「保存」を押すとアップロードします。';
-  }catch(e){
-    msg.textContent='❌ 変換に失敗しました';
-  }
+  }catch(e){msg.textContent='❌ 変換に失敗しました';}
 }
 
-// ペダル画像を長辺600px・JPEG80%に圧縮
 function compressPedalImage(file){
   return new Promise((resolve,reject)=>{
     const reader=new FileReader();
@@ -759,25 +720,18 @@ function compressPedalImage(file){
       img.onload=()=>{
         const MAX=600;
         let{width,height}=img;
-        if(width>MAX||height>MAX){
-          const ratio=Math.min(MAX/width,MAX/height);
-          width=Math.round(width*ratio);
-          height=Math.round(height*ratio);
-        }
+        if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}
         const canvas=document.createElement('canvas');
         canvas.width=width;canvas.height=height;
         canvas.getContext('2d').drawImage(img,0,0,width,height);
         resolve(canvas.toDataURL('image/jpeg',0.80));
       };
-      img.onerror=reject;
-      img.src=ev.target.result;
+      img.onerror=reject;img.src=ev.target.result;
     };
-    reader.onerror=reject;
-    reader.readAsDataURL(file);
+    reader.onerror=reject;reader.readAsDataURL(file);
   });
 }
 
-// base64をSupabase Storage（pedal-images）にアップロードしてURLを返す
 async function uploadPedalImage(b64,pedalId){
   const byteStr=atob(b64.split(',')[1]);
   const ab=new ArrayBuffer(byteStr.length);
@@ -794,8 +748,16 @@ async function uploadPedalImage(b64,pedalId){
 async function savePedalEdit(){
   if(!editingPedalId)return;
   const msg=document.getElementById('upload-progress-msg');
+  // ★追加：機材名・ブランド・タイプを取得して保存
+  const full_name=document.getElementById('edit-full-name').value.trim();
+  const brand=document.getElementById('edit-brand-name').value.trim();
+  const typesRaw=document.getElementById('edit-types-modal').value.trim();
+  const types=typesRaw?typesRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
+  if(!full_name||!brand){showToast('❌ 機材名とブランド名は必須です');return;}
+  const model=full_name.startsWith(brand+' ')?full_name.slice(brand.length+1).trim():full_name;
+  const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  // 既存フィールド
   let image_url=document.getElementById('edit-image-url').value.trim()||null;
-  // __pending__のまま保存しないようにチェック
   if(image_url==='__pending__'){
     if(window._pendingPedalImageB64){
       msg.textContent='📤 アップロード中...';
@@ -809,16 +771,14 @@ async function savePedalEdit(){
         console.error('upload error:',e);
         return;
       }
-    } else {
-      // pendingのまま画像データが消えている場合はnullに戻す
-      image_url=null;
-    }
+    }else{image_url=null;}
   }
   const image_source=document.getElementById('edit-image-source').value.trim()||null;
   const description=document.getElementById('edit-desc-ja').innerHTML.trim()||null;
   const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
   const resetYt=document.getElementById('reset-youtube').checked;
-  const updates={image_url,image_source,description,description_en};
+  // ★full_name・brand・model・slug・typesを既存フィールドと合わせて保存
+  const updates={full_name,brand,model,slug,types,image_url,image_source,description,description_en};
   if(resetYt)updates.youtube_video_id=null;
   const{error}=await sb.from('pedals').update(updates).eq('id',editingPedalId);
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
@@ -838,7 +798,6 @@ async function deletePedalFromEdit(){
   await loadPedals();
 }
 
-// ── 機材NEWS
 async function loadNews(){
   const{data}=await sb.from('news').select('*').order('sort_order').order('created_at');
   newsItems=data||[];
@@ -872,11 +831,9 @@ async function fetchOGP(){
     if(data.title)document.getElementById('news-title-input').value=data.title;
     const preview=document.getElementById('ogp-preview');
     const thumb=document.getElementById('ogp-thumb');
-    const titleEl=document.getElementById('ogp-title');
-    const urlEl=document.getElementById('ogp-url');
     if(data.image){thumb.src=data.image;preview.classList.add('show');}
-    if(data.title)titleEl.textContent=data.title;
-    urlEl.textContent=url;
+    document.getElementById('ogp-title').textContent=data.title||'';
+    document.getElementById('ogp-url').textContent=url;
     showToast('✅ 情報を取得しました');
   }catch(e){showToast('❌ 取得に失敗しました');}
 }
@@ -907,7 +864,6 @@ async function deleteNews(id){
   await loadNews();
 }
 
-// ── 言語圏別
 let currentRegionFilter='all';
 function renderRegionStats(){
   const total=allPosts.length;
@@ -944,7 +900,6 @@ function renderRegionPosts(){
     +'</tbody></table></div>';
 }
 
-// ── ユーティリティ
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function timeAgo(ts){
   const d=Math.floor((Date.now()-new Date(ts))/1000);
@@ -956,13 +911,12 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2400);
 }
 
-// ── 初期化
 window.addEventListener('DOMContentLoaded',()=>{
   if(checkSession()){
     document.getElementById('login-wrap').style.display='none';
     document.getElementById('admin-wrap').classList.add('show');
     loadAll();
-  } else {
+  }else{
     setTimeout(()=>document.getElementById('login-input').focus(),100);
   }
 });
