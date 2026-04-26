@@ -2,8 +2,8 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-  <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>MGMB Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -203,7 +203,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <!-- 未登録機材 -->
   <div class="panel" id="tab-gear-unknown">
     <div class="section-title">🔍 未登録機材（ユーザー手入力） <span class="badge" id="unknown-count">-</span></div>
-    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">ペダルDBに存在しない機材名の一覧です。よく使われているものはDBへの追加を検討してください。</p>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">ペダルDBに存在しない機材名の一覧です。よく使われているもの・報告数が多いものはDBへの追加を優先してください。</p>
     <div id="unknown-list" class="loading">読み込み中...</div>
   </div>
 
@@ -286,7 +286,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <h3>🎛 ペダルを編集</h3>
     <div id="pedal-edit-name" style="font-size:14px;font-weight:600;color:var(--tm);margin-bottom:4px"></div>
 
-    <!-- ★追加：機材名・ブランド名・タイプ -->
+    <!-- 機材名・ブランド名・タイプ -->
     <label class="pedal-edit-label">機材名（full_name）</label>
     <input class="form-input" id="edit-full-name" type="text" placeholder="例: BOSS DS-1" style="width:100%">
 
@@ -409,8 +409,7 @@ async function loadComments(){
 }
 
 function renderCommentPostSelect(){
-  const sel=document.getElementById('comment-post-select');
-  if(!sel)return;
+  const sel=document.getElementById('comment-post-select');if(!sel)return;
   const commentPostIds=[...new Set(allComments.map(c=>c.post_id))];
   sel.innerHTML='<option value="">▼ 投稿を選択してください</option>'
     +commentPostIds.map(pid=>{
@@ -540,6 +539,7 @@ async function deletePost(postId){
   await loadPosts();
 }
 
+// ── 未登録機材（gear_reportsの報告数も表示）
 async function loadUnknownGear(){
   const{data:pedals}=await sb.from('pedals').select('full_name');
   const pedalNames=new Set((pedals||[]).map(p=>p.full_name.toLowerCase()));
@@ -551,19 +551,32 @@ async function loadUnknownGear(){
       if(name&&!pedalNames.has(name.toLowerCase())){gearCount[name]=(gearCount[name]||0)+1;}
     });
   });
+
+  // gear_reportsから報告数を取得
+  const{data:reports}=await sb.from('gear_reports').select('gear_name,count');
+  const reportMap={};
+  if(reports)reports.forEach(r=>{reportMap[r.gear_name]=(r.count||0);});
+
   const sorted=Object.entries(gearCount).sort((a,b)=>b[1]-a[1]);
   document.getElementById('unknown-count').textContent=sorted.length;
   document.getElementById('stat-unknown').textContent=sorted.length;
   const el=document.getElementById('unknown-list');
   if(!sorted.length){el.innerHTML='<div class="empty-msg">未登録機材はありません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
-    +'<thead><tr><th>機材名</th><th>使用投稿数</th><th>操作</th></tr></thead>'
+    +'<thead><tr><th>機材名</th><th>使用投稿数</th><th>📣 報告数</th><th>操作</th></tr></thead>'
     +'<tbody>'
-    +sorted.map(([name,count])=>'<tr>'
-      +'<td style="font-size:13px;font-weight:500">'+escHtml(name)+'</td>'
-      +'<td style="text-align:center">'+count+' 件</td>'
-      +'<td><button class="approve-btn" onclick="addPedalFromUnknown(\''+escHtml(name).replace(/'/g,"\\'")+'\')">＋ DBに追加</button></td>'
-      +'</tr>').join('')
+    +sorted.map(([name,count])=>{
+      const reportCount=reportMap[name]||0;
+      const reportBadge=reportCount>0
+        ?'<span style="color:var(--ac);font-weight:700;font-family:JetBrains Mono,monospace">'+reportCount+' 件</span>'
+        :'<span style="color:var(--td)">—</span>';
+      return '<tr>'
+        +'<td style="font-size:13px;font-weight:500">'+escHtml(name)+'</td>'
+        +'<td style="text-align:center">'+count+' 件</td>'
+        +'<td style="text-align:center">'+reportBadge+'</td>'
+        +'<td><button class="approve-btn" onclick="addPedalFromUnknown(\''+escHtml(name).replace(/'/g,"\\'")+'\')">＋ DBに追加</button></td>'
+        +'</tr>';
+    }).join('')
     +'</tbody></table></div>';
 }
 
@@ -576,13 +589,13 @@ function addPedalFromUnknown(name){
   showToast('モデル名を入力しました。ブランド名とタイプを追加してください。');
 }
 
+// ── ペダルDB
 let pedalFilterMode='all';
 
 function setPedalFilter(mode){
   pedalFilterMode=mode;
   document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('on'));
-  const btn=document.getElementById('pf-'+mode);
-  if(btn)btn.classList.add('on');
+  const btn=document.getElementById('pf-'+mode);if(btn)btn.classList.add('on');
   applyPedalFilter();
 }
 
@@ -615,32 +628,22 @@ function renderPedals(){applyPedalFilter();}
 function filterPedals(){applyPedalFilter();}
 
 function richCmd(editorId,tag){
-  const editor=document.getElementById(editorId);
-  if(!editor)return;
+  const editor=document.getElementById(editorId);if(!editor)return;
   editor.focus();
-  const sel=window.getSelection();
-  if(!sel||sel.rangeCount===0)return;
+  const sel=window.getSelection();if(!sel||sel.rangeCount===0)return;
   const range=sel.getRangeAt(0);
   if(tag==='br'){
-    const br=document.createElement('br');
-    range.deleteContents();range.insertNode(br);
-    range.setStartAfter(br);range.setEndAfter(br);
-    sel.removeAllRanges();sel.addRange(range);
+    const br=document.createElement('br');range.deleteContents();range.insertNode(br);
+    range.setStartAfter(br);range.setEndAfter(br);sel.removeAllRanges();sel.addRange(range);
   }else if(tag==='p'){
-    const selectedText=range.toString();
-    range.deleteContents();
-    const textNode=document.createTextNode(selectedText||'テキスト');
-    range.insertNode(textNode);
-    range.setStartAfter(textNode);range.setEndAfter(textNode);
-    sel.removeAllRanges();sel.addRange(range);
+    const selectedText=range.toString();range.deleteContents();
+    const textNode=document.createTextNode(selectedText||'テキスト');range.insertNode(textNode);
+    range.setStartAfter(textNode);range.setEndAfter(textNode);sel.removeAllRanges();sel.addRange(range);
   }else{
-    const selectedText=range.toString();
-    const el=document.createElement(tag);
+    const selectedText=range.toString();const el=document.createElement(tag);
     if(selectedText){range.deleteContents();el.textContent=selectedText;}
     else{el.textContent=tag==='h2'?'見出し':tag==='h3'?'小見出し':'テキスト';}
-    range.insertNode(el);
-    range.setStartAfter(el);range.setEndAfter(el);
-    sel.removeAllRanges();sel.addRange(range);
+    range.insertNode(el);range.setStartAfter(el);range.setEndAfter(el);sel.removeAllRanges();sel.addRange(range);
   }
 }
 
@@ -655,9 +658,7 @@ async function addPedal(){
   const{error}=await sb.from('pedals').insert({brand,model,full_name,slug,types});
   if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
   showToast('✅ ペダルを追加しました');
-  document.getElementById('new-brand').value='';
-  document.getElementById('new-model').value='';
-  document.getElementById('new-types').value='';
+  document.getElementById('new-brand').value='';document.getElementById('new-model').value='';document.getElementById('new-types').value='';
   await loadPedals();
 }
 
@@ -665,15 +666,12 @@ async function addPedal(){
 let editingPedalId=null;
 
 function openPedalEdit(pedalId){
-  const pedal=allPedals.find(p=>p.id==pedalId);
-  if(!pedal)return;
+  const pedal=allPedals.find(p=>p.id==pedalId);if(!pedal)return;
   editingPedalId=pedal.id;
   document.getElementById('pedal-edit-name').textContent=pedal.full_name;
-  // ★追加：機材名・ブランド・タイプをセット
   document.getElementById('edit-full-name').value=pedal.full_name||'';
   document.getElementById('edit-brand-name').value=pedal.brand||'';
   document.getElementById('edit-types-modal').value=(pedal.types||[]).join(',');
-  // 既存フィールド
   document.getElementById('edit-image-url').value=pedal.image_url||'';
   document.getElementById('edit-image-source').value=pedal.image_source||'';
   document.getElementById('edit-desc-ja').innerHTML=pedal.description||'';
@@ -699,8 +697,7 @@ function previewPedalImg(url){
 }
 
 async function handlePedalImageFile(input){
-  const file=input.files[0];
-  if(!file)return;
+  const file=input.files[0];if(!file)return;
   const msg=document.getElementById('upload-progress-msg');
   msg.textContent='🔄 画像を変換中...';
   try{
@@ -719,24 +716,18 @@ function compressPedalImage(file){
     reader.onload=ev=>{
       const img=new Image();
       img.onload=()=>{
-        const MAX=600;
-        let{width,height}=img;
+        const MAX=600;let{width,height}=img;
         if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}
-        const canvas=document.createElement('canvas');
-        canvas.width=width;canvas.height=height;
+        const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
         canvas.getContext('2d').drawImage(img,0,0,width,height);
         resolve(canvas.toDataURL('image/jpeg',0.80));
-      };
-      img.onerror=reject;img.src=ev.target.result;
-    };
-    reader.onerror=reject;reader.readAsDataURL(file);
+      };img.onerror=reject;img.src=ev.target.result;
+    };reader.onerror=reject;reader.readAsDataURL(file);
   });
 }
 
 async function uploadPedalImage(b64,pedalId){
-  const byteStr=atob(b64.split(',')[1]);
-  const ab=new ArrayBuffer(byteStr.length);
-  const ia=new Uint8Array(ab);
+  const byteStr=atob(b64.split(',')[1]);const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);
   for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
   const blob=new Blob([ab],{type:'image/jpeg'});
   const filename=`pedal_${pedalId}_${Date.now()}.jpg`;
@@ -749,7 +740,6 @@ async function uploadPedalImage(b64,pedalId){
 async function savePedalEdit(){
   if(!editingPedalId)return;
   const msg=document.getElementById('upload-progress-msg');
-  // ★追加：機材名・ブランド・タイプを取得して保存
   const full_name=document.getElementById('edit-full-name').value.trim();
   const brand=document.getElementById('edit-brand-name').value.trim();
   const typesRaw=document.getElementById('edit-types-modal').value.trim();
@@ -757,35 +747,25 @@ async function savePedalEdit(){
   if(!full_name||!brand){showToast('❌ 機材名とブランド名は必須です');return;}
   const model=full_name.startsWith(brand+' ')?full_name.slice(brand.length+1).trim():full_name;
   const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  // 既存フィールド
   let image_url=document.getElementById('edit-image-url').value.trim()||null;
   if(image_url==='__pending__'){
     if(window._pendingPedalImageB64){
       msg.textContent='📤 アップロード中...';
       try{
         image_url=await uploadPedalImage(window._pendingPedalImageB64,editingPedalId);
-        window._pendingPedalImageB64=null;
-        msg.textContent='✅ アップロード完了';
-      }catch(e){
-        const detail=e?.message||e?.statusCode||JSON.stringify(e)||'不明なエラー';
-        msg.textContent='❌ '+detail;
-        console.error('upload error:',e);
-        return;
-      }
+        window._pendingPedalImageB64=null;msg.textContent='✅ アップロード完了';
+      }catch(e){msg.textContent='❌ '+(e?.message||'不明なエラー');return;}
     }else{image_url=null;}
   }
   const image_source=document.getElementById('edit-image-source').value.trim()||null;
   const description=document.getElementById('edit-desc-ja').innerHTML.trim()||null;
   const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
   const resetYt=document.getElementById('reset-youtube').checked;
-  // ★full_name・brand・model・slug・typesを既存フィールドと合わせて保存
   const updates={full_name,brand,model,slug,types,image_url,image_source,description,description_en};
   if(resetYt)updates.youtube_video_id=null;
   const{error}=await sb.from('pedals').update(updates).eq('id',editingPedalId);
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
-  showToast('✅ 保存しました');
-  closePedalEdit();
-  await loadPedals();
+  showToast('✅ 保存しました');closePedalEdit();await loadPedals();
 }
 
 async function deletePedalFromEdit(){
@@ -794,15 +774,13 @@ async function deletePedalFromEdit(){
   if(!confirm('「'+(pedal?.full_name||'このペダル')+'」を削除しますか？\nこの操作は取り消せません。'))return;
   const{error}=await sb.from('pedals').delete().eq('id',editingPedalId);
   if(error){showToast('❌ 削除に失敗しました: '+error.message);return;}
-  showToast('🗑 ペダルを削除しました');
-  closePedalEdit();
-  await loadPedals();
+  showToast('🗑 ペダルを削除しました');closePedalEdit();await loadPedals();
 }
 
+// ── 機材NEWS
 async function loadNews(){
   const{data}=await sb.from('news').select('*').order('sort_order').order('created_at');
-  newsItems=data||[];
-  renderNewsList();
+  newsItems=data||[];renderNewsList();
 }
 
 function renderNewsList(){
@@ -830,8 +808,7 @@ async function fetchOGP(){
     const res=await fetch('/.netlify/functions/ogp?url='+encodeURIComponent(url));
     const data=await res.json();
     if(data.title)document.getElementById('news-title-input').value=data.title;
-    const preview=document.getElementById('ogp-preview');
-    const thumb=document.getElementById('ogp-thumb');
+    const preview=document.getElementById('ogp-preview');const thumb=document.getElementById('ogp-thumb');
     if(data.image){thumb.src=data.image;preview.classList.add('show');}
     document.getElementById('ogp-title').textContent=data.title||'';
     document.getElementById('ogp-url').textContent=url;
@@ -850,10 +827,8 @@ async function addNewsItem(){
   const{error}=await sb.from('news').insert({url,title,emoji:emoji||'🔗',thumb_url,sort_order:maxSort+1});
   if(error){showToast('❌ 追加に失敗しました');return;}
   showToast('✅ NEWSを追加しました');
-  document.getElementById('news-url-input').value='';
-  document.getElementById('news-title-input').value='';
-  document.getElementById('news-emoji-input').value='';
-  document.getElementById('ogp-preview').classList.remove('show');
+  document.getElementById('news-url-input').value='';document.getElementById('news-title-input').value='';
+  document.getElementById('news-emoji-input').value='';document.getElementById('ogp-preview').classList.remove('show');
   await loadNews();
 }
 
@@ -861,10 +836,10 @@ async function deleteNews(id){
   if(!confirm('このNEWSを削除しますか？'))return;
   const{error}=await sb.from('news').delete().eq('id',id);
   if(error){showToast('❌ 削除に失敗しました');return;}
-  showToast('🗑 削除しました');
-  await loadNews();
+  showToast('🗑 削除しました');await loadNews();
 }
 
+// ── 言語圏別
 let currentRegionFilter='all';
 function renderRegionStats(){
   const total=allPosts.length;
