@@ -318,7 +318,15 @@ async function loadPostsFromDB(){
   if(error){console.error(error);return;}
   const{data:cc}=await sb.from('comments').select('post_id');
   const cm={};if(cc)cc.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  const{data:pedals}=await sb.from('pedals').select('full_name,types,slug').limit(5000);
+  let pedals=[];
+let offset=0;
+while(true){
+  const{data:batch}=await sb.from('pedals').select('full_name,types,slug').range(offset,offset+999);
+  if(!batch||batch.length===0)break;
+  pedals=[...pedals,...batch];
+  if(batch.length<1000)break;
+  offset+=1000;
+}
   const pedalTypesMap={};
   pedalSlugMap={};
   if(pedals)pedals.forEach(p=>{
