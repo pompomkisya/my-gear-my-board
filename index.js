@@ -4,7 +4,6 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const MASTER_KEY='MSTR';
 function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+Math.random().toString(36).slice(2)+Date.now();localStorage.setItem('mgmb_sid',s);}return s;}
 const SESSION_ID=getSessionId();
-// 言語自動判定（ブラウザ設定に基づく）
 function detectLang(){
   const saved=localStorage.getItem('mgmb_lang');
   if(saved)return saved;
@@ -14,8 +13,10 @@ function detectLang(){
 let lang=detectLang();
 let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentFxFilter=null,currentTab='all',currentSort='new',currentDBPost=null;
 
-// ── ペダルslugマップ（full_name → slug）- index.jsのみで使用
+// ── ペダルslugマップ（正規化キー → slug）
 let pedalSlugMap={};
+function normalizeName(name){return(name||'').toLowerCase().trim().replace(/\s+/g,' ');}
+function getSlugByName(name){return pedalSlugMap[normalizeName(name)]||null;}
 
 // ── 翻訳辞書
 const I18N={
@@ -32,8 +33,7 @@ const I18N={
     postDropBoard:'🎛 &nbsp;ボードを投稿',postDropGear:'🎸 &nbsp;機材を投稿',headerPost:'＋ &nbsp;投稿する ▾',
     uploadAreaText:'クリックして写真を選択',uploadAreaSub:'最大3枚 · 1枚目がサムネイル',uploadAreaHint:'番号をつけると伝わりやすくなります',
     photoEditBtn:'🎯 機材に番号をつける',skipPhoto:'スキップ（写真なしで続ける）',
-    lblUsername:'ユーザー名（任意）',
-    phUsername:'名前をつけると自分の投稿を探せます',
+    lblUsername:'ユーザー名（任意）',phUsername:'名前をつけると自分の投稿を探せます',
     lblTitle:'タイトル',phTitle:'例：ライブ用最強ボード',phTitleGear:'例：My New Gear！',lblYoutube:'YouTube URL（任意）',
     lblGear:'使用機材（1つ以上推奨）',gearHint1:'※入力すると閲覧数が上がります',
     gearHint2:'候補からタップで簡単に追加できます',gearHint3:'まずは1つだけでOKです',
@@ -69,9 +69,12 @@ const I18N={
     subStandard:'定番',subAmbient:'空間系',subAlterna:'オルタナ系',
     subDrive:'歪み系',subModulation:'モジュレーション',subOther:'その他',
     tagHomRec:'宅録',tagBeginner:'初心者相談',
-    lblPhoto:'写真（最大3枚・任意）',
-    langBtn:'EN',
+    lblPhoto:'写真（最大3枚・任意）',langBtn:'EN',
     gearWidgetLink:'機材詳細ページへ',
+    reportModalTitle:'まだ詳細ページがありません',
+    reportModalBody:'この機材はまだMGMBのデータベースに登録されていません。報告するとページ作成の優先度が上がります。',
+    reportModalBtn:'MGMBに報告する',reportModalClose:'閉じる',
+    reportDone:'📣 報告しました！ありがとうございます',
   },
   en:{
     postBannerTitle:'Share your board or gear!',postBannerSub:'No sign-up needed. Post anonymously with just one photo.',
@@ -87,8 +90,7 @@ const I18N={
     uploadAreaText:'Tap to select photos',uploadAreaSub:'Up to 3 photos · First photo is thumbnail',
     uploadAreaHint:'Adding numbers makes it easier to understand',
     photoEditBtn:'🎯 Number your gear',skipPhoto:'Skip (continue without photo)',
-    lblUsername:'Username (optional)',
-    phUsername:'Add a name to find your posts later (blank = anonymous)',
+    lblUsername:'Username (optional)',phUsername:'Add a name to find your posts later (blank = anonymous)',
     lblTitle:'Title',phTitle:'e.g. My Live Pedalboard',phTitleGear:'e.g. My New Gear！',lblYoutube:'YouTube URL (optional)',
     lblGear:'Gear (1+ recommended)',gearHint1:'※ Adding gear increases views',
     gearHint2:'Tap a suggestion to add easily',gearHint3:'Just one is fine to start',
@@ -124,29 +126,71 @@ const I18N={
     subStandard:'Classics',subAmbient:'Ambient',subAlterna:'Alternative',
     subDrive:'Drive',subModulation:'Modulation',subOther:'Other',
     tagHomRec:'Home Rec',tagBeginner:'Beginner',
-    lblPhoto:'Photos (max 3 · optional)',
-    langBtn:'JA',
+    lblPhoto:'Photos (max 3 · optional)',langBtn:'JA',
     gearWidgetLink:'View Pedal Page',
+    reportModalTitle:'No page yet',
+    reportModalBody:'This gear is not yet in the MGMB database. Reporting it helps us prioritize adding it.',
+    reportModalBtn:'Report to MGMB',reportModalClose:'Close',
+    reportDone:'📣 Reported! Thank you.',
   }
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
 
-// ── 機材ウィジェット用リンク生成
-// DBに登録済みならMGMBのペダルページへ、未登録ならサウンドハウスへ
-function gearWidgetUrl(name){
-  const slug=pedalSlugMap[name];
-  if(slug)return'/pedal?slug='+slug;
-  return'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(name);
+// ── 報告モーダル
+let _reportGearName='';
+function openGearReportModal(name){
+  _reportGearName=name;
+  const modal=document.getElementById('gear-report-modal');if(!modal)return;
+  document.getElementById('grm-title').textContent=tr('reportModalTitle');
+  document.getElementById('grm-body').textContent=tr('reportModalBody');
+  document.getElementById('grm-gear').textContent='「'+name+'」';
+  document.getElementById('grm-btn').textContent=tr('reportModalBtn');
+  document.getElementById('grm-close').textContent=tr('reportModalClose');
+  modal.classList.add('open');
 }
-// 🔍ボタン用も同じ
-function gearWidgetSearchUrl(name){
-  return gearWidgetUrl(name);
+function closeGearReportModal(){
+  const modal=document.getElementById('gear-report-modal');if(modal)modal.classList.remove('open');
+  _reportGearName='';
+}
+async function submitGearReport(){
+  const name=_reportGearName;if(!name)return;
+  const{data:existing}=await sb.from('gear_reports').select('id,count').eq('gear_name',name).maybeSingle();
+  if(existing){
+    await sb.from('gear_reports').update({count:(existing.count||1)+1,last_reported_at:new Date().toISOString()}).eq('id',existing.id);
+  }else{
+    await sb.from('gear_reports').insert({gear_name:name,count:1});
+  }
+  closeGearReportModal();
+  showToast(tr('reportDone'));
+}
+
+// ── ギアウィジェット共通HTML生成
+function renderGearWidgetHTML(name,count){
+  const slug=getSlugByName(name);
+  const btnLabel=tr('gearWidgetLink');
+  const btnStyle='width:auto;padding:0 8px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;color:var(--ac);white-space:nowrap;cursor:pointer;';
+  const safeN=name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  if(slug){
+    return '<div class="gr">'
+      +'<a href="/pedal?slug='+slug+'" style="flex:1;min-width:0;text-decoration:none">'
+      +'<div class="gr-n" style="color:var(--tx)">'+name+'</div>'
+      +'<div class="gr-b">'+count+tr('posts')+'</div>'
+      +'</a>'
+      +'<a href="/pedal?slug='+slug+'" style="'+btnStyle+'">'+btnLabel+'</a>'
+      +'</div>';
+  }else{
+    return '<div class="gr">'
+      +'<div style="flex:1;min-width:0;cursor:pointer" onclick="openGearReportModal(\''+safeN+'\')">'
+      +'<div class="gr-n" style="color:var(--tx)">'+name+'</div>'
+      +'<div class="gr-b">'+count+tr('posts')+'</div>'
+      +'</div>'
+      +'<button onclick="openGearReportModal(\''+safeN+'\')" style="'+btnStyle+'border:none;">'+btnLabel+'</button>'
+      +'</div>';
+  }
 }
 
 function applyLangUI(){
-  // lang-labelを現在の言語に合わせて更新
-  const label=document.getElementById('lang-label');
-  if(label)label.textContent=lang==='ja'?'EN':'JA';
+  const label=document.getElementById('lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
   document.querySelectorAll('.logo-sub').forEach(el=>el.textContent=tr('logoSub'));
   const hbtn=document.querySelector('.h-btn');if(hbtn)hbtn.innerHTML=tr('headerPost');
   const ddItems=document.querySelectorAll('.post-dropdown-item');
@@ -176,8 +220,7 @@ function applyLangUI(){
     else if(txt.match(/機材NEWS|Gear News/))el.textContent=tr('widgetNews');
   });
   document.querySelectorAll('.mob-panel-title').forEach(el=>{
-    const txt=el.textContent.trim();
-    let key=null;
+    const txt=el.textContent.trim();let key=null;
     if(txt.match(/今月の人気|Top Boards/))key='widgetRankingMob';
     else if(txt.match(/よく使われ|Popular Gear/))key='widgetGearMob';
     else if(txt.match(/機材NEWS|Gear News/))key='widgetNewsMob';
@@ -196,11 +239,9 @@ function applyLangUI(){
     else if(el.textContent.match(/お問い合わせ|Contact/)){el.textContent=tr('footerContact');el.setAttribute('onclick',"showToast('"+tr('contactMsg')+"')");}
   });
   const fcopy=document.querySelector('.footer-copy');if(fcopy)fcopy.textContent=tr('footerCopy');
-  // 左パネルタイトル
   const mpGenre=document.getElementById('mob-title-genre');if(mpGenre)mpGenre.textContent=tr('panelGenre');
   const mpBrand=document.getElementById('mob-title-brand');if(mpBrand)mpBrand.textContent=tr('panelBrand');
   const mpFx=document.getElementById('mob-title-fxtype');if(mpFx)mpFx.textContent=tr('panelFxType');
-  // PC サイドバータイトル
   document.querySelectorAll('.sl-lbl').forEach(el=>{
     const txt=el.textContent;
     if(txt.match(/ブランドで絞る|Filter by Brand/))el.textContent=tr('slBrand');
@@ -208,14 +249,8 @@ function applyLangUI(){
     else if(txt.match(/ジャンル|Genre/))el.textContent=tr('slGenre');
     else if(txt.match(/ブランド$|^Brand$/))el.textContent=tr('slBrandTitle');
   });
-  // 宅録・初心者相談タグ（フィルター＋投稿フォーム）
-  ['tag-tagroku-pc','tag-tagroku-mob','gs-tagroku'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.textContent=tr('tagHomRec');
-  });
-  ['tag-shoshinsha-pc','tag-shoshinsha-mob','gs-shoshinsha'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.textContent=tr('tagBeginner');
-  });
-  // brand-group-lbl（ジャンル・エフェクトタイプのサブラベル）
+  ['tag-tagroku-pc','tag-tagroku-mob','gs-tagroku'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tr('tagHomRec');});
+  ['tag-shoshinsha-pc','tag-shoshinsha-mob','gs-shoshinsha'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tr('tagBeginner');});
   document.querySelectorAll('.brand-group-lbl').forEach(el=>{
     const txt=el.textContent.trim();
     if(txt.match(/^定番$|^Classics$/))el.textContent=tr('subStandard');
@@ -225,7 +260,6 @@ function applyLangUI(){
     else if(txt.match(/^モジュレーション$|^Modulation$/))el.textContent=tr('subModulation');
     else if(txt.match(/^その他$|^Other$/))el.textContent=tr('subOther');
   });
-  // 投稿フォーム内のジャンルサブラベル
   document.querySelectorAll('#post-genre-select [style*="font-size"]').forEach(el=>{
     const txt=el.textContent.trim();
     if(txt.match(/^定番$|^Classics$/))el.textContent=tr('subStandard');
@@ -233,7 +267,6 @@ function applyLangUI(){
     else if(txt.match(/^オルタナ系$|^Alternative$/))el.textContent=tr('subAlterna');
   });
   const lblGearStep=document.getElementById('gear-step-lbl');if(lblGearStep)lblGearStep.textContent=tr('lblGear');
-  // フォームラベル
   const lblPhoto=document.getElementById('lbl-photo');if(lblPhoto)lblPhoto.textContent=tr('lblPhoto');
   const lblUser=document.getElementById('lbl-username');if(lblUser)lblUser.textContent=tr('lblUsername');
   const lblTitle=document.getElementById('lbl-title');if(lblTitle)lblTitle.textContent=tr('lblTitle');
@@ -243,7 +276,6 @@ function applyLangUI(){
   const passTitle=document.getElementById('pass-box-title');if(passTitle)passTitle.textContent=tr('passTitle');
   const passWarn=document.getElementById('pass-warn');if(passWarn)passWarn.innerHTML=tr('passWarn');
   const anonNote=document.getElementById('anon-note');if(anonNote)anonNote.textContent=tr('anonNote');
-  // フォームplaceholder
   const pusr=document.getElementById('post-username');if(pusr)pusr.placeholder=tr('phUsername');
   const ptitle=document.getElementById('post-title');if(ptitle)ptitle.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
   const pdesc=document.getElementById('post-desc');if(pdesc)pdesc.placeholder=tr('phDesc');
@@ -264,8 +296,7 @@ document.addEventListener('click',()=>document.getElementById('post-dropdown').c
 function toggleLang(){
   lang=lang==='ja'?'en':'ja';
   localStorage.setItem('mgmb_lang',lang);
-  const label=document.getElementById('lang-label');
-  if(label)label.textContent=lang==='ja'?'EN':'JA';
+  const label=document.getElementById('lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
   applyLangUI();
   if(allDBPosts.length)applyFilter();
 }
@@ -289,11 +320,10 @@ async function loadPostsFromDB(){
   const cm={};if(cc)cc.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
   const{data:pedals}=await sb.from('pedals').select('full_name,types,slug');
   const pedalTypesMap={};
-  // ── slugマップを構築（full_name → slug）
   pedalSlugMap={};
   if(pedals)pedals.forEach(p=>{
     pedalTypesMap[p.full_name]=(p.types||[]);
-    if(p.slug)pedalSlugMap[p.full_name]=p.slug;
+    if(p.slug)pedalSlugMap[normalizeName(p.full_name)]=p.slug;
   });
   allDBPosts=(posts||[]).map(p=>({
     ...p,
@@ -317,9 +347,6 @@ function genreMatches(post,filter){
   const genres=parseGenre(post.genre);
   return genres.some(g=>g===filter||g.toUpperCase()===filter.toUpperCase());
 }
-
-
-// ジャンル名を言語に応じて翻訳
 function translateGenre(g){
   if(lang!=='en')return g;
   const map={'初心者相談':'Beginner','宅録':'Home Rec','ROCK':'ROCK','BLUES':'BLUES','JAZZ':'JAZZ','METAL':'METAL','FUNK':'FUNK','AMBIENT':'AMBIENT','SHOEGAZE':'SHOEGAZE','POST ROCK':'POST ROCK','INDIE':'INDIE','ALTERNATIVE':'ALTERNATIVE','PUNK':'PUNK'};
@@ -386,7 +413,6 @@ function renderDBPosts(posts){
   const html=posts.length?posts.map((p,i)=>{
     const init=(p.username||'匿')[0].toUpperCase();
     const gear=Array.isArray(p.gear_list)?p.gear_list:[];
-    // 2件表示 + 残り件数を「…他N件」で表示
     const SHOW=2;
     const tags=gear.slice(0,SHOW).map(g=>'<span class="ptag">'+(g.name||g)+'</span>').join('');
     const moreCount=gear.length-SHOW;
@@ -446,28 +472,13 @@ function renderRankingWidget(posts){
   }).join('');
 }
 
-function soundhouseUrl(name){return'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(name);}
-
 function renderGearWidget(posts){
   const el=document.getElementById('gear-widget');if(!el)return;
   const count={};
   posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
   const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noData')+'</div>';return;}
-  el.innerHTML=sorted.map(([n,c])=>{
-    const mainUrl=gearWidgetUrl(n);
-    const isRegistered=!!pedalSlugMap[n];
-    const linkLabel=isRegistered?tr('gearWidgetLink'):'🔍';
-    const linkStyle=isRegistered
-      ?'width:auto;padding:0 8px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;color:var(--ac);white-space:nowrap'
-      :'width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:13px';
-    const target=isRegistered?'_self':'_blank';
-    return '<div class="gr">'
-      +'<a href="'+mainUrl+'" '+(isRegistered?'':'target="_blank" rel="noopener" ')+'style="flex:1;min-width:0;text-decoration:none" onclick="event.stopPropagation();'+(isRegistered?'':'filterByGearName(\''+n.replace(/'/g,"\\'")+'\');')+'">'
-      +'<div class="gr-n" style="color:var(--tx)">'+n+'</div><div class="gr-b">'+c+tr('posts')+'</div></a>'
-      +'<a href="'+mainUrl+'" target="'+target+'" '+(isRegistered?'':' rel="noopener"')+' style="'+linkStyle+'">'+linkLabel+'</a>'
-      +'</div>';
-  }).join('');
+  el.innerHTML=sorted.map(([n,c])=>renderGearWidgetHTML(n,c)).join('');
 }
 
 function filterByGearName(name){
@@ -483,8 +494,7 @@ function clearSearch(){currentSearchQuery='';const input=document.getElementById
 let _mobSearchTimer=null;
 function handleSearchMob(val){
   currentSearchQuery=val.trim();
-  const clearBtn=document.getElementById('mob-search-clear');
-  if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);
+  const clearBtn=document.getElementById('mob-search-clear');if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);
   applyFilter();updateMobFilterClear();
   clearTimeout(_mobSearchTimer);
   if(currentSearchQuery)_mobSearchTimer=setTimeout(()=>goPanel(1),5000);
@@ -498,7 +508,6 @@ function searchMatches(post,query){
   return title.includes(q)||username.includes(q)||desc.includes(q)||gearStr.includes(q)||genres.includes(q);
 }
 
-// ── 機材サジェスト
 let selectedGears=[],acResults=[],acFocusIdx=-1;
 async function searchGear(val){
   const q=val.trim();closeAC();if(!q)return;
@@ -512,10 +521,7 @@ async function searchGear(val){
   dd.classList.add('open');
 }
 function setACFocus(i){acFocusIdx=i;document.querySelectorAll('.ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
-function selectGear(i){
-  const x=acResults[i];if(!x)return;
-  addGearTag({name:x.full_name,brand:x.brand,search_query:x.search_query||null});closeAC();
-}
+function selectGear(i){const x=acResults[i];if(!x)return;addGearTag({name:x.full_name,brand:x.brand,search_query:x.search_query||null});closeAC();}
 function addGearTag(g){
   if(selectedGears.length>=20){showToast(lang==='en'?'⚠️ Max 20 items':'⚠️ 最大20件まで');return;}
   selectedGears.push(g);renderGearTags();document.getElementById('gear-search').value='';updateGearFeedback();
@@ -543,7 +549,6 @@ function gearKeyDown(e){
 function closeAC(){document.getElementById('ac-dropdown').classList.remove('open');}
 function toggleGenre(el){el.classList.toggle('on');}
 
-// ── ステップフォーム
 let currentStep=1,currentPostType='board';
 const TOTAL_STEPS=5;
 const STEP_SUBS=['stepPhotoSub','stepInfoSub','stepGearSub','stepGenreSub','stepConfirmSub'];
@@ -570,11 +575,9 @@ function renderStep3PhotoPreview(){
 }
 function updateStepUI(){
   document.querySelectorAll('.step-panel').forEach((el,i)=>el.classList.toggle('on',i+1===currentStep));
-  const titleEl=document.getElementById('step-title');
-  if(titleEl)titleEl.textContent=currentPostType==='board'?tr('btnPostBoard'):tr('btnPostGear');
+  const titleEl=document.getElementById('step-title');if(titleEl)titleEl.textContent=currentPostType==='board'?tr('btnPostBoard'):tr('btnPostGear');
   const subEl=document.getElementById('step-sub');if(subEl)subEl.textContent=tr(STEP_SUBS[currentStep-1]);
-  const ptitleEl=document.getElementById('post-title');
-  if(ptitleEl)ptitleEl.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
+  const ptitleEl=document.getElementById('post-title');if(ptitleEl)ptitleEl.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
   document.getElementById('step-dots').innerHTML=Array.from({length:TOTAL_STEPS},(_,i)=>'<div class="step-dot '+(i+1===currentStep?'on':i+1<currentStep?'done':'')+'"></div>').join('');
   document.querySelectorAll('.step-btn.back').forEach(b=>b.textContent=tr('btnBack'));
   document.querySelectorAll('.step-btn.next').forEach(b=>{if(b.id!=='gear-next-btn')b.textContent=tr('btnNext')+' →';});
@@ -611,7 +614,6 @@ function renderConfirm(){
   ].map(([l,v])=>'<div class="confirm-row"><div class="confirm-lbl">'+l+'</div><div class="confirm-val">'+v+'</div></div>').join('');
 }
 
-// ── 写真
 let uploadedPhotos=[],editedPhotos=[];
 const MAX_PHOTOS=3,MAX_DIM=1280,JPEG_QUALITY=0.82;
 function compressImage(dataUrl){
@@ -657,7 +659,6 @@ async function uploadPhoto(b64,idx,total){
   }catch(e){console.error(e);return null;}
 }
 
-// ── 0件リマインド
 let _skipGearRemind=false;
 function closeGearRemind(){const r=document.getElementById('gear-remind-bd');if(r)r.style.display='none';}
 async function doSubmitPost(){closeGearRemind();_skipGearRemind=true;await submitPostToDB();}
@@ -697,9 +698,7 @@ async function submitPostToDB(){
   await loadPostsFromDB();
 }
 
-// ── 編集モーダル（index.html用）
 let editGearList=[];
-
 function openEditModal(){
   if(!currentDBPost)return;
   ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
@@ -728,7 +727,6 @@ function verifyPin(){
     ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});document.getElementById('pin1').focus();
   }
 }
-
 function renderEditGearSortList(){
   const wrap=document.getElementById('edit-gear-sort-list');if(!wrap)return;
   if(!editGearList.length){wrap.innerHTML='<div style="font-size:12px;color:var(--td);padding:4px 0">機材が登録されていません</div>';return;}
@@ -742,25 +740,16 @@ function renderEditGearSortList(){
     </div>
   `).join('');
 }
-
 function moveEditGear(idx,dir){
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=editGearList.length)return;
-  [editGearList[idx],editGearList[newIdx]]=[editGearList[newIdx],editGearList[idx]];
-  renderEditGearSortList();
+  const newIdx=idx+dir;if(newIdx<0||newIdx>=editGearList.length)return;
+  [editGearList[idx],editGearList[newIdx]]=[editGearList[newIdx],editGearList[idx]];renderEditGearSortList();
 }
-function removeEditGear(idx){
-  editGearList.splice(idx,1);
-  renderEditGearSortList();
-}
+function removeEditGear(idx){editGearList.splice(idx,1);renderEditGearSortList();}
 function addEditGearItem(){
   const input=document.getElementById('edit-pedals-add');if(!input)return;
   const name=input.value.trim();if(!name)return;
-  editGearList.push({name,brand:'',search_query:null});
-  renderEditGearSortList();
-  input.value='';
+  editGearList.push({name,brand:'',search_query:null});renderEditGearSortList();input.value='';
 }
-
 async function saveEdit(){
   const title=document.getElementById('edit-title').value.trim();if(!title){showToast(lang==='en'?'Please enter a title':'タイトルを入力してください');return;}
   const gear_list=editGearList.map(g=>({name:g.name,brand:g.brand||'',search_query:g.search_query||null}));
@@ -779,7 +768,6 @@ async function confirmDelete(){
 function hideTutorial(){localStorage.setItem('mgmb_tutorial_seen','1');}
 function tutorialAddNumber(){hideTutorial();if(uploadedPhotos.length>0)openImgEditor(0);}
 
-// ── 画像エディター
 let editorPhotoIndex=0,editorCanvas=null,editorCtx=null,editorImage=null;
 let editorNumbers=[],editorMode='normal';
 let cropStart=null,cropBox={x:0,y:0,w:0,h:0},cropActive=false,cropDragging=false,cropHandleDrag=null;
@@ -788,11 +776,7 @@ let currentStickerSize='large';
 const DEFAULT_STICKER_SIZE=20;
 
 function getStickerSize(){return currentStickerSize==='large'?20:currentStickerSize==='medium'?15:10;}
-function cycleStickerSize(){
-  currentStickerSize=currentStickerSize==='large'?'medium':currentStickerSize==='medium'?'small':'large';
-  editorNumbers.forEach(n=>n.size=getStickerSize());
-  drawEditor();renderEditorToolbar();
-}
+function cycleStickerSize(){currentStickerSize=currentStickerSize==='large'?'medium':currentStickerSize==='medium'?'small':'large';editorNumbers.forEach(n=>n.size=getStickerSize());drawEditor();renderEditorToolbar();}
 function stickerSizeLabel(){return currentStickerSize==='large'?'大':'medium'===currentStickerSize?'中':'小';}
 function getStickerPosition(num,canvasW,canvasH){
   const cols=6;const idx=num-1;const row=Math.floor(idx/cols);const colInRow=idx%cols;
@@ -800,7 +784,6 @@ function getStickerPosition(num,canvasW,canvasH){
   const cellH=canvasH/Math.max(totalRows,4);const margin=DEFAULT_STICKER_SIZE+4;
   return{x:Math.min(canvasW-margin,Math.max(margin,cellW*(col+0.5))),y:Math.min(canvasH-margin,Math.max(margin,cellH*(row+0.5)))};
 }
-
 function openImgEditor(idx){
   editorPhotoIndex=idx;editorNumbers=[];editorMode='normal';currentStickerSize='large';
   cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropDragging=false;cropHandleDrag=null;
@@ -824,7 +807,6 @@ function loadEditorImage(src){
     canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);drawEditor();
   };img.src=src;
 }
-
 function renderEditorToolbar(){
   const toolbar=document.getElementById('img-editor-toolbar');if(!toolbar)return;
   const hint=document.getElementById('editor-hint');
@@ -848,12 +830,7 @@ function renderEditorToolbar(){
     if(hint)hint.textContent=tr('hintNumberMode');
   }
 }
-function eraseLastNumber(){
-  if(!editorNumbers.length)return;
-  editorNumbers.pop();
-  editorNumbers.forEach((n,i)=>n.num=i+1);
-  drawEditor();renderEditorToolbar();
-}
+function eraseLastNumber(){if(!editorNumbers.length)return;editorNumbers.pop();editorNumbers.forEach((n,i)=>n.num=i+1);drawEditor();renderEditorToolbar();}
 function enterCropMode(){editorMode=editorMode==='crop'?'normal':'crop';cropActive=false;cropStart=null;cropBox={x:0,y:0,w:0,h:0};renderEditorToolbar();drawEditor();}
 function enterNumberMode(){editorMode='number';addNumberSticker();renderEditorToolbar();}
 function exitNumberMode(){editorMode='normal';renderEditorToolbar();drawEditor();}
@@ -874,7 +851,6 @@ function closeEditorMenuOnce(){closeEditorMenu();}
 function resetAllEdits(){editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropStart=null;editorMode='normal';loadEditorImage(uploadedPhotos[editorPhotoIndex]);renderEditorToolbar();showToast(lang==='en'?'↩️ Reset':'↩️ リセットしました');}
 function removeAllNumbers(){editorNumbers=[];drawEditor();renderEditorToolbar();showToast(lang==='en'?'🗑 Numbers removed':'番号をすべて削除しました');}
 function updateToolUI(){}
-
 function drawEditor(){
   if(!editorCtx||!editorImage)return;
   const c=editorCanvas,ctx=editorCtx;ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(editorImage,0,0,c.width,c.height);
@@ -893,8 +869,7 @@ function drawEditor(){
 }
 function addNumberSticker(){
   if(!editorCanvas)return;const num=editorNumbers.length+1;const pos=getStickerPosition(num,editorCanvas.width,editorCanvas.height);
-  editorNumbers.push({x:pos.x,y:pos.y,num,size:getStickerSize()});drawEditor();
-  if(editorMode==='number')renderEditorToolbar();
+  editorNumbers.push({x:pos.x,y:pos.y,num,size:getStickerSize()});drawEditor();if(editorMode==='number')renderEditorToolbar();
 }
 function rotateImage(){
   if(!editorImage)return;const canvas=document.createElement('canvas');canvas.width=editorImage.naturalHeight;canvas.height=editorImage.naturalWidth;
@@ -919,7 +894,6 @@ function saveCurrentEditorState(){
   editedPhotos[editorPhotoIndex]=out.toDataURL('image/jpeg',0.92);
 }
 function finishEdit(){saveCurrentEditorState();document.getElementById('img-editor-bd').classList.remove('open');document.body.style.overflow='hidden';renderPhotoPreviews();showToast(lang==='en'?'✅ Saved':'✅ 編集を保存しました');}
-
 function getCanvasPos(touch){const rect=editorCanvas.getBoundingClientRect();const scaleX=editorCanvas.width/rect.width;const scaleY=editorCanvas.height/rect.height;return{x:(touch.clientX-rect.left)*scaleX,y:(touch.clientY-rect.top)*scaleY};}
 function getTouchDist(t1,t2){return Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);}
 function getCropHandle(pos){
@@ -928,8 +902,8 @@ function getCropHandle(pos){
   return handles.find(h=>Math.hypot(h.x-pos.x,h.y-pos.y)<20)||null;
 }
 function canvasPointerDown(e){
-  e.preventDefault();
-  if(e.touches&&e.touches.length===2)return;const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);dragMoved=false;
+  e.preventDefault();if(e.touches&&e.touches.length===2)return;
+  const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);dragMoved=false;
   if(editorMode==='number'){
     const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<(n.size||DEFAULT_STICKER_SIZE)+8);
     if(hit>=0){isDraggingNum=true;dragNumIdx=hit;dragOffX=pos.x-editorNumbers[hit].x;dragOffY=pos.y-editorNumbers[hit].y;}else isDraggingNum=false;
@@ -941,8 +915,7 @@ function canvasPointerDown(e){
   }
 }
 function canvasPointerMove(e){
-  e.preventDefault();if(!editorCanvas)return;
-  if(e.touches&&e.touches.length===2)return;
+  e.preventDefault();if(!editorCanvas)return;if(e.touches&&e.touches.length===2)return;
   const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);const c=editorCanvas;
   if(editorMode==='number'&&isDraggingNum&&dragNumIdx>=0){
     editorNumbers[dragNumIdx].x=Math.max(10,Math.min(c.width-10,pos.x-dragOffX));editorNumbers[dragNumIdx].y=Math.max(10,Math.min(c.height-10,pos.y-dragOffY));dragMoved=true;drawEditor();
@@ -969,7 +942,6 @@ function canvasPointerUp(e){
     cropDragging=false;if(cropBox.w>10&&cropBox.h>10)cropActive=true;else cropActive=false;cropHandleDrag=null;cropStart=null;drawEditor();
   }
 }
-
 document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
     const c=document.getElementById('editor-canvas');if(!c)return;
@@ -1001,13 +973,9 @@ function updateMobFilterClear(){
   const active=currentGenreFilter!=='ALL'||currentBrandFilter!==null||currentFxFilter!==null||currentSearchQuery;
   bar.style.display=active?'flex':'none';
   const lbl=document.getElementById('mob-filter-clear-lbl');
-  if(lbl){
-    let txt=currentSearchQuery?'「'+currentSearchQuery+'」を解除':tr('filterClear');
-    lbl.textContent=txt;
-  }
+  if(lbl){let txt=currentSearchQuery?'「'+currentSearchQuery+'」を解除':tr('filterClear');lbl.textContent=txt;}
 }
 
-// ── スワイプUI
 let currentPanel=1,swipeStartX=0,swipeStartY=0,isHorizSwipe=false,swipeDecided=false;
 const SWIPE_THRESHOLD=90,ANGLE_LOCK=0.4;
 function goPanel(n){
@@ -1057,79 +1025,40 @@ function renderGearWidgetMob(posts){
   const count={};posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
   const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noData')+'</div>';return;}
-  el.innerHTML=sorted.map(([n,c])=>{
-    const mainUrl=gearWidgetUrl(n);
-    const isRegistered=!!pedalSlugMap[n];
-    const linkLabel=isRegistered?tr('gearWidgetLink'):'🔍';
-    const linkStyle=isRegistered
-      ?'width:auto;padding:0 8px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;color:var(--ac);white-space:nowrap'
-      :'width:28px;height:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;text-decoration:none;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:13px';
-    const target=isRegistered?'_self':'_blank';
-    return '<div class="gr">'
-      +'<a href="'+mainUrl+'" '+(isRegistered?'':'target="_blank" rel="noopener" ')+'style="flex:1;min-width:0;text-decoration:none" onclick="event.stopPropagation();'+(isRegistered?'':'filterByGearName(\''+n.replace(/'/g,"\\'")+'\');')+'">'
-      +'<div class="gr-n" style="color:var(--tx)">'+n+'</div><div class="gr-b">'+c+tr('posts')+'</div></a>'
-      +'<a href="'+mainUrl+'" target="'+target+'" '+(isRegistered?'':' rel="noopener"')+' style="'+linkStyle+'">'+linkLabel+'</a>'
-      +'</div>';
-  }).join('');
+  el.innerHTML=sorted.map(([n,c])=>renderGearWidgetHTML(n,c)).join('');
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeAll();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeGearReportModal();}});
 document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();initPCScrollSync();});
 
-
-// ── 画像ライトボックス
 function openLightbox(src){
-  const lb=document.getElementById('lightbox');
-  const img=document.getElementById('lightbox-img');
-  if(!lb||!img)return;
-  img.src=src;
-  lb.classList.add('open');
-  document.body.style.overflow='hidden';
+  const lb=document.getElementById('lightbox');const img=document.getElementById('lightbox-img');
+  if(!lb||!img)return;img.src=src;lb.classList.add('open');document.body.style.overflow='hidden';
 }
-function closeLightbox(){
-  const lb=document.getElementById('lightbox');
-  if(lb)lb.classList.remove('open');
-  document.body.style.overflow='';
-}
+function closeLightbox(){const lb=document.getElementById('lightbox');if(lb)lb.classList.remove('open');document.body.style.overflow='';}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 
-// ── PC版スクロール連携
 function initPCScrollSync(){
-  const feed=document.querySelector('.feed');
-  const sr=document.querySelector('.sr');
-  if(!feed||!sr)return;
+  const feed=document.querySelector('.feed');const sr=document.querySelector('.sr');if(!feed||!sr)return;
   let syncLock=false;
-  window.addEventListener('scroll',()=>{
-    if(window.innerWidth<=680)return;
-    if(syncLock)return;
-    syncLock=true;
-    requestAnimationFrame(()=>{syncLock=false;});
-  },{passive:true});
   feed.addEventListener('scroll',()=>{
-    if(window.innerWidth<=680)return;
-    if(syncLock)return;
-    syncLock=true;
+    if(window.innerWidth<=680)return;if(syncLock)return;syncLock=true;
     const ratio=feed.scrollTop/(feed.scrollHeight-feed.clientHeight||1);
     sr.scrollTop=ratio*(sr.scrollHeight-sr.clientHeight);
     requestAnimationFrame(()=>{syncLock=false;});
   },{passive:true});
   sr.addEventListener('scroll',()=>{
-    if(window.innerWidth<=680)return;
-    if(syncLock)return;
-    syncLock=true;
+    if(window.innerWidth<=680)return;if(syncLock)return;syncLock=true;
     const ratio=sr.scrollTop/(sr.scrollHeight-sr.clientHeight||1);
     feed.scrollTop=ratio*(feed.scrollHeight-feed.clientHeight);
     requestAnimationFrame(()=>{syncLock=false;});
   },{passive:true});
 }
 
-// ── 機材NEWSをSupabaseから取得して表示
 async function loadNewsWidget(){
   const{data,error}=await sb.from('news').select('*').order('sort_order').order('created_at').limit(10);
   if(error||!data||!data.length)return;
   const html=data.map(item=>`<a class="news-link" href="${item.url}" target="_blank" rel="noopener"><div class="nth">${item.thumb_url?`<img src="${item.thumb_url}" style="width:100%;height:100%;object-fit:cover;border-radius:3px" onerror="this.parentElement.textContent='${item.emoji||'🔗'}'">`:item.emoji||'🔗'}</div><div><div class="nr-t">${item.title}</div><div class="nr-d">${item.subtitle||''}</div></div></a>`).join('');
-  const w1=document.getElementById('news-widget');
-  const w2=document.getElementById('news-widget-mob');
-  if(w1)w1.innerHTML=html;
-  if(w2)w2.innerHTML=html;
+  const w1=document.getElementById('news-widget');const w2=document.getElementById('news-widget-mob');
+  if(w1)w1.innerHTML=html;if(w2)w2.innerHTML=html;
 }
