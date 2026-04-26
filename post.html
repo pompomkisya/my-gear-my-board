@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="index, follow">
 <title>My Gear My Board</title>
 <meta property="og:title" content="My Gear My Board">
 <meta property="og:description" content="ペダルボード・機材を投稿・共有するSNS">
@@ -12,7 +13,6 @@
 <meta property="og:site_name" content="My Gear My Board">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MGMBpedalboard">
-<meta name="robots" content="index, follow">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--ac2:#f0a500;--tx:#eae8e2;--tm:#9a9890;--td:#6e6c68}
@@ -26,7 +26,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .logo-sub{font-family:Noto Sans JP,sans-serif;font-size:9px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-top:2px}
 .back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;transition:all .15s;touch-action:manipulation}
 .back-btn:hover{border-color:var(--ac);color:var(--ac)}
-.lang-btn{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-size:14px;cursor:pointer;touch-action:manipulation}
 .page{max-width:900px;margin:0 auto;padding:32px 20px;position:relative;z-index:1;background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%);min-height:calc(100vh - 58px);overflow-x:hidden}
 .slider{position:relative;background:var(--sf2);border-radius:8px;overflow:hidden;margin-bottom:24px;border:1px solid var(--bd)}
 .slide{min-width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center}
@@ -62,7 +61,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .gear-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;margin-bottom:6px}
 .gear-dot{width:6px;height:6px;border-radius:50%;background:var(--ac);flex-shrink:0;margin-right:10px}
 .gear-name{font-size:14px;font-weight:400;flex:1}
-.sh-link{font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--ac);text-decoration:none;padding:4px 10px;border:1px solid rgba(232,85,45,.3);border-radius:3px;white-space:nowrap;transition:all .15s}
+.sh-link{font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--ac);text-decoration:none;padding:4px 10px;border:1px solid rgba(232,85,45,.3);border-radius:3px;white-space:nowrap;transition:all .15s;cursor:pointer;background:transparent}
 .sh-link:hover{background:rgba(232,85,45,.1);border-color:var(--ac)}
 .genre-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
 .gtag{padding:4px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:2px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--tm)}
@@ -113,7 +112,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .pin-d:focus{border-color:var(--ac)}
 .pin-err{font-family:Noto Sans JP,sans-serif;font-size:10px;color:#e05050;text-align:center;min-height:16px;margin-bottom:6px}
 .form-row{margin-bottom:14px}
-.form-lbl{font-family:Noto Sans JP,sans-serif;font-size:12px;letter-spacing:0px;text-transform:none;color:#b0ada6;margin-bottom:6px;display:block}
+.form-lbl{font-family:Noto Sans JP,sans-serif;font-size:12px;color:#b0ada6;margin-bottom:6px;display:block}
 .form-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 12px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
 .form-input:focus{border-color:var(--ac)}
 textarea.form-input{resize:vertical;min-height:80px}
@@ -135,11 +134,9 @@ textarea.form-input{resize:vertical;min-height:80px}
 .report-submit{width:100%;background:#c03030;border:none;border-radius:4px;padding:10px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation}
 .report-close{position:absolute;top:14px;right:14px;width:26px;height:26px;background:var(--sf2);border:1px solid var(--bd);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--tm)}
 .report-close:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
-/* 編集モーダル 画像サムネイル */
 .edit-img-small{position:relative;width:90px;height:90px;border-radius:4px;overflow:hidden;border:1px solid var(--bd);flex-shrink:0;background:#000}
 .edit-img-small img{width:100%;height:100%;object-fit:contain}
 .edit-img-edit-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(232,85,45,.85);border:none;color:#fff;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;padding:4px;cursor:pointer;text-align:center;touch-action:manipulation}
-/* サジェスト入力（機材） */
 .gear-input-wrap{position:relative}
 .gear-tags{display:flex;flex-wrap:wrap;gap:5px;min-height:36px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:6px 8px;cursor:text;transition:border-color .15s}
 .gear-tags:focus-within{border-color:var(--ac)}
@@ -155,7 +152,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 .ac-item-name{flex:1;color:var(--tx)}
 .ac-item-brand{font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)}
 .ac-empty{padding:10px 12px;font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--td);text-align:center}
-/* 画像エディター */
 .img-editor-bd{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:800;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .22s}
 .img-editor-bd.open{opacity:1;pointer-events:all}
 .img-editor-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--bd);flex-shrink:0}
@@ -181,6 +177,18 @@ textarea.form-input{resize:vertical;min-height:80px}
 .lightbox-overlay.open .lightbox-img{transform:scale(1)}
 .lightbox-close{position:absolute;top:16px;right:16px;width:36px;height:36px;background:rgba(255,255,255,.15);border:none;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 .lightbox-close:hover{background:rgba(232,85,45,.7)}
+/* 報告モーダル（機材詳細ページなし） */
+.grm-bd{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .22s}
+.grm-bd.open{opacity:1;pointer-events:all}
+.grm-box{background:var(--sf);border:1px solid var(--bd);border-radius:10px;width:100%;max-width:380px;padding:24px;position:relative}
+.grm-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--ac);margin-bottom:8px}
+.grm-gear{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:8px}
+.grm-body{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td);line-height:1.6;margin-bottom:20px}
+.grm-actions{display:flex;gap:8px;flex-wrap:wrap}
+.grm-report-btn{flex:1;background:var(--ac);border:none;border-radius:4px;padding:10px 16px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;touch-action:manipulation;transition:all .15s}
+.grm-report-btn:hover{background:#cf4c26}
+.grm-close-btn{padding:10px 16px;background:transparent;border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;touch-action:manipulation;transition:all .15s}
+.grm-close-btn:hover{border-color:var(--tm);color:var(--tx)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 @media(max-width:600px){
 .page{padding:16px 14px}
@@ -241,7 +249,6 @@ textarea.form-input{resize:vertical;min-height:80px}
     <div id="edit-step2" style="display:none">
       <div class="eform-title">記事を編集</div>
       <div class="eform-sub" style="color:#4caf50">✅ パスワード認証が完了しました</div>
-      <!-- 画像編集セクション -->
       <div class="form-row" style="margin-top:16px">
         <label class="form-lbl">画像を編集・差し替え</label>
         <div id="edit-photo-previews" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
@@ -256,7 +263,6 @@ textarea.form-input{resize:vertical;min-height:80px}
         <label class="form-lbl">タイトル</label>
         <input class="form-input" id="edit-title" type="text">
       </div>
-      <!-- 機材並び替えUI -->
       <div class="form-row">
         <label class="form-lbl">使用機材（↑↓で並び替え可）</label>
         <div id="post-edit-gear-sort-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px"></div>
@@ -282,7 +288,7 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- REPORT MODAL -->
+<!-- REPORT MODAL（投稿通報） -->
 <div class="report-bd" id="report-bd" onclick="closeOnBd(event,'report-bd')">
   <div class="report-form">
     <div class="report-close" onclick="closeModal('report-bd')">✕</div>
@@ -297,7 +303,20 @@ textarea.form-input{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- 画像エディター（編集モーダル用） -->
+<!-- 機材詳細ページ未登録 報告モーダル -->
+<div class="grm-bd" id="gear-report-modal" onclick="if(event.target===this)closeGearReportModal()">
+  <div class="grm-box">
+    <div class="grm-title" id="grm-title">まだ詳細ページがありません</div>
+    <div class="grm-gear" id="grm-gear"></div>
+    <div class="grm-body" id="grm-body">この機材はまだMGMBのデータベースに登録されていません。報告するとページ作成の優先度が上がります。</div>
+    <div class="grm-actions">
+      <button class="grm-report-btn" id="grm-btn" onclick="submitGearReport()">MGMBに報告する</button>
+      <button class="grm-close-btn" id="grm-close" onclick="closeGearReportModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- 画像エディター -->
 <div class="img-editor-bd" id="img-editor-bd">
   <div class="img-editor-header">
     <div><div class="img-editor-title">画像編集</div><div class="img-editor-subtitle">ステッカー・トリミング・回転（任意）</div></div>
@@ -325,7 +344,6 @@ const SESSION_ID=getSessionId();
 const params=new URLSearchParams(location.search);
 const POST_ID=params.get('id');
 
-// 言語自動判定
 function detectPostLang(){
   const urlLang=new URLSearchParams(location.search).get('lang');
   if(urlLang)return urlLang;
@@ -337,8 +355,10 @@ function detectPostLang(){
 let lang=detectPostLang();
 let currentPost=null,allComments=[];
 
-// ── ペダルslugマップ（full_name → slug）
+// ── ペダルslugマップ（正規化キー → slug）
 let pedalSlugMap={};
+function normalizeName(name){return(name||'').toLowerCase().trim().replace(/\s+/g,' ');}
+function getSlugByName(name){return pedalSlugMap[normalizeName(name)]||null;}
 
 function toggleLang(){
   lang=lang==='ja'?'en':'ja';
@@ -353,48 +373,51 @@ function toggleLang(){
 }
 function goBack(){location.href='/';}
 
-const SWEETWATER_TAG='';
-
-// ── 機材リンク生成
-// DBに登録済みならMGMBのペダルページへ、未登録ならSweetwater(EN) or サウンドハウス(JA)へ
+// ── 機材リンク生成（正規化マッチ）
 function gearUrl(gearItem){
   const name=(gearItem&&typeof gearItem==='object')?gearItem.name||'':gearItem||'';
-  const slug=pedalSlugMap[name];
-  if(slug)return'/pedal?slug='+slug;
-  // 未登録の場合は外部検索
+  return getSlugByName(name);// slugがあればそれ、なければnull
+}
+function gearLinkLabel(){
+  return lang==='en'?'View Pedal Page →':'機材詳細ページへ →';
+}
+function soundhouseUrl(gearItem){
   let q;
-  if(gearItem&&typeof gearItem==='object'){
-    q=gearItem.search_query||gearItem.name||'';
-  }else{
-    q=gearItem||'';
-  }
-  if(!gearItem?.search_query){
-    const modMatch=q.match(/\bmod(?:ified)?\b\s+(.+)/i);
-    if(modMatch)q=modMatch[1].trim();
-  }
-  if(lang==='en'){
-    const base='https://www.sweetwater.com/store/search.php?s='+encodeURIComponent(q);
-    return SWEETWATER_TAG?base+'&'+SWEETWATER_TAG:base;
-  }
+  if(gearItem&&typeof gearItem==='object'){q=gearItem.search_query||gearItem.name||'';}
+  else{q=gearItem||'';}
+  if(lang==='en')return'https://www.sweetwater.com/store/search.php?s='+encodeURIComponent(q);
   return'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(q);
 }
 
-// 機材リンクのラベル生成
-function gearLinkLabel(gearItem){
-  const name=(gearItem&&typeof gearItem==='object')?gearItem.name||'':gearItem||'';
-  const slug=pedalSlugMap[name];
-  if(slug)return lang==='en'?'View Pedal Page →':'機材詳細ページへ →';
-  return lang==='en'?'View on Sweetwater →':'サウンドハウスで見る →';
+// ── 報告モーダル（機材詳細ページなし）
+let _reportGearName='';
+function openGearReportModal(name){
+  _reportGearName=name;
+  const modal=document.getElementById('gear-report-modal');if(!modal)return;
+  document.getElementById('grm-title').textContent=lang==='en'?'No page yet':'まだ詳細ページがありません';
+  document.getElementById('grm-gear').textContent='「'+name+'」';
+  document.getElementById('grm-body').textContent=lang==='en'
+    ?'This gear is not yet in the MGMB database. Reporting it helps us prioritize adding it.'
+    :'この機材はまだMGMBのデータベースに登録されていません。報告するとページ作成の優先度が上がります。';
+  document.getElementById('grm-btn').textContent=lang==='en'?'Report to MGMB':'MGMBに報告する';
+  document.getElementById('grm-close').textContent=lang==='en'?'Close':'閉じる';
+  modal.classList.add('open');
 }
-
-// 機材リンクがMGMB内かどうか
-function isInternalGearLink(gearItem){
-  const name=(gearItem&&typeof gearItem==='object')?gearItem.name||'':gearItem||'';
-  return!!pedalSlugMap[name];
+function closeGearReportModal(){
+  const modal=document.getElementById('gear-report-modal');if(modal)modal.classList.remove('open');
+  _reportGearName='';
 }
-
-// 後方互換
-function soundhouseUrl(gearItem){return gearUrl(gearItem);}
+async function submitGearReport(){
+  const name=_reportGearName;if(!name)return;
+  const{data:existing}=await sb.from('gear_reports').select('id,count').eq('gear_name',name).maybeSingle();
+  if(existing){
+    await sb.from('gear_reports').update({count:(existing.count||1)+1,last_reported_at:new Date().toISOString()}).eq('id',existing.id);
+  }else{
+    await sb.from('gear_reports').insert({gear_name:name,count:1});
+  }
+  closeGearReportModal();
+  showToast(lang==='en'?'📣 Reported! Thank you.':'📣 報告しました！ありがとうございます');
+}
 
 function parseGenre(genre){
   if(!genre)return[];
@@ -402,7 +425,6 @@ function parseGenre(genre){
   if(typeof genre==='string'){try{const p=JSON.parse(genre);return Array.isArray(p)?p:[genre];}catch(e){return[genre];}}
   return[];
 }
-
 function getYouTubeId(url){
   if(!url)return null;
   const patterns=[
@@ -415,10 +437,10 @@ function getYouTubeId(url){
 
 async function loadPost(){
   if(!POST_ID){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:Noto Sans JP,sans-serif">投稿が見つかりません</div>';return;}
-  // ペダルslugマップを先に取得
+  // ペダルslugマップを正規化キーで構築
   const{data:pedals}=await sb.from('pedals').select('full_name,slug');
   pedalSlugMap={};
-  if(pedals)pedals.forEach(p=>{if(p.slug)pedalSlugMap[p.full_name]=p.slug;});
+  if(pedals)pedals.forEach(p=>{if(p.slug)pedalSlugMap[normalizeName(p.full_name)]=p.slug;});
 
   const{data,error}=await sb.from('posts').select('*').eq('id',POST_ID).single();
   if(error||!data){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:Noto Sans JP,sans-serif">投稿が見つかりません</div>';return;}
@@ -486,11 +508,18 @@ function renderPost(p){
     html+='<div class="section"><div class="section-lbl">'+(lang==='en'?'Gear List':'使用機材リスト')+'</div>';
     gear.forEach(g=>{
       const name=g.name||g;
-      const url=gearUrl(g);
-      const label=gearLinkLabel(g);
-      const internal=isInternalGearLink(g);
-      html+='<div class="gear-item"><div class="gear-dot"></div><div class="gear-name">'+name+'</div>'
-        +'<a class="sh-link" href="'+url+'" '+(internal?'':'target="_blank" rel="noopener"')+'>'+label+'</a></div>';
+      const slug=gearUrl(g);
+      const label=gearLinkLabel();
+      const safeN=name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      if(slug){
+        // DB登録済み → ペダルページへ
+        html+='<div class="gear-item"><div class="gear-dot"></div><div class="gear-name">'+name+'</div>'
+          +'<a class="sh-link" href="/pedal?slug='+slug+'">'+label+'</a></div>';
+      }else{
+        // 未登録 → 報告モーダル
+        html+='<div class="gear-item"><div class="gear-dot"></div><div class="gear-name">'+name+'</div>'
+          +'<button class="sh-link" onclick="openGearReportModal(\''+safeN+'\')">'+label+'</button></div>';
+      }
     });
     html+='</div>';
   }
@@ -619,10 +648,7 @@ function openReply(parentId,name){
   const form=document.getElementById('rf-'+parentId);
   if(form){form.classList.add('open');document.getElementById('rn-'+parentId).focus();}
 }
-function autoResize(el){
-  el.style.height='auto';
-  el.style.height=Math.min(el.scrollHeight,120)+'px';
-}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
 
 async function postComment(parentId,replyToName){
   const nameEl=parentId?document.getElementById('rn-'+parentId):document.getElementById('comment-name');
@@ -676,7 +702,6 @@ function verifyPin(){
   }
 }
 
-// ── 編集フォームの画像管理
 let editPhotoUrls=[];
 let editNewPhotos=[];
 let editImgEditorTarget=null,editImgEditorTargetIdx=0;
@@ -685,17 +710,14 @@ function renderEditPhotoPreviews(){
   const wrap=document.getElementById('edit-photo-previews');if(!wrap)return;
   wrap.innerHTML='';
   editPhotoUrls.forEach((url,i)=>{
-    const div=document.createElement('div');
-    div.className='edit-img-small';
+    const div=document.createElement('div');div.className='edit-img-small';
     div.innerHTML='<img src="'+url+'" style="width:100%;height:100%;object-fit:contain">'
       +'<button onclick="removeEditUrlPhoto('+i+')" style="position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.75);border-radius:50%;border:none;color:#fff;font-size:10px;cursor:pointer;touch-action:manipulation;z-index:2">✕</button>'
       +'<button class="edit-img-edit-btn" onclick="openEditImgEditor(\'url\','+i+')">✏️ 編集</button>';
     wrap.appendChild(div);
   });
   editNewPhotos.forEach((src,i)=>{
-    const div=document.createElement('div');
-    div.className='edit-img-small';
-    div.style.border='1px solid rgba(232,85,45,.5)';
+    const div=document.createElement('div');div.className='edit-img-small';div.style.border='1px solid rgba(232,85,45,.5)';
     div.innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:contain">'
       +'<button onclick="removeEditNewPhoto('+i+')" style="position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,.75);border-radius:50%;border:none;color:#fff;font-size:10px;cursor:pointer;touch-action:manipulation;z-index:2">✕</button>'
       +'<button class="edit-img-edit-btn" onclick="openEditImgEditor(\'new\','+i+')">✏️ 編集</button>'
@@ -711,9 +733,7 @@ async function handleEditPhotos(e){
   const max=3-(editPhotoUrls.length+editNewPhotos.length);
   if(max<=0){showToast('⚠️ 最大3枚まで');e.target.value='';return;}
   for(const f of files.slice(0,max)){
-    const compressed=await compressEditImage(f);
-    editNewPhotos.push(compressed);
-    renderEditPhotoPreviews();
+    const compressed=await compressEditImage(f);editNewPhotos.push(compressed);renderEditPhotoPreviews();
   }
   e.target.value='';
 }
@@ -733,8 +753,7 @@ function compressEditImage(file){
   });
 }
 async function uploadEditPhoto(b64){
-  const byteStr=atob(b64.split(',')[1]);
-  const mime=b64.split(',')[0].split(':')[1].split(';')[0];
+  const byteStr=atob(b64.split(',')[1]);const mime=b64.split(',')[0].split(':')[1].split(';')[0];
   const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);
   for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
   const blob=new Blob([ab],{type:mime});
@@ -767,9 +786,7 @@ async function confirmDelete(){
   showToast('🗑 投稿を削除しました');setTimeout(()=>location.href='/',1500);
 }
 
-// ── 機材並び替え（編集モーダル用）
 let postEditGearList=[];
-
 function renderPostEditGearSortList(){
   const wrap=document.getElementById('post-edit-gear-sort-list');if(!wrap)return;
   if(!postEditGearList.length){wrap.innerHTML='<div style="font-size:12px;color:var(--td);padding:4px 0">機材が登録されていません</div>';return;}
@@ -783,49 +800,35 @@ function renderPostEditGearSortList(){
     </div>
   `).join('');
 }
-
 function movePostEditGear(idx,dir){
-  const newIdx=idx+dir;
-  if(newIdx<0||newIdx>=postEditGearList.length)return;
+  const newIdx=idx+dir;if(newIdx<0||newIdx>=postEditGearList.length)return;
   [postEditGearList[idx],postEditGearList[newIdx]]=[postEditGearList[newIdx],postEditGearList[idx]];
   renderPostEditGearSortList();
 }
-function removePostEditGear(idx){
-  postEditGearList.splice(idx,1);
-  renderPostEditGearSortList();
-}
+function removePostEditGear(idx){postEditGearList.splice(idx,1);renderPostEditGearSortList();}
 function addPostEditGearItem(){
   const input=document.getElementById('post-edit-gear-add');if(!input)return;
   const name=input.value.trim();if(!name){showToast('機材名を入力してください');return;}
   postEditGearList.push({name,brand:'',search_query:null});
-  renderPostEditGearSortList();
-  input.value='';
+  renderPostEditGearSortList();input.value='';
 }
 
-// ── 機材サジェスト（編集モーダル用・未使用になったが残す）
 let editSelectedGears=[],editAcResults=[],editAcFocusIdx=-1;
-
 async function editSearchGear(val){
   const q=val.trim();closeEditAC();if(!q)return;
-  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name')
-    .or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%').limit(10);
+  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name').or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%').limit(10);
   let results=prefixData||[];
-  if(results.length<5){
-    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name').ilike('full_name','%'+q+'%').limit(10);
-    if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
-  }
+  if(results.length<5){const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name').ilike('full_name','%'+q+'%').limit(10);if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});}
   results=results.slice(0,10);editAcResults=results;editAcFocusIdx=-1;
   const dd=document.getElementById('edit-ac-dropdown');
+  if(!dd)return;
   if(!results.length){dd.innerHTML='<div class="ac-empty">「'+q+'」— 候補なし　Enterで追加</div>';dd.classList.add('open');return;}
   dd.innerHTML=results.map((x,i)=>'<div class="ac-item" onmousedown="selectEditGear('+i+')" onmouseover="setEditACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>').join('');
   dd.classList.add('open');
 }
 function setEditACFocus(i){editAcFocusIdx=i;document.querySelectorAll('#edit-ac-dropdown .ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
 function selectEditGear(i){const x=editAcResults[i];if(!x)return;addEditGearTag({name:x.full_name,brand:x.brand});closeEditAC();}
-function addEditGearTag(g){
-  if(editSelectedGears.length>=20){showToast('⚠️ 最大20件まで');return;}
-  editSelectedGears.push(g);renderEditGearTags();document.getElementById('edit-gear-search').value='';
-}
+function addEditGearTag(g){if(editSelectedGears.length>=20){showToast('⚠️ 最大20件まで');return;}editSelectedGears.push(g);renderEditGearTags();const gs=document.getElementById('edit-gear-search');if(gs)gs.value='';}
 function removeEditGearTag(i){editSelectedGears.splice(i,1);renderEditGearTags();}
 function renderEditGearTags(){
   const wrap=document.getElementById('edit-gear-tags');if(!wrap)return;
@@ -838,7 +841,7 @@ function renderEditGearTags(){
   });
 }
 function editGearKeyDown(e){
-  const dd=document.getElementById('edit-ac-dropdown');const open=dd.classList.contains('open');
+  const dd=document.getElementById('edit-ac-dropdown');const open=dd&&dd.classList.contains('open');
   if(e.key==='ArrowDown'){e.preventDefault();if(open)setEditACFocus(Math.min(editAcFocusIdx+1,editAcResults.length-1));}
   else if(e.key==='ArrowUp'){e.preventDefault();setEditACFocus(Math.max(editAcFocusIdx-1,0));}
   else if(e.key==='Enter'){
@@ -850,7 +853,7 @@ function editGearKeyDown(e){
 }
 function closeEditAC(){const dd=document.getElementById('edit-ac-dropdown');if(dd)dd.classList.remove('open');}
 
-// ── 画像エディター（編集モーダル用）
+// ── 画像エディター
 let editorCanvas=null,editorCtx=null,editorImage=null;
 let editorNumbers=[],editorMode='normal';
 let cropStart=null,cropBox={x:0,y:0,w:0,h:0},cropActive=false,cropDragging=false,cropHandleDrag=null;
@@ -859,45 +862,29 @@ let currentStickerSize='large';
 const DEFAULT_STICKER_SIZE=20;
 
 function getStickerSize(){return currentStickerSize==='large'?20:currentStickerSize==='medium'?15:10;}
-function cycleStickerSize(){
-  currentStickerSize=currentStickerSize==='large'?'medium':currentStickerSize==='medium'?'small':'large';
-  editorNumbers.forEach(n=>n.size=getStickerSize());
-  drawEditor();renderEditorToolbar();
-}
+function cycleStickerSize(){currentStickerSize=currentStickerSize==='large'?'medium':currentStickerSize==='medium'?'small':'large';editorNumbers.forEach(n=>n.size=getStickerSize());drawEditor();renderEditorToolbar();}
 function stickerSizeLabel(){return currentStickerSize==='large'?'大':'medium'===currentStickerSize?'中':'小';}
 function getStickerPosition(num,canvasW,canvasH){
   const cols=6;const idx=num-1;const row=Math.floor(idx/cols);const colInRow=idx%cols;
-  const col=(cols-1)-colInRow;const cellW=canvasW/cols;
-  const totalRows=Math.ceil(24/cols);const cellH=canvasH/Math.max(totalRows,4);const margin=DEFAULT_STICKER_SIZE+4;
+  const col=(cols-1)-colInRow;const cellW=canvasW/cols;const totalRows=Math.ceil(24/cols);const cellH=canvasH/Math.max(totalRows,4);const margin=DEFAULT_STICKER_SIZE+4;
   return{x:Math.min(canvasW-margin,Math.max(margin,cellW*(col+0.5))),y:Math.min(canvasH-margin,Math.max(margin,cellH*(row+0.5)))};
 }
-
 function openEditImgEditor(target,idx){
   editImgEditorTarget=target;editImgEditorTargetIdx=idx;
-  editorNumbers=[];editorMode='normal';
-  cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropDragging=false;cropHandleDrag=null;
+  editorNumbers=[];editorMode='normal';cropStart=null;cropBox={x:0,y:0,w:0,h:0};cropActive=false;cropDragging=false;cropHandleDrag=null;
   document.getElementById('img-tab-bar').innerHTML='';
-  document.getElementById('img-editor-bd').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.getElementById('img-editor-bd').classList.add('open');document.body.style.overflow='hidden';
   currentStickerSize='large';
   if(target==='url'){
-    fetch(editPhotoUrls[idx])
-      .then(r=>r.blob())
-      .then(blob=>{const reader=new FileReader();reader.onload=ev=>loadEditorImage(ev.target.result);reader.readAsDataURL(blob);})
-      .catch(()=>loadEditorImage(editPhotoUrls[idx]));
-  }else{
-    loadEditorImage(editNewPhotos[idx]);
-  }
+    fetch(editPhotoUrls[idx]).then(r=>r.blob()).then(blob=>{const reader=new FileReader();reader.onload=ev=>loadEditorImage(ev.target.result);reader.readAsDataURL(blob);}).catch(()=>loadEditorImage(editPhotoUrls[idx]));
+  }else{loadEditorImage(editNewPhotos[idx]);}
 }
 function loadEditorImage(src){
-  const canvas=document.getElementById('editor-canvas');
-  const wrap=document.getElementById('canvas-wrap');
+  const canvas=document.getElementById('editor-canvas');const wrap=document.getElementById('canvas-wrap');
   editorCanvas=canvas;editorCtx=canvas.getContext('2d');
-  const img=new Image();
-  img.crossOrigin='anonymous';
+  const img=new Image();img.crossOrigin='anonymous';
   img.onload=()=>{
-    editorImage=img;
-    const maxW=wrap.clientWidth||360;const maxH=wrap.clientHeight||400;
+    editorImage=img;const maxW=wrap.clientWidth||360;const maxH=wrap.clientHeight||400;
     const scale=Math.min(maxW/img.width,maxH/img.height,1);
     canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
     drawEditor();renderEditorToolbar();
@@ -905,30 +892,18 @@ function loadEditorImage(src){
 }
 function drawEditor(){
   if(!editorCtx||!editorImage)return;
-  const c=editorCanvas,ctx=editorCtx;
-  ctx.clearRect(0,0,c.width,c.height);
-  ctx.drawImage(editorImage,0,0,c.width,c.height);
+  const c=editorCanvas,ctx=editorCtx;ctx.clearRect(0,0,c.width,c.height);ctx.drawImage(editorImage,0,0,c.width,c.height);
   if(editorMode==='crop'&&cropActive){
-    ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(0,0,c.width,c.height);
-    ctx.clearRect(cropBox.x,cropBox.y,cropBox.w,cropBox.h);
-    ctx.drawImage(editorImage,cropBox.x/c.width*editorImage.naturalWidth,cropBox.y/c.height*editorImage.naturalHeight,
-      cropBox.w/c.width*editorImage.naturalWidth,cropBox.h/c.height*editorImage.naturalHeight,
-      cropBox.x,cropBox.y,cropBox.w,cropBox.h);
+    ctx.fillStyle='rgba(0,0,0,.45)';ctx.fillRect(0,0,c.width,c.height);ctx.clearRect(cropBox.x,cropBox.y,cropBox.w,cropBox.h);
+    ctx.drawImage(editorImage,cropBox.x/c.width*editorImage.naturalWidth,cropBox.y/c.height*editorImage.naturalHeight,cropBox.w/c.width*editorImage.naturalWidth,cropBox.h/c.height*editorImage.naturalHeight,cropBox.x,cropBox.y,cropBox.w,cropBox.h);
     ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.setLineDash([]);ctx.strokeRect(cropBox.x,cropBox.y,cropBox.w,cropBox.h);
-    [{x:cropBox.x,y:cropBox.y},{x:cropBox.x+cropBox.w,y:cropBox.y},{x:cropBox.x,y:cropBox.y+cropBox.h},{x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h}].forEach(h=>{
-      ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(h.x,h.y,8,0,Math.PI*2);ctx.fill();
-      ctx.strokeStyle='#e8552d';ctx.lineWidth=2;ctx.stroke();
-    });ctx.setLineDash([]);
+    [{x:cropBox.x,y:cropBox.y},{x:cropBox.x+cropBox.w,y:cropBox.y},{x:cropBox.x,y:cropBox.y+cropBox.h},{x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h}].forEach(h=>{ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(h.x,h.y,8,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#e8552d';ctx.lineWidth=2;ctx.stroke();});ctx.setLineDash([]);
   }
   editorNumbers.forEach(n=>{
-    const r=n.size||DEFAULT_STICKER_SIZE;
-    ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();
-    ctx.strokeStyle='#e8552d';ctx.lineWidth=2.5;ctx.stroke();
-    ctx.fillStyle='#111';
-    const fs=Math.max(10,Math.round(r*0.65));
-    ctx.font='bold '+fs+'px JetBrains Mono,monospace';
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.num,n.x,n.y);
+    const r=n.size||DEFAULT_STICKER_SIZE;ctx.beginPath();ctx.arc(n.x,n.y,r,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();ctx.strokeStyle='#e8552d';ctx.lineWidth=2.5;ctx.stroke();
+    ctx.fillStyle='#111';const fs=Math.max(10,Math.round(r*0.65));
+    ctx.font='bold '+fs+'px JetBrains Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.num,n.x,n.y);
   });
 }
 function renderEditorToolbar(){
@@ -953,12 +928,7 @@ function renderEditorToolbar(){
     if(hint)hint.textContent='ドラッグで移動・タップで削除';
   }
 }
-function eraseLastNumber(){
-  if(!editorNumbers.length)return;
-  editorNumbers.pop();
-  editorNumbers.forEach((n,i)=>n.num=i+1);
-  drawEditor();renderEditorToolbar();
-}
+function eraseLastNumber(){if(!editorNumbers.length)return;editorNumbers.pop();editorNumbers.forEach((n,i)=>n.num=i+1);drawEditor();renderEditorToolbar();}
 function enterCropMode(){editorMode=editorMode==='crop'?'normal':'crop';cropActive=false;cropStart=null;cropBox={x:0,y:0,w:0,h:0};renderEditorToolbar();drawEditor();}
 function enterNumberMode(){editorMode='number';addNumberSticker();renderEditorToolbar();}
 function exitNumberMode(){editorMode='normal';renderEditorToolbar();drawEditor();}
@@ -978,12 +948,8 @@ function closeEditorMenu(){const m=document.getElementById('editor-menu');if(m)m
 function closeEditorMenuOnce(){closeEditorMenu();}
 function removeAllNumbers(){editorNumbers=[];drawEditor();renderEditorToolbar();showToast('番号をすべて削除しました');}
 function addNumberSticker(){
-  if(!editorCanvas)return;
-  const num=editorNumbers.length+1;
-  const pos=getStickerPosition(num,editorCanvas.width,editorCanvas.height);
-  editorNumbers.push({x:pos.x,y:pos.y,num,size:getStickerSize()});
-  drawEditor();
-  if(editorMode==='number')renderEditorToolbar();
+  if(!editorCanvas)return;const num=editorNumbers.length+1;const pos=getStickerPosition(num,editorCanvas.width,editorCanvas.height);
+  editorNumbers.push({x:pos.x,y:pos.y,num,size:getStickerSize()});drawEditor();if(editorMode==='number')renderEditorToolbar();
 }
 function updateToolUI(){}
 function resetAllEdits(){
@@ -994,81 +960,51 @@ function resetAllEdits(){
 function resetEdits(){resetAllEdits();}
 function rotateImage(){
   if(!editorImage)return;
-  const canvas=document.createElement('canvas');
-  canvas.width=editorImage.naturalHeight;canvas.height=editorImage.naturalWidth;
-  const ctx=canvas.getContext('2d');
-  ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(Math.PI/2);
-  ctx.drawImage(editorImage,-editorImage.naturalWidth/2,-editorImage.naturalHeight/2);
+  const canvas=document.createElement('canvas');canvas.width=editorImage.naturalHeight;canvas.height=editorImage.naturalWidth;
+  const ctx=canvas.getContext('2d');ctx.translate(canvas.width/2,canvas.height/2);ctx.rotate(Math.PI/2);ctx.drawImage(editorImage,-editorImage.naturalWidth/2,-editorImage.naturalHeight/2);
   const rotated=canvas.toDataURL('image/jpeg',0.92);
-  if(editImgEditorTarget==='url'){
-    editPhotoUrls.splice(editImgEditorTargetIdx,1);
-    editNewPhotos.unshift(rotated);
-    editImgEditorTarget='new';editImgEditorTargetIdx=0;
-  }else{
-    editNewPhotos[editImgEditorTargetIdx]=rotated;
-  }
-  editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;
-  loadEditorImage(rotated);showToast('🔄 90度回転しました');
+  if(editImgEditorTarget==='url'){editPhotoUrls.splice(editImgEditorTargetIdx,1);editNewPhotos.unshift(rotated);editImgEditorTarget='new';editImgEditorTargetIdx=0;}
+  else{editNewPhotos[editImgEditorTargetIdx]=rotated;}
+  editorNumbers=[];cropBox={x:0,y:0,w:0,h:0};cropActive=false;loadEditorImage(rotated);showToast('🔄 90度回転しました');
 }
 function finishEditPhoto(){
   if(!editorCanvas||!editorImage){document.getElementById('img-editor-bd').classList.remove('open');document.body.style.overflow='hidden';return;}
   try{
-  const c=editorCanvas;let sx=0,sy=0,sw=editorImage.naturalWidth,sh=editorImage.naturalHeight;
-  if(cropActive&&cropBox.w>10&&cropBox.h>10){
-    const scaleX=editorImage.naturalWidth/c.width;const scaleY=editorImage.naturalHeight/c.height;
-    sx=cropBox.x*scaleX;sy=cropBox.y*scaleY;sw=cropBox.w*scaleX;sh=cropBox.h*scaleY;
-  }
-  const out=document.createElement('canvas');out.width=Math.round(sw);out.height=Math.round(sh);
-  const ctx=out.getContext('2d');ctx.drawImage(editorImage,sx,sy,sw,sh,0,0,out.width,out.height);
-  editorNumbers.forEach(n=>{
-    const realX=n.x/c.width*editorImage.naturalWidth-sx;
-    const realY=n.y/c.height*editorImage.naturalHeight-sy;
-    if(realX<0||realY<0||realX>sw||realY>sh)return;
-    const r=Math.round((n.size||DEFAULT_STICKER_SIZE)/c.width*editorImage.naturalWidth);
-    const fs=Math.max(10,Math.round(r*0.65));
-    ctx.beginPath();ctx.arc(realX,realY,r,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();
-    ctx.strokeStyle='#e8552d';ctx.lineWidth=Math.max(2,Math.round(r*0.1));ctx.stroke();
-    ctx.fillStyle='#111';ctx.font='bold '+fs+'px JetBrains Mono,monospace';
-    ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.num,realX,realY);
-  });
-  const result=out.toDataURL('image/jpeg',0.92);
-  if(editImgEditorTarget==='url'){
-    editPhotoUrls.splice(editImgEditorTargetIdx,1);
-    editNewPhotos.unshift(result);
-  }else{
-    editNewPhotos[editImgEditorTargetIdx]=result;
-  }
-  document.getElementById('img-editor-bd').classList.remove('open');
-  document.body.style.overflow='hidden';
-  renderEditPhotoPreviews();showToast('✅ 編集を保存しました');
+    const c=editorCanvas;let sx=0,sy=0,sw=editorImage.naturalWidth,sh=editorImage.naturalHeight;
+    if(cropActive&&cropBox.w>10&&cropBox.h>10){const scaleX=editorImage.naturalWidth/c.width;const scaleY=editorImage.naturalHeight/c.height;sx=cropBox.x*scaleX;sy=cropBox.y*scaleY;sw=cropBox.w*scaleX;sh=cropBox.h*scaleY;}
+    const out=document.createElement('canvas');out.width=Math.round(sw);out.height=Math.round(sh);
+    const ctx=out.getContext('2d');ctx.drawImage(editorImage,sx,sy,sw,sh,0,0,out.width,out.height);
+    editorNumbers.forEach(n=>{
+      const realX=n.x/c.width*editorImage.naturalWidth-sx;const realY=n.y/c.height*editorImage.naturalHeight-sy;
+      if(realX<0||realY<0||realX>sw||realY>sh)return;
+      const r=Math.round((n.size||DEFAULT_STICKER_SIZE)/c.width*editorImage.naturalWidth);const fs=Math.max(10,Math.round(r*0.65));
+      ctx.beginPath();ctx.arc(realX,realY,r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.95)';ctx.fill();
+      ctx.strokeStyle='#e8552d';ctx.lineWidth=Math.max(2,Math.round(r*0.1));ctx.stroke();
+      ctx.fillStyle='#111';ctx.font='bold '+fs+'px JetBrains Mono,monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(n.num,realX,realY);
+    });
+    const result=out.toDataURL('image/jpeg',0.92);
+    if(editImgEditorTarget==='url'){editPhotoUrls.splice(editImgEditorTargetIdx,1);editNewPhotos.unshift(result);}
+    else{editNewPhotos[editImgEditorTargetIdx]=result;}
+    document.getElementById('img-editor-bd').classList.remove('open');document.body.style.overflow='hidden';
+    renderEditPhotoPreviews();showToast('✅ 編集を保存しました');
   }catch(err){
     console.error('finishEditPhoto error:',err);
-    document.getElementById('img-editor-bd').classList.remove('open');
-    document.body.style.overflow='hidden';
+    document.getElementById('img-editor-bd').classList.remove('open');document.body.style.overflow='hidden';
     renderEditPhotoPreviews();showToast('✅ 保存しました');
   }
 }
-
-function getCanvasPos(touch){
-  const rect=editorCanvas.getBoundingClientRect();
-  const scaleX=editorCanvas.width/rect.width;const scaleY=editorCanvas.height/rect.height;
-  return{x:(touch.clientX-rect.left)*scaleX,y:(touch.clientY-rect.top)*scaleY};
-}
-function getTouchDist(t1,t2){return Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);}
+function getCanvasPos(touch){const rect=editorCanvas.getBoundingClientRect();const scaleX=editorCanvas.width/rect.width;const scaleY=editorCanvas.height/rect.height;return{x:(touch.clientX-rect.left)*scaleX,y:(touch.clientY-rect.top)*scaleY};}
 function getCropHandle(pos){
   if(!cropActive)return null;
   const handles=[{id:'tl',x:cropBox.x,y:cropBox.y},{id:'tr',x:cropBox.x+cropBox.w,y:cropBox.y},{id:'bl',x:cropBox.x,y:cropBox.y+cropBox.h},{id:'br',x:cropBox.x+cropBox.w,y:cropBox.y+cropBox.h}];
   return handles.find(h=>Math.hypot(h.x-pos.x,h.y-pos.y)<20)||null;
 }
 function canvasPointerDown(e){
-  e.preventDefault();
-  if(e.touches&&e.touches.length===2)return;
+  e.preventDefault();if(e.touches&&e.touches.length===2)return;
   const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);dragMoved=false;
   if(editorMode==='number'){
     const hit=editorNumbers.findIndex(n=>Math.hypot(n.x-pos.x,n.y-pos.y)<(n.size||DEFAULT_STICKER_SIZE)+8);
-    if(hit>=0){isDraggingNum=true;dragNumIdx=hit;dragOffX=pos.x-editorNumbers[hit].x;dragOffY=pos.y-editorNumbers[hit].y;}
-    else isDraggingNum=false;
+    if(hit>=0){isDraggingNum=true;dragNumIdx=hit;dragOffX=pos.x-editorNumbers[hit].x;dragOffY=pos.y-editorNumbers[hit].y;}else isDraggingNum=false;
   }else if(editorMode==='crop'){
     const handle=getCropHandle(pos);
     if(handle){cropHandleDrag=handle;cropDragging=true;}
@@ -1077,16 +1013,12 @@ function canvasPointerDown(e){
   }
 }
 function canvasPointerMove(e){
-  e.preventDefault();if(!editorCanvas)return;
-  if(e.touches&&e.touches.length===2)return;
+  e.preventDefault();if(!editorCanvas)return;if(e.touches&&e.touches.length===2)return;
   const touch=e.touches?e.touches[0]:e;const pos=getCanvasPos(touch);const c=editorCanvas;
   if(editorMode==='number'&&isDraggingNum&&dragNumIdx>=0){
-    editorNumbers[dragNumIdx].x=Math.max(10,Math.min(c.width-10,pos.x-dragOffX));
-    editorNumbers[dragNumIdx].y=Math.max(10,Math.min(c.height-10,pos.y-dragOffY));
-    dragMoved=true;drawEditor();
+    editorNumbers[dragNumIdx].x=Math.max(10,Math.min(c.width-10,pos.x-dragOffX));editorNumbers[dragNumIdx].y=Math.max(10,Math.min(c.height-10,pos.y-dragOffY));dragMoved=true;drawEditor();
   }else if(editorMode==='crop'&&cropDragging){
-    if(cropHandleDrag){
-      const id=cropHandleDrag.id;
+    if(cropHandleDrag){const id=cropHandleDrag.id;
       if(id==='move'){cropBox.x=Math.max(0,Math.min(c.width-cropBox.w,pos.x-dragOffX));cropBox.y=Math.max(0,Math.min(c.height-cropBox.h,pos.y-dragOffY));}
       else{let{x,y,w,h}=cropBox;
         if(id==='tl'){const nx=Math.min(pos.x,x+w-20);const ny=Math.min(pos.y,y+h-20);w=x+w-nx;h=y+h-ny;x=nx;y=ny;}
@@ -1095,22 +1027,17 @@ function canvasPointerMove(e){
         else if(id==='br'){w=Math.max(20,pos.x-x);h=Math.max(20,pos.y-y);}
         cropBox={x:Math.max(0,x),y:Math.max(0,y),w:Math.min(c.width-x,w),h:Math.min(c.height-y,h)};
       }
-    }else if(cropStart){
-      const x=Math.min(cropStart.x,pos.x);const y=Math.min(cropStart.y,pos.y);
-      cropBox={x:Math.max(0,x),y:Math.max(0,y),w:Math.min(c.width-x,Math.abs(pos.x-cropStart.x)),h:Math.min(c.height-y,Math.abs(pos.y-cropStart.y))};cropActive=true;
-    }
+    }else if(cropStart){const x=Math.min(cropStart.x,pos.x);const y=Math.min(cropStart.y,pos.y);cropBox={x:Math.max(0,x),y:Math.max(0,y),w:Math.min(c.width-x,Math.abs(pos.x-cropStart.x)),h:Math.min(c.height-y,Math.abs(pos.y-cropStart.y))};cropActive=true;}
     dragMoved=true;drawEditor();
   }
 }
 function canvasPointerUp(e){
-  e.preventDefault();
-  if(e.touches&&e.touches.length>=2)return;
+  e.preventDefault();if(e.touches&&e.touches.length>=2)return;
   if(editorMode==='number'){
     if(isDraggingNum&&!dragMoved&&dragNumIdx>=0){editorNumbers.splice(dragNumIdx,1);editorNumbers.forEach((n,i)=>n.num=i+1);showToast('番号を削除しました');drawEditor();}
     isDraggingNum=false;dragNumIdx=-1;dragMoved=false;
   }else if(editorMode==='crop'){
-    cropDragging=false;if(cropBox.w>10&&cropBox.h>10)cropActive=true;else cropActive=false;
-    cropHandleDrag=null;cropStart=null;drawEditor();
+    cropDragging=false;if(cropBox.w>10&&cropBox.h>10)cropActive=true;else cropActive=false;cropHandleDrag=null;cropStart=null;drawEditor();
   }
 }
 
@@ -1124,17 +1051,8 @@ function closeModal(id){document.getElementById(id).classList.remove('open');doc
 function closeOnBd(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 
-// ── 投稿ページ ライトボックス
-function openPostLightbox(src){
-  const lb=document.getElementById('post-lightbox');
-  const img=document.getElementById('post-lightbox-img');
-  if(!lb||!img)return;
-  img.src=src;lb.classList.add('open');document.body.style.overflow='hidden';
-}
-function closePostLightbox(){
-  const lb=document.getElementById('post-lightbox');
-  if(lb)lb.classList.remove('open');document.body.style.overflow='';
-}
+function openPostLightbox(src){const lb=document.getElementById('post-lightbox');const img=document.getElementById('post-lightbox-img');if(!lb||!img)return;img.src=src;lb.classList.add('open');document.body.style.overflow='hidden';}
+function closePostLightbox(){const lb=document.getElementById('post-lightbox');if(lb)lb.classList.remove('open');document.body.style.overflow='';}
 
 ['pin1','pin2','pin3','pin4'].forEach((id,i,arr)=>{
   const el=document.getElementById(id);
@@ -1143,24 +1061,17 @@ function closePostLightbox(){
 });
 
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal('edit-bd');closeModal('report-bd');closePostLightbox();}
+  if(e.key==='Escape'){closeModal('edit-bd');closeModal('report-bd');closePostLightbox();closeGearReportModal();}
 });
 document.addEventListener('DOMContentLoaded',()=>{
   setTimeout(()=>{
     const c=document.getElementById('editor-canvas');if(!c)return;
-    c.addEventListener('mousedown',canvasPointerDown);
-    c.addEventListener('mousemove',canvasPointerMove);
-    c.addEventListener('mouseup',canvasPointerUp);
-    c.addEventListener('touchstart',canvasPointerDown,{passive:false});
-    c.addEventListener('touchmove',canvasPointerMove,{passive:false});
-    c.addEventListener('touchend',canvasPointerUp,{passive:false});
+    c.addEventListener('mousedown',canvasPointerDown);c.addEventListener('mousemove',canvasPointerMove);c.addEventListener('mouseup',canvasPointerUp);
+    c.addEventListener('touchstart',canvasPointerDown,{passive:false});c.addEventListener('touchmove',canvasPointerMove,{passive:false});c.addEventListener('touchend',canvasPointerUp,{passive:false});
   },500);
-  const label=document.getElementById('post-lang-label');
-  if(label)label.textContent=lang==='ja'?'EN':'JA';
-  const backBtn=document.getElementById('back-btn');
-  if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧へ';
-  const logosub=document.querySelector('.logo-sub');
-  if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
+  const label=document.getElementById('post-lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
+  const backBtn=document.getElementById('back-btn');if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧へ';
+  const logosub=document.querySelector('.logo-sub');if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
   loadPost();
 });
 </script>
