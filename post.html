@@ -438,7 +438,7 @@ function getYouTubeId(url){
 async function loadPost(){
   if(!POST_ID){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:Noto Sans JP,sans-serif">投稿が見つかりません</div>';return;}
   // ペダルslugマップを正規化キーで構築
-  const{data:pedals}=await sb.from('pedals').select('full_name,slug');
+  const{data:pedals}=await sb.from('pedals').select('full_name,slug').limit(5000);
   pedalSlugMap={};
   if(pedals)pedals.forEach(p=>{if(p.slug)pedalSlugMap[normalizeName(p.full_name)]=p.slug;});
 
