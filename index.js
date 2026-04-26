@@ -318,7 +318,7 @@ async function loadPostsFromDB(){
   if(error){console.error(error);return;}
   const{data:cc}=await sb.from('comments').select('post_id');
   const cm={};if(cc)cc.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  const{data:pedals}=await sb.from('pedals').select('full_name,types,slug');
+  const{data:pedals}=await sb.from('pedals').select('full_name,types,slug').limit(5000);
   const pedalTypesMap={};
   pedalSlugMap={};
   if(pedals)pedals.forEach(p=>{
