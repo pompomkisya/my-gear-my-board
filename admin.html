@@ -14,7 +14,6 @@ header{position:sticky;top:0;z-index:300;height:54px;display:flex;align-items:ce
 .logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--ac)}
 .back-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none}
 .back-btn:hover{border-color:var(--ac);color:var(--ac)}
-/* ログイン画面 */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 54px);padding:20px}
 .login-box{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:40px 32px;width:100%;max-width:360px;text-align:center}
 .login-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;margin-bottom:8px}
@@ -24,7 +23,6 @@ header{position:sticky;top:0;z-index:300;height:54px;display:flex;align-items:ce
 .pin-err{font-family:'JetBrains Mono',monospace;font-size:11px;color:#e05050;min-height:18px;margin-bottom:10px}
 .login-btn{width:100%;background:var(--ac);border:none;border-radius:4px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .18s}
 .login-btn:hover{background:#cf4c26}
-/* メインレイアウト */
 .admin-wrap{display:none;max-width:1200px;margin:0 auto;padding:24px 20px}
 .admin-wrap.show{display:block}
 .tab-bar{display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:24px;flex-wrap:wrap}
@@ -34,7 +32,6 @@ header{position:sticky;top:0;z-index:300;height:54px;display:flex;align-items:ce
 .panel{display:none}.panel.on{display:block}
 .section-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
 .badge{background:var(--ac);color:#fff;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
-/* テーブル */
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--td);padding:8px 12px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap}
@@ -49,7 +46,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .approve-btn:hover{background:rgba(74,222,128,.1)}
 .tag-chip{display:inline-block;padding:2px 7px;background:var(--sf2);border:1px solid var(--bd);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tm);margin:2px}
 .empty-msg{text-align:center;padding:40px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--td)}
-/* 機材NEWS管理 */
 .news-item{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:14px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}
 .news-thumb{width:80px;height:60px;object-fit:cover;border-radius:4px;border:1px solid var(--bd);background:var(--sf2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--td)}
 .news-thumb img{width:100%;height:100%;object-fit:cover;border-radius:4px}
@@ -82,13 +78,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .ogp-preview-url{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .drag-handle{color:var(--td);cursor:grab;font-size:18px;padding:0 4px;user-select:none;flex-shrink:0}
 .drag-handle:active{cursor:grabbing}
-/* pedals */
 .pedal-form{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:16px;margin-bottom:16px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr 2fr;gap:8px;margin-bottom:8px}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr}}
 .submit-btn{padding:8px 20px;background:var(--ac);border:none;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:#fff;cursor:pointer;transition:all .15s}
 .submit-btn:hover{background:#cf4c26}
-/* ペダル編集モーダル */
 .pedal-edit-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .pedal-edit-modal.open{display:flex}
 .pedal-edit-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
@@ -97,7 +91,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .pedal-edit-actions{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
 .pedal-img-preview{width:80px;height:80px;border-radius:8px;border:1px solid var(--bd);object-fit:contain;background:var(--sf2);margin-top:8px;display:none}
 .pedal-img-preview.show{display:block}
-/* リッチエディタ */
 .rich-toolbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
 .rich-btn{padding:4px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;user-select:none}
 .rich-btn:hover{border-color:var(--ac);color:var(--ac)}
@@ -105,12 +98,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .rich-editor:focus{border-color:var(--ac)}
 .rich-editor h2{font-size:18px;font-weight:700;margin:8px 0 4px;color:var(--tx)}
 .rich-editor h3{font-size:15px;font-weight:600;margin:6px 0 4px;color:var(--tm)}
-/* ペダルDBフィルター */
 .pedal-filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .pf-btn{padding:6px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s}
 .pf-btn:hover{border-color:var(--ac);color:var(--ac)}
 .pf-btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
-/* 統計カード */
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
 .stat-card{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:16px}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--ac);line-height:1}
@@ -127,7 +118,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <a class="back-btn" href="/">← サイトへ戻る</a>
 </header>
 
-<!-- ログイン画面 -->
 <div class="login-wrap" id="login-wrap">
   <div class="login-box">
     <div class="login-title">管理者ログイン</div>
@@ -139,7 +129,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 </div>
 
-<!-- 管理画面 -->
 <div class="admin-wrap" id="admin-wrap">
   <div class="tab-bar">
     <div class="tab on" onclick="switchTab(this,'tab-dashboard')">📊 ダッシュボード</div>
@@ -153,7 +142,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-regions')">🌍 言語圏別</div>
   </div>
 
-  <!-- ダッシュボード -->
   <div class="panel on" id="tab-dashboard">
     <div class="section-title">📊 ダッシュボード</div>
     <div class="stats-grid">
@@ -168,13 +156,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="recent-posts" class="loading">読み込み中...</div>
   </div>
 
-  <!-- 投稿管理 -->
   <div class="panel" id="tab-posts">
     <div class="section-title">📝 投稿管理 <span class="badge" id="posts-count">-</span></div>
     <div id="posts-list" class="loading">読み込み中...</div>
   </div>
 
-  <!-- コメント管理 -->
   <div class="panel" id="tab-comments">
     <div class="section-title">💬 コメント管理 <span class="badge" id="comments-count">-</span></div>
     <p style="font-size:12px;color:var(--td);margin-bottom:16px">投稿を選択してコメントを確認・削除できます。</p>
@@ -187,27 +173,23 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="comments-list-admin" class="empty-msg">投稿を選択するとコメントが表示されます</div>
   </div>
 
-  <!-- いいね管理 -->
   <div class="panel" id="tab-likes">
     <div class="section-title">❤️ いいね管理</div>
     <p style="font-size:12px;color:var(--td);margin-bottom:16px">投稿のいいね数を直接編集できます。自然な範囲で調整してください。</p>
     <div id="likes-list" class="loading">読み込み中...</div>
   </div>
 
-  <!-- 通報管理 -->
   <div class="panel" id="tab-reports">
     <div class="section-title">🚩 通報された投稿 <span class="badge" id="reports-count">0</span></div>
     <div id="reports-list" class="empty-msg">通報管理機能は今後実装予定です。<br>現在は投稿管理タブから手動で削除できます。</div>
   </div>
 
-  <!-- 未登録機材 -->
   <div class="panel" id="tab-gear-unknown">
     <div class="section-title">🔍 未登録機材（ユーザー手入力） <span class="badge" id="unknown-count">-</span></div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">ペダルDBに存在しない機材名の一覧です。よく使われているもの・報告数が多いものはDBへの追加を優先してください。</p>
     <div id="unknown-list" class="loading">読み込み中...</div>
   </div>
 
-  <!-- 機材NEWS管理 -->
   <div class="panel" id="tab-news">
     <div class="section-title">📰 機材NEWS管理</div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">URLを入力するとOGP情報（タイトル・サムネイル）を自動取得してトップページのNEWSに表示します。</p>
@@ -237,7 +219,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#4ade80;margin-top:12px">✅ 追加・削除・並び替えは即時サイトに反映されます。GitHubの更新は不要です。</p>
   </div>
 
-  <!-- ペダルDB -->
   <div class="panel" id="tab-pedals">
     <div class="section-title">🎛 ペダルDB管理 <span class="badge" id="pedals-count">-</span></div>
     <div class="pedal-form">
@@ -262,7 +243,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="pedals-list" class="loading">読み込み中...</div>
   </div>
 
-  <!-- 言語圏別投稿 -->
   <div class="panel" id="tab-regions">
     <div class="section-title">🌍 言語圏別 投稿一覧</div>
     <p style="font-size:12px;color:var(--td);margin-bottom:16px">ブラウザ言語設定から判定した投稿者の言語圏を表示します。</p>
@@ -286,7 +266,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <h3>🎛 ペダルを編集</h3>
     <div id="pedal-edit-name" style="font-size:14px;font-weight:600;color:var(--tm);margin-bottom:4px"></div>
 
-    <!-- 機材名・ブランド名・タイプ -->
     <label class="pedal-edit-label">機材名（full_name）</label>
     <input class="form-input" id="edit-full-name" type="text" placeholder="例: BOSS DS-1" style="width:100%">
 
@@ -397,8 +376,17 @@ async function loadPedals(){
   const total=countRes.count||0;
   document.getElementById('stat-pedals').textContent=total;
   document.getElementById('pedals-count').textContent=total;
-  const{data}=await sb.from('pedals').select('*').order('brand').order('model');
-  allPedals=data||[];
+  // ── 全件取得（1000件上限対策）
+  let data=[];
+  let offset=0;
+  while(true){
+    const{data:batch}=await sb.from('pedals').select('*').order('brand').order('model').range(offset,offset+999);
+    if(!batch||batch.length===0)break;
+    data=[...data,...batch];
+    if(batch.length<1000)break;
+    offset+=1000;
+  }
+  allPedals=data;
   renderPedals();
 }
 
@@ -541,7 +529,16 @@ async function deletePost(postId){
 
 // ── 未登録機材（gear_reportsの報告数も表示）
 async function loadUnknownGear(){
-  const{data:pedals}=await sb.from('pedals').select('full_name');
+  // ── 全件取得（1000件上限対策）
+  let pedals=[];
+  let offset=0;
+  while(true){
+    const{data:batch}=await sb.from('pedals').select('full_name').range(offset,offset+999);
+    if(!batch||batch.length===0)break;
+    pedals=[...pedals,...batch];
+    if(batch.length<1000)break;
+    offset+=1000;
+  }
   const pedalNames=new Set((pedals||[]).map(p=>p.full_name.toLowerCase()));
   const gearCount={};
   allPosts.forEach(p=>{
@@ -552,7 +549,6 @@ async function loadUnknownGear(){
     });
   });
 
-  // gear_reportsから報告数を取得
   const{data:reports}=await sb.from('gear_reports').select('gear_name,count');
   const reportMap={};
   if(reports)reports.forEach(r=>{reportMap[r.gear_name]=(r.count||0);});
@@ -589,7 +585,6 @@ function addPedalFromUnknown(name){
   showToast('モデル名を入力しました。ブランド名とタイプを追加してください。');
 }
 
-// ── ペダルDB
 let pedalFilterMode='all';
 
 function setPedalFilter(mode){
@@ -662,7 +657,6 @@ async function addPedal(){
   await loadPedals();
 }
 
-// ── ペダル編集モーダル
 let editingPedalId=null;
 
 function openPedalEdit(pedalId){
@@ -777,7 +771,6 @@ async function deletePedalFromEdit(){
   showToast('🗑 ペダルを削除しました');closePedalEdit();await loadPedals();
 }
 
-// ── 機材NEWS
 async function loadNews(){
   const{data}=await sb.from('news').select('*').order('sort_order').order('created_at');
   newsItems=data||[];renderNewsList();
@@ -839,7 +832,6 @@ async function deleteNews(id){
   showToast('🗑 削除しました');await loadNews();
 }
 
-// ── 言語圏別
 let currentRegionFilter='all';
 function renderRegionStats(){
   const total=allPosts.length;
