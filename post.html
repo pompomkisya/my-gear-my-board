@@ -177,7 +177,6 @@ textarea.form-input{resize:vertical;min-height:80px}
 .lightbox-overlay.open .lightbox-img{transform:scale(1)}
 .lightbox-close{position:absolute;top:16px;right:16px;width:36px;height:36px;background:rgba(255,255,255,.15);border:none;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
 .lightbox-close:hover{background:rgba(232,85,45,.7)}
-/* 報告モーダル（機材詳細ページなし） */
 .grm-bd{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:700;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .22s}
 .grm-bd.open{opacity:1;pointer-events:all}
 .grm-box{background:var(--sf);border:1px solid var(--bd);border-radius:10px;width:100%;max-width:380px;padding:24px;position:relative}
@@ -373,10 +372,9 @@ function toggleLang(){
 }
 function goBack(){location.href='/';}
 
-// ── 機材リンク生成（正規化マッチ）
 function gearUrl(gearItem){
   const name=(gearItem&&typeof gearItem==='object')?gearItem.name||'':gearItem||'';
-  return getSlugByName(name);// slugがあればそれ、なければnull
+  return getSlugByName(name);
 }
 function gearLinkLabel(){
   return lang==='en'?'View Pedal Page →':'機材詳細ページへ →';
@@ -389,7 +387,7 @@ function soundhouseUrl(gearItem){
   return'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(q);
 }
 
-// ── 報告モーダル（機材詳細ページなし）
+// ── 報告モーダル
 let _reportGearName='';
 function openGearReportModal(name){
   _reportGearName=name;
@@ -439,16 +437,22 @@ async function loadPost(){
   if(!POST_ID){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:Noto Sans JP,sans-serif">投稿が見つかりません</div>';return;}
   // ペダルslugマップを正規化キーで構築
   let pedals=[];
-let offset=0;
-while(true){
-  const{data:batch}=await sb.from('pedals').select('full_name,types,slug').range(offset,offset+999);
-  if(!batch||batch.length===0)break;
-  pedals=[...pedals,...batch];
-  if(batch.length<1000)break;
-  offset+=1000;
-}
+  let offset=0;
+  while(true){
+    const{data:batch}=await sb.from('pedals').select('full_name,types,slug').range(offset,offset+999);
+    if(!batch||batch.length===0)break;
+    pedals=[...pedals,...batch];
+    if(batch.length<1000)break;
+    offset+=1000;
+  }
   pedalSlugMap={};
   if(pedals)pedals.forEach(p=>{if(p.slug)pedalSlugMap[normalizeName(p.full_name)]=p.slug;});
+  // ── エイリアステーブルでslugマップを補完
+  const{data:aliases}=await sb.from('pedal_aliases').select('alias,pedal_full_name');
+  if(aliases)aliases.forEach(a=>{
+    const targetSlug=pedalSlugMap[normalizeName(a.pedal_full_name)];
+    if(targetSlug)pedalSlugMap[normalizeName(a.alias)]=targetSlug;
+  });
 
   const{data,error}=await sb.from('posts').select('*').eq('id',POST_ID).single();
   if(error||!data){document.getElementById('page-content').innerHTML='<div style="text-align:center;padding:60px;color:var(--td);font-family:Noto Sans JP,sans-serif">投稿が見つかりません</div>';return;}
@@ -473,7 +477,6 @@ function renderPost(p){
   const ytId=getYouTubeId(p.youtube_url);
   let html='';
 
-  // ① 画像スライダー
   if(imgs.length){
     html+='<div class="slider"><div class="slide-track" id="slide-track">';
     imgs.forEach(u=>html+='<div class="slide"><img src="'+u+'" loading="lazy" onclick="openPostLightbox(this.src)" style="cursor:zoom-in"></div>');
@@ -490,7 +493,6 @@ function renderPost(p){
     html+='<div class="no-img">'+(isGear?'🎸':'🎛')+'</div>';
   }
 
-  // ② タイプバッジ・タイトル・投稿者
   html+='<div class="type-badge '+(isGear?'gear':'board')+'">'+(isGear?(lang==='en'?'Gear':'機材'):(lang==='en'?'Pedalboard':'エフェクターボード'))+'</div>';
   html+='<div class="post-title">'+p.title+'</div>';
   html+='<div class="meta">'
@@ -499,7 +501,6 @@ function renderPost(p){
     +'<div class="meta-time">'+timeAgo(p.created_at)+'</div></div>'
     +'</div>';
 
-  // ③ アクションボタン
   html+='<div class="actions">'
     +'<div class="act-btn'+(liked?' liked':'')+'" id="like-btn" onclick="toggleLike()">'+(liked?'❤️':'🤍')+(lang==='en'?' Like ':' いいね ')+'<span id="like-count">'+(p.likes||0)+'</span></div>'
     +'<div class="act-btn" onclick="copyUrl()">🔗 '+(lang==='en'?'Copy URL':'URLをコピー')+'</div>'
@@ -508,10 +509,8 @@ function renderPost(p){
     +'<div class="act-btn" style="color:#e05050;border-color:rgba(224,80,80,.3)" onclick="openReport()">🚩 '+(lang==='en'?'Report':'通報')+'</div>'
     +'</div>';
 
-  // ④ タグ（ジャンル）
   if(genres.length){html+='<div class="genre-tags">'+genres.map(g=>'<span class="gtag">'+g+'</span>').join('')+'</div>';}
 
-  // ⑤ 機材リスト
   if(gear.length){
     html+='<div class="section"><div class="section-lbl">'+(lang==='en'?'Gear List':'使用機材リスト')+'</div>';
     gear.forEach(g=>{
@@ -520,11 +519,9 @@ function renderPost(p){
       const label=gearLinkLabel();
       const safeN=name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       if(slug){
-        // DB登録済み → ペダルページへ
         html+='<div class="gear-item"><div class="gear-dot"></div><div class="gear-name">'+name+'</div>'
           +'<a class="sh-link" href="/pedal?slug='+slug+'">'+label+'</a></div>';
       }else{
-        // 未登録 → 報告モーダル
         html+='<div class="gear-item"><div class="gear-dot"></div><div class="gear-name">'+name+'</div>'
           +'<button class="sh-link" onclick="openGearReportModal(\''+safeN+'\')">'+label+'</button></div>';
       }
@@ -532,7 +529,6 @@ function renderPost(p){
     html+='</div>';
   }
 
-  // ⑥ 本文
   if(p.description){
     const desc=p.description;const limit=200;
     html+='<div class="section">';
@@ -546,7 +542,6 @@ function renderPost(p){
     html+='</div>';
   }
 
-  // ⑦ YouTube
   if(ytId){
     html+='<div class="section yt-section">'
       +'<div class="section-lbl" style="margin-bottom:10px">▶ YouTube動画</div>'
@@ -555,7 +550,6 @@ function renderPost(p){
       +'</div></div>';
   }
 
-  // ⑧ コメント
   const _cL=lang==='en'?'Comments':'コメント',_cN=lang==='en'?'Name (optional)':'名前（任意）',_cP=lang==='en'?'Write a comment...':'コメントを投稿する...',_cB=lang==='en'?'Post':'投稿';
   html+='<div class="section" id="comment-section">'
     +'<div class="section-lbl">'+_cL+'</div>'
@@ -672,7 +666,6 @@ async function postComment(parentId,replyToName){
   await loadComments();
 }
 
-// ── 編集モーダル
 function openEditModal(){
   ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('pin-err').textContent='';
@@ -820,46 +813,6 @@ function addPostEditGearItem(){
   postEditGearList.push({name,brand:'',search_query:null});
   renderPostEditGearSortList();input.value='';
 }
-
-let editSelectedGears=[],editAcResults=[],editAcFocusIdx=-1;
-async function editSearchGear(val){
-  const q=val.trim();closeEditAC();if(!q)return;
-  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name').or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%').limit(10);
-  let results=prefixData||[];
-  if(results.length<5){const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name').ilike('full_name','%'+q+'%').limit(10);if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});}
-  results=results.slice(0,10);editAcResults=results;editAcFocusIdx=-1;
-  const dd=document.getElementById('edit-ac-dropdown');
-  if(!dd)return;
-  if(!results.length){dd.innerHTML='<div class="ac-empty">「'+q+'」— 候補なし　Enterで追加</div>';dd.classList.add('open');return;}
-  dd.innerHTML=results.map((x,i)=>'<div class="ac-item" onmousedown="selectEditGear('+i+')" onmouseover="setEditACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>').join('');
-  dd.classList.add('open');
-}
-function setEditACFocus(i){editAcFocusIdx=i;document.querySelectorAll('#edit-ac-dropdown .ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
-function selectEditGear(i){const x=editAcResults[i];if(!x)return;addEditGearTag({name:x.full_name,brand:x.brand});closeEditAC();}
-function addEditGearTag(g){if(editSelectedGears.length>=20){showToast('⚠️ 最大20件まで');return;}editSelectedGears.push(g);renderEditGearTags();const gs=document.getElementById('edit-gear-search');if(gs)gs.value='';}
-function removeEditGearTag(i){editSelectedGears.splice(i,1);renderEditGearTags();}
-function renderEditGearTags(){
-  const wrap=document.getElementById('edit-gear-tags');if(!wrap)return;
-  const inp=document.getElementById('edit-gear-search');
-  wrap.querySelectorAll('.gear-tag').forEach(el=>el.remove());
-  editSelectedGears.forEach((g,i)=>{
-    const tag=document.createElement('div');tag.className='gear-tag';
-    tag.innerHTML=g.name+'<button class="gear-tag-x" onmousedown="event.preventDefault();removeEditGearTag('+i+')">✕</button>';
-    wrap.insertBefore(tag,inp);
-  });
-}
-function editGearKeyDown(e){
-  const dd=document.getElementById('edit-ac-dropdown');const open=dd&&dd.classList.contains('open');
-  if(e.key==='ArrowDown'){e.preventDefault();if(open)setEditACFocus(Math.min(editAcFocusIdx+1,editAcResults.length-1));}
-  else if(e.key==='ArrowUp'){e.preventDefault();setEditACFocus(Math.max(editAcFocusIdx-1,0));}
-  else if(e.key==='Enter'){
-    e.preventDefault();
-    if(open&&editAcFocusIdx>=0&&editAcResults[editAcFocusIdx])selectEditGear(editAcFocusIdx);
-    else{const v=e.target.value.trim();if(v){addEditGearTag({name:v,brand:''});const gs=document.getElementById('edit-gear-search');if(gs)gs.value='';closeEditAC();}}
-  }else if(e.key==='Backspace'&&!e.target.value&&editSelectedGears.length)removeEditGearTag(editSelectedGears.length-1);
-  else if(e.key==='Escape')closeEditAC();
-}
-function closeEditAC(){const dd=document.getElementById('edit-ac-dropdown');if(dd)dd.classList.remove('open');}
 
 // ── 画像エディター
 let editorCanvas=null,editorCtx=null,editorImage=null;
