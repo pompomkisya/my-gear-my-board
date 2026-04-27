@@ -453,14 +453,8 @@ function renderLikesList(){
     +'</tbody></table></div>';
 }
 
-async function adjustLikes(postId,delta){
-  const post=allPosts.find(p=>p.id===postId);if(!post)return;
-  await updateLikes(postId,Math.max(0,(post.likes||0)+delta));
-}
-async function setLikes(postId){
-  const val=parseInt(document.getElementById('likes-input-'+postId).value)||0;
-  await updateLikes(postId,Math.max(0,val));
-}
+async function adjustLikes(postId,delta){const post=allPosts.find(p=>p.id===postId);if(!post)return;await updateLikes(postId,Math.max(0,(post.likes||0)+delta));}
+async function setLikes(postId){const val=parseInt(document.getElementById('likes-input-'+postId).value)||0;await updateLikes(postId,Math.max(0,val));}
 async function updateLikes(postId,newVal){
   const{error}=await sb.from('posts').update({likes:newVal}).eq('id',postId);
   if(error){showToast('❌ 更新に失敗しました');return;}
@@ -535,26 +529,21 @@ function levenshtein(a,b){
   return dp[m][n];
 }
 
-// ── 類似機材を検索してカード表示
+// ── 類似機材カード表示
 function showSimilar(name,rowId){
-  // 既存のカードを閉じる
-  document.querySelectorAll('.sim-card').forEach(c=>c.remove());
-  const row=document.getElementById(rowId);
-  if(!row)return;
-
+  document.querySelectorAll('.sim-card-row').forEach(c=>c.remove());
+  const row=document.getElementById(rowId);if(!row)return;
   const results=allPedals
     .map(p=>({name:p.full_name,dist:levenshtein(name,p.full_name)}))
     .filter(r=>r.dist<=4&&r.dist>0)
     .sort((a,b)=>a.dist-b.dist)
     .slice(0,5);
-
   const itemsHtml=results.length
-    ? results.map(r=>`<div class="sim-item"><span class="sim-dist">d=${r.dist}</span><span class="sim-name">${escHtml(r.name)}</span></div>`).join('')
-    : '<div class="sim-none">類似候補なし（距離4以内）</div>';
-
+    ?results.map(r=>`<div class="sim-item"><span class="sim-dist">d=${r.dist}</span><span class="sim-name">${escHtml(r.name)}</span></div>`).join('')
+    :'<div class="sim-none">類似候補なし（距離4以内）</div>';
   const card=document.createElement('tr');
   card.className='sim-card-row';
-  card.innerHTML=`<td colspan="5" style="padding:0 12px 12px">
+  card.innerHTML=`<td colspan="6" style="padding:0 12px 12px">
     <div class="sim-card">
       <div class="sim-card-title">🔍 「${escHtml(name)}」の類似候補</div>
       <div class="sim-card-close" onclick="this.closest('.sim-card-row').remove()">✕</div>
@@ -565,8 +554,9 @@ function showSimilar(name,rowId){
   row.insertAdjacentElement('afterend',card);
 }
 
-// ── 未登録機材
+// ── 未登録機材（unknown_gear_hiddenで除外）
 async function loadUnknownGear(){
+  // ペダル全件取得
   let pedals=[];
   let offset=0;
   while(true){
@@ -577,12 +567,19 @@ async function loadUnknownGear(){
     offset+=1000;
   }
   const pedalNames=new Set((pedals||[]).map(p=>p.full_name.toLowerCase()));
+
+  // 非表示リスト取得
+  const{data:hiddenData}=await sb.from('unknown_gear_hidden').select('gear_name');
+  const hiddenNames=new Set((hiddenData||[]).map(h=>h.gear_name.toLowerCase()));
+
   const gearCount={};
   allPosts.forEach(p=>{
     const gear=Array.isArray(p.gear_list)?p.gear_list:[];
     gear.forEach(g=>{
       const name=(g.name||g||'').trim();
-      if(name&&!pedalNames.has(name.toLowerCase())){gearCount[name]=(gearCount[name]||0)+1;}
+      if(name&&!pedalNames.has(name.toLowerCase())&&!hiddenNames.has(name.toLowerCase())){
+        gearCount[name]=(gearCount[name]||0)+1;
+      }
     });
   });
 
@@ -596,7 +593,6 @@ async function loadUnknownGear(){
   const el=document.getElementById('unknown-list');
   if(!sorted.length){el.innerHTML='<div class="empty-msg">未登録機材はありません</div>';return;}
 
-  // テーブル行にid付与して削除・類似検索に使う
   el.innerHTML='<div class="table-wrap"><table id="unknown-table">'
     +'<thead><tr><th>機材名</th><th>使用投稿数</th><th>📣 報告数</th><th colspan="3">操作</th></tr></thead>'
     +'<tbody>'
@@ -613,22 +609,30 @@ async function loadUnknownGear(){
         +'<td style="text-align:center">'+reportBadge+'</td>'
         +`<td><button class="approve-btn" onclick="addPedalFromUnknown('${safeName}')">＋ DBに追加</button></td>`
         +`<td><button class="fetch-btn" style="font-size:10px;padding:4px 8px" onclick="showSimilar('${safeName}','${rowId}')">🔍 登録確認</button></td>`
-        +`<td><button class="del-btn" onclick="removeUnknownRow('${rowId}')">✕ 削除</button></td>`
+        +`<td><button class="del-btn" onclick="hideUnknownGear('${safeName}','${rowId}')">✕ 非表示</button></td>`
         +'</tr>';
     }).join('')
     +'</tbody></table></div>';
 }
 
-function removeUnknownRow(rowId){
-  // 類似カードも一緒に消す
+async function hideUnknownGear(name,rowId){
+  if(!confirm(`「${name}」をリストから非表示にしますか？\nリロード後も表示されなくなります。`))return;
+  const{error}=await sb.from('unknown_gear_hidden').insert({gear_name:name});
+  if(error&&error.code!=='23505'){// 23505=重複キーは無視
+    showToast('❌ 非表示に失敗しました');return;
+  }
+  // 類似カードも消す
   const row=document.getElementById(rowId);
-  if(!row)return;
-  const next=row.nextElementSibling;
-  if(next&&next.classList.contains('sim-card-row'))next.remove();
-  row.remove();
+  if(row){
+    const next=row.nextElementSibling;
+    if(next&&next.classList.contains('sim-card-row'))next.remove();
+    row.remove();
+  }
   // バッジ更新
   const remaining=document.querySelectorAll('#unknown-table tbody tr:not(.sim-card-row)').length;
   document.getElementById('unknown-count').textContent=remaining;
+  document.getElementById('stat-unknown').textContent=remaining;
+  showToast('✅ 非表示にしました');
 }
 
 function addPedalFromUnknown(name){
@@ -676,22 +680,17 @@ function filterPedals(){applyPedalFilter();}
 
 function richCmd(editorId,tag){
   const editor=document.getElementById(editorId);if(!editor)return;
-  editor.focus();
-  const sel=window.getSelection();if(!sel||sel.rangeCount===0)return;
-  const range=sel.getRangeAt(0);
+  editor.focus();const sel=window.getSelection();if(!sel||sel.rangeCount===0)return;const range=sel.getRangeAt(0);
   if(tag==='br'){const br=document.createElement('br');range.deleteContents();range.insertNode(br);range.setStartAfter(br);range.setEndAfter(br);sel.removeAllRanges();sel.addRange(range);}
   else if(tag==='p'){const selectedText=range.toString();range.deleteContents();const textNode=document.createTextNode(selectedText||'テキスト');range.insertNode(textNode);range.setStartAfter(textNode);range.setEndAfter(textNode);sel.removeAllRanges();sel.addRange(range);}
   else{const selectedText=range.toString();const el=document.createElement(tag);if(selectedText){range.deleteContents();el.textContent=selectedText;}else{el.textContent=tag==='h2'?'見出し':tag==='h3'?'小見出し':'テキスト';}range.insertNode(el);range.setStartAfter(el);range.setEndAfter(el);sel.removeAllRanges();sel.addRange(range);}
 }
 
 async function addPedal(){
-  const brand=document.getElementById('new-brand').value.trim();
-  const model=document.getElementById('new-model').value.trim();
-  const typesRaw=document.getElementById('new-types').value.trim();
+  const brand=document.getElementById('new-brand').value.trim();const model=document.getElementById('new-model').value.trim();const typesRaw=document.getElementById('new-types').value.trim();
   if(!brand||!model){showToast('❌ ブランド名とモデル名は必須です');return;}
   const types=typesRaw?typesRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
-  const full_name=brand+' '+model;
-  const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const full_name=brand+' '+model;const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   const{error}=await sb.from('pedals').insert({brand,model,full_name,slug,types});
   if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
   showToast('✅ ペダルを追加しました');
@@ -723,9 +722,7 @@ function closePedalEdit(){document.getElementById('pedal-edit-modal').classList.
 function previewPedalImg(url){const preview=document.getElementById('pedal-img-preview');if(url){preview.src=url;preview.classList.add('show');}else{preview.src='';preview.classList.remove('show');}}
 
 async function handlePedalImageFile(input){
-  const file=input.files[0];if(!file)return;
-  const msg=document.getElementById('upload-progress-msg');
-  msg.textContent='🔄 画像を変換中...';
+  const file=input.files[0];if(!file)return;const msg=document.getElementById('upload-progress-msg');msg.textContent='🔄 画像を変換中...';
   try{const compressed=await compressPedalImage(file);const preview=document.getElementById('pedal-img-preview');preview.src=compressed;preview.classList.add('show');document.getElementById('edit-image-url').value='__pending__';window._pendingPedalImageB64=compressed;msg.textContent='✅ 変換完了。「保存」を押すとアップロードします。';}
   catch(e){msg.textContent='❌ 変換に失敗しました';}
 }
@@ -739,12 +736,9 @@ async function uploadPedalImage(b64,pedalId){
   const{data}=sb.storage.from('pedal-images').getPublicUrl(filename);return data.publicUrl;
 }
 async function savePedalEdit(){
-  if(!editingPedalId)return;
-  const msg=document.getElementById('upload-progress-msg');
-  const full_name=document.getElementById('edit-full-name').value.trim();
-  const brand=document.getElementById('edit-brand-name').value.trim();
-  const typesRaw=document.getElementById('edit-types-modal').value.trim();
-  const types=typesRaw?typesRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
+  if(!editingPedalId)return;const msg=document.getElementById('upload-progress-msg');
+  const full_name=document.getElementById('edit-full-name').value.trim();const brand=document.getElementById('edit-brand-name').value.trim();
+  const typesRaw=document.getElementById('edit-types-modal').value.trim();const types=typesRaw?typesRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
   if(!full_name||!brand){showToast('❌ 機材名とブランド名は必須です');return;}
   const model=full_name.startsWith(brand+' ')?full_name.slice(brand.length+1).trim():full_name;
   const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -761,8 +755,7 @@ async function savePedalEdit(){
   showToast('✅ 保存しました');closePedalEdit();await loadPedals();
 }
 async function deletePedalFromEdit(){
-  if(!editingPedalId)return;
-  const pedal=allPedals.find(p=>p.id==editingPedalId);
+  if(!editingPedalId)return;const pedal=allPedals.find(p=>p.id==editingPedalId);
   if(!confirm('「'+(pedal?.full_name||'このペダル')+'」を削除しますか？\nこの操作は取り消せません。'))return;
   const{error}=await sb.from('pedals').delete().eq('id',editingPedalId);
   if(error){showToast('❌ 削除に失敗しました: '+error.message);return;}
