@@ -73,6 +73,7 @@ const I18N={
     reportModalBody:'この機材はまだMGMBのデータベースに登録されていません。報告するとページ作成の優先度が上がります。',
     reportModalBtn:'MGMBに報告する',reportModalClose:'閉じる',
     reportDone:'📣 報告しました！ありがとうございます',
+    brandSelectDefault:'ブランドを選択...',
   },
   en:{
     postBannerTitle:'Share your board or gear!',postBannerSub:'No sign-up needed. Post anonymously with just one photo.',
@@ -130,6 +131,7 @@ const I18N={
     reportModalBody:'This gear is not yet in the MGMB database. Reporting it helps us prioritize adding it.',
     reportModalBtn:'Report to MGMB',reportModalClose:'Close',
     reportDone:'📣 Reported! Thank you.',
+    brandSelectDefault:'Select brand...',
   }
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
@@ -183,6 +185,19 @@ function renderGearWidgetHTML(name,count){
       +'<button onclick="openGearReportModal(\''+safeN+'\')" style="'+btnStyle+'border:none;">'+btnLabel+'</button>'
       +'</div>';
   }
+}
+// ── ブランドセレクトを生成する関数
+function populateBrandSelects(pedals){
+  const brands=[...new Set(pedals.map(p=>p.brand).filter(Boolean))].sort();
+  const pcSelect=document.getElementById('pc-brand-select');
+  const mobSelect=document.getElementById('mob-brand-select');
+  // 既存オプションをデフォルト以外削除
+  if(pcSelect)pcSelect.querySelectorAll('option:not(#pc-brand-select-default)').forEach(el=>el.remove());
+  if(mobSelect)mobSelect.querySelectorAll('option:not(#mob-brand-select-default)').forEach(el=>el.remove());
+  brands.forEach(brand=>{
+    if(pcSelect){const opt=document.createElement('option');opt.value=brand;opt.textContent=brand;pcSelect.appendChild(opt);}
+    if(mobSelect){const opt=document.createElement('option');opt.value=brand;opt.textContent=brand;mobSelect.appendChild(opt);}
+  });
 }
 function applyLangUI(){
   const label=document.getElementById('lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
@@ -244,6 +259,9 @@ function applyLangUI(){
     else if(txt.match(/ジャンル|Genre/))el.textContent=tr('slGenre');
     else if(txt.match(/ブランド$|^Brand$/))el.textContent=tr('slBrandTitle');
   });
+  // ブランドセレクトのデフォルトオプションテキストを言語に合わせて更新
+  const pcDef=document.getElementById('pc-brand-select-default');if(pcDef)pcDef.textContent=tr('brandSelectDefault');
+  const mobDef=document.getElementById('mob-brand-select-default');if(mobDef)mobDef.textContent=tr('brandSelectDefault');
   ['tag-tagroku-pc','tag-tagroku-mob','gs-tagroku'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tr('tagHomRec');});
   ['tag-shoshinsha-pc','tag-shoshinsha-mob','gs-shoshinsha'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tr('tagBeginner');});
   document.querySelectorAll('.brand-group-lbl').forEach(el=>{
@@ -313,7 +331,7 @@ async function loadPostsFromDB(){
   let pedals=[];
   let offset=0;
   while(true){
-    const{data:batch}=await sb.from('pedals').select('full_name,types,slug').range(offset,offset+999);
+    const{data:batch}=await sb.from('pedals').select('full_name,types,slug,brand').range(offset,offset+999);
     if(!batch||batch.length===0)break;
     pedals=[...pedals,...batch];
     if(batch.length<1000)break;
@@ -331,6 +349,8 @@ async function loadPostsFromDB(){
     const targetSlug=pedalSlugMap[normalizeName(a.pedal_full_name)];
     if(targetSlug)pedalSlugMap[normalizeName(a.alias)]=targetSlug;
   });
+  // ── ブランドセレクトを生成
+  populateBrandSelects(pedals);
   allDBPosts=(posts||[]).map(p=>({
     ...p,
     comment_count:cm[p.id]||0,
@@ -405,6 +425,9 @@ function getEmptyHTML(){
 function clearFilter(){
   currentGenreFilter='ALL';currentBrandFilter=null;currentFxFilter=null;
   document.querySelectorAll('.sl .tag, #swipe-ui .tag').forEach(t2=>{t2.classList.toggle('on',t2.getAttribute('data-genre')==='ALL');});
+  // ブランドセレクトをデフォルトに戻す
+  const pcSelect=document.getElementById('pc-brand-select');if(pcSelect)pcSelect.value='';
+  const mobSelect=document.getElementById('mob-brand-select');if(mobSelect)mobSelect.value='';
   clearSearch();updateMobFilterClear();
 }
 function renderDBPosts(posts){
