@@ -69,12 +69,9 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .sl-item:hover{background:var(--sf);color:var(--tx);border-color:var(--bd)}
 .sl-item.on{background:rgba(232,85,45,.1);color:var(--ac);border-color:rgba(232,85,45,.25)}
 .sl-div{height:1px;background:var(--bd);margin:14px 0}
-
-/* ★ ドロップダウン共通スタイル */
 .sl-select{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:8px 28px 8px 10px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);cursor:pointer;outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;margin-bottom:6px}
 .sl-select:focus{border-color:var(--ac)}
 .sl-select option{background:var(--sf);color:var(--tx)}
-
 .tags{display:flex;flex-wrap:wrap;gap:4px;padding:0 2px}
 .tag{padding:4px 10px;border:1px solid var(--bd);border-radius:2px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:var(--tm);cursor:pointer;transition:all .15s;touch-action:manipulation}
 .tag:hover,.tag.on{border-color:var(--ac);color:var(--ac);background:rgba(232,85,45,.07)}
@@ -317,7 +314,6 @@ header{padding:0 14px;height:54px}
 footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;display:flex!important}.footer-links{gap:12px}
 .pform{padding:20px 16px;margin:8px auto}
 .img-editor-toolbar{gap:6px;padding:8px}.editor-tool-btn{padding:8px 10px;min-width:58px}
-/* モバイル用ドロップダウン */
 .mob-select-wrap{margin-bottom:12px}
 .mob-sl-select{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:10px 28px 10px 10px;font-family:Noto Sans JP,sans-serif;font-size:14px;color:var(--tx);cursor:pointer;outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .mob-sl-select:focus{border-color:var(--ac)}
@@ -408,6 +404,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </div>
       <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px" id="mob-title-fxtype">エフェクタータイプ</div>
       <div class="mob-select-wrap" style="margin-bottom:20px">
+        <!-- ★ モバイル タイプ選択 -->
         <select class="mob-sl-select" id="mob-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
           <option value="" id="mob-type-select-default">タイプを選択...</option>
           <option value="overdrive">OD（オーバードライブ）</option>
@@ -421,18 +418,27 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           <option value="phaser">Phaser（フェイザー）</option>
           <option value="tremolo">Tremolo（トレモロ）</option>
           <option value="vibrato">Vibrato（ビブラート）</option>
-          <option value="pitch">Pitch（ピッチ）</option>
-          <option value="wah">Wah（ワウ）</option>
+          <option value="pitch_octave">Pitch / Octave（ピッチ/オクターブ）</option>
+          <option value="wah_filter">Wah / Filter（ワウ/フィルター）</option>
           <option value="comp">Comp（コンプレッサー）</option>
           <option value="eq">EQ（イコライザー）</option>
-          <option value="noise_gate">Noise Gate</option>
+          <option value="noise_gate">Noise Gate（ノイズゲート）</option>
           <option value="looper">Looper（ルーパー）</option>
           <option value="volume">Volume（ボリューム）</option>
           <option value="tuner">Tuner（チューナー）</option>
           <option value="multi">Multi FX（マルチ）</option>
           <option value="preamp">Preamp（プリアンプ）</option>
+          <option value="modulation">Modulation（モジュレーション）</option>
+          <option value="sequence_rhythm">Sequence / Rhythm（シークエンス/リズム）</option>
+          <option value="glitch">Glitch（グリッチ）</option>
+          <option value="acoustic">Acoustic（アコースティック）</option>
+          <option value="vocal">Vocal（ボーカル）</option>
+          <option value="power_supply">Power Supply（パワーサプライ）</option>
           <option value="switcher">Switcher（スイッチャー）</option>
           <option value="buffer">Buffer（バッファー）</option>
+          <option value="synth">Synth（シンセ）</option>
+          <option value="junction_box">Junction Box（ジャンクションボックス）</option>
+          <option value="other">Other（その他）</option>
         </select>
       </div>
 
@@ -537,6 +543,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <option value="" id="pc-brand-select-default">ブランドを選択...</option>
     </select>
     <div class="sl-lbl" id="sl-lbl-fxtype" style="margin-top:8px">エフェクタータイプ</div>
+    <!-- ★ PC タイプ選択 -->
     <select class="sl-select" id="pc-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
       <option value="" id="pc-type-select-default">タイプを選択...</option>
       <option value="overdrive">OD（オーバードライブ）</option>
@@ -550,18 +557,27 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <option value="phaser">Phaser（フェイザー）</option>
       <option value="tremolo">Tremolo（トレモロ）</option>
       <option value="vibrato">Vibrato（ビブラート）</option>
-      <option value="pitch">Pitch（ピッチ）</option>
-      <option value="wah">Wah（ワウ）</option>
+      <option value="pitch_octave">Pitch / Octave（ピッチ/オクターブ）</option>
+      <option value="wah_filter">Wah / Filter（ワウ/フィルター）</option>
       <option value="comp">Comp（コンプレッサー）</option>
       <option value="eq">EQ（イコライザー）</option>
-      <option value="noise_gate">Noise Gate</option>
+      <option value="noise_gate">Noise Gate（ノイズゲート）</option>
       <option value="looper">Looper（ルーパー）</option>
       <option value="volume">Volume（ボリューム）</option>
       <option value="tuner">Tuner（チューナー）</option>
       <option value="multi">Multi FX（マルチ）</option>
       <option value="preamp">Preamp（プリアンプ）</option>
+      <option value="modulation">Modulation（モジュレーション）</option>
+      <option value="sequence_rhythm">Sequence / Rhythm（シークエンス/リズム）</option>
+      <option value="glitch">Glitch（グリッチ）</option>
+      <option value="acoustic">Acoustic（アコースティック）</option>
+      <option value="vocal">Vocal（ボーカル）</option>
+      <option value="power_supply">Power Supply（パワーサプライ）</option>
       <option value="switcher">Switcher（スイッチャー）</option>
       <option value="buffer">Buffer（バッファー）</option>
+      <option value="synth">Synth（シンセ）</option>
+      <option value="junction_box">Junction Box（ジャンクションボックス）</option>
+      <option value="other">Other（その他）</option>
     </select>
   </div>
   <div class="sl-div"></div>
@@ -856,7 +872,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="index.js"></script>
-  <!-- 機材報告モーダル -->
+
+<!-- 機材報告モーダル -->
 <div id="gear-report-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:700;display:none;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeGearReportModal()">
   <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:24px;width:100%;max-width:380px;position:relative">
     <div id="grm-title" style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;margin-bottom:8px;color:var(--ac)">まだ詳細ページがありません</div>
