@@ -207,18 +207,27 @@
       <option value="phaser" id="type-phaser">Phaser（フェイザー）</option>
       <option value="tremolo" id="type-tremolo">Tremolo（トレモロ）</option>
       <option value="vibrato" id="type-vibrato">Vibrato（ビブラート）</option>
-      <option value="pitch" id="type-pitch">Pitch（ピッチ）</option>
-      <option value="wah" id="type-wah">Wah（ワウ）</option>
+      <option value="pitch_octave" id="type-pitch_octave">Pitch / Octave（ピッチ/オクターブ）</option>
+      <option value="wah_filter" id="type-wah_filter">Wah / Filter（ワウ/フィルター）</option>
       <option value="comp" id="type-comp">Comp（コンプレッサー）</option>
       <option value="eq" id="type-eq">EQ（イコライザー）</option>
-      <option value="noise_gate" id="type-noise_gate">Noise Gate</option>
+      <option value="noise_gate" id="type-noise_gate">Noise Gate（ノイズゲート）</option>
       <option value="looper" id="type-looper">Looper（ルーパー）</option>
       <option value="volume" id="type-volume">Volume（ボリューム）</option>
       <option value="tuner" id="type-tuner">Tuner（チューナー）</option>
       <option value="multi" id="type-multi">Multi FX（マルチ）</option>
       <option value="preamp" id="type-preamp">Preamp（プリアンプ）</option>
+      <option value="modulation" id="type-modulation">Modulation（モジュレーション）</option>
+      <option value="sequence_rhythm" id="type-sequence_rhythm">Sequence / Rhythm（シークエンス/リズム）</option>
+      <option value="glitch" id="type-glitch">Glitch（グリッチ）</option>
+      <option value="acoustic" id="type-acoustic">Acoustic（アコースティック）</option>
+      <option value="vocal" id="type-vocal">Vocal（ボーカル）</option>
+      <option value="power_supply" id="type-power_supply">Power Supply（パワーサプライ）</option>
       <option value="switcher" id="type-switcher">Switcher（スイッチャー）</option>
       <option value="buffer" id="type-buffer">Buffer（バッファー）</option>
+      <option value="synth" id="type-synth">Synth（シンセ）</option>
+      <option value="junction_box" id="type-junction_box">Junction Box（ジャンクションボックス）</option>
+      <option value="other" id="type-other">Other（その他）</option>
     </select>
   </div>
 </div>
@@ -236,7 +245,6 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ── 言語
 function detectLang() {
   const saved = localStorage.getItem('mgmb_lang');
   if (saved) return saved;
@@ -261,12 +269,21 @@ const I18N = {
       reverb:'Reverb（リバーブ）', delay:'Delay（ディレイ）',
       chorus:'Chorus（コーラス）', flanger:'Flanger（フランジャー）',
       phaser:'Phaser（フェイザー）', tremolo:'Tremolo（トレモロ）',
-      vibrato:'Vibrato（ビブラート）', pitch:'Pitch（ピッチ）',
-      wah:'Wah（ワウ）', comp:'Comp（コンプレッサー）', eq:'EQ（イコライザー）',
-      noise_gate:'Noise Gate', looper:'Looper（ルーパー）',
-      volume:'Volume（ボリューム）', tuner:'Tuner（チューナー）',
-      multi:'Multi FX（マルチ）', preamp:'Preamp（プリアンプ）',
-      switcher:'Switcher（スイッチャー）', buffer:'Buffer（バッファー）'
+      vibrato:'Vibrato（ビブラート）',
+      pitch_octave:'Pitch / Octave（ピッチ/オクターブ）',
+      wah_filter:'Wah / Filter（ワウ/フィルター）',
+      comp:'Comp（コンプレッサー）', eq:'EQ（イコライザー）',
+      noise_gate:'Noise Gate（ノイズゲート）',
+      looper:'Looper（ルーパー）', volume:'Volume（ボリューム）',
+      tuner:'Tuner（チューナー）', multi:'Multi FX（マルチ）',
+      preamp:'Preamp（プリアンプ）',
+      modulation:'Modulation（モジュレーション）',
+      sequence_rhythm:'Sequence / Rhythm（シークエンス/リズム）',
+      glitch:'Glitch（グリッチ）', acoustic:'Acoustic（アコースティック）',
+      vocal:'Vocal（ボーカル）', power_supply:'Power Supply（パワーサプライ）',
+      switcher:'Switcher（スイッチャー）', buffer:'Buffer（バッファー）',
+      synth:'Synth（シンセ）', junction_box:'Junction Box（ジャンクションボックス）',
+      other:'Other（その他）'
     }
   },
   en: {
@@ -284,12 +301,21 @@ const I18N = {
       reverb:'Reverb', delay:'Delay',
       chorus:'Chorus', flanger:'Flanger',
       phaser:'Phaser', tremolo:'Tremolo',
-      vibrato:'Vibrato', pitch:'Pitch Shifter',
-      wah:'Wah', comp:'Compressor', eq:'EQ',
-      noise_gate:'Noise Gate', looper:'Looper',
-      volume:'Volume', tuner:'Tuner',
-      multi:'Multi FX', preamp:'Preamp',
-      switcher:'Switcher', buffer:'Buffer'
+      vibrato:'Vibrato',
+      pitch_octave:'Pitch / Octave',
+      wah_filter:'Wah / Filter',
+      comp:'Compressor', eq:'EQ',
+      noise_gate:'Noise Gate',
+      looper:'Looper', volume:'Volume',
+      tuner:'Tuner', multi:'Multi FX',
+      preamp:'Preamp',
+      modulation:'Modulation',
+      sequence_rhythm:'Sequence / Rhythm',
+      glitch:'Glitch', acoustic:'Acoustic',
+      vocal:'Vocal', power_supply:'Power Supply',
+      switcher:'Switcher', buffer:'Buffer',
+      synth:'Synth', junction_box:'Junction Box',
+      other:'Other'
     }
   }
 };
@@ -306,19 +332,16 @@ function applyLang() {
   document.getElementById('brand-all').textContent = tr('brandAll');
   document.getElementById('type-all').textContent = tr('typeAll');
   document.getElementById('loading').textContent = tr('loading');
-  // タイプoption翻訳
   const opts = tr('typeOptions');
   Object.keys(opts).forEach(k => {
     const el = document.getElementById('type-' + k);
     if (el) el.textContent = opts[k];
   });
-  // もっと見るボタン
   const lmBtn = document.getElementById('load-more');
   if (lmBtn && lmBtn.style.display !== 'none') {
     const remaining = total - offset;
     lmBtn.textContent = tr('loadMore') + (remaining > 0 ? `（${tr('loadMoreCount')} ${remaining} 件）` : '');
   }
-  // 件数表示更新
   if (total > 0) {
     document.getElementById('result-count').innerHTML = `<span>${total}</span> ${tr('resultCount')}`;
   }
@@ -330,17 +353,19 @@ function toggleLang() {
   applyLang();
 }
 
-// ── TYPE LABELS（バッジ用）
 const TYPE_LABELS = {
   'overdrive':'OD','od':'OD','distortion':'Dist','dist':'Dist',
   'fuzz':'Fuzz','boost':'Boost','reverb':'Reverb','delay':'Delay',
   'chorus':'Chorus','flanger':'Flanger','phaser':'Phaser',
-  'modulation':'Mod','mod':'Mod','tremolo':'Tremolo','vibrato':'Vibrato',
-  'pitch':'Pitch','wah':'Wah','compressor':'Comp','comp':'Comp',
+  'modulation':'Mod','tremolo':'Tremolo','vibrato':'Vibrato',
+  'pitch_octave':'Pitch/Oct','wah_filter':'Wah/Filter',
+  'compressor':'Comp','comp':'Comp',
   'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
   'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
   'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer',
-  'junction_box':'Junction Box','pre':'Preamp','acoustic':'Acoustic','other':'Other'
+  'sequence_rhythm':'Seq/Rhythm','glitch':'Glitch',
+  'acoustic':'Acoustic','vocal':'Vocal','power_supply':'Power Supply',
+  'synth':'Synth','junction_box':'Junction Box','other':'Other'
 };
 function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()] || t; }
 
