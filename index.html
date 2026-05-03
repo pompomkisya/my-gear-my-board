@@ -19,7 +19,6 @@
 <meta name="robots" content="index, follow">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* ★変更: --tm と --td を明るく（グレー文字の視認性改善） */
 :root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--ac2:#f0a500;--tx:#eae8e2;--tm:#9a9890;--td:#6e6c68}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--tx);font-family:Noto Sans JP,sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
@@ -97,6 +96,8 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .feed-tab{flex:1;padding:7px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:#8a8880;cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;text-align:center;touch-action:manipulation}
 .feed-tab:last-child{border-right:none}
 .feed-tab.on{background:var(--sf2);color:var(--tx)}
+/* ★ グリッドラッパー */
+.grid-wrap{position:relative}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;animation:fu .4s ease both}
 @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -287,6 +288,42 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 .img-tab-bar{display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--bg)}
 .img-tab{padding:5px 12px;border-radius:3px;border:1px solid var(--bd);font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;min-height:32px;touch-action:manipulation}
 .img-tab.on{background:rgba(232,85,45,.15);border-color:var(--ac);color:var(--ac)}
+
+/* ★ ガチャ CSS */
+@keyframes gPulse{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.06);opacity:1}}
+@keyframes gBlink{0%,100%{opacity:1}50%{opacity:.08}}
+@keyframes gShimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+@keyframes gGlowGold{0%,100%{box-shadow:0 0 8px 2px rgba(255,215,0,.5)}50%{box-shadow:0 0 28px 10px rgba(255,215,0,.85)}}
+@keyframes gGlowPurple{0%,100%{box-shadow:0 0 8px 2px rgba(168,85,247,.4)}50%{box-shadow:0 0 24px 9px rgba(168,85,247,.8)}}
+@keyframes gGlowBlue{0%,100%{box-shadow:0 0 8px 2px rgba(59,130,246,.4)}50%{box-shadow:0 0 22px 8px rgba(59,130,246,.75)}}
+@keyframes gGlowGreen{0%,100%{box-shadow:0 0 8px 2px rgba(34,197,94,.4)}50%{box-shadow:0 0 20px 7px rgba(34,197,94,.7)}}
+@keyframes gGlowGray{0%,100%{box-shadow:0 0 5px 1px rgba(154,152,144,.2)}50%{box-shadow:0 0 12px 4px rgba(154,152,144,.4)}}
+@keyframes gRainbow{0%{border-color:#ff6b6b}16%{border-color:#ffd93d}33%{border-color:#6bcb77}50%{border-color:#4ecdc4}66%{border-color:#a855f7}83%{border-color:#f72585}100%{border-color:#ff6b6b}}
+@keyframes gFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-55px) scale(1.3)}}
+@keyframes gSpark{0%{transform:scale(0) rotate(0);opacity:1}55%{transform:scale(1.3) rotate(180deg)}100%{transform:scale(0) rotate(360deg);opacity:0}}
+@keyframes gReveal{0%{opacity:0;transform:scale(.72) rotateY(90deg)}60%{transform:scale(1.05) rotateY(-4deg)}100%{opacity:1;transform:scale(1) rotateY(0)}}
+.g-idle-icon{animation:gPulse 2.8s ease-in-out infinite}
+.g-db{animation:gBlink 1s infinite;display:inline-block;width:4px;height:4px;border-radius:50%;background:#e8552d}
+.g-result-reveal{animation:gReveal .6s cubic-bezier(.34,1.56,.64,1) both}
+.g-fp{animation:gFloat .9s ease-out forwards;position:absolute;border-radius:50%;pointer-events:none;z-index:21}
+.g-sp{animation:gSpark .65s ease-out forwards;position:absolute;pointer-events:none;z-index:22;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.g-hr{display:flex;align-items:center;gap:6px;padding:4px 6px;border-bottom:1px solid #272729;cursor:pointer;transition:background .12s;border-radius:3px}
+.g-hr:hover{background:rgba(255,255,255,.05)}
+/* ガチャボタン（グリッド右上固定） */
+.gacha-trigger-btn{position:absolute;top:0;right:0;z-index:10;display:flex;align-items:center;gap:5px;padding:6px 12px;background:linear-gradient(135deg,rgba(232,85,45,.15),rgba(240,165,0,.1));border:1px solid rgba(232,85,45,.4);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;color:#e8552d;cursor:pointer;transition:all .2s;touch-action:manipulation;backdrop-filter:blur(4px)}
+.gacha-trigger-btn:hover{background:linear-gradient(135deg,rgba(232,85,45,.25),rgba(240,165,0,.15));border-color:rgba(232,85,45,.7);box-shadow:0 0 12px rgba(232,85,45,.3)}
+/* ガチャモーダル */
+.gacha-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:800;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+.gacha-modal-overlay.open{opacity:1;pointer-events:all}
+.gacha-modal-inner{display:flex;flex-direction:column;align-items:center;font-family:'JetBrains Mono',monospace;color:#eae8e2;position:relative}
+/* ガチャカード */
+.g-card{width:240px;aspect-ratio:4/3;background:#151517;border:1.5px solid #272729;border-radius:6px;overflow:hidden;cursor:pointer;position:relative;display:flex;flex-direction:column;user-select:none;transition:border-color .25s}
+/* ツールチップ */
+.g-tooltip-wrap{position:relative;display:inline-flex;align-items:center}
+.g-tooltip-icon{width:16px;height:16px;border-radius:50%;border:1px solid #6e6c68;display:flex;align-items:center;justify-content:center;font-size:9px;color:#6e6c68;cursor:pointer;flex-shrink:0;font-family:sans-serif;font-style:normal}
+.g-tooltip-box{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#1c1c1f;border:1px solid #272729;border-radius:6px;padding:10px 12px;width:230px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:#9a9890;line-height:1.6;z-index:50;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.g-tooltip-wrap:hover .g-tooltip-box,.g-tooltip-wrap.open .g-tooltip-box{display:block}
+
 @media(max-width:1024px){.wrap{grid-template-columns:180px 1fr}.sr{display:none}}
 @media(max-width:680px){
 .wrap{display:block}.sl{display:none}.sr{display:none}.feed{padding:0;border:none}
@@ -318,6 +355,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 .mob-sl-select{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:10px 28px 10px 10px;font-family:Noto Sans JP,sans-serif;font-size:14px;color:var(--tx);cursor:pointer;outline:none;transition:border-color .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .mob-sl-select:focus{border-color:var(--ac)}
 .mob-sl-select option{background:var(--sf);color:var(--tx)}
+.gacha-trigger-btn{font-size:10px;padding:5px 10px}
+.g-tooltip-box{width:200px;left:auto;right:0;transform:none}
 }
 </style>
 <!-- Google tag (gtag.js) -->
@@ -374,7 +413,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="swipe-dot" onclick="goPanel(2)"></div>
   </div>
   <div class="swipe-container" id="swipe-container">
-
     <!-- モバイル 左パネル -->
     <div class="swipe-panel mob-left-panel">
       <div class="mob-search-wrap">
@@ -384,14 +422,10 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <button class="mob-search-clear" id="mob-search-clear" onclick="clearSearchMob()">✕</button>
       </div>
       <div class="mob-search-badge" id="mob-search-badge"></div>
-
-      <!-- マイページボタン（モバイル） -->
       <a href="/mypage" class="sl-item" style="display:flex;margin-bottom:16px;font-size:14px;font-weight:500;color:var(--tx);border-color:var(--bd)">
         👤 &nbsp;<span id="mob-mypage-text">マイページ / 登録・ログイン</span>
       </a>
       <div style="height:1px;background:var(--bd);margin-bottom:16px"></div>
-
-      <!-- エフェクター図鑑セクション（モバイル） -->
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:10px;color:var(--ac);display:flex;align-items:center;gap:8px" id="mob-title-encyclopedia">エフェクター図鑑<span style="flex:1;height:1px;background:var(--bd);display:inline-block;vertical-align:middle"></span></div>
       <a href="/pedals" class="sl-item" style="display:flex;margin-bottom:10px;font-size:13px;font-weight:500;color:var(--tx)">
         🎛 &nbsp;<span id="mob-encyclopedia-link-text">2,300件以上のペダルを見る</span>
@@ -404,7 +438,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </div>
       <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px" id="mob-title-fxtype">エフェクタータイプ</div>
       <div class="mob-select-wrap" style="margin-bottom:20px">
-        <!-- ★ モバイル タイプ選択 -->
         <select class="mob-sl-select" id="mob-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
           <option value="" id="mob-type-select-default">タイプを選択...</option>
           <option value="overdrive">OD（オーバードライブ）</option>
@@ -436,13 +469,11 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           <option value="power_supply">Power Supply（パワーサプライ）</option>
           <option value="switcher">Switcher（スイッチャー）</option>
           <option value="buffer">Buffer（バッファー）</option>
-          <option value="synth">Synth（シンセ）</option>
+          <option value="synth">Synth（シンせ）</option>
           <option value="junction_box">Junction Box（ジャンクションボックス）</option>
           <option value="other">Other（その他）</option>
         </select>
       </div>
-
-      <!-- 投稿ボードジャンルセクション（モバイル） -->
       <div style="height:1px;background:var(--bd);margin-bottom:16px"></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:10px;color:var(--tm);display:flex;align-items:center;gap:8px" id="mob-title-board-genre">投稿ボードジャンル<span style="flex:1;height:1px;background:var(--bd);display:inline-block;vertical-align:middle"></span></div>
       <div class="tags" style="margin-bottom:10px"><div class="tag on" data-genre="ALL" onclick="filterGenreMob(this,'ALL')">ALL</div></div>
@@ -468,11 +499,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div class="tag" data-genre="ALTERNATIVE" onclick="filterGenreMob(this,'ALTERNATIVE')">ALTERNATIVE</div>
         <div class="tag" data-genre="PUNK" onclick="filterGenreMob(this,'PUNK')">PUNK</div>
       </div>
-
       <div class="ad-slot" style="height:100px;margin-top:14px;border-radius:4px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">Google AdSense</div></div>
       <div style="height:40px"></div>
     </div>
-
     <!-- モバイル フィードパネル -->
     <div class="swipe-panel" id="mob-feed-panel">
       <div class="mob-feed-inner">
@@ -499,10 +528,13 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           <div class="feed-tab" onclick="setTab(this,'board')">ボード</div>
           <div class="feed-tab" onclick="setTab(this,'gear')">機材</div>
         </div>
-        <div class="grid" id="card-grid-mob"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)">読み込み中...</div></div>
+        <!-- ★ モバイル グリッドラッパー -->
+        <div class="grid-wrap" style="margin-top:10px">
+          <button class="gacha-trigger-btn" id="gacha-btn-mob" onclick="openGacha()">🎰 <span class="gacha-btn-txt">PEDAL GACHA</span></button>
+          <div class="grid" id="card-grid-mob" style="padding-top:36px"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)">読み込み中...</div></div>
+        </div>
       </div>
     </div>
-
     <!-- モバイル 右パネル -->
     <div class="swipe-panel mob-right-panel">
       <div class="mob-panel-title">今月の人気ボード</div>
@@ -524,15 +556,12 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 <!-- ===== PC レイアウト ===== -->
 <div class="wrap">
 <aside class="sl">
-  <!-- マイページボタン（PC） -->
   <div style="margin-bottom:16px">
     <a href="/mypage" class="sl-item" style="font-size:13px;font-weight:500;color:var(--tx);border-color:var(--bd)">
       👤 &nbsp;<span id="sl-mypage-text">マイページ / 登録・ログイン</span>
     </a>
   </div>
   <div class="sl-div"></div>
-
-  <!-- エフェクター図鑑セクション -->
   <div style="margin:16px 0">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ac);padding:0 8px;margin-bottom:8px" id="sl-encyclopedia-text">エフェクター図鑑</div>
     <a href="/pedals" class="sl-item" style="color:var(--tx);margin-bottom:8px;font-size:12px">
@@ -543,7 +572,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <option value="" id="pc-brand-select-default">ブランドを選択...</option>
     </select>
     <div class="sl-lbl" id="sl-lbl-fxtype" style="margin-top:8px">エフェクタータイプ</div>
-    <!-- ★ PC タイプ選択 -->
     <select class="sl-select" id="pc-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
       <option value="" id="pc-type-select-default">タイプを選択...</option>
       <option value="overdrive">OD（オーバードライブ）</option>
@@ -581,8 +609,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </select>
   </div>
   <div class="sl-div"></div>
-
-  <!-- 投稿ボードジャンルセクション -->
   <div style="margin-top:16px">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--tm);padding:0 8px;margin-bottom:8px" id="sl-lbl-genre">投稿ボードジャンル</div>
     <div class="tags"><div class="tag on" data-genre="ALL" onclick="filterGenre(this,'ALL')">ALL</div></div>
@@ -611,7 +637,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="ad-slot" style="height:100px;margin-top:14px;border-radius:4px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">広告</div></div>
   </div>
 </aside>
-
 <main class="feed">
   <div class="post-banner">
     <div class="post-banner-text"><strong>🎸 あなたのボードや機材を投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。</div>
@@ -632,9 +657,12 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="feed-tab" onclick="setTab(this,'board')">エフェクターボード</div>
     <div class="feed-tab" onclick="setTab(this,'gear')">機材</div>
   </div>
-  <div class="grid" id="card-grid"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)">読み込み中...</div></div>
+  <!-- ★ PC グリッドラッパー -->
+  <div class="grid-wrap">
+    <button class="gacha-trigger-btn" id="gacha-btn-pc" onclick="openGacha()">🎰 <span class="gacha-btn-txt">PEDAL GACHA</span></button>
+    <div class="grid" id="card-grid" style="padding-top:36px"><div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)">読み込み中...</div></div>
+  </div>
 </main>
-
 <aside class="sr">
   <div class="widget"><div class="wt">🔥 今月の人気ボード</div><div id="ranking-widget"></div></div>
   <div class="widget"><div class="wt">🎛 よく使われている機材</div><div id="gear-widget"></div></div>
@@ -870,8 +898,337 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <div class="img-editor-toolbar" id="img-editor-toolbar"></div>
 </div>
 
+<!-- ★ ガチャ モーダル -->
+<div class="gacha-modal-overlay" id="gacha-overlay" onclick="if(event.target===this)closeGacha()">
+  <div class="gacha-modal-inner">
+    <!-- タイトル -->
+    <div style="margin-bottom:14px;text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:#e8552d;margin-bottom:4px">GEAR GACHA</div>
+      <div id="g-sub1" style="font-family:Noto Sans JP,sans-serif;font-size:12px;color:#9a9890;letter-spacing:1px">次の相棒に出会おう</div>
+      <div id="g-sub2" style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:#6e6c68;letter-spacing:1px">ペダル図鑑から厳選紹介</div>
+    </div>
+
+    <!-- カード -->
+    <div class="g-card" id="g-card" onclick="gHandleTap()">
+      <div style="position:absolute;inset:0;pointer-events:none;z-index:28;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px)"></div>
+      <div id="g-pts" style="position:absolute;inset:0;pointer-events:none;z-index:20"></div>
+      <div id="g-panel" style="flex:1;display:flex;flex-direction:column"></div>
+    </div>
+
+    <!-- シェアボタン -->
+    <div id="g-sw" style="width:240px;margin-top:8px;opacity:0;pointer-events:none;transition:opacity .3s">
+      <button onclick="gDoShare()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 0;background:rgba(29,161,242,.12);border:1px solid rgba(29,161,242,.35);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#1da1f2;cursor:pointer;letter-spacing:.5px">
+        <span style="font-size:14px;line-height:1;font-weight:900">X</span>
+        <span id="g-share-txt">シェアする</span>
+      </button>
+    </div>
+
+    <!-- 排出率 + ツールチップ -->
+    <div style="margin-top:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center">
+      <span style="color:#ffd700;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">SS 3%</span>
+      <span style="color:#a855f7;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">SR 5%</span>
+      <span style="color:#3b82f6;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">R 15%</span>
+      <span style="color:#22c55e;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">S 27%</span>
+      <span style="color:#9a9890;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">STD 50%</span>
+      <div class="g-tooltip-wrap" id="g-tt-wrap" onclick="this.classList.toggle('open')">
+        <div class="g-tooltip-icon">?</div>
+        <div class="g-tooltip-box" id="g-tt-box">レアリティの基準は当サイト独自の遊び心です。ペダルの価値は市場の評価ではなく、弾き手の音の中で決まるものです。機材製作者に敬意を込めて</div>
+      </div>
+    </div>
+
+    <!-- 直近履歴 -->
+    <div id="g-hw" style="margin-top:12px;width:240px;display:none">
+      <div id="g-hist-lbl" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;letter-spacing:2px;margin-bottom:4px;text-align:center">— 直近履歴 —</div>
+      <div id="g-hl"></div>
+    </div>
+
+    <!-- ヒント -->
+    <div id="g-hint" style="margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6e6c68;letter-spacing:1px;display:flex;align-items:center;gap:5px">
+      <span class="g-db"></span>
+      <span id="g-ht">カードをタップして引く</span>
+      <span class="g-db" style="animation-delay:.5s"></span>
+    </div>
+
+    <!-- 閉じるボタン -->
+    <button onclick="closeGacha()" style="margin-top:14px;padding:6px 20px;background:transparent;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;letter-spacing:1px" id="g-close-txt">✕ 閉じる</button>
+
+    <canvas id="g-cv" style="display:none"></canvas>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="index.js"></script>
+
+<!-- ★ ガチャ スクリプト -->
+<script>
+(function(){
+const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
+const GACHA_IMG='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png';
+const TYPE_ICON_BASE='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_';
+
+const RR={
+  SS:{l:'SS',n:'LEGENDARY',  nEn:'LEGENDARY',  c:'#ffd700',gw:'rgba(255,215,0,.85)', bd:'#ffd700',rb:true, w:3, pc:20,ga:'gGlowGold 1.4s ease-in-out infinite,gRainbow 2s linear infinite',gr:'linear-gradient(135deg,#ffd700 0%,#ff6b35 25%,#a855f7 50%,#06b6d4 75%,#ffd700 100%)'},
+  SR:{l:'SR',n:'SUPER RARE', nEn:'SUPER RARE', c:'#a855f7',gw:'rgba(168,85,247,.8)',  bd:'#a855f7',rb:false,w:5, pc:13,ga:'gGlowPurple 1.8s ease-in-out infinite',gr:'linear-gradient(135deg,#a855f7,#7c3aed)'},
+  R: {l:'R', n:'RARE',       nEn:'RARE',       c:'#3b82f6',gw:'rgba(59,130,246,.75)', bd:'#3b82f6',rb:false,w:15,pc:7, ga:'gGlowBlue 1.8s ease-in-out infinite',  gr:'linear-gradient(135deg,#3b82f6,#1d4ed8)'},
+  S: {l:'S', n:'SPECIALIST', nEn:'SPECIALIST', c:'#22c55e',gw:'rgba(34,197,94,.7)',   bd:'#22c55e',rb:false,w:27,pc:4, ga:'gGlowGreen 1.8s ease-in-out infinite',  gr:'linear-gradient(135deg,#22c55e,#15803d)'},
+  STD:{l:'STD',n:'STANDARD', nEn:'STANDARD',   c:'#9a9890',gw:'rgba(154,152,144,.3)', bd:'#272729',rb:false,w:50,pc:1, ga:'gGlowGray 2s ease-in-out infinite',     gr:'linear-gradient(135deg,#9a9890,#6e6c68)'},
+};
+const SL=['BOSS','MXR','EHX','STRYMON','KLON','TC ELEC','WALRUS','JHS','WAMPLER','KEELEY','FULLTONE','CAROLINE','EVENTIDE','CHASE BLISS'];
+
+let gPedals={SS:[],SR:[],R:[],S:[],STD:[]};
+let gLoaded=false;
+let gPhase='idle',gResult=null,gSlotT=null,gRollT=null,gCnt=0,gHist=[];
+let gLang='ja';
+
+// 言語判定（index.jsのlang変数と同期）
+function getGLang(){
+  try{return localStorage.getItem('mgmb_lang')||((navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en');}
+  catch(e){return 'ja';}
+}
+
+// Supabaseからrarity設定済みペダルを取得
+async function loadGachaPedals(){
+  if(gLoaded)return;
+  try{
+    const sb2=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+    const{data}=await sb2.from('pedals').select('id,brand,model,full_name,slug,rarity,image_url,types').not('rarity','is',null);
+    if(!data)return;
+    gPedals={SS:[],SR:[],R:[],S:[],STD:[]};
+    data.forEach(p=>{
+      if(gPedals[p.rarity])gPedals[p.rarity].push(p);
+    });
+    gLoaded=true;
+  }catch(e){console.error('gacha load error',e);}
+}
+
+function gPick(){
+  const tot=Object.values(RR).reduce((s,r)=>s+r.w,0);
+  let rn=Math.random()*tot,rk='STD';
+  for(const [k,r] of Object.entries(RR)){rn-=r.w;if(rn<=0){rk=k;break;}}
+  // フォールバック：そのレアリティが0件ならSTD
+  let pool=gPedals[rk]||[];
+  if(!pool.length)pool=gPedals['STD']||[];
+  if(!pool.length)return null;
+  return {...pool[Math.floor(Math.random()*pool.length)],_rk:rk};
+}
+
+function gSetShare(v){
+  const el=document.getElementById('g-sw');
+  el.style.opacity=v?'1':'0';
+  el.style.pointerEvents=v?'auto':'none';
+}
+
+function openGacha(){
+  gLang=getGLang();
+  applyGachaLang();
+  document.getElementById('gacha-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  loadGachaPedals();
+  gSetIdle();
+}
+function closeGacha(){
+  document.getElementById('gacha-overlay').classList.remove('open');
+  document.body.style.overflow='';
+  if(gSlotT)clearInterval(gSlotT);
+  if(gRollT)clearTimeout(gRollT);
+}
+
+function applyGachaLang(){
+  const isEn=gLang==='en';
+  document.getElementById('g-sub1').textContent=isEn?'Find your next pedal':'次の相棒に出会おう';
+  document.getElementById('g-sub2').textContent=isEn?'Handpicked from our gear database':'ペダル図鑑から厳選紹介';
+  document.getElementById('g-share-txt').textContent=isEn?'Share':'シェアする';
+  document.getElementById('g-hist-lbl').textContent=isEn?'— RECENT ROLLS —':'— 直近履歴 —';
+  document.getElementById('g-tt-box').textContent=isEn
+    ?'Rarity is our own playful take. A pedal\'s true value is found in the player\'s sound, not the market. With respect to all who craft these instruments.'
+    :'レアリティの基準は当サイト独自の遊び心です。ペダルの価値は市場の評価ではなく、弾き手の音の中で決まるものです。機材製作者に敬意を込めて';
+  document.getElementById('g-close-txt').textContent=isEn?'✕ Close':'✕ 閉じる';
+}
+
+function gHandleTap(){
+  if(gPhase==='rolling')return;
+  if(gPhase==='result'){gSetIdle();return;}
+  gStartRoll();
+}
+
+function gSetIdle(){
+  gPhase='idle';gResult=null;
+  const c=document.getElementById('g-card');c.style.animation='none';c.style.borderColor='#272729';
+  gSetShare(false);
+  gRenderIdle();
+  const isEn=gLang==='en';
+  document.getElementById('g-ht').textContent=isEn?'Tap card to roll':'カードをタップして引く';
+  document.getElementById('g-hint').style.display='flex';
+}
+
+function gStartRoll(){
+  gPhase='rolling';
+  const c=document.getElementById('g-card');c.style.animation='none';c.style.borderColor='#272729';
+  gSetShare(false);gRenderRolling();
+  document.getElementById('g-hint').style.display='none';
+  let tick=0;
+  gSlotT=setInterval(()=>{
+    tick++;
+    const s=[SL[Math.floor(Math.random()*SL.length)],tick%2===0?'◆◆◆◆◆◆◆':'●●●●●●●',tick%3===0?'★★★★★':tick%3===1?'▓▓▓▓▓▓':'▒▒▒▒▒▒'];
+    document.querySelectorAll('.g-sr').forEach((el,i)=>{if(s[i])el.textContent=s[i];});
+  },55);
+  const p=gPick();
+  if(!p){
+    clearInterval(gSlotT);
+    gPhase='idle';
+    const isEn=gLang==='en';
+    alert(isEn?'No pedals in gacha pool yet.':'ガチャ対象のペダルがまだありません。');
+    gRenderIdle();return;
+  }
+  const dur={SS:2800,SR:2200,R:1700,S:1300,STD:950}[p._rk]||950;
+  gRollT=setTimeout(()=>{
+    clearInterval(gSlotT);
+    gResult=p;gPhase='result';gCnt++;
+    gHist.unshift(p);if(gHist.length>5)gHist.pop();
+    gRenderResult(p);gSpawnPts(p);
+    gSetShare(true);
+    document.getElementById('g-hint').style.display='flex';
+    const isEn=gLang==='en';
+    document.getElementById('g-ht').textContent=isEn?'Tap again to re-roll':'再タップでもう一度';
+  },dur);
+}
+
+function gSpawnPts(p){
+  const rk=RR[p._rk],el=document.getElementById('g-pts');el.innerHTML='';
+  for(let i=0;i<rk.pc;i++){
+    const d=document.createElement('div');d.className='g-fp';
+    d.style.cssText=`left:${10+Math.random()*80}%;top:${15+Math.random()*70}%;width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;background:${rk.c};animation-delay:${Math.random()*.35}s;`;
+    el.appendChild(d);
+  }
+  if(['SS','SR'].includes(p._rk)){
+    const n=p._rk==='SS'?14:8;
+    for(let i=0;i<n;i++){
+      const d=document.createElement('div');d.className='g-sp';
+      d.style.cssText=`left:${8+Math.random()*84}%;top:${8+Math.random()*84}%;width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;background:${rk.c};animation-delay:${Math.random()*.45}s;`;
+      el.appendChild(d);
+    }
+  }
+  setTimeout(()=>{el.innerHTML='';},1500);
+}
+
+function gPedalImgSrc(p){
+  if(p.image_url)return p.image_url;
+  const t=(p.types&&p.types[0])||'other';
+  return TYPE_ICON_BASE+t+'.png';
+}
+
+function gRenderIdle(){
+  document.getElementById('g-panel').innerHTML=`
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 14px;background:radial-gradient(ellipse at 50% 55%,rgba(232,85,45,.08) 0%,transparent 68%);position:relative">
+      <div class="g-idle-icon" style="width:88px;height:88px;margin-bottom:6px">
+        <img src="${GACHA_IMG}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px rgba(232,85,45,.55))" onerror="this.style.display='none'">
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:#e8552d;margin-bottom:2px">GEAR GACHA</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#9a9890;letter-spacing:1.5px;margin-bottom:10px">GET YOUR NEXT PEDAL</div>
+      <div style="display:flex;align-items:center;gap:5px;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.4);border-radius:4px;padding:5px 13px">
+        <span style="font-size:14px;line-height:1">🎰</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#e8552d;font-weight:bold">TAP TO ROLL</span>
+        <span class="g-db"></span>
+      </div>
+      ${gCnt>0?`<div style="position:absolute;top:7px;right:7px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}
+    </div>`;
+}
+
+function gRenderRolling(){
+  document.getElementById('g-panel').innerHTML=`
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:14px 12px;gap:8px">
+      <div style="width:100%;background:#0d0d0e;border:1px solid rgba(240,165,0,.3);border-radius:4px;overflow:hidden">
+        <div class="g-sr" style="padding:5px 10px;border-bottom:1px solid #272729;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#f0a500;text-align:center;letter-spacing:2px;white-space:nowrap;overflow:hidden">BOSS</div>
+        <div class="g-sr" style="padding:5px 10px;border-bottom:1px solid #272729;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#6e6c68;text-align:center;white-space:nowrap;overflow:hidden">◆◆◆◆◆◆◆</div>
+        <div class="g-sr" style="padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#6e6c68;text-align:center;white-space:nowrap;overflow:hidden">★★★★★</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:4px;font-weight:bold">
+        ROLLING
+        <span class="g-db" style="background:#f0a500;width:4px;height:4px"></span>
+        <span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span>
+        <span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span>
+      </div>
+      <div style="width:75%;height:3px;background:#272729;border-radius:2px;overflow:hidden">
+        <div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div>
+      </div>
+    </div>`;
+}
+
+function gRenderResult(p){
+  const rk=RR[p._rk];
+  const c=document.getElementById('g-card');c.style.borderColor=rk.bd;c.style.animation=rk.ga;
+  const bs=`display:inline-flex;align-items:center;padding:2px 9px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;font-weight:bold;color:${rk.l==='STD'?'#9a9890':'#fff'};background:${rk.gr};background-size:200% 100%;${rk.rb?'animation:gShimmer 1.8s linear infinite;':''}`;
+  const isEn=gLang==='en';
+  const imgSrc=gPedalImgSrc(p);
+  document.getElementById('g-panel').innerHTML=`
+    <div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column">
+      <div style="position:relative;flex:0 0 55%;background:#1c1c1f;display:flex;align-items:center;justify-content:center;overflow:hidden">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,${rk.gw.replace(/,[^,)]+\)$/,',0.2)')} 0%,transparent 65%);pointer-events:none"></div>
+        ${rk.rb?`<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>`:''}
+        <img src="${imgSrc}" style="width:84px;height:84px;object-fit:contain;filter:drop-shadow(0 0 14px ${rk.gw});position:relative;z-index:2" onerror="this.src='${GACHA_IMG}'">
+        <div style="position:absolute;top:7px;left:7px;z-index:5"><span style="${bs}">${rk.l}</span></div>
+        ${gCnt>0?`<div style="position:absolute;top:7px;right:7px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}
+      </div>
+      <div style="flex:1;padding:7px 11px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:2px">${p.brand}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:3px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.model}</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c}">${isEn?rk.nEn:rk.n}</div>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:5px">
+          <button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="flex:1;padding:4px 0;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.3);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#e8552d;cursor:pointer">${isEn?'Details →':'詳細 →'}</button>
+          <button onclick="event.stopPropagation();gSetIdle()" style="padding:4px 8px;background:#1c1c1f;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;white-space:nowrap">🎰 ${isEn?'AGAIN':'AGAIN'}</button>
+        </div>
+      </div>
+    </div>`;
+  gRenderHist();
+}
+
+function gRenderHist(){
+  if(!gHist.length)return;
+  const isEn=gLang==='en';
+  document.getElementById('g-hw').style.display='block';
+  document.getElementById('g-hl').innerHTML=gHist.map((p,i)=>{
+    const r=RR[p._rk];
+    return `<div class="g-hr" onclick="location.href='/pedal?slug=${p.slug}'" style="opacity:${1-i*.16}">
+      <span style="padding:1px 7px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:bold;color:${r.l==='STD'?'#9a9890':'#fff'};background:${r.gr};background-size:200% 100%;flex-shrink:0;${r.rb?'animation:gShimmer 2s linear infinite;':''}">${r.l}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a9890;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${p.model}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;flex-shrink:0;margin-left:2px">→</span>
+    </div>`;
+  }).join('');
+}
+
+async function gDoShare(){
+  if(!gResult)return;
+  const rk=RR[gResult._rk];
+  const isEn=gLang==='en';
+  const text=isEn
+    ?`GACHA Result [${rk.l}] Met "${gResult.model}"!\n#MGMB #guitarpedals\nhttps://mygearmyboard.com`
+    :`GACHA結果【${rk.l}】「${gResult.model}」と出会った！\n#MGMB #エフェクター\nhttps://mygearmyboard.com`;
+  try{
+    if(navigator.share){await navigator.share({title:'MGMB GEAR GACHA',text});}
+    else{await navigator.clipboard.writeText(text).catch(()=>{});alert(isEn?'Copied!':'コピーしました');}
+  }catch(e){if(e.name!=='AbortError'){navigator.clipboard.writeText(text).catch(()=>{});}}
+}
+
+// 言語切り替え時にガチャUIも更新
+const _origToggleLang=window.toggleLang;
+window.toggleLang=function(){
+  if(_origToggleLang)_origToggleLang();
+  setTimeout(()=>{
+    gLang=getGLang();
+    if(document.getElementById('gacha-overlay').classList.contains('open'))applyGachaLang();
+  },50);
+};
+
+// グローバルに公開
+window.openGacha=openGacha;
+window.closeGacha=closeGacha;
+window.gHandleTap=gHandleTap;
+window.gDoShare=gDoShare;
+})();
+</script>
 
 <!-- 機材報告モーダル -->
 <div id="gear-report-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:700;display:none;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeGearReportModal()">
