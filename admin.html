@@ -99,10 +99,20 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .pf-btn{padding:6px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s}
 .pf-btn:hover{border-color:var(--ac);color:var(--ac)}
 .pf-btn.on{background:var(--ac);border-color:var(--ac);color:#fff}
-/* タイプ絞り込みプルダウン */
 .pf-type-select{padding:6px 28px 6px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;outline:none;transition:all .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 .pf-type-select:focus,.pf-type-select.active{border-color:var(--ac);color:var(--ac)}
 .pf-type-select option{background:var(--sf);color:var(--tx)}
+/* ★ rarityセレクト */
+.rarity-select{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:8px 12px;font-size:13px;color:var(--tx);font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .15s;cursor:pointer}
+.rarity-select:focus{border-color:var(--ac)}
+.rarity-select option{background:var(--sf);color:var(--tx)}
+/* ★ rarityバッジ */
+.rarity-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px}
+.rarity-SS{background:linear-gradient(135deg,#ffd700,#ff6b35);color:#fff}
+.rarity-SR{background:#a855f7;color:#fff}
+.rarity-R{background:#3b82f6;color:#fff}
+.rarity-S{background:#22c55e;color:#fff}
+.rarity-STD{background:#6e6c68;color:#fff}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
 .stat-card{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:16px}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--ac);line-height:1}
@@ -118,7 +128,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .sim-dist{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);flex-shrink:0;width:30px;text-align:right}
 .sim-name{flex:1;font-weight:500}
 .sim-none{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);padding:6px}
-/* タイプ予測変換ドロップダウン共通 */
 .type-ac-wrap{position:relative}
 .type-ac-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:600;max-height:220px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6)}
 .type-ac-dropdown.open{display:block}
@@ -127,7 +136,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .type-ac-item:hover,.type-ac-item.focus{background:rgba(232,85,45,.12)}
 .type-ac-value{color:var(--ac2);flex-shrink:0;font-size:10px}
 .type-ac-label{color:var(--tx);flex:1}
-/* エイリアス管理 */
 .alias-form{background:var(--sf);border:1px solid rgba(232,85,45,.25);border-radius:6px;padding:16px;margin-bottom:16px}
 .alias-row{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:8px}
 .alias-input{flex:1;min-width:160px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:8px 12px;font-size:14px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
@@ -278,7 +286,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="form-grid">
         <input class="form-input" id="new-brand" type="text" placeholder="ブランド名">
         <input class="form-input" id="new-model" type="text" placeholder="モデル名">
-        <!-- ★ 追加フォームのタイプ入力（予測変換付き） -->
         <div class="type-ac-wrap">
           <input class="form-input" id="new-types" type="text" placeholder="タイプ（例: overdrive,boost）"
             oninput="handleTypeInput(this,'new-types-ac')"
@@ -302,7 +309,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="pf-btn" id="pf-no-desc" onclick="setPedalFilter('no-desc')">📝 説明文なし</button>
       <button class="pf-btn" id="pf-no-yt" onclick="setPedalFilter('no-yt')">▶ YouTube動画なし</button>
       <button class="pf-btn" id="pf-complete" onclick="setPedalFilter('complete')">✅ すべて入力済み</button>
-      <!-- ★ タイプ絞り込みプルダウン -->
       <select class="pf-type-select" id="pf-type-select" onchange="setPedalTypeFilter(this.value)">
         <option value="">🏷 タイプで絞る</option>
         <option value="overdrive">overdrive</option>
@@ -369,7 +375,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <label class="pedal-edit-label">ブランド名（brand）</label>
     <input class="form-input" id="edit-brand-name" type="text" placeholder="例: BOSS" style="width:100%">
     <label class="pedal-edit-label">タイプ（types）― カンマ区切り</label>
-    <!-- ★ 編集モーダルのタイプ入力（予測変換付き） -->
     <div class="type-ac-wrap">
       <input class="form-input" id="edit-types-modal" type="text" placeholder="例: overdrive,boost"
         oninput="handleTypeInput(this,'edit-types-ac')"
@@ -381,6 +386,21 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px;margin-bottom:4px">
       💡 カンマ区切りで複数指定。入力中に候補が表示されます。
     </div>
+
+    <!-- ★ rarityセレクト -->
+    <label class="pedal-edit-label">🎰 レアリティ（RARITY）― ガチャ排出設定</label>
+    <select class="rarity-select" id="edit-rarity">
+      <option value="">― ガチャ対象外（未設定）</option>
+      <option value="SS">⭐⭐ SS ― LEGENDARY（3%）</option>
+      <option value="SR">⭐ SR ― SUPER RARE（5%）</option>
+      <option value="R">🔵 R ― RARE（15%）</option>
+      <option value="S">🟢 S ― SPECIALIST（27%）</option>
+      <option value="STD">⚪ STD ― STANDARD（50%）</option>
+    </select>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px;margin-bottom:8px">
+      💡 未設定のペダルはガチャに出現しません。画像・説明文も設定推奨。
+    </div>
+
     <label class="pedal-edit-label">画像をアップロード（iPhoneから選択可）</label>
     <input type="file" id="edit-image-file" accept="image/*" style="display:none" onchange="handlePedalImageFile(this)">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
@@ -441,63 +461,37 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const MASTER_PIN='MSTR0198';
 const SESSION_KEY='mgmb_admin_auth';
 
-// ── タイプ一覧（正式値 + 日本語ラベル）
-const TYPE_LIST = [
-  {v:'overdrive',       l:'OD（オーバードライブ）'},
-  {v:'distortion',      l:'Dist（ディストーション）'},
-  {v:'fuzz',            l:'Fuzz（ファズ）'},
-  {v:'boost',           l:'Boost（ブースター）'},
-  {v:'reverb',          l:'Reverb（リバーブ）'},
-  {v:'delay',           l:'Delay（ディレイ）'},
-  {v:'chorus',          l:'Chorus（コーラス）'},
-  {v:'flanger',         l:'Flanger（フランジャー）'},
-  {v:'phaser',          l:'Phaser（フェイザー）'},
-  {v:'tremolo',         l:'Tremolo（トレモロ）'},
-  {v:'vibrato',         l:'Vibrato（ビブラート）'},
-  {v:'pitch_octave',    l:'Pitch / Octave（ピッチ/オクターブ）'},
-  {v:'wah_filter',      l:'Wah / Filter（ワウ/フィルター）'},
-  {v:'comp',            l:'Comp（コンプレッサー）'},
-  {v:'eq',              l:'EQ（イコライザー）'},
-  {v:'noise_gate',      l:'Noise Gate（ノイズゲート）'},
-  {v:'looper',          l:'Looper（ルーパー）'},
-  {v:'volume',          l:'Volume（ボリューム）'},
-  {v:'tuner',           l:'Tuner（チューナー）'},
-  {v:'multi',           l:'Multi FX（マルチ）'},
-  {v:'preamp',          l:'Preamp（プリアンプ）'},
-  {v:'modulation',      l:'Modulation（モジュレーション）'},
-  {v:'sequence_rhythm', l:'Sequence / Rhythm（シークエンス/リズム）'},
-  {v:'glitch',          l:'Glitch（グリッチ）'},
-  {v:'acoustic',        l:'Acoustic（アコースティック）'},
-  {v:'vocal',           l:'Vocal（ボーカル）'},
-  {v:'power_supply',    l:'Power Supply（パワーサプライ）'},
-  {v:'switcher',        l:'Switcher（スイッチャー）'},
-  {v:'buffer',          l:'Buffer（バッファー）'},
-  {v:'synth',           l:'Synth（シンセ）'},
-  {v:'junction_box',    l:'Junction Box（ジャンクションボックス）'},
-  {v:'other',           l:'Other（その他）'},
+const TYPE_LIST=[
+  {v:'overdrive',l:'OD（オーバードライブ）'},{v:'distortion',l:'Dist（ディストーション）'},
+  {v:'fuzz',l:'Fuzz（ファズ）'},{v:'boost',l:'Boost（ブースター）'},
+  {v:'reverb',l:'Reverb（リバーブ）'},{v:'delay',l:'Delay（ディレイ）'},
+  {v:'chorus',l:'Chorus（コーラス）'},{v:'flanger',l:'Flanger（フランジャー）'},
+  {v:'phaser',l:'Phaser（フェイザー）'},{v:'tremolo',l:'Tremolo（トレモロ）'},
+  {v:'vibrato',l:'Vibrato（ビブラート）'},{v:'pitch_octave',l:'Pitch / Octave（ピッチ/オクターブ）'},
+  {v:'wah_filter',l:'Wah / Filter（ワウ/フィルター）'},{v:'comp',l:'Comp（コンプレッサー）'},
+  {v:'eq',l:'EQ（イコライザー）'},{v:'noise_gate',l:'Noise Gate（ノイズゲート）'},
+  {v:'looper',l:'Looper（ルーパー）'},{v:'volume',l:'Volume（ボリューム）'},
+  {v:'tuner',l:'Tuner（チューナー）'},{v:'multi',l:'Multi FX（マルチ）'},
+  {v:'preamp',l:'Preamp（プリアンプ）'},{v:'modulation',l:'Modulation（モジュレーション）'},
+  {v:'sequence_rhythm',l:'Sequence / Rhythm（シークエンス/リズム）'},{v:'glitch',l:'Glitch（グリッチ）'},
+  {v:'acoustic',l:'Acoustic（アコースティック）'},{v:'vocal',l:'Vocal（ボーカル）'},
+  {v:'power_supply',l:'Power Supply（パワーサプライ）'},{v:'switcher',l:'Switcher（スイッチャー）'},
+  {v:'buffer',l:'Buffer（バッファー）'},{v:'synth',l:'Synth（シンセ）'},
+  {v:'junction_box',l:'Junction Box（ジャンクションボックス）'},{v:'other',l:'Other（その他）'},
 ];
 
-// ── タイプ予測変換ロジック
-// inputEl: input要素, acId: ドロップダウンのID
-let typeAcFocusIdx = {};
+let typeAcFocusIdx={};
 
-function handleTypeInput(inputEl, acId) {
-  const val = inputEl.value;
-  // カンマで分割して最後のトークンを取得
-  const parts = val.split(',');
-  const current = parts[parts.length - 1].trim().toLowerCase();
-  const ac = document.getElementById(acId);
-  typeAcFocusIdx[acId] = -1;
-
-  if (!current) { ac.innerHTML = ''; ac.classList.remove('open'); return; }
-
-  const matches = TYPE_LIST.filter(t =>
-    t.v.includes(current) || t.l.toLowerCase().includes(current)
-  ).slice(0, 10);
-
-  if (!matches.length) { ac.innerHTML = ''; ac.classList.remove('open'); return; }
-
-  ac.innerHTML = matches.map((t, i) =>
+function handleTypeInput(inputEl,acId){
+  const val=inputEl.value;
+  const parts=val.split(',');
+  const current=parts[parts.length-1].trim().toLowerCase();
+  const ac=document.getElementById(acId);
+  typeAcFocusIdx[acId]=-1;
+  if(!current){ac.innerHTML='';ac.classList.remove('open');return;}
+  const matches=TYPE_LIST.filter(t=>t.v.includes(current)||t.l.toLowerCase().includes(current)).slice(0,10);
+  if(!matches.length){ac.innerHTML='';ac.classList.remove('open');return;}
+  ac.innerHTML=matches.map((t,i)=>
     `<div class="type-ac-item" data-idx="${i}" data-val="${t.v}"
       onmousedown="selectTypeAC(event,'${acId}','${t.v}')"
       onmouseover="setTypeAcFocus('${acId}',${i})">
@@ -508,74 +502,58 @@ function handleTypeInput(inputEl, acId) {
   ac.classList.add('open');
 }
 
-function selectTypeAC(event, acId, val) {
+function selectTypeAC(event,acId,val){
   event.preventDefault();
-  const input = document.querySelector(`[oninput*="${acId}"]`) ||
-                document.querySelector(`input + #${acId}`)?.previousElementSibling;
-  // より確実な取得方法
-  const ac = document.getElementById(acId);
-  const wrap = ac.closest('.type-ac-wrap');
-  if (!wrap) return;
-  const inp = wrap.querySelector('input');
-  if (!inp) return;
-
-  const parts = inp.value.split(',');
-  parts[parts.length - 1] = val;
-  inp.value = parts.join(',');
-  ac.innerHTML = '';
-  ac.classList.remove('open');
+  const ac=document.getElementById(acId);
+  const wrap=ac.closest('.type-ac-wrap');
+  if(!wrap)return;
+  const inp=wrap.querySelector('input');
+  if(!inp)return;
+  const parts=inp.value.split(',');
+  parts[parts.length-1]=val;
+  inp.value=parts.join(',');
+  ac.innerHTML='';ac.classList.remove('open');
   inp.focus();
 }
 
-function setTypeAcFocus(acId, idx) {
-  typeAcFocusIdx[acId] = idx;
-  document.querySelectorAll(`#${acId} .type-ac-item`).forEach((el, i) => {
-    el.classList.toggle('focus', i === idx);
+function setTypeAcFocus(acId,idx){
+  typeAcFocusIdx[acId]=idx;
+  document.querySelectorAll(`#${acId} .type-ac-item`).forEach((el,i)=>{
+    el.classList.toggle('focus',i===idx);
   });
 }
 
-function closeTypeAC(acId) {
-  const ac = document.getElementById(acId);
-  if (ac) { ac.innerHTML = ''; ac.classList.remove('open'); }
+function closeTypeAC(acId){
+  const ac=document.getElementById(acId);
+  if(ac){ac.innerHTML='';ac.classList.remove('open');}
 }
 
-function typeKeyDown(event, acId) {
-  const ac = document.getElementById(acId);
-  if (!ac.classList.contains('open')) return;
-  const items = ac.querySelectorAll('.type-ac-item');
-  const cur = typeAcFocusIdx[acId] || -1;
-
-  if (event.key === 'ArrowDown') {
-    event.preventDefault();
-    const next = Math.min(cur + 1, items.length - 1);
-    setTypeAcFocus(acId, next);
-  } else if (event.key === 'ArrowUp') {
-    event.preventDefault();
-    const prev = Math.max(cur - 1, 0);
-    setTypeAcFocus(acId, prev);
-  } else if (event.key === 'Enter' || event.key === 'Tab') {
-    if (cur >= 0 && items[cur]) {
+function typeKeyDown(event,acId){
+  const ac=document.getElementById(acId);
+  if(!ac.classList.contains('open'))return;
+  const items=ac.querySelectorAll('.type-ac-item');
+  const cur=typeAcFocusIdx[acId]||-1;
+  if(event.key==='ArrowDown'){event.preventDefault();setTypeAcFocus(acId,Math.min(cur+1,items.length-1));}
+  else if(event.key==='ArrowUp'){event.preventDefault();setTypeAcFocus(acId,Math.max(cur-1,0));}
+  else if(event.key==='Enter'||event.key==='Tab'){
+    if(cur>=0&&items[cur]){
       event.preventDefault();
-      const val = items[cur].getAttribute('data-val');
-      const wrap = ac.closest('.type-ac-wrap');
-      const inp = wrap.querySelector('input');
-      const parts = inp.value.split(',');
-      parts[parts.length - 1] = val;
-      inp.value = parts.join(',');
-      ac.innerHTML = '';
-      ac.classList.remove('open');
+      const val=items[cur].getAttribute('data-val');
+      const wrap=ac.closest('.type-ac-wrap');
+      const inp=wrap.querySelector('input');
+      const parts=inp.value.split(',');
+      parts[parts.length-1]=val;
+      inp.value=parts.join(',');
+      ac.innerHTML='';ac.classList.remove('open');
     }
-  } else if (event.key === 'Escape') {
-    closeTypeAC(acId);
-  }
+  }else if(event.key==='Escape'){closeTypeAC(acId);}
 }
 
-// ── タイプ絞り込み（プルダウン）
-let pedalTypeFilter = '';
-function setPedalTypeFilter(val) {
-  pedalTypeFilter = val;
-  const sel = document.getElementById('pf-type-select');
-  if (sel) sel.classList.toggle('active', !!val);
+let pedalTypeFilter='';
+function setPedalTypeFilter(val){
+  pedalTypeFilter=val;
+  const sel=document.getElementById('pf-type-select');
+  if(sel)sel.classList.toggle('active',!!val);
   applyPedalFilter();
 }
 
@@ -790,7 +768,7 @@ function showSimilar(name,rowId){
     :'<div class="sim-none">類似候補なし（距離4以内）</div>';
   const card=document.createElement('tr');
   card.className='sim-card-row';
-  card.innerHTML=`<td colspan="6" style="padding:0 12px 12px">
+  card.innerHTML=`<td colspan="8" style="padding:0 12px 12px">
     <div class="sim-card">
       <div class="sim-card-title">🔍 「${escHtml(name)}」の類似候補</div>
       <div class="sim-card-close" onclick="this.closest('.sim-card-row').remove()">✕</div>
@@ -874,7 +852,6 @@ function addPedalFromUnknown(name){
   showToast('モデル名を入力しました。ブランド名とタイプを追加してください。');
 }
 
-// ── エイリアス管理
 let allAliases=[];
 
 async function loadAliases(){
@@ -908,9 +885,7 @@ async function searchAliasTarget(val){
   const q=val.trim();
   const ac=document.getElementById('alias-ac');
   if(!q||q.length<2){ac.style.display='none';return;}
-  const results=allPedals
-    .filter(p=>p.full_name.toLowerCase().includes(q.toLowerCase()))
-    .slice(0,8);
+  const results=allPedals.filter(p=>p.full_name.toLowerCase().includes(q.toLowerCase())).slice(0,8);
   if(!results.length){ac.style.display='none';return;}
   ac.innerHTML=results.map(p=>
     `<div onclick="selectAliasTarget('${escHtml(p.full_name).replace(/'/g,"\\'")}');closeAliasAC()"
@@ -949,13 +924,19 @@ async function deleteAlias(id,name){
   await loadAliases();
 }
 
-// ── ペダルDB
 let pedalFilterMode='all';
 function setPedalFilter(mode){
   pedalFilterMode=mode;
   document.querySelectorAll('.pf-btn').forEach(b=>b.classList.remove('on'));
   const btn=document.getElementById('pf-'+mode);if(btn)btn.classList.add('on');
   applyPedalFilter();
+}
+
+// ★ rarityバッジ生成
+function rarityBadge(r){
+  if(!r)return '<span style="font-size:10px;color:var(--td)">—</span>';
+  const map={SS:'rarity-SS',SR:'rarity-SR',R:'rarity-R',S:'rarity-S',STD:'rarity-STD'};
+  return `<span class="rarity-badge ${map[r]||''}">${r}</span>`;
 }
 
 function applyPedalFilter(){
@@ -967,11 +948,10 @@ function applyPedalFilter(){
   else if(pedalFilterMode==='no-desc')filtered=filtered.filter(p=>!p.description);
   else if(pedalFilterMode==='no-yt')filtered=filtered.filter(p=>!p.youtube_video_id);
   else if(pedalFilterMode==='complete')filtered=filtered.filter(p=>p.image_url&&p.description&&p.youtube_video_id);
-  // ★ タイプ絞り込み
   if(pedalTypeFilter)filtered=filtered.filter(p=>(p.types||[]).includes(pedalTypeFilter));
   if(!filtered.length){el.innerHTML='<div class="empty-msg">ペダルが見つかりません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
-    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>操作</th></tr></thead>'
+    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>🎰 Rarity</th><th>操作</th></tr></thead>'
     +'<tbody>'
     +filtered.map(p=>'<tr>'
       +'<td style="font-size:12px;font-weight:600;color:var(--ac)">'+escHtml(p.brand)+'</td>'
@@ -980,6 +960,7 @@ function applyPedalFilter(){
       +'<td>'+(p.image_url?'<img src="'+p.image_url+'" style="width:40px;height:40px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">':'<span style="font-size:10px;color:#e05050">なし</span>')+'</td>'
       +'<td style="font-size:10px">'+(p.description?'<span style="color:#4ade80">✅</span>':'<span style="color:#e05050">なし</span>')+'</td>'
       +'<td style="font-size:10px;color:var(--td)">'+(p.youtube_video_id?'<span style="color:#4ade80">✅</span>':'<span style="color:var(--td)">—</span>')+'</td>'
+      +'<td>'+rarityBadge(p.rarity)+'</td>'
       +'<td><button class="approve-btn" onclick="openPedalEdit(\''+p.id+'\')">✏️ 編集</button></td>'
       +'</tr>').join('')
     +'</tbody></table></div>';
@@ -1030,6 +1011,7 @@ function openPedalEdit(pedalId){
   document.getElementById('edit-full-name').value=pedal.full_name||'';
   document.getElementById('edit-brand-name').value=pedal.brand||'';
   document.getElementById('edit-types-modal').value=(pedal.types||[]).join(',');
+  document.getElementById('edit-rarity').value=pedal.rarity||''; // ★
   document.getElementById('edit-image-url').value=pedal.image_url||'';
   document.getElementById('edit-image-source').value=pedal.image_source||'';
   document.getElementById('edit-desc-ja').innerHTML=pedal.description||'';
@@ -1038,7 +1020,6 @@ function openPedalEdit(pedalId){
   document.getElementById('edit-youtube-url').value='';
   document.getElementById('upload-progress-msg').textContent='';
   document.getElementById('edit-image-file').value='';
-  // タイプACをリセット
   closeTypeAC('edit-types-ac');
   const preview=document.getElementById('pedal-img-preview');
   if(pedal.image_url){preview.src=pedal.image_url;preview.classList.add('show');}
@@ -1070,6 +1051,7 @@ async function savePedalEdit(){
   const brand=document.getElementById('edit-brand-name').value.trim();
   const typesRaw=document.getElementById('edit-types-modal').value.trim();
   const types=typesRaw?typesRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
+  const rarity=document.getElementById('edit-rarity').value||null; // ★
   if(!full_name||!brand){showToast('❌ 機材名とブランド名は必須です');return;}
   const model=full_name.startsWith(brand+' ')?full_name.slice(brand.length+1).trim():full_name;
   const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -1083,7 +1065,7 @@ async function savePedalEdit(){
   const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
   const ytUrlInput=document.getElementById('edit-youtube-url').value.trim();
   const resetYt=document.getElementById('reset-youtube').checked;
-  const updates={full_name,brand,model,slug,types,image_url,image_source,description,description_en};
+  const updates={full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity}; // ★
   if(ytUrlInput){
     const ytId=getYouTubeIdFromUrl(ytUrlInput);
     if(ytId){updates.youtube_video_id=ytId;}
