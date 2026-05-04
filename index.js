@@ -431,9 +431,11 @@ function clearFilter(){
   clearSearch();updateMobFilterClear();
 }
 function renderDBPosts(posts){
-  const grid=document.getElementById('card-grid');const gridMob=document.getElementById('card-grid-mob');
+  const grid=document.getElementById('card-grid');
+  const gridMob=document.getElementById('card-grid-mob');
   const anonName=lang==='en'?'Anonymous':'匿名ユーザー';
-  const html=posts.length?posts.map((p,i)=>{
+
+  function makeCardHTML(p,i){
     const init=(p.username||'匿')[0].toUpperCase();
     const gear=Array.isArray(p.gear_list)?p.gear_list:[];
     const SHOW=2;
@@ -452,8 +454,33 @@ function renderDBPosts(posts){
       +'<div class="ct">'+p.title+'</div><div class="ptags">'+tags+moreBadge+'</div>'
       +'<div class="cf"><div class="st" onclick="toggleDBLike(event,\''+p.id+'\',this)">❤️ <span>'+(p.likes||0)+'</span></div>'
       +'<div class="st">💬 <span>'+(p.comment_count||0)+'</span></div></div></div></div>';
-  }).join(''):getEmptyHTML();
-  if(grid)grid.innerHTML=html;if(gridMob)gridMob.innerHTML=html;
+  }
+
+  // ★ PC版：gacha-feed-wrap内のcard-grid(display:contents)に投稿カードを挿入
+  // ガチャカード(gacha-card-pc)はgrid-column:2,grid-row:1固定
+  // 1枚目の投稿カードはgrid-column:1,grid-row:1に入る
+  if(grid){
+    if(!posts.length){
+      grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
+    }else{
+      grid.innerHTML=posts.map((p,i)=>makeCardHTML(p,i)).join('');
+    }
+  }
+
+  // ★ モバイル版：mob-gacha-grid内のcard-grid-mob(display:contents)に投稿カードを挿入
+  // ガチャカード(gacha-card-mob)はgrid-column:2,grid-row:1固定
+  // 1枚目の投稿カードはgrid-column:1,grid-row:1に入る（左上）
+  // 2枚目以降は通常フローで左右交互に並ぶ
+  if(gridMob){
+    if(!posts.length){
+      gridMob.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
+    }else{
+      // 1枚目は明示的にgrid-column:1,grid-row:1を指定してガチャの隣に配置
+      const firstCard=makeCardHTML(posts[0],0).replace('<div class="card"','<div class="card" style="grid-column:1;grid-row:1;animation-delay:0s"');
+      const restCards=posts.slice(1).map((p,i)=>makeCardHTML(p,i+1)).join('');
+      gridMob.innerHTML=firstCard+restCards;
+    }
+  }
 }
 async function toggleDBLike(e,postId,el){
   e.stopPropagation();const cnt=el.querySelector('span');
