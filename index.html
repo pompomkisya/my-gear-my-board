@@ -97,22 +97,20 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .feed-tab:last-child{border-right:none}
 .feed-tab.on{background:var(--sf2);color:var(--tx)}
 
-/* ★ ガチャ＋グリッドの2カラムレイアウト */
-.gacha-feed-wrap{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.gacha-grid-card{background:var(--sf);border:1px solid rgba(232,85,45,.3);border-radius:6px;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 10px;text-align:center;aspect-ratio:4/3}
+/* ★ PC：ガチャ＋投稿カードの2カラムレイアウト */
+.gacha-feed-wrap{display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:start}
+/* ★ ガチャカード：aspect-ratioを使わず、投稿カードと同じ構造で高さを自然に合わせる */
+.gacha-grid-card{background:var(--sf);border:1px solid rgba(232,85,45,.3);border-radius:6px;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 14px;text-align:center;min-height:200px}
 @keyframes gPulseCard{0%,100%{box-shadow:0 0 0 0 rgba(232,85,45,0)}50%{box-shadow:0 0 14px 3px rgba(232,85,45,.2)}}
 .gacha-grid-card{animation:gPulseCard 3s ease-in-out infinite}
 .gacha-grid-card:hover{border-color:rgba(232,85,45,.7);transform:translateY(-2px);box-shadow:0 8px 28px rgba(232,85,45,.2)}
-/* 投稿グリッドは1カラム（ガチャの隣に並ぶ） */
-.posts-grid-col{display:flex;flex-direction:column;gap:13px}
 
 .card{background:var(--sf);border:1px solid var(--bd);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;animation:fu .4s ease both}
 @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .card:hover{border-color:rgba(232,85,45,.4);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.45)}
 
-/* モバイル用グリッド（ガチャ右上固定） */
-.mob-gacha-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.mob-posts-col{display:contents}
+/* ★ モバイル：ガチャ右上固定の2カラムグリッド */
+.mob-gacha-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
 
 .iw{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--sf2);display:flex;align-items:center;justify-content:center}
 .iw img{width:100%;height:100%;object-fit:contain;object-position:center;background:#0d0d0e}
@@ -527,25 +525,30 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           <div class="feed-tab" onclick="setTab(this,'board')">ボード</div>
           <div class="feed-tab" onclick="setTab(this,'gear')">機材</div>
         </div>
-        <!-- ★ モバイル：ガチャ固定＋投稿グリッド -->
-        <div class="mob-gacha-grid" id="mob-gacha-grid" style="margin-top:10px">
-          <!-- ★ ガチャカード（右上固定・グリッドの外で管理） -->
-          <div class="gacha-grid-card" onclick="openGacha()" id="gacha-card-mob" style="grid-column:2;grid-row:1">
-            <div class="g-idle-icon" style="width:58px;height:58px;margin-bottom:6px">
-              <img id="gacha-img-mob" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px rgba(232,85,45,.6))" onerror="this.style.display='none';document.getElementById('gacha-fb-mob').style.display='block'">
-              <div id="gacha-fb-mob" style="display:none;font-size:36px;line-height:1">🎰</div>
+        <!-- ★ モバイル：ガチャ右上固定 + 投稿カードグリッド -->
+        <div style="margin-top:10px;position:relative">
+          <!-- 2カラムグリッド：左列=投稿カード、右列上=ガチャ固定 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">
+            <!-- ★ ガチャカード（右上・grid-column:2 grid-row:1固定） -->
+            <div class="gacha-grid-card" onclick="openGacha()" id="gacha-card-mob" style="grid-column:2;grid-row:1;min-height:160px">
+              <div class="g-idle-icon" style="width:54px;height:54px;margin-bottom:5px">
+                <img id="gacha-img-mob" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px rgba(232,85,45,.6))" onerror="this.style.display='none';document.getElementById('gacha-fb-mob').style.display='block'">
+                <div id="gacha-fb-mob" style="display:none;font-size:32px;line-height:1">🎰</div>
+              </div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:2px;color:#e8552d;margin-bottom:2px" id="g-gc-title-mob">GEAR GACHA</div>
+              <div style="font-family:Noto Sans JP,sans-serif;font-size:8px;color:#9a9890;margin-bottom:1px" id="g-gc-sub1-mob">次の相棒に出会おう</div>
+              <div style="font-family:Noto Sans JP,sans-serif;font-size:7px;color:#6e6c68;margin-bottom:7px" id="g-gc-sub2-mob">ペダル図鑑から厳選紹介</div>
+              <div style="display:flex;align-items:center;gap:2px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.4);border-radius:3px;padding:4px 7px">
+                <span style="font-size:10px">🎰</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;color:#e8552d;font-weight:bold" id="g-gc-tap-mob">TAP TO ROLL</span>
+                <span class="g-db" style="width:3px;height:3px"></span>
+              </div>
             </div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:3px;color:#e8552d;margin-bottom:2px" id="g-gc-title-mob">GEAR GACHA</div>
-            <div style="font-family:Noto Sans JP,sans-serif;font-size:9px;color:#9a9890;margin-bottom:1px" id="g-gc-sub1-mob">次の相棒に出会おう</div>
-            <div style="font-family:Noto Sans JP,sans-serif;font-size:8px;color:#6e6c68;margin-bottom:7px" id="g-gc-sub2-mob">ペダル図鑑から厳選紹介</div>
-            <div style="display:flex;align-items:center;gap:3px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.4);border-radius:3px;padding:4px 8px">
-              <span style="font-size:10px">🎰</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#e8552d;font-weight:bold" id="g-gc-tap-mob">TAP TO ROLL</span>
-              <span class="g-db" style="width:3px;height:3px"></span>
-            </div>
+            <!-- ★ 投稿カードグリッド（JSで中身を書き換え）
+                 grid-column:1に配置される投稿カードは自動フローで積み上がる
+                 2枚目以降はgrid-columnが自動で1→2→1→2...と並ぶ -->
+            <div id="card-grid-mob" style="display:contents"></div>
           </div>
-          <!-- 投稿カードはここにJSで挿入される -->
-          <div id="card-grid-mob" style="display:contents"></div>
         </div>
       </div>
     </div>
@@ -671,9 +674,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="feed-tab" onclick="setTab(this,'board')">エフェクターボード</div>
     <div class="feed-tab" onclick="setTab(this,'gear')">機材</div>
   </div>
-  <!-- ★ PC：ガチャ固定（左）＋投稿カード（右）の2カラム -->
-  <div class="gacha-feed-wrap">
-    <!-- ガチャカード（左上固定） -->
+  <!-- ★ PC：ガチャ右上固定 + 投稿カードグリッド -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:start">
+    <!-- ★ ガチャカード（右上・grid-column:2 grid-row:1固定） -->
     <div class="gacha-grid-card" onclick="openGacha()" id="gacha-card-pc" style="grid-column:2;grid-row:1">
       <div class="g-idle-icon" style="width:72px;height:72px;margin-bottom:8px">
         <img id="gacha-img-pc" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px rgba(232,85,45,.6))" onerror="this.style.display='none';document.getElementById('gacha-fb-pc').style.display='block'">
