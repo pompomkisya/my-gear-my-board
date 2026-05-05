@@ -531,24 +531,30 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           <!-- 2カラムグリッド：左列=投稿カード、右列上=ガチャ固定 -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">
             <!-- ★ ガチャカード（右上・grid-column:2 grid-row:1固定） -->
-            <div class="gacha-grid-card" onclick="openGacha()" id="gacha-card-mob" style="grid-column:2;grid-row:1;min-height:160px">
-              <!-- 画像エリア：.iwと同じ aspect-ratio:4/3 -->
+            <div class="gacha-grid-card" onclick="openGacha()" id="gacha-card-mob" style="grid-column:2;grid-row:1">
+              <!-- 画像エリア：aspect-ratio:4/3 -->
               <div class="gacha-iw">
-                <div class="g-idle-icon" style="width:50px;height:50px">
-                  <img id="gacha-img-mob" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 10px rgba(232,85,45,.6))" onerror="this.style.display='none';document.getElementById('gacha-fb-mob').style.display='block'">
-                  <div id="gacha-fb-mob" style="display:none;font-size:30px;line-height:1">🎰</div>
+                <div class="g-idle-icon" style="width:64px;height:64px">
+                  <img id="gacha-img-mob" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 12px rgba(232,85,45,.65))" onerror="this.style.display='none';document.getElementById('gacha-fb-mob').style.display='block'">
+                  <div id="gacha-fb-mob" style="display:none;font-size:38px;line-height:1">🎰</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:2px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.4);border-radius:3px;padding:4px 7px">
-                  <span style="font-size:9px">🎰</span>
-                  <span style="font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:1px;color:#e8552d;font-weight:bold">TAP TO ROLL</span>
+                <div style="display:flex;align-items:center;gap:3px;background:rgba(232,85,45,.14);border:1px solid rgba(232,85,45,.5);border-radius:3px;padding:5px 9px">
+                  <span style="font-size:11px">🎰</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:#e8552d;font-weight:bold">TAP TO ROLL</span>
                   <span class="g-db" style="width:3px;height:3px"></span>
                 </div>
               </div>
               <!-- テキストエリア -->
-              <div class="gacha-body" style="padding:8px 8px">
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;color:#e8552d" id="g-gc-title-mob">GEAR GACHA</div>
-                <div style="font-family:Noto Sans JP,sans-serif;font-size:8px;color:#9a9890" id="g-gc-sub1-mob">次の相棒に出会おう</div>
-                <div style="font-family:Noto Sans JP,sans-serif;font-size:7px;color:#6e6c68" id="g-gc-sub2-mob">図鑑から厳選紹介</div>
+              <div class="gacha-body" style="padding:9px 10px">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2.5px;color:#e8552d" id="g-gc-title-mob">GEAR GACHA</div>
+                <div style="font-family:Noto Sans JP,sans-serif;font-size:9px;color:#9a9890" id="g-gc-sub1-mob">次の相棒に出会おう</div>
+                <div style="font-family:Noto Sans JP,sans-serif;font-size:8px;color:#6e6c68" id="g-gc-sub2-mob">ペダル図鑑から厳選紹介</div>
+                <div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:center;margin-top:3px">
+                  <span style="color:#ffd700;font-family:'JetBrains Mono',monospace;font-size:8px;opacity:.8">SSR 5%</span>
+                  <span style="color:#a855f7;font-family:'JetBrains Mono',monospace;font-size:8px;opacity:.8">SR 10%</span>
+                  <span style="color:#f97316;font-family:'JetBrains Mono',monospace;font-size:8px;opacity:.8">Sp 20%</span>
+                  <span style="color:#9a9890;font-family:'JetBrains Mono',monospace;font-size:8px;opacity:.8">Std 65%</span>
+                </div>
               </div>
             </div>
             <!-- ★ 投稿カードグリッド（JSで中身を書き換え）
