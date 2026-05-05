@@ -534,26 +534,51 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
             <div class="gacha-grid-card" onclick="openGacha()" id="gacha-card-mob" style="grid-column:2;grid-row:1">
               <!-- 画像エリア：aspect-ratio:4/3 -->
               <div class="gacha-iw" style="background:radial-gradient(ellipse at center,rgba(232,85,45,.1) 0%,transparent 70%)">
-                <div class="g-idle-icon" style="width:90px;height:90px;margin-bottom:8px">
+                <div class="g-idle-icon" style="width:112px;height:112px;margin-bottom:6px">
                   <img id="gacha-img-mob" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 16px rgba(232,85,45,.7))" onerror="this.style.display='none';document.getElementById('gacha-fb-mob').style.display='block'">
                   <div id="gacha-fb-mob" style="display:none;font-size:54px;line-height:1;text-align:center">🎰</div>
                 </div>
-                <div style="display:flex;align-items:center;gap:4px;background:rgba(232,85,45,.14);border:1px solid rgba(232,85,45,.5);border-radius:3px;padding:6px 11px">
-                  <span style="font-size:13px">🎰</span>
-                  <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:#e8552d;font-weight:bold">TAP TO ROLL</span>
-                  <span class="g-db" style="width:4px;height:4px"></span>
+                <div style="display:flex;align-items:center;gap:3px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.4);border-radius:3px;padding:4px 8px">
+                  <span style="font-size:10px">🎰</span>
+                  <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#e8552d;font-weight:bold">TAP TO ROLL</span>
+                  <span class="g-db" style="width:3px;height:3px"></span>
                 </div>
               </div>
               <!-- テキストエリア -->
-              <div class="gacha-body" style="padding:10px 12px">
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#e8552d" id="g-gc-title-mob">GEAR GACHA</div>
-                <div style="font-family:Noto Sans JP,sans-serif;font-size:12px;color:#9a9890" id="g-gc-sub1-mob">次の相棒に出会おう</div>
-                <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:#6e6c68" id="g-gc-sub2-mob">ペダル図鑑から厳選紹介</div>
-                <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;margin-top:5px">
-                  <span style="color:#ffd700;font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.8">SSR 5%</span>
-                  <span style="color:#a855f7;font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.8">SR 10%</span>
-                  <span style="color:#f97316;font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.8">Sp 20%</span>
-                  <span style="color:#9a9890;font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.8">Std 65%</span>
+              <div class="gacha-body" style="padding:9px 10px;width:100%">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:#e8552d;margin-bottom:1px" id="g-gc-title-mob">GEAR GACHA</div>
+                <div style="font-family:Noto Sans JP,sans-serif;font-size:10px;color:#9a9890;margin-bottom:1px" id="g-gc-sub1-mob">次の相棒に出会おう</div>
+                <div style="font-family:Noto Sans JP,sans-serif;font-size:9px;color:#6e6c68;margin-bottom:7px" id="g-gc-sub2-mob">ペダル図鑑から厳選紹介</div>
+                <!-- プログレスバー -->
+                <div style="width:100%;display:flex;flex-direction:column;gap:3px">
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#ffd700;width:20px;text-align:right;flex-shrink:0">SSR</span>
+                    <div style="flex:1;height:4px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+                      <div style="width:5%;height:100%;background:linear-gradient(90deg,#b8860b,#ffd700);border-radius:2px;box-shadow:0 0 4px rgba(255,215,0,.6)"></div>
+                    </div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#ffd700;width:22px;flex-shrink:0;text-align:right">5%</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#a855f7;width:20px;text-align:right;flex-shrink:0">SR</span>
+                    <div style="flex:1;height:4px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+                      <div style="width:10%;height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:2px;box-shadow:0 0 4px rgba(168,85,247,.6)"></div>
+                    </div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#a855f7;width:22px;flex-shrink:0;text-align:right">10%</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#f97316;width:20px;text-align:right;flex-shrink:0">Sp</span>
+                    <div style="flex:1;height:4px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+                      <div style="width:20%;height:100%;background:linear-gradient(90deg,#c2410c,#f97316);border-radius:2px;box-shadow:0 0 4px rgba(249,115,22,.6)"></div>
+                    </div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#f97316;width:22px;flex-shrink:0;text-align:right">20%</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:4px">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#9a9890;width:20px;text-align:right;flex-shrink:0">Std</span>
+                    <div style="flex:1;height:4px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+                      <div style="width:65%;height:100%;background:linear-gradient(90deg,#4a4a48,#9a9890);border-radius:2px;box-shadow:0 0 4px rgba(154,152,144,.3)"></div>
+                    </div>
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:#9a9890;width:22px;flex-shrink:0;text-align:right">65%</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -708,11 +733,36 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#e8552d" id="g-gc-title-pc">GEAR GACHA</div>
         <div style="font-family:Noto Sans JP,sans-serif;font-size:14px;color:#9a9890" id="g-gc-sub1-pc">次の相棒に出会おう</div>
         <div style="font-family:Noto Sans JP,sans-serif;font-size:13px;color:#6e6c68" id="g-gc-sub2-pc">ペダル図鑑から厳選紹介</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:6px">
-          <span style="color:#ffd700;font-family:'JetBrains Mono',monospace;font-size:12px;opacity:.8">SSR 5%</span>
-          <span style="color:#a855f7;font-family:'JetBrains Mono',monospace;font-size:12px;opacity:.8">SR 10%</span>
-          <span style="color:#f97316;font-family:'JetBrains Mono',monospace;font-size:12px;opacity:.8">Sp 20%</span>
-          <span style="color:#9a9890;font-family:'JetBrains Mono',monospace;font-size:12px;opacity:.8">Std 65%</span>
+        <!-- プログレスバー（PC版） -->
+        <div style="width:100%;display:flex;flex-direction:column;gap:5px;margin-top:6px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#ffd700;width:28px;text-align:right;flex-shrink:0">SSR</span>
+            <div style="flex:1;height:5px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+              <div style="width:5%;height:100%;background:linear-gradient(90deg,#b8860b,#ffd700);border-radius:2px;box-shadow:0 0 6px rgba(255,215,0,.6)"></div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#ffd700;width:30px;flex-shrink:0;text-align:right">5%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a855f7;width:28px;text-align:right;flex-shrink:0">SR</span>
+            <div style="flex:1;height:5px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+              <div style="width:10%;height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:2px;box-shadow:0 0 6px rgba(168,85,247,.6)"></div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#a855f7;width:30px;flex-shrink:0;text-align:right">10%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#f97316;width:28px;text-align:right;flex-shrink:0">Sp</span>
+            <div style="flex:1;height:5px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+              <div style="width:20%;height:100%;background:linear-gradient(90deg,#c2410c,#f97316);border-radius:2px;box-shadow:0 0 6px rgba(249,115,22,.6)"></div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#f97316;width:30px;flex-shrink:0;text-align:right">20%</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#9a9890;width:28px;text-align:right;flex-shrink:0">Std</span>
+            <div style="flex:1;height:5px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+              <div style="width:65%;height:100%;background:linear-gradient(90deg,#4a4a48,#9a9890);border-radius:2px;box-shadow:0 0 6px rgba(154,152,144,.3)"></div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#9a9890;width:30px;flex-shrink:0;text-align:right">65%</span>
+          </div>
         </div>
       </div>
     </div>
@@ -984,12 +1034,38 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </button>
     </div>
 
-    <!-- 排出率 + ツールチップ -->
-    <div style="margin-top:10px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center">
-      <span style="color:#ffd700;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">SSR 5%</span>
-      <span style="color:#a855f7;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">SR 10%</span>
-      <span style="color:#f97316;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">Sp 20%</span>
-      <span style="color:#9a9890;font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.7">Std 65%</span>
+    <!-- 排出率 プログレスバー + ツールチップ -->
+    <div style="margin-top:12px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:5px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#ffd700;width:26px;text-align:right;flex-shrink:0">SSR</span>
+        <div style="flex:1;height:4px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+          <div style="width:5%;height:100%;background:linear-gradient(90deg,#b8860b,#ffd700);border-radius:2px;box-shadow:0 0 5px rgba(255,215,0,.7)"></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#ffd700;width:28px;flex-shrink:0;text-align:right">5%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a855f7;width:26px;text-align:right;flex-shrink:0">SR</span>
+        <div style="flex:1;height:4px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+          <div style="width:10%;height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:2px;box-shadow:0 0 5px rgba(168,85,247,.7)"></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#a855f7;width:28px;flex-shrink:0;text-align:right">10%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#f97316;width:26px;text-align:right;flex-shrink:0">Sp</span>
+        <div style="flex:1;height:4px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+          <div style="width:20%;height:100%;background:linear-gradient(90deg,#c2410c,#f97316);border-radius:2px;box-shadow:0 0 5px rgba(249,115,22,.7)"></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#f97316;width:28px;flex-shrink:0;text-align:right">20%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a9890;width:26px;text-align:right;flex-shrink:0">Std</span>
+        <div style="flex:1;height:4px;background:#1c1c1f;border-radius:2px;overflow:hidden">
+          <div style="width:65%;height:100%;background:linear-gradient(90deg,#4a4a48,#9a9890);border-radius:2px;box-shadow:0 0 5px rgba(154,152,144,.4)"></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a9890;width:28px;flex-shrink:0;text-align:right">65%</span>
+      </div>
+    </div>
+    <div style="margin-top:6px">
       <div class="g-tooltip-wrap" id="g-tt-wrap" onclick="this.classList.toggle('open')">
         <div class="g-tooltip-icon">?</div>
         <div class="g-tooltip-box" id="g-tt-box">レアリティの基準は当サイト独自の遊び心です。ペダルの価値は市場の評価ではなく、弾き手の音の中で決まるものです。機材製作者に敬意を込めて</div>
