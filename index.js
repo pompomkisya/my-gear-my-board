@@ -594,11 +594,25 @@ function toggleGenre(el){el.classList.toggle('on');}
 let currentStep=1,currentPostType='board';
 const TOTAL_STEPS=5;
 const STEP_SUBS=['stepPhotoSub','stepInfoSub','stepGearSub','stepGenreSub','stepConfirmSub'];
-function openPost(type){
+async function openPost(type){
   currentPostType=type||'board';currentStep=1;selectedGears=[];uploadedPhotos=[];editedPhotos=[];
   document.querySelectorAll('#post-genre-select .gs').forEach(g=>g.classList.remove('on'));
   ['post-username','post-desc','post-youtube','post-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
+  // ★ ログイン済みならユーザー名を自動入力・入力欄を非表示
+  const{data:{session}}=await sb.auth.getSession();
+  const usernameRow=document.getElementById('username-form-row');
+  const loginBadge=document.getElementById('login-user-badge');
+  if(session){
+    const{data:userData}=await sb.from('users').select('username').eq('id',session.user.id).single();
+    const uname=userData?.username||session.user.user_metadata?.username||'User';
+    const el=document.getElementById('post-username');if(el)el.value=uname;
+    if(usernameRow)usernameRow.style.display='none';
+    if(loginBadge){loginBadge.style.display='flex';loginBadge.querySelector('span').textContent=uname;}
+  }else{
+    if(usernameRow)usernameRow.style.display='block';
+    if(loginBadge)loginBadge.style.display='none';
+  }
   updateGearFeedback();renderGearTags();renderPhotoPreviews();updateStepUI();
   document.getElementById('post-bd').classList.add('open');document.body.style.overflow='hidden';
 }
@@ -717,12 +731,18 @@ async function submitPostToDB(){
     for(let i=0;i<finals.length;i++){if(finals[i]){const url=await uploadPhoto(finals[i],i,total);if(url)image_urls.push(url);}}
     hideUploadProgress();
   }
-  const{error}=await sb.from('posts').insert({
-    username:document.getElementById('post-username').value.trim()||(lang==='en'?'Anonymous':'匿名ユーザー'),
+  // ★ ログイン済みならuser_idを取得
+  const{data:{session:postSession}}=await sb.auth.getSession();
+  const postUserId=postSession?postSession.user.id:null;
+  const postUsername=document.getElementById('post-username').value.trim()||(lang==='en'?'Anonymous':'匿名ユーザー');
+  const insertData={
+    username:postUsername,
     title,description:desc,genre:genres,
     gear_list:selectedGears.map(g=>({name:g.name,brand:g.brand||'',search_query:g.search_query||null})),
     image_urls,pin_hash:pin,likes:0,post_type:currentPostType,youtube_url
-  });
+  };
+  if(postUserId)insertData.user_id=postUserId;
+  const{error}=await sb.from('posts').insert(insertData);
   if(btn){btn.disabled=false;btn.textContent=tr('btnSubmit');}
   if(error){showToast(lang==='en'?'❌ Failed to post':'❌ 投稿に失敗しました');console.error(error);return;}
   closeModal('post-bd');
