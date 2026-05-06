@@ -55,6 +55,7 @@
     .error-box { background: var(--sf); border: 1px solid #c0392b; border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--tm); }
     .pedal-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
     .pedal-top { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
+    /* 画像ブロック（画像＋出典をセット） */
     .pedal-image-block { width: 120px; flex-shrink: 0; }
     .pedal-image {
       width: 120px; height: 120px;
@@ -78,77 +79,11 @@
     .pedal-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; line-height: 1.2; margin-bottom: 10px; word-break: break-word; }
     .type-badges { display: flex; flex-wrap: wrap; gap: 6px; }
     .type-badge { background: var(--sf2); border: 1px solid var(--bd); color: var(--tm); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
-
-    /* ★ クイックナビ */
-    .quick-nav {
-      display: flex; gap: 8px;
-      overflow-x: auto; -webkit-overflow-scrolling: touch;
-      padding: 16px 0 4px;
-      border-top: 1px solid var(--bd);
-      scrollbar-width: none;
-    }
-    .quick-nav::-webkit-scrollbar { display: none; }
-    .quick-nav-chip {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 7px 14px;
-      background: var(--sf2); border: 1px solid var(--bd); border-radius: 20px;
-      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 500;
-      color: var(--tm); cursor: pointer; text-decoration: none;
-      white-space: nowrap; flex-shrink: 0;
-      transition: border-color .15s, color .15s;
-      touch-action: manipulation;
-    }
-    .quick-nav-chip:hover { border-color: var(--ac); color: var(--ac); }
-
-    /* ★ 説明文 アコーディオン */
-    .pedal-description-wrap {
-      margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bd);
-      position: relative;
-    }
-    .pedal-description {
-      font-size: 14px; color: var(--tm); line-height: 1.7;
-      font-family: 'Noto Sans JP', sans-serif;
-      max-height: 8.5em; /* 約5行 */
-      overflow: hidden;
-      transition: max-height .4s ease;
-    }
-    .pedal-description.expanded { max-height: 9999px; }
-    .pedal-description.empty { font-style: italic; color: var(--td); max-height: none; }
+    .pedal-description { margin-top: 16px; font-size: 14px; color: var(--tm); line-height: 1.7; padding-top: 16px; border-top: 1px solid var(--bd); font-family: 'Noto Sans JP', sans-serif; }
+    .pedal-description.empty { font-style: italic; color: var(--td); }
     .pedal-description h2 { font-size: 17px; font-weight: 700; color: var(--tx); margin: 14px 0 6px; }
     .pedal-description h3 { font-size: 14px; font-weight: 600; color: var(--tm); margin: 10px 0 4px; }
     .pedal-description b { font-weight: 700; color: var(--tx); }
-
-    /* フェードアウトグラデーション */
-    .desc-fade {
-      position: absolute; bottom: 40px; left: 0; right: 0;
-      height: 48px;
-      background: linear-gradient(to bottom, transparent, var(--sf));
-      pointer-events: none;
-      transition: opacity .3s;
-    }
-    .desc-fade.hidden { opacity: 0; pointer-events: none; }
-
-    /* 続きを読むボタン */
-    .desc-toggle-btn {
-      display: block; width: 100%; margin-top: 8px;
-      padding: 8px;
-      background: transparent; border: 1px solid var(--bd); border-radius: 6px;
-      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 500;
-      color: var(--tm); cursor: pointer; text-align: center;
-      transition: border-color .15s, color .15s;
-      touch-action: manipulation;
-    }
-    .desc-toggle-btn:hover { border-color: var(--ac); color: var(--ac); }
-    .desc-toggle-btn.hidden { display: none; }
-
-    /* ★ 最終更新日 */
-    .desc-updated {
-      margin-top: 12px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--td);
-      text-align: right;
-    }
-
     /* YouTube */
     .yt-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
     .yt-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 14px; }
@@ -271,12 +206,6 @@ const I18N = {
     emptyBoardBtn:'ボードを投稿する →',
     loading:'読み込み中...', notFound:'ペダルが見つかりませんでした。',
     backHome:'← ホームに戻る', anonUser:'匿名', untitled:'無題のボード',
-    navVideo:'📺 デモ動画',
-    navBuy:'🛒 在庫を調べる',
-    navBoards:'🎸 投稿ボード',
-    readMore:'続きを読む ▼',
-    readLess:'閉じる ▲',
-    updatedAt:'紹介文最終更新日：',
   },
   en: {
     headerSub:'Pedalboard SNS', home:'Home', langLabel:'JA', bcHome:'Home',
@@ -295,12 +224,6 @@ const I18N = {
     emptyBoardBtn:'Post your board →',
     loading:'Loading...', notFound:'Pedal not found.',
     backHome:'← Back to Home', anonUser:'Anonymous', untitled:'Untitled Board',
-    navVideo:'📺 Demo Video',
-    navBuy:'🛒 Check Prices',
-    navBoards:'🎸 Boards',
-    readMore:'Read more ▼',
-    readLess:'Close ▲',
-    updatedAt:'Last updated: ',
   }
 };
 function tr(key) { return (I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key; }
@@ -332,26 +255,7 @@ function toggleLang() {
 }
 let cachedPedal = null;
 let cachedPosts = [];
-
-// ★ アコーディオン制御
-function initDescAccordion() {
-  const desc = document.getElementById('desc-text');
-  const fade = document.getElementById('desc-fade');
-  const btn = document.getElementById('desc-toggle-btn');
-  if (!desc || !btn) return;
-  // テキストが短い場合はボタン不要
-  if (desc.scrollHeight <= desc.clientHeight + 4) {
-    if (fade) fade.classList.add('hidden');
-    btn.classList.add('hidden');
-    return;
-  }
-  btn.onclick = function() {
-    const expanded = desc.classList.toggle('expanded');
-    if (fade) fade.classList.toggle('hidden', expanded);
-    btn.textContent = expanded ? tr('readLess') : tr('readMore');
-  };
-}
-
+// Netlify Function経由でYouTube動画IDを取得（APIキーはサーバー側で保持）
 async function fetchVideoId(pedalName) {
   try {
     const res = await fetch(`/.netlify/functions/youtube?q=${encodeURIComponent(pedalName)}`);
@@ -363,15 +267,17 @@ async function fetchVideoId(pedalName) {
     return null;
   }
 }
+// Supabaseに保存（キャッシュ）
 async function cacheVideoId(pedalId, videoId) {
   await db.from('pedals').update({ youtube_video_id: videoId }).eq('id', pedalId);
 }
+// YouTube表示を更新
 function renderYouTube(pedalId, pedalName, videoId) {
   const el = document.getElementById('yt-section');
   if (!el) return;
   if (videoId) {
     el.innerHTML = `
-      <div class="yt-card" id="section-video">
+      <div class="yt-card">
         <div class="yt-card-title">${tr('ytTitle')}</div>
         <div class="yt-embed-wrap">
           <iframe src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1"
@@ -381,7 +287,7 @@ function renderYouTube(pedalId, pedalName, videoId) {
       </div>`;
   } else {
     el.innerHTML = `
-      <div class="yt-card" id="section-video">
+      <div class="yt-card">
         <div class="yt-card-title">${tr('ytTitle')}</div>
         <div class="yt-fallback">
           <div class="yt-fallback-icon">▶</div>
@@ -391,6 +297,7 @@ function renderYouTube(pedalId, pedalName, videoId) {
       </div>`;
   }
 }
+// YouTube処理（ページ描画をブロックしない）
 async function handleYouTube(pedal) {
   if (pedal.youtube_video_id) {
     renderYouTube(pedal.id, pedal.full_name, pedal.youtube_video_id);
@@ -407,9 +314,8 @@ async function loadPedal() {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get('slug');
   if (!slug) { showError(tr('notFound')); return; }
-  // ★ updated_atも取得
   const { data: pedals } = await db.from('pedals')
-    .select('id, brand, model, full_name, slug, types, image_url, image_source, description, description_en, youtube_video_id, updated_at')
+    .select('id, brand, model, full_name, slug, types, image_url, image_source, description, description_en, youtube_video_id')
     .eq('slug', decodeURIComponent(slug)).limit(1);
   if (!pedals?.length) { showError(tr('notFound')); return; }
   const pedal = pedals[0];
@@ -418,6 +324,7 @@ async function loadPedal() {
   document.getElementById('bc-brand').href = `/brand?name=${encodeURIComponent(pedal.brand)}`;
   document.getElementById('bc-pedal').textContent = pedal.model;
   document.title = `${pedal.full_name} | My Gear My Board`;
+  // 投稿の逆引き
   const { data: allPosts } = await db.from('posts')
     .select('id, title, username, image_urls, gear_list')
     .order('created_at', { ascending: false });
@@ -426,20 +333,14 @@ async function loadPedal() {
     return gear.some(g => (g.name||'').toLowerCase() === pedal.full_name.toLowerCase());
   }).slice(0, 6);
   cachedPosts = posts;
+  // ページ描画（YouTube部分はローディング状態で）
   renderPedal(pedal, posts);
+  // YouTube非同期処理（描画をブロックしない）
   handleYouTube(pedal);
-}
-function formatUpdatedAt(isoStr) {
-  if (!isoStr) return '';
-  const d = new Date(isoStr);
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const day = String(d.getDate()).padStart(2,'0');
-  return `${y}.${m}.${day}`;
 }
 function renderPedal(pedal, posts) {
   const typesHtml = (pedal.types||[]).map(t => `<span class="type-badge">${getTypeLabel(t)}</span>`).join('');
-  // 画像ブロック
+  // 画像ブロック（画像＋出典）
   let imageBlockHtml = '';
   if (pedal.image_url) {
     const hasSource = !!pedal.image_source;
@@ -458,35 +359,11 @@ function renderPedal(pedal, posts) {
         </div>
       </div>`;
   }
-
-  // ★ クイックナビ
-  const quickNavHtml = `
-    <nav class="quick-nav" aria-label="ページ内ナビ">
-      <a href="#section-video" class="quick-nav-chip">${tr('navVideo')}</a>
-      <a href="#section-buy" class="quick-nav-chip">${tr('navBuy')}</a>
-      <a href="#section-boards" class="quick-nav-chip">${tr('navBoards')}</a>
-    </nav>`;
-
-  // ★ 説明文（アコーディオン + 最終更新日）
+  // 説明文（言語切り替え対応・HTMLとして表示）
   const desc = lang === 'en' ? (pedal.description_en || pedal.description) : pedal.description;
-  const updatedStr = formatUpdatedAt(pedal.updated_at);
-  let descHtml = '';
-  if (desc) {
-    descHtml = `
-      <div class="pedal-description-wrap">
-        <div class="pedal-description" id="desc-text">${desc}</div>
-        <div class="desc-fade" id="desc-fade"></div>
-        <button class="desc-toggle-btn" id="desc-toggle-btn">${tr('readMore')}</button>
-        ${updatedStr ? `<div class="desc-updated">${tr('updatedAt')}${updatedStr}</div>` : ''}
-      </div>`;
-  } else {
-    descHtml = `
-      <div class="pedal-description-wrap">
-        <div class="pedal-description empty">${tr('descEmpty')}</div>
-      </div>`;
-  }
-
-  // ボード一覧
+  const descHtml = desc
+    ? `<div class="pedal-description">${desc}</div>`
+    : `<div class="pedal-description empty">${tr('descEmpty')}</div>`;
   let boardsHtml = '';
   if (posts.length > 0) {
     boardsHtml = posts.map(post => {
@@ -510,7 +387,6 @@ function renderPedal(pedal, posts) {
         <a href="/" class="empty-state-btn">${tr('emptyBoardBtn')}</a>
       </div>`;
   }
-
   document.getElementById('content').innerHTML = `
     <div class="pedal-card">
       <div class="pedal-top">
@@ -521,11 +397,10 @@ function renderPedal(pedal, posts) {
           <div class="type-badges">${typesHtml}</div>
         </div>
       </div>
-      ${quickNavHtml}
       ${descHtml}
     </div>
     <div id="yt-section">
-      <div class="yt-card" id="section-video">
+      <div class="yt-card">
         <div class="yt-card-title">${tr('ytTitle')}</div>
         <div class="yt-loading">
           <div class="yt-loading-icon">▶</div>
@@ -533,7 +408,7 @@ function renderPedal(pedal, posts) {
         </div>
       </div>
     </div>
-    <div class="buy-card" id="section-buy">
+    <div class="buy-card">
       <div class="buy-card-title">${tr('buyTitle')}</div>
       <div class="buy-buttons">
         <a href="${soundhouseUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn soundhouse">${tr('btnSoundhouse')}</a>
@@ -541,13 +416,10 @@ function renderPedal(pedal, posts) {
         <a href="${amazonUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazon')}</a>
       </div>
     </div>
-    <div class="boards-card" id="section-boards">
+    <div class="boards-card">
       <h3>🎛 ${tr('sectionBoards')}</h3>
       <div class="boards-grid">${boardsHtml}</div>
     </div>`;
-
-  // ★ アコーディオン初期化（DOM挿入後に実行）
-  initDescAccordion();
 }
 function showError(msg) {
   document.getElementById('content').innerHTML = `
