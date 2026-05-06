@@ -40,15 +40,23 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .rf-note-icon{font-size:15px;flex-shrink:0;margin-top:1px}
 .mypage-wrap{display:none}
 .mypage-wrap.show{display:block}
-.profile-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:24px;margin-bottom:20px}
-.profile-top{display:flex;align-items:center;gap:16px;margin-bottom:20px}
-.profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;cursor:pointer;position:relative;overflow:hidden;border:2px solid var(--bd)}
+
+/* ★ プロフィールカード */
+.profile-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:20px;overflow:hidden}
+.profile-card-header{display:flex;align-items:center;gap:16px;padding:20px 24px;cursor:pointer;transition:background .15s;user-select:none}
+.profile-card-header:hover{background:rgba(255,255,255,.03)}
+.profile-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;position:relative;overflow:hidden;border:2px solid var(--bd)}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-avatar-edit{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);font-family:Noto Sans JP,sans-serif;font-size:9px;text-align:center;padding:3px;color:#fff}
 .profile-info{flex:1;min-width:0}
-.profile-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:4px}
+.profile-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:3px}
 .profile-email{font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)}
-.section-title{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--tm);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
+.profile-chevron{font-size:14px;color:var(--td);transition:transform .25s;flex-shrink:0}
+.profile-chevron.open{transform:rotate(180deg)}
+
+/* ★ 折りたたみエリア */
+.profile-body{padding:0 24px;max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1),padding .35s}
+.profile-body.open{max-height:700px;padding:0 24px 20px}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--tm);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
 .edit-form-row{margin-bottom:12px}
 .edit-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#b0ada6;margin-bottom:5px;display:block}
 .edit-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:8px 12px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
@@ -57,8 +65,10 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 textarea.edit-input{resize:vertical;min-height:70px}
 .save-btn{padding:9px 20px;background:var(--ac);border:none;border-radius:3px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;touch-action:manipulation;transition:all .15s}
 .save-btn:hover{background:#cf4c26}
-.tab-bar{display:flex;border-bottom:1px solid var(--bd);margin-bottom:20px}
-.tab{padding:10px 16px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:var(--td);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;touch-action:manipulation}
+
+/* タブ */
+.tab-bar{display:flex;border-bottom:1px solid var(--bd);margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{padding:10px 14px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:var(--td);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;touch-action:manipulation;white-space:nowrap;flex-shrink:0}
 .tab.on{color:var(--ac);border-bottom-color:var(--ac)}
 .post-list{display:flex;flex-direction:column;gap:10px}
 .post-item{display:flex;gap:12px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px;cursor:pointer;transition:border-color .15s;touch-action:manipulation}
@@ -71,12 +81,32 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .post-item-likes{font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--tm);margin-top:4px}
 .empty-msg{text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)}
 .notif-badge{background:var(--ac);color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-family:JetBrains Mono,monospace;font-weight:600;display:inline-flex;align-items:center;justify-content:center;margin-left:4px;vertical-align:middle}
-.logout-btn{width:100%;padding:10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s;margin-top:16px;touch-action:manipulation}
+.logout-btn{width:100%;padding:10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s;margin-top:12px;touch-action:manipulation}
 .logout-btn:hover{background:rgba(224,80,80,.1);border-color:#e05050}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ★ ガチャ保存カード */
+.gacha-save-list{display:flex;flex-direction:column;gap:10px}
+.gacha-save-item{display:flex;align-items:center;gap:12px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px;cursor:pointer;transition:border-color .2s,transform .15s;touch-action:manipulation;text-decoration:none}
+.gacha-save-item:hover{border-color:rgba(232,85,45,.4);transform:translateY(-1px)}
+.gacha-save-img{width:56px;height:56px;border-radius:4px;object-fit:contain;background:var(--sf2);flex-shrink:0;border:1px solid var(--bd)}
+.gacha-save-img-empty{width:56px;height:56px;border-radius:4px;background:var(--sf2);flex-shrink:0;border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:22px;opacity:.5}
+.gacha-save-info{flex:1;min-width:0}
+.gacha-save-brand{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:2px}
+.gacha-save-model{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.gacha-save-meta{display:flex;align-items:center;gap:8px}
+.gacha-rarity-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px}
+.rarity-SSR{background:linear-gradient(135deg,#ffd700,#ff6b35,#a855f7);color:#fff}
+.rarity-SR{background:#a855f7;color:#fff}
+.rarity-Sp{background:#f97316;color:#fff}
+.rarity-Std{background:#4a4a48;color:#9a9890}
+.gacha-save-date{font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--td)}
+.gacha-save-arrow{font-size:14px;color:var(--td);flex-shrink:0;transition:color .15s}
+.gacha-save-item:hover .gacha-save-arrow{color:var(--ac)}
+
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
-@media(max-width:600px){.page{padding:16px 14px}.form-box{padding:20px 16px}}
+@media(max-width:600px){.page{padding:16px 14px}.form-box{padding:20px 16px}.profile-card-header{padding:16px 18px}.profile-body.open{padding:0 18px 18px}}
 </style>
 </head>
 <body>
@@ -99,6 +129,7 @@ textarea.edit-input{resize:vertical;min-height:70px}
   </div>
 </header>
 <div class="page" id="page">
+  <!-- 未ログイン：認証フォーム -->
   <div id="auth-wrap">
     <div class="auth-tabs">
       <div class="auth-tab on" id="tab-login" onclick="switchAuthTab('login')">ログイン</div>
@@ -153,50 +184,61 @@ textarea.edit-input{resize:vertical;min-height:70px}
       <span class="text-link" id="rst-back-link" onclick="showLoginForm()">← ログインに戻る</span>
     </div>
   </div>
+
+  <!-- ログイン済み：マイページ -->
   <div class="mypage-wrap" id="mypage-wrap">
+
+    <!-- ★ プロフィールカード（折りたたみ） -->
     <div class="profile-card">
-      <div class="profile-top">
-        <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()">
+      <!-- ヘッダー（クリックで開閉） -->
+      <div class="profile-card-header" onclick="toggleProfileBody()" id="profile-card-header">
+        <div class="profile-avatar" id="profile-avatar">
           <span id="avatar-initial">?</span>
-          <div class="profile-avatar-edit" id="av-edit-lbl">変更</div>
         </div>
-        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatarChange(event)">
         <div class="profile-info">
           <div class="profile-name" id="profile-name">-</div>
           <div class="profile-email" id="profile-email">-</div>
         </div>
+        <div class="profile-chevron" id="profile-chevron">▼</div>
       </div>
-      <div class="section-title" id="mp-section-profile">プロフィール編集</div>
-      <div class="edit-form-row">
-        <label class="edit-lbl" id="mp-lbl-username">ユーザー名</label>
-        <input class="edit-input" id="edit-username" type="text" maxlength="30">
+      <!-- 折りたたみ本体 -->
+      <div class="profile-body" id="profile-body">
+        <div class="section-title" id="mp-section-profile">プロフィール編集</div>
+        <div class="edit-form-row">
+          <label class="edit-lbl" id="mp-lbl-username">ユーザー名</label>
+          <input class="edit-input" id="edit-username" type="text" maxlength="30">
+        </div>
+        <div class="edit-form-row">
+          <label class="edit-lbl" id="mp-lbl-bio">自己紹介</label>
+          <textarea class="edit-input" id="edit-bio"></textarea>
+        </div>
+        <div class="edit-form-row">
+          <label class="edit-lbl" id="mp-lbl-amp">使用アンプ</label>
+          <input class="edit-input" id="edit-amp" type="text" placeholder="例: Fender Twin Reverb">
+        </div>
+        <div class="edit-form-row">
+          <label class="edit-lbl" id="mp-lbl-x">X（Twitter）URL</label>
+          <input class="edit-input" id="edit-x-url" type="url" placeholder="https://x.com/yourname">
+        </div>
+        <div class="edit-form-row">
+          <label class="edit-lbl" id="mp-lbl-ig">Instagram URL</label>
+          <input class="edit-input" id="edit-instagram-url" type="url" placeholder="https://instagram.com/yourname">
+        </div>
+        <button class="save-btn" id="mp-save-btn" onclick="saveProfile()">プロフィールを保存</button>
+        <button class="logout-btn" id="mp-logout-btn" onclick="doLogout()">ログアウト</button>
       </div>
-      <div class="edit-form-row">
-        <label class="edit-lbl" id="mp-lbl-bio">自己紹介</label>
-        <textarea class="edit-input" id="edit-bio"></textarea>
-      </div>
-      <div class="edit-form-row">
-        <label class="edit-lbl" id="mp-lbl-amp">使用アンプ</label>
-        <input class="edit-input" id="edit-amp" type="text" placeholder="例: Fender Twin Reverb">
-      </div>
-      <div class="edit-form-row">
-        <label class="edit-lbl" id="mp-lbl-x">X（Twitter）URL</label>
-        <input class="edit-input" id="edit-x-url" type="url" placeholder="https://x.com/yourname">
-      </div>
-      <div class="edit-form-row">
-        <label class="edit-lbl" id="mp-lbl-ig">Instagram URL</label>
-        <input class="edit-input" id="edit-instagram-url" type="url" placeholder="https://instagram.com/yourname">
-      </div>
-      <button class="save-btn" id="mp-save-btn" onclick="saveProfile()">プロフィールを保存</button>
-      <button class="logout-btn" id="mp-logout-btn" onclick="doLogout()">ログアウト</button>
     </div>
+
+    <!-- タブバー -->
     <div class="tab-bar">
       <div class="tab on" id="my-tab-posts" onclick="switchMyTab('posts')">自分の投稿</div>
       <div class="tab" id="my-tab-likes" onclick="switchMyTab('likes')">いいねした投稿</div>
+      <div class="tab" id="my-tab-gacha" onclick="switchMyTab('gacha')">🎰 ガチャ保存</div>
       <div class="tab" id="my-tab-notif" onclick="switchMyTab('notif')">通知 <span class="notif-badge" id="notif-badge" style="display:none">0</span></div>
     </div>
     <div id="my-panel-posts" class="post-list"></div>
     <div id="my-panel-likes" class="post-list" style="display:none"></div>
+    <div id="my-panel-gacha" class="gacha-save-list" style="display:none"></div>
     <div id="my-panel-notif" style="display:none"></div>
   </div>
 </div>
@@ -209,14 +251,15 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 function detectLang(){const saved=localStorage.getItem('mgmb_lang');if(saved)return saved;const bl=navigator.language||navigator.userLanguage||'ja';return bl.toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
 const MP_I18N={
-  ja:{logoSub:'ペダルボードSNS',backBtn:'← ホームへ',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとマイページを持てます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',avEditLbl:'変更',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'自分の投稿',tabLikes:'いいねした投稿',tabNotif:'通知',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyNotif:'通知はありません',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastAvatarUploading:'📤 アップロード中...',toastAvatarFail:'❌ アップロードに失敗しました',toastAvatarDone:'✅ アバターを更新しました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました'},
-  en:{logoSub:'Pedalboard SNS',backBtn:'← Home',tabLogin:'Login',tabRegister:'Sign Up',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email address',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Sign Up',rfSub:'You can post without registering, but signing up gives you a profile page.',rfLblName:'Username',rfLblEmail:'Email address',rfLblPw:'Password (6+ characters)',registerBtn:'Sign Up',registerBtnLoading:'Signing up...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:"We'll send a reset link to your registered email.",rstLblEmail:'Email address',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',avEditLbl:'Edit',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Your amp, genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Log Out',confirmLogout:'Log out?',tabPosts:'My Posts',tabLikes:'Liked Posts',tabNotif:'Notifications',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyNotif:'No notifications',loading:'Loading...',errEmailPw:'Please enter your email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email address',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email address is already registered',errResetEmail:'Please enter your email address',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastAvatarUploading:'📤 Uploading...',toastAvatarFail:'❌ Upload failed',toastAvatarDone:'✅ Avatar updated',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated'}
+  ja:{logoSub:'ペダルボードSNS',backBtn:'← ホームへ',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとマイページを持てます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'自分の投稿',tabLikes:'いいねした投稿',tabGacha:'🎰 ガチャ保存',tabNotif:'通知',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyGacha:'ガチャ保存がまだありません',emptyNotif:'通知はありません',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました',profileToggleOpen:'プロフィールを編集',profileToggleClose:'閉じる'},
+  en:{logoSub:'Pedalboard SNS',backBtn:'← Home',tabLogin:'Login',tabRegister:'Sign Up',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email address',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Sign Up',rfSub:'You can post without registering, but signing up gives you a profile page.',rfLblName:'Username',rfLblEmail:'Email address',rfLblPw:'Password (6+ characters)',registerBtn:'Sign Up',registerBtnLoading:'Signing up...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:"We'll send a reset link to your registered email.",rstLblEmail:'Email address',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Your amp, genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Log Out',confirmLogout:'Log out?',tabPosts:'My Posts',tabLikes:'Liked Posts',tabGacha:'🎰 Gacha Saves',tabNotif:'Notifications',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyGacha:'No gacha saves yet',emptyNotif:'No notifications',loading:'Loading...',errEmailPw:'Please enter your email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email address',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email address is already registered',errResetEmail:'Please enter your email address',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',profileToggleOpen:'Edit Profile',profileToggleClose:'Close'}
 };
 function tr(key){return(MP_I18N[lang]||MP_I18N.ja)[key]||MP_I18N.ja[key]||key;}
 function setTxt(id,text){const el=document.getElementById(id);if(el)el.textContent=text;}
 function applyLang(){
   const label=document.getElementById('mp-lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
-  setTxt('mp-logo-sub',tr('logoSub'));setTxt('mp-back-btn',tr('backBtn'));setTxt('tab-login',tr('tabLogin'));setTxt('tab-register',tr('tabRegister'));
+  setTxt('mp-logo-sub',tr('logoSub'));setTxt('mp-back-btn',tr('backBtn'));
+  setTxt('tab-login',tr('tabLogin'));setTxt('tab-register',tr('tabRegister'));
   setTxt('lf-title',tr('lfTitle'));setTxt('lf-sub',tr('lfSub'));setTxt('lf-lbl-email',tr('lfLblEmail'));setTxt('lf-lbl-pw',tr('lfLblPw'));
   const loginBtn=document.getElementById('login-btn');if(loginBtn&&!loginBtn.disabled)loginBtn.textContent=tr('loginBtn');
   setTxt('lf-reset-link',tr('resetLink'));setTxt('rf-title',tr('rfTitle'));setTxt('rf-sub',tr('rfSub'));
@@ -226,17 +269,29 @@ function applyLang(){
   const regUsernameEl=document.getElementById('reg-username');if(regUsernameEl)regUsernameEl.placeholder=tr('regUsernamePh');
   setTxt('rst-title',tr('rstTitle'));setTxt('rst-sub',tr('rstSub'));setTxt('rst-lbl-email',tr('rstLblEmail'));
   const rstBtn=document.getElementById('reset-btn');if(rstBtn&&!rstBtn.disabled)rstBtn.textContent=tr('resetBtn');
-  setTxt('rst-back-link',tr('rstBackLink'));setTxt('av-edit-lbl',tr('avEditLbl'));setTxt('mp-section-profile',tr('sectionProfile'));
+  setTxt('rst-back-link',tr('rstBackLink'));
+  setTxt('mp-section-profile',tr('sectionProfile'));
   setTxt('mp-lbl-username',tr('lblUsername'));setTxt('mp-lbl-bio',tr('lblBio'));setTxt('mp-lbl-amp',tr('lblAmp'));setTxt('mp-lbl-x',tr('lblX'));setTxt('mp-lbl-ig',tr('lblIg'));
   const bioEl=document.getElementById('edit-bio');if(bioEl)bioEl.placeholder=tr('bioPh');
   const ampEl=document.getElementById('edit-amp');if(ampEl)ampEl.placeholder=tr('ampPh');
   const loginPwEl=document.getElementById('login-password');if(loginPwEl)loginPwEl.placeholder=tr('pwPh');
   const regPwEl=document.getElementById('reg-password');if(regPwEl)regPwEl.placeholder=tr('regPwPh');
-  setTxt('mp-save-btn',tr('saveBtn'));setTxt('mp-logout-btn',tr('logoutBtn'));setTxt('my-tab-posts',tr('tabPosts'));setTxt('my-tab-likes',tr('tabLikes'));
+  setTxt('mp-save-btn',tr('saveBtn'));setTxt('mp-logout-btn',tr('logoutBtn'));
+  setTxt('my-tab-posts',tr('tabPosts'));setTxt('my-tab-likes',tr('tabLikes'));setTxt('my-tab-gacha',tr('tabGacha'));
   const notifTab=document.getElementById('my-tab-notif');
   if(notifTab){const badge=document.getElementById('notif-badge');notifTab.textContent=tr('tabNotif')+' ';if(badge)notifTab.appendChild(badge);}
 }
 function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();}
+
+// ★ プロフィール折りたたみ
+function toggleProfileBody(){
+  const body=document.getElementById('profile-body');
+  const chevron=document.getElementById('profile-chevron');
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chevron.classList.toggle('open',!isOpen);
+}
+
 let currentUser=null;
 document.addEventListener('DOMContentLoaded',async()=>{
   applyLang();
@@ -249,10 +304,17 @@ document.addEventListener('DOMContentLoaded',async()=>{
   });
 });
 function showAuthWrap(){document.getElementById('auth-wrap').style.display='block';document.getElementById('mypage-wrap').classList.remove('show');}
-function showMyPage(){document.getElementById('auth-wrap').style.display='none';document.getElementById('mypage-wrap').classList.add('show');loadProfile();loadMyPosts();loadNotifCount();}
+function showMyPage(){
+  document.getElementById('auth-wrap').style.display='none';
+  document.getElementById('mypage-wrap').classList.add('show');
+  loadProfile();loadMyPosts();loadNotifCount();
+}
 function switchAuthTab(tab){
-  document.getElementById('tab-login').classList.toggle('on',tab==='login');document.getElementById('tab-register').classList.toggle('on',tab==='register');
-  document.getElementById('login-form').style.display=tab==='login'?'block':'none';document.getElementById('register-form').style.display=tab==='register'?'block':'none';document.getElementById('reset-form').style.display='none';
+  document.getElementById('tab-login').classList.toggle('on',tab==='login');
+  document.getElementById('tab-register').classList.toggle('on',tab==='register');
+  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
+  document.getElementById('register-form').style.display=tab==='register'?'block':'none';
+  document.getElementById('reset-form').style.display='none';
 }
 function showResetForm(){['login-form','register-form'].forEach(id=>document.getElementById(id).style.display='none');document.getElementById('reset-form').style.display='block';document.getElementById('tab-login').classList.remove('on');document.getElementById('tab-register').classList.remove('on');}
 function showLoginForm(){switchAuthTab('login');}
@@ -303,39 +365,43 @@ async function loadProfile(){
   const{data}=await sb.from('users').select('*').eq('id',currentUser.id).single();
   const username=data?.username||currentUser.user_metadata?.username||'User';
   const initial=username[0].toUpperCase();
-  document.getElementById('profile-name').textContent=username;document.getElementById('profile-email').textContent=currentUser.email;
-  document.getElementById('avatar-initial').textContent=initial;document.getElementById('edit-username').value=username;
-  document.getElementById('edit-bio').value=data?.bio||'';document.getElementById('edit-amp').value=data?.amp||'';
-  document.getElementById('edit-x-url').value=data?.x_url||'';document.getElementById('edit-instagram-url').value=data?.instagram_url||'';
-  if(data?.avatar_url){const av=document.getElementById('profile-avatar');av.innerHTML=`<img src="${data.avatar_url}" alt="avatar"><div class="profile-avatar-edit" id="av-edit-lbl">${tr('avEditLbl')}</div>`;av.onclick=()=>document.getElementById('avatar-input').click();}
-}
-async function handleAvatarChange(e){
-  const file=e.target.files[0];if(!file)return;
-  const MAX=512;
-  const compressed=await new Promise(resolve=>{const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{let{width,height}=img;if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;canvas.getContext('2d').drawImage(img,0,0,width,height);resolve(canvas.toDataURL('image/jpeg',0.85));};img.src=ev.target.result;};r.readAsDataURL(file);});
-  showToast(tr('toastAvatarUploading'));
-  const byteStr=atob(compressed.split(',')[1]);const mime='image/jpeg';const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
-  const blob=new Blob([ab],{type:mime});const fn='avatars/'+currentUser.id+'_'+Date.now()+'.jpg';
-  const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime,upsert:true});
-  if(error){showToast(tr('toastAvatarFail'));return;}
-  const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);
-  await sb.from('users').update({avatar_url:u.publicUrl}).eq('id',currentUser.id);
-  const av=document.getElementById('profile-avatar');av.innerHTML=`<img src="${u.publicUrl}" alt="avatar"><div class="profile-avatar-edit" id="av-edit-lbl">${tr('avEditLbl')}</div>`;av.onclick=()=>document.getElementById('avatar-input').click();
-  showToast(tr('toastAvatarDone'));e.target.value='';
+  document.getElementById('profile-name').textContent=username;
+  document.getElementById('profile-email').textContent=currentUser.email;
+  document.getElementById('avatar-initial').textContent=initial;
+  document.getElementById('edit-username').value=username;
+  document.getElementById('edit-bio').value=data?.bio||'';
+  document.getElementById('edit-amp').value=data?.amp||'';
+  document.getElementById('edit-x-url').value=data?.x_url||'';
+  document.getElementById('edit-instagram-url').value=data?.instagram_url||'';
+  if(data?.avatar_url){
+    const av=document.getElementById('profile-avatar');
+    av.innerHTML=`<img src="${data.avatar_url}" alt="avatar">`;
+  }
 }
 async function saveProfile(){
   if(!currentUser)return;
   const username=document.getElementById('edit-username').value.trim();if(!username){showToast(tr('toastUsernameReq'));return;}
-  const bio=document.getElementById('edit-bio').value.trim();const amp=document.getElementById('edit-amp').value.trim();const x_url=document.getElementById('edit-x-url').value.trim();const instagram_url=document.getElementById('edit-instagram-url').value.trim();
+  const bio=document.getElementById('edit-bio').value.trim();const amp=document.getElementById('edit-amp').value.trim();
+  const x_url=document.getElementById('edit-x-url').value.trim();const instagram_url=document.getElementById('edit-instagram-url').value.trim();
   const{error}=await sb.from('users').upsert({id:currentUser.id,email:currentUser.email,username,bio,amp,x_url,instagram_url,password_hash:''},{onConflict:'id'});
   if(error){showToast(tr('toastSaveFail'));return;}
   await sb.auth.updateUser({data:{username}});
-  document.getElementById('profile-name').textContent=username;document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
+  document.getElementById('profile-name').textContent=username;
+  document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
   showToast(tr('toastSaveDone'));
+  // 保存後に折りたたむ
+  const body=document.getElementById('profile-body');
+  const chevron=document.getElementById('profile-chevron');
+  body.classList.remove('open');chevron.classList.remove('open');
 }
 function switchMyTab(tab){
-  ['posts','likes','notif'].forEach(t2=>{document.getElementById('my-tab-'+t2).classList.toggle('on',t2===tab);document.getElementById('my-panel-'+t2).style.display=t2===tab?'block':'none';});
-  if(tab==='likes')loadLikedPosts();if(tab==='notif')loadNotifications();
+  ['posts','likes','gacha','notif'].forEach(t=>{
+    document.getElementById('my-tab-'+t).classList.toggle('on',t===tab);
+    document.getElementById('my-panel-'+t).style.display=t===tab?'block':'none';
+  });
+  if(tab==='likes')loadLikedPosts();
+  if(tab==='gacha')loadGachaSaves();
+  if(tab==='notif')loadNotifications();
 }
 async function loadMyPosts(){
   if(!currentUser)return;const el=document.getElementById('my-panel-posts');el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
@@ -351,6 +417,47 @@ async function loadLikedPosts(){
   if(!posts||!posts.length){el.innerHTML=`<div class="empty-msg">${tr('emptyLikes')}</div>`;return;}
   el.innerHTML=posts.map(p=>postItemHTML(p)).join('');
 }
+
+// ★ ガチャ保存を読み込む
+async function loadGachaSaves(){
+  if(!currentUser)return;
+  const el=document.getElementById('my-panel-gacha');
+  el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
+  try{
+    const{data,error}=await sb
+      .from('gacha_saves')
+      .select('id,rarity,created_at,pedals(id,brand,model,slug,image_url,types)')
+      .eq('user_id',currentUser.id)
+      .order('created_at',{ascending:false})
+      .limit(50);
+    if(error)throw error;
+    if(!data||!data.length){
+      el.innerHTML=`<div class="empty-msg">${tr('emptyGacha')}</div>`;return;
+    }
+    el.innerHTML=data.map(s=>gachaSaveItemHTML(s)).join('');
+  }catch(e){
+    console.error('gacha saves error',e);
+    el.innerHTML=`<div class="empty-msg">${tr('emptyGacha')}</div>`;
+  }
+}
+
+function gachaSaveItemHTML(s){
+  const p=s.pedals;
+  if(!p)return'';
+  const rarity=s.rarity||'Std';
+  const rarityColors={SSR:'rarity-SSR',SR:'rarity-SR',Sp:'rarity-Sp',Std:'rarity-Std'};
+  const badgeCls=rarityColors[rarity]||'rarity-Std';
+  const imgSrc=p.image_url||'';
+  const typeIcon=p.types&&p.types[0]?`https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_${p.types[0]}.png`:'';
+  const img=imgSrc
+    ?`<img class="gacha-save-img" src="${escHtml(imgSrc)}" loading="lazy" onerror="this.src='${escHtml(typeIcon)}'">`
+    :(typeIcon?`<img class="gacha-save-img" src="${escHtml(typeIcon)}" loading="lazy">`:`<div class="gacha-save-img-empty">🎛</div>`);
+  const date=timeAgo(s.created_at);
+  const rarityNames={SSR:'Legendary',SR:'Expert',Sp:'Specialist',Std:'Standard'};
+  const rarityName=lang==='en'?(rarityNames[rarity]||rarity):(rarityNames[rarity]||rarity);
+  return`<div class="gacha-save-item" onclick="location.href='/pedal?slug=${escHtml(p.slug)}'">${img}<div class="gacha-save-info"><div class="gacha-save-brand">${escHtml(p.brand)}</div><div class="gacha-save-model">${escHtml(p.model)}</div><div class="gacha-save-meta"><span class="gacha-rarity-badge ${badgeCls}">${rarity}</span><span class="gacha-save-date">${date}</span></div></div><div class="gacha-save-arrow">→</div></div>`;
+}
+
 function postItemHTML(p){
   const thumb=p.image_urls&&p.image_urls[0]?`<img class="post-thumb" src="${p.image_urls[0]}" loading="lazy">`:`<div class="post-thumb-empty">${p.post_type==='gear'?'🎸':'🎛'}</div>`;
   return`<div class="post-item" onclick="location.href='/post?id=${p.id}'">${thumb}<div class="post-info"><div class="post-item-title">${escHtml(p.title)}</div><div class="post-item-meta">${timeAgo(p.created_at)}</div><div class="post-item-likes">❤️ ${p.likes||0}</div></div></div>`;
