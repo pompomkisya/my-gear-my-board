@@ -191,15 +191,20 @@ textarea.edit-input{resize:vertical;min-height:70px}
     <!-- ★ プロフィールカード（折りたたみ） -->
     <div class="profile-card">
       <!-- ヘッダー（クリックで開閉） -->
-      <div class="profile-card-header" onclick="toggleProfileBody()" id="profile-card-header">
-        <div class="profile-avatar" id="profile-avatar">
+      <div class="profile-card-header" id="profile-card-header">
+        <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()" title="プロフィール画像を変更" style="cursor:pointer">
           <span id="avatar-initial">?</span>
+          <div id="av-edit-lbl" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">変更</div>
         </div>
-        <div class="profile-info">
+        <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatarChange(event)">
+        <div class="profile-info" onclick="toggleProfileBody()" style="cursor:pointer;flex:1;min-width:0">
           <div class="profile-name" id="profile-name">-</div>
           <div class="profile-email" id="profile-email">-</div>
         </div>
-        <div class="profile-chevron" id="profile-chevron">▼</div>
+        <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;cursor:pointer" onclick="toggleProfileBody()">
+          <span id="profile-edit-hint" style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">プロフィール編集</span>
+          <div class="profile-chevron" id="profile-chevron">▼</div>
+        </div>
       </div>
       <!-- 折りたたみ本体 -->
       <div class="profile-body" id="profile-body">
@@ -375,8 +380,43 @@ async function loadProfile(){
   document.getElementById('edit-instagram-url').value=data?.instagram_url||'';
   if(data?.avatar_url){
     const av=document.getElementById('profile-avatar');
-    av.innerHTML=`<img src="${data.avatar_url}" alt="avatar">`;
+    av.innerHTML=`<img src="${data.avatar_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">${lang==='en'?'Edit':'変更'}</div>`;
   }
+}
+async function handleAvatarChange(e){
+  const file=e.target.files[0];if(!file)return;
+  const MAX=512;
+  const compressed=await new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        let{width,height}=img;
+        if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}
+        const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        resolve(canvas.toDataURL('image/jpeg',0.85));
+      };
+      img.src=ev.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+  showToast(lang==='en'?'📤 Uploading...':'📤 アップロード中...');
+  const byteStr=atob(compressed.split(',')[1]);
+  const mime='image/jpeg';
+  const ab=new ArrayBuffer(byteStr.length);
+  const ia=new Uint8Array(ab);
+  for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+  const blob=new Blob([ab],{type:mime});
+  const fn='avatars/'+currentUser.id+'_'+Date.now()+'.jpg';
+  const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime,upsert:true});
+  if(error){showToast(lang==='en'?'❌ Upload failed':'❌ アップロードに失敗しました');return;}
+  const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);
+  await sb.from('users').update({avatar_url:u.publicUrl}).eq('id',currentUser.id);
+  showToast(lang==='en'?'✅ Avatar updated':'✅ アバターを更新しました');
+  e.target.value='';
+  // 成功後1.2秒待ってリロード（画像反映を確認できるよう）
+  setTimeout(()=>location.reload(),1200);
 }
 async function saveProfile(){
   if(!currentUser)return;
@@ -455,7 +495,7 @@ function gachaSaveItemHTML(s){
   const date=timeAgo(s.created_at);
   const rarityNames={SSR:'Legendary',SR:'Expert',Sp:'Specialist',Std:'Standard'};
   const rarityName=lang==='en'?(rarityNames[rarity]||rarity):(rarityNames[rarity]||rarity);
-  return`<div class="gacha-save-item" onclick="location.href='/pedal?slug=${escHtml(p.slug)}'">${img}<div class="gacha-save-info"><div class="gacha-save-brand">${escHtml(p.brand)}</div><div class="gacha-save-model">${escHtml(p.model)}</div><div class="gacha-save-meta"><span class="gacha-rarity-badge ${badgeCls}">${rarity}</span><span class="gacha-save-date">${date}</span></div></div><div class="gacha-save-arrow">→</div></div>`;
+  return`<div class="gacha-save-item" onclick="location.href='/pedal?slug=${escHtml(p.slug)}'">${img}<div class="gacha-save-info"><div class="gacha-save-brand">${escHtml(p.brand)}</div><div class="gacha-save-model">${escHtml(p.model)}</div><div class="gacha-save-meta"><span class="gacha-rarity-badge ${badgeCls}">${rarity}</span><span class="gacha-save-date">${date}</span></div></div><div class="gacha-save-arrow" style="font-family:Noto Sans JP,sans-serif;font-size:10px;white-space:nowrap">${lang==='en'?'Detail →':'ペダル詳細ページへ →'}</div></div>`;
 }
 
 function postItemHTML(p){
