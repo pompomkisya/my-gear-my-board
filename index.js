@@ -323,43 +323,85 @@ function buildTicker(posts){
   const doubled=[...items,...items];
   inner.innerHTML=doubled.map(x=>'<span class="ti" onclick="location.href=\'/post?id='+x.id+'\'">'+x.text+'</span>').join('');
 }
+// ★ ペダルデータのロード状態管理
+let pedalDataLoaded=false;
+let pedalDataLoading=false;
+let pedalTypesMap={};
+
 async function loadPostsFromDB(){
-  const{data:posts,error}=await sb.from('posts').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);return;}
-  const{data:cc}=await sb.from('comments').select('post_id');
-  const cm={};if(cc)cc.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  let pedals=[];
-  let offset=0;
-  while(true){
-    const{data:batch}=await sb.from('pedals').select('full_name,types,slug,brand').range(offset,offset+999);
-    if(!batch||batch.length===0)break;
-    pedals=[...pedals,...batch];
-    if(batch.length<1000)break;
-    offset+=1000;
-  }
-  const pedalTypesMap={};
-  pedalSlugMap={};
-  if(pedals)pedals.forEach(p=>{
-    pedalTypesMap[p.full_name]=(p.types||[]);
-    if(p.slug)pedalSlugMap[normalizeName(p.full_name)]=p.slug;
-  });
-  // ── エイリアステーブルでslugマップを補完
-  const{data:aliases}=await sb.from('pedal_aliases').select('alias,pedal_full_name');
-  if(aliases)aliases.forEach(a=>{
-    const targetSlug=pedalSlugMap[normalizeName(a.pedal_full_name)];
-    if(targetSlug)pedalSlugMap[normalizeName(a.alias)]=targetSlug;
-  });
-  // ── ブランドセレクトを生成
-  populateBrandSelects(pedals);
-  allDBPosts=(posts||[]).map(p=>({
+  // ── フェーズ1：posts + comments のみ取得して即座に表示（高速）
+  const[postsResult,ccResult]=await Promise.all([
+    sb.from('posts').select('*').order('created_at',{ascending:false}),
+    sb.from('comments').select('post_id')
+  ]);
+  if(postsResult.error){console.error(postsResult.error);return;}
+  const posts=postsResult.data||[];
+  const cm={};
+  if(ccResult.data)ccResult.data.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
+
+  // 投稿カードをペダルデータなしで即描画
+  allDBPosts=posts.map(p=>({
     ...p,
     comment_count:cm[p.id]||0,
-    gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({...g,types:pedalTypesMap[g.name]||[]}))
+    gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
+      ...g,
+      types:pedalTypesMap[g.name]||[]
+    }))
   }));
   applyFilter();
   buildTicker(allDBPosts);
   renderRankingWidget(allDBPosts);renderGearWidget(allDBPosts);
   renderRankingWidgetMob(allDBPosts);renderGearWidgetMob(allDBPosts);
+
+  // ── フェーズ2：ペダルデータをバックグラウンドで取得（遅延）
+  loadPedalDataBackground(posts,cm);
+}
+
+async function loadPedalDataBackground(posts,cm){
+  if(pedalDataLoading||pedalDataLoaded)return;
+  pedalDataLoading=true;
+  try{
+    // posts + comments は既に表示済みなのでペダルデータだけ取得
+    let pedals=[];
+    let offset=0;
+    while(true){
+      const{data:batch}=await sb.from('pedals').select('full_name,types,slug,brand').range(offset,offset+999);
+      if(!batch||batch.length===0)break;
+      pedals=[...pedals,...batch];
+      if(batch.length<1000)break;
+      offset+=1000;
+    }
+    pedalTypesMap={};
+    pedalSlugMap={};
+    pedals.forEach(p=>{
+      pedalTypesMap[p.full_name]=(p.types||[]);
+      if(p.slug)pedalSlugMap[normalizeName(p.full_name)]=p.slug;
+    });
+    // エイリアステーブルでslugマップを補完
+    const{data:aliases}=await sb.from('pedal_aliases').select('alias,pedal_full_name');
+    if(aliases)aliases.forEach(a=>{
+      const targetSlug=pedalSlugMap[normalizeName(a.pedal_full_name)];
+      if(targetSlug)pedalSlugMap[normalizeName(a.alias)]=targetSlug;
+    });
+    // ブランドセレクトを生成
+    populateBrandSelects(pedals);
+    // 投稿カードのgear_list.typesをペダルデータで補完して再描画
+    allDBPosts=allDBPosts.map(p=>({
+      ...p,
+      gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
+        ...g,
+        types:pedalTypesMap[g.name]||g.types||[]
+      }))
+    }));
+    // ウィジェット類を更新（投稿カード自体は変化しないので再描画不要）
+    renderGearWidget(allDBPosts);
+    renderGearWidgetMob(allDBPosts);
+    pedalDataLoaded=true;
+  }catch(e){
+    console.error('pedal data load error',e);
+  }finally{
+    pedalDataLoading=false;
+  }
 }
 function parseGenre(genre){
   if(!genre)return[];
@@ -599,6 +641,8 @@ async function openPost(type){
   document.querySelectorAll('#post-genre-select .gs').forEach(g=>g.classList.remove('on'));
   ['post-username','post-desc','post-youtube','post-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
+  // ★ ペダルデータがまだの場合はバックグラウンドで取得開始（機材入力のため）
+  if(!pedalDataLoaded&&!pedalDataLoading)loadPedalDataBackground(allDBPosts,[]);
   // ★ ログイン済みならユーザー名を自動入力・入力欄を非表示
   const{data:{session}}=await sb.auth.getSession();
   const usernameRow=document.getElementById('username-form-row');
