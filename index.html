@@ -819,7 +819,15 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <div class="step-nav"><button class="step-btn next" onclick="goStep(2)">次へ →</button></div>
     </div>
     <div class="step-panel" id="step-2">
-      <div class="form-row">
+      <!-- ★ ログイン済み表示バッジ（ログイン時のみ表示） -->
+      <div id="login-user-badge" style="display:none;align-items:center;gap:8px;background:rgba(232,85,45,.08);border:1px solid rgba(232,85,45,.25);border-radius:4px;padding:8px 12px;margin-bottom:12px">
+        <span style="font-size:16px">👤</span>
+        <div>
+          <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--ac);font-weight:600;margin-bottom:1px">ログイン中で投稿</div>
+          <div style="font-family:Noto Sans JP,sans-serif;font-size:13px;color:var(--tx);font-weight:500"><span>-</span> として投稿されます</div>
+        </div>
+      </div>
+      <div class="form-row" id="username-form-row">
         <label class="form-lbl" id="lbl-username">ユーザー名（任意）</label>
         <input class="form-input" id="post-username" type="text" placeholder="名前をつけると自分の投稿を探せます" maxlength="30">
       </div>
