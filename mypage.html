@@ -106,8 +106,8 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .gacha-save-arrow{font-size:14px;color:var(--td);flex-shrink:0;transition:color .15s}
 .gacha-save-item:hover .gacha-save-arrow{color:var(--ac)}
 
-.avatar-menu{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--sf);border:1px solid var(--bd);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.6);z-index:100;min-width:160px;overflow:hidden;animation:fadeIn .15s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(-4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.avatar-menu{position:fixed;background:var(--sf);border:1px solid var(--bd);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.7);z-index:500;min-width:180px;overflow:hidden;animation:fadeInMenu .15s ease}
+@keyframes fadeInMenu{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .avatar-menu-item{display:flex;align-items:center;gap:8px;padding:11px 14px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:var(--tx);cursor:pointer;transition:background .12s;border-bottom:1px solid var(--bd)}
 .avatar-menu-item:last-child{border-bottom:none}
 .avatar-menu-item:hover{background:rgba(232,85,45,.08);color:var(--ac)}
@@ -397,11 +397,8 @@ async function loadProfile(){
 // ★ アバターメニュー開閉
 function openAvatarMenu(e){
   e.stopPropagation();
-  // 既存メニューを閉じる
   closeAvatarMenu();
-  const av=document.getElementById('profile-avatar');
   const isEn=lang==='en';
-  // 現在のavatar_urlを確認
   const hasCustomAvatar=!!document.querySelector('#profile-avatar img');
   const menu=document.createElement('div');
   menu.className='avatar-menu';
@@ -413,8 +410,22 @@ function openAvatarMenu(e){
     (hasCustomAvatar?`<div class="avatar-menu-item danger" onclick="setDefaultAvatar()">
       <span>↩️</span><span>${isEn?'Reset to default':'デフォルトに戻す'}</span>
     </div>`:'');
-  av.appendChild(menu);
-  // 外クリックで閉じる
+  // アバターの位置を取得してメニューをその直下に表示
+  const av=document.getElementById('profile-avatar');
+  const rect=av.getBoundingClientRect();
+  // メニューをbodyに追加（アバターの子ではなく）
+  document.body.appendChild(menu);
+  // 位置計算：アバターの左下、画面右端に収まるよう調整
+  const menuW=180;
+  let left=rect.left;
+  let top=rect.bottom+8;
+  // 画面右端をはみ出す場合は右寄せ
+  if(left+menuW>window.innerWidth-8)left=window.innerWidth-menuW-8;
+  // 画面下端をはみ出す場合は上に表示
+  const menuH=hasCustomAvatar?92:46;
+  if(top+menuH>window.innerHeight-8)top=rect.top-menuH-8;
+  menu.style.left=Math.max(8,left)+'px';
+  menu.style.top=top+'px';
   setTimeout(()=>document.addEventListener('click',closeAvatarMenu,{once:true}),10);
 }
 function closeAvatarMenu(){
