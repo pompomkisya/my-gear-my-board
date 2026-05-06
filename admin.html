@@ -108,11 +108,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .rarity-select option{background:var(--sf);color:var(--tx)}
 /* ★ rarityバッジ */
 .rarity-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px}
-.rarity-SS{background:linear-gradient(135deg,#ffd700,#ff6b35);color:#fff}
+.rarity-SSR{background:linear-gradient(135deg,#ffd700,#ff6b35,#a855f7);color:#fff}
 .rarity-SR{background:#a855f7;color:#fff}
-.rarity-R{background:#3b82f6;color:#fff}
-.rarity-S{background:#22c55e;color:#fff}
-.rarity-STD{background:#6e6c68;color:#fff}
+.rarity-Sp{background:#f97316;color:#fff}
+.rarity-Std{background:#6e6c68;color:#fff}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
 .stat-card{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:16px}
 .stat-num{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--ac);line-height:1}
@@ -344,6 +343,14 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <option value="junction_box">junction_box</option>
         <option value="other">other</option>
       </select>
+      <select class="pf-type-select" id="pf-rarity-select" onchange="setPedalRarityFilter(this.value)">
+        <option value="">🎰 レアリティで絞る</option>
+        <option value="SSR">🌈 SSR ― LEGENDARY</option>
+        <option value="SR">⭐ SR ― EXPERT</option>
+        <option value="Sp">🔶 Sp ― SPECIALIST</option>
+        <option value="Std">⚪ Std ― STANDARD</option>
+        <option value="__none__">― ガチャ対象外（未設定）</option>
+      </select>
     </div>
     <div id="pedals-list" class="loading">読み込み中...</div>
   </div>
@@ -391,11 +398,10 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <label class="pedal-edit-label">🎰 レアリティ（RARITY）― ガチャ排出設定</label>
     <select class="rarity-select" id="edit-rarity">
       <option value="">― ガチャ対象外（未設定）</option>
-      <option value="SS">⭐⭐ SS ― LEGENDARY（3%）</option>
-      <option value="SR">⭐ SR ― SUPER RARE（5%）</option>
-      <option value="R">🔵 R ― RARE（15%）</option>
-      <option value="S">🟢 S ― SPECIALIST（27%）</option>
-      <option value="STD">⚪ STD ― STANDARD（50%）</option>
+      <option value="SSR">🌈 SSR ― LEGENDARY（5%）</option>
+      <option value="SR">⭐ SR ― EXPERT（10%）</option>
+      <option value="Sp">🔶 Sp ― SPECIALIST（20%）</option>
+      <option value="Std">⚪ Std ― STANDARD（65%）</option>
     </select>
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px;margin-bottom:8px">
       💡 未設定のペダルはガチャに出現しません。画像・説明文も設定推奨。
@@ -553,6 +559,13 @@ let pedalTypeFilter='';
 function setPedalTypeFilter(val){
   pedalTypeFilter=val;
   const sel=document.getElementById('pf-type-select');
+  if(sel)sel.classList.toggle('active',!!val);
+  applyPedalFilter();
+}
+let pedalRarityFilter='';
+function setPedalRarityFilter(val){
+  pedalRarityFilter=val;
+  const sel=document.getElementById('pf-rarity-select');
   if(sel)sel.classList.toggle('active',!!val);
   applyPedalFilter();
 }
@@ -935,7 +948,7 @@ function setPedalFilter(mode){
 // ★ rarityバッジ生成
 function rarityBadge(r){
   if(!r)return '<span style="font-size:10px;color:var(--td)">—</span>';
-  const map={SS:'rarity-SS',SR:'rarity-SR',R:'rarity-R',S:'rarity-S',STD:'rarity-STD'};
+  const map={SSR:'rarity-SSR',SR:'rarity-SR',Sp:'rarity-Sp',Std:'rarity-Std'};
   return `<span class="rarity-badge ${map[r]||''}">${r}</span>`;
 }
 
@@ -949,6 +962,8 @@ function applyPedalFilter(){
   else if(pedalFilterMode==='no-yt')filtered=filtered.filter(p=>!p.youtube_video_id);
   else if(pedalFilterMode==='complete')filtered=filtered.filter(p=>p.image_url&&p.description&&p.youtube_video_id);
   if(pedalTypeFilter)filtered=filtered.filter(p=>(p.types||[]).includes(pedalTypeFilter));
+  if(pedalRarityFilter==='__none__')filtered=filtered.filter(p=>!p.rarity);
+  else if(pedalRarityFilter)filtered=filtered.filter(p=>p.rarity===pedalRarityFilter);
   if(!filtered.length){el.innerHTML='<div class="empty-msg">ペダルが見つかりません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
     +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>🎰 Rarity</th><th>操作</th></tr></thead>'
