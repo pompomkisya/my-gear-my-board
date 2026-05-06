@@ -404,15 +404,16 @@ async function loadPedal() {
   document.getElementById('bc-brand').href = `/brand?name=${encodeURIComponent(pedal.brand)}`;
   document.getElementById('bc-pedal').textContent = pedal.model;
   document.title = `${pedal.full_name} | My Gear My Board`;
-  const { data: allPosts } = await db.from('posts')
+  // ★ DB側でgear_listをフィルタリング（全件取得→JS処理を廃止）
+  // gear_listはjsonb配列なので contains演算子で検索
+  const { data: posts } = await db.from('posts')
     .select('id, title, username, image_urls, gear_list')
-    .order('created_at', { ascending: false });
-  const posts = (allPosts||[]).filter(p => {
-    const gear = Array.isArray(p.gear_list) ? p.gear_list : [];
-    return gear.some(g => (g.name||'').toLowerCase() === pedal.full_name.toLowerCase());
-  }).slice(0, 6);
-  cachedPosts = posts;
-  renderPedal(pedal, posts);
+    .contains('gear_list', JSON.stringify([{name: pedal.full_name}]))
+    .order('created_at', { ascending: false })
+    .limit(6);
+  cachedPosts = posts || [];
+  // ★ 描画とYouTube取得を並列実行
+  renderPedal(pedal, cachedPosts);
   handleYouTube(pedal);
 }
 function formatUpdatedAt(isoStr) {
