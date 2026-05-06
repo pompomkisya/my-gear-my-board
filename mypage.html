@@ -45,7 +45,8 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .profile-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:20px;overflow:hidden}
 .profile-card-header{display:flex;align-items:center;gap:16px;padding:20px 24px;cursor:pointer;transition:background .15s;user-select:none}
 .profile-card-header:hover{background:rgba(255,255,255,.03)}
-.profile-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;position:relative;overflow:hidden;border:2px solid var(--bd)}
+.profile-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;position:relative;border:2px solid var(--bd)}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
 .profile-info{flex:1;min-width:0}
 .profile-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:3px}
@@ -105,6 +106,13 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .gacha-save-arrow{font-size:14px;color:var(--td);flex-shrink:0;transition:color .15s}
 .gacha-save-item:hover .gacha-save-arrow{color:var(--ac)}
 
+.avatar-menu{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--sf);border:1px solid var(--bd);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.6);z-index:100;min-width:160px;overflow:hidden;animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-50%) translateY(-4px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.avatar-menu-item{display:flex;align-items:center;gap:8px;padding:11px 14px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:var(--tx);cursor:pointer;transition:background .12s;border-bottom:1px solid var(--bd)}
+.avatar-menu-item:last-child{border-bottom:none}
+.avatar-menu-item:hover{background:rgba(232,85,45,.08);color:var(--ac)}
+.avatar-menu-item.danger{color:#e05050}
+.avatar-menu-item.danger:hover{background:rgba(224,80,80,.08)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 @media(max-width:600px){.page{padding:16px 14px}.form-box{padding:20px 16px}.profile-card-header{padding:16px 18px}.profile-body.open{padding:0 18px 18px}}
 </style>
@@ -192,9 +200,11 @@ textarea.edit-input{resize:vertical;min-height:70px}
     <div class="profile-card">
       <!-- ヘッダー（クリックで開閉） -->
       <div class="profile-card-header" id="profile-card-header">
-        <div class="profile-avatar" id="profile-avatar" onclick="document.getElementById('avatar-input').click()" title="プロフィール画像を変更" style="cursor:pointer">
-          <span id="avatar-initial">?</span>
-          <div id="av-edit-lbl" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">変更</div>
+        <div class="profile-avatar" id="profile-avatar" onclick="openAvatarMenu(event)" title="プロフィール画像を変更" style="cursor:pointer;overflow:visible">
+          <div style="width:60px;height:60px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e85c2f,#b03020);position:relative">
+            <span id="avatar-initial">?</span>
+            <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff" id="av-edit-lbl">変更</div>
+          </div>
         </div>
         <input type="file" id="avatar-input" accept="image/*" style="display:none" onchange="handleAvatarChange(event)">
         <div class="profile-info" onclick="toggleProfileBody()" style="cursor:pointer;flex:1;min-width:0">
@@ -380,11 +390,77 @@ async function loadProfile(){
   document.getElementById('edit-instagram-url').value=data?.instagram_url||'';
   if(data?.avatar_url){
     const av=document.getElementById('profile-avatar');
-    av.innerHTML=`<img src="${data.avatar_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover"><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">${lang==='en'?'Edit':'変更'}</div>`;
+    const inner=av.querySelector('div');
+    if(inner)inner.innerHTML=`<img src="${data.avatar_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">${lang==='en'?'Edit':'変更'}</div>`;
   }
 }
+// ★ アバターメニュー開閉
+function openAvatarMenu(e){
+  e.stopPropagation();
+  // 既存メニューを閉じる
+  closeAvatarMenu();
+  const av=document.getElementById('profile-avatar');
+  const isEn=lang==='en';
+  // 現在のavatar_urlを確認
+  const hasCustomAvatar=!!document.querySelector('#profile-avatar img');
+  const menu=document.createElement('div');
+  menu.className='avatar-menu';
+  menu.id='avatar-menu';
+  menu.innerHTML=
+    `<div class="avatar-menu-item" onclick="triggerAvatarUpload()">
+      <span>📷</span><span>${isEn?'Upload image':'画像をアップロード'}</span>
+    </div>`+
+    (hasCustomAvatar?`<div class="avatar-menu-item danger" onclick="setDefaultAvatar()">
+      <span>↩️</span><span>${isEn?'Reset to default':'デフォルトに戻す'}</span>
+    </div>`:'');
+  av.appendChild(menu);
+  // 外クリックで閉じる
+  setTimeout(()=>document.addEventListener('click',closeAvatarMenu,{once:true}),10);
+}
+function closeAvatarMenu(){
+  const menu=document.getElementById('avatar-menu');
+  if(menu)menu.remove();
+}
+function triggerAvatarUpload(){
+  closeAvatarMenu();
+  document.getElementById('avatar-input').click();
+}
+
+// ★ Supabase Storageから古いアバター画像を削除するヘルパー
+async function deleteOldAvatar(avatarUrl){
+  if(!avatarUrl)return;
+  try{
+    // URLからStorageのパスを抽出
+    // 例: https://xxx.supabase.co/storage/v1/object/public/post-images/avatars/uid_xxx.jpg
+    const match=avatarUrl.match(/\/public\/post-images\/(.+)$/);
+    if(match&&match[1]){
+      await sb.storage.from('post-images').remove([match[1]]);
+    }
+  }catch(e){console.warn('古い画像削除に失敗（続行）',e);}
+}
+
+// ★ デフォルト（頭文字）に戻す
+async function setDefaultAvatar(){
+  closeAvatarMenu();
+  if(!currentUser)return;
+  const isEn=lang==='en';
+  // 現在のavatar_urlを取得して削除
+  const{data}=await sb.from('users').select('avatar_url').eq('id',currentUser.id).single();
+  if(data?.avatar_url)await deleteOldAvatar(data.avatar_url);
+  // DBのavatar_urlをnullに
+  await sb.from('users').update({avatar_url:null}).eq('id',currentUser.id);
+  // UIをデフォルトに戻す
+  const username=document.getElementById('profile-name').textContent||'U';
+  const av=document.getElementById('profile-avatar');
+  av.querySelector('div').innerHTML=
+    `<span id="avatar-initial">${username[0].toUpperCase()}</span>`+
+    `<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">${isEn?'Edit':'変更'}</div>`;
+  showToast(isEn?'✅ Reset to default':'✅ デフォルトに戻しました');
+}
+
 async function handleAvatarChange(e){
   const file=e.target.files[0];if(!file)return;
+  const isEn=lang==='en';
   const MAX=512;
   const compressed=await new Promise(resolve=>{
     const r=new FileReader();
@@ -401,21 +477,30 @@ async function handleAvatarChange(e){
     };
     r.readAsDataURL(file);
   });
-  showToast(lang==='en'?'📤 Uploading...':'📤 アップロード中...');
+  showToast(isEn?'📤 Uploading...':'📤 アップロード中...');
+  // 古い画像を先に取得して後で削除
+  const{data:userData}=await sb.from('users').select('avatar_url').eq('id',currentUser.id).single();
+  const oldUrl=userData?.avatar_url||null;
   const byteStr=atob(compressed.split(',')[1]);
   const mime='image/jpeg';
   const ab=new ArrayBuffer(byteStr.length);
   const ia=new Uint8Array(ab);
   for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
   const blob=new Blob([ab],{type:mime});
-  const fn='avatars/'+currentUser.id+'_'+Date.now()+'.jpg';
+  // ユーザーIDをファイル名に使うことで常に1ファイルのみ保持（upsert:true）
+  const fn='avatars/'+currentUser.id+'.jpg';
   const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime,upsert:true});
-  if(error){showToast(lang==='en'?'❌ Upload failed':'❌ アップロードに失敗しました');return;}
+  if(error){showToast(isEn?'❌ Upload failed':'❌ アップロードに失敗しました');return;}
   const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);
-  await sb.from('users').update({avatar_url:u.publicUrl}).eq('id',currentUser.id);
-  showToast(lang==='en'?'✅ Avatar updated':'✅ アバターを更新しました');
+  // キャッシュバスティング用にタイムスタンプ付きURLをDBに保存
+  const finalUrl=u.publicUrl+'?t='+Date.now();
+  await sb.from('users').update({avatar_url:finalUrl}).eq('id',currentUser.id);
+  // 旧URLが別パスだった場合は削除（ファイル名が変わった場合のみ）
+  if(oldUrl&&!oldUrl.includes('/avatars/'+currentUser.id+'.jpg')){
+    await deleteOldAvatar(oldUrl);
+  }
+  showToast(isEn?'✅ Avatar updated':'✅ アバターを更新しました');
   e.target.value='';
-  // 成功後1.2秒待ってリロード（画像反映を確認できるよう）
   setTimeout(()=>location.reload(),1200);
 }
 async function saveProfile(){
