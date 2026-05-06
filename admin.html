@@ -1081,6 +1081,8 @@ async function savePedalEdit(){
   const ytUrlInput=document.getElementById('edit-youtube-url').value.trim();
   const resetYt=document.getElementById('reset-youtube').checked;
   const updates={full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity}; // ★
+  // ★ 説明文が入力されている場合はupdated_atを現在時刻に更新
+  if(description||description_en)updates.updated_at=new Date().toISOString();
   if(ytUrlInput){
     const ytId=getYouTubeIdFromUrl(ytUrlInput);
     if(ytId){updates.youtube_video_id=ytId;}
