@@ -1035,7 +1035,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </div>
 
     <!-- ★ シェア＋保存ボタン（横並び） -->
-    <div id="g-sw" style="width:100%;max-width:340px;margin-top:8px;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;gap:6px">
+    <div id="g-sw" style="width:100%;max-width:340px;margin-top:8px;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;gap:6px;visibility:hidden">
       <button onclick="gDoShare()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px 0;background:rgba(29,161,242,.12);border:1px solid rgba(29,161,242,.35);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#1da1f2;cursor:pointer">
         <span style="font-size:13px;line-height:1;font-weight:900">X</span>
         <span id="g-share-txt">シェアする</span>
@@ -1173,14 +1173,14 @@ function gSetShare(v){
   const el=document.getElementById('g-sw');
   if(!el)return;
   if(v){
-    el.style.display='flex';
+    el.style.visibility='visible';
     el.style.opacity='1';
     el.style.pointerEvents='auto';
   }else{
     el.style.opacity='0';
     el.style.pointerEvents='none';
-    // モバイルで残像が出ないよう少し遅らせてdisplay:noneに
-    setTimeout(()=>{if(el.style.opacity==='0')el.style.display='none';},300);
+    // visibilityで制御（display変更しないのでレイアウトがずれない）
+    setTimeout(()=>{if(el.style.opacity==='0')el.style.visibility='hidden';},300);
   }
 }
 
