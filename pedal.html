@@ -79,23 +79,25 @@
     .type-badges { display: flex; flex-wrap: wrap; gap: 6px; }
     .type-badge { background: var(--sf2); border: 1px solid var(--bd); color: var(--tm); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
 
-    /* ★ クイックナビ（縦並び） */
+    /* ★ クイックナビ（横一列・均等幅） */
     .quick-nav {
-      display: flex; flex-direction: column; gap: 6px;
+      display: flex; flex-direction: row; gap: 6px;
       padding: 14px 0 4px;
       border-top: 1px solid var(--bd);
     }
     .quick-nav-chip {
-      display: flex; align-items: center; gap: 8px;
-      padding: 9px 14px;
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+      padding: 9px 4px;
       background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px;
-      font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 500;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 500;
       color: var(--tm); cursor: pointer; text-decoration: none;
       transition: border-color .15s, color .15s, background .15s;
-      touch-action: manipulation;
+      touch-action: manipulation; text-align: center; min-width: 0;
     }
     .quick-nav-chip:hover { border-color: var(--ac); color: var(--ac); background: rgba(232,85,45,.05); }
-    .quick-nav-chip::after { content: "→"; margin-left: auto; font-size: 12px; opacity: .5; }
+    .quick-nav-chip-icon { font-size: 16px; line-height: 1; }
+    .quick-nav-chip-label { font-size: 10px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
 
     /* ★ 説明文 アコーディオン */
     .pedal-description-wrap {
@@ -115,27 +117,28 @@
     .pedal-description h3 { font-size: 14px; font-weight: 600; color: var(--tm); margin: 10px 0 4px; }
     .pedal-description b { font-weight: 700; color: var(--tx); }
 
-    /* フェードアウトグラデーション */
+    /* フェードアウトグラデーション：descriptionの末尾のみに重ねる */
     .desc-fade {
-      position: absolute; bottom: 40px; left: 0; right: 0;
-      height: 48px;
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 52px;
       background: linear-gradient(to bottom, transparent, var(--sf));
       pointer-events: none;
       transition: opacity .3s;
     }
-    .desc-fade.hidden { opacity: 0; pointer-events: none; }
+    .desc-fade.hidden { opacity: 0; }
 
-    /* 続きを読むボタン */
+    /* 続きを読むボタン：グラデーションの外に配置 */
     .desc-toggle-btn {
-      display: block; width: 100%; margin-top: 8px;
-      padding: 8px;
-      background: transparent; border: 1px solid var(--bd); border-radius: 6px;
-      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 500;
-      color: var(--tm); cursor: pointer; text-align: center;
-      transition: border-color .15s, color .15s;
+      display: block; width: 100%; margin-top: 10px;
+      padding: 9px;
+      background: var(--sf2); border: 1px solid var(--bd); border-radius: 6px;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600;
+      color: var(--ac); cursor: pointer; text-align: center;
+      transition: border-color .15s, background .15s;
       touch-action: manipulation;
     }
-    .desc-toggle-btn:hover { border-color: var(--ac); color: var(--ac); }
+    .desc-toggle-btn:hover { border-color: var(--ac); background: rgba(232,85,45,.06); }
     .desc-toggle-btn.hidden { display: none; }
 
     /* ★ 最終更新日 */
@@ -457,11 +460,19 @@ function renderPedal(pedal, posts) {
   }
 
   // ★ クイックナビ
+  // クイックナビのアイコンとラベルを分離（横一列対応）
+  const navItems = [
+    {href:'#section-video', icon:'📺', labelJa:'デモ動画', labelEn:'Demo'},
+    {href:'#section-buy',   icon:'🛒', labelJa:'在庫を調べる', labelEn:'Buy'},
+    {href:'#section-boards',icon:'🎸', labelJa:'投稿ボード', labelEn:'Boards'},
+  ];
   const quickNavHtml = `
     <nav class="quick-nav" aria-label="ページ内ナビ">
-      <a href="#section-video" class="quick-nav-chip">${tr('navVideo')}</a>
-      <a href="#section-buy" class="quick-nav-chip">${tr('navBuy')}</a>
-      <a href="#section-boards" class="quick-nav-chip">${tr('navBoards')}</a>
+      ${navItems.map(item=>`
+        <a href="${item.href}" class="quick-nav-chip">
+          <span class="quick-nav-chip-icon">${item.icon}</span>
+          <span class="quick-nav-chip-label">${lang==='en'?item.labelEn:item.labelJa}</span>
+        </a>`).join('')}
     </nav>`;
 
   // ★ 説明文（アコーディオン + 最終更新日）
