@@ -608,7 +608,15 @@ async function openPost(type){
     const uname=userData?.username||session.user.user_metadata?.username||'User';
     const el=document.getElementById('post-username');if(el)el.value=uname;
     if(usernameRow)usernameRow.style.display='none';
-    if(loginBadge){loginBadge.style.display='flex';loginBadge.querySelector('span').textContent=uname;}
+    if(loginBadge){
+      loginBadge.style.display='flex';
+      const badgeTitle=document.getElementById('login-badge-title');
+      const badgeName=document.getElementById('login-badge-name');
+      const badgeSuffix=document.getElementById('login-badge-suffix');
+      if(badgeTitle)badgeTitle.textContent=lang==='en'?'Posting as logged-in user':'ログイン中で投稿';
+      if(badgeName)badgeName.textContent=uname;
+      if(badgeSuffix)badgeSuffix.textContent=lang==='en'?'will be posted as':'として投稿されます';
+    }
   }else{
     if(usernameRow)usernameRow.style.display='block';
     if(loginBadge)loginBadge.style.display='none';
