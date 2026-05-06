@@ -117,18 +117,7 @@
     .pedal-description h3 { font-size: 14px; font-weight: 600; color: var(--tm); margin: 10px 0 4px; }
     .pedal-description b { font-weight: 700; color: var(--tx); }
 
-    /* フェードアウトグラデーション：descriptionの末尾のみに重ねる */
-    .desc-fade {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 52px;
-      background: linear-gradient(to bottom, transparent, var(--sf));
-      pointer-events: none;
-      transition: opacity .3s;
-    }
-    .desc-fade.hidden { opacity: 0; }
-
-    /* 続きを読むボタン：グラデーションの外に配置 */
+    /* 続きを読むボタン */
     .desc-toggle-btn {
       display: block; width: 100%; margin-top: 10px;
       padding: 9px;
@@ -336,18 +325,15 @@ let cachedPosts = [];
 // ★ アコーディオン制御
 function initDescAccordion() {
   const desc = document.getElementById('desc-text');
-  const fade = document.getElementById('desc-fade');
   const btn = document.getElementById('desc-toggle-btn');
   if (!desc || !btn) return;
   // テキストが短い場合はボタン不要
   if (desc.scrollHeight <= desc.clientHeight + 4) {
-    if (fade) fade.classList.add('hidden');
     btn.classList.add('hidden');
     return;
   }
   btn.onclick = function() {
     const expanded = desc.classList.toggle('expanded');
-    if (fade) fade.classList.toggle('hidden', expanded);
     btn.textContent = expanded ? tr('readLess') : tr('readMore');
   };
 }
@@ -451,10 +437,18 @@ function renderPedal(pedal, posts) {
         ${hasSource?`<div class="image-source">出典: ${pedal.image_source}</div>`:''}
       </div>`;
   } else {
+    // ★ タイプに応じたアイコン画像をフォールバック表示
+    const firstType = (pedal.types && pedal.types[0]) ? pedal.types[0] : null;
+    const typeIconUrl = firstType
+      ? 'https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_' + firstType + '.png'
+      : null;
     imageBlockHtml = `
       <div class="pedal-image-block">
         <div class="pedal-image no-source">
-          <span class="pedal-image-placeholder">🎛</span>
+          ${typeIconUrl
+            ? `<img src="${typeIconUrl}" alt="${firstType}" loading="lazy" style="width:72px;height:72px;object-fit:contain;opacity:.5" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+            : ''}
+          <span class="pedal-image-placeholder" ${typeIconUrl ? 'style="display:none"' : ''}>🎛</span>
         </div>
       </div>`;
   }
@@ -483,7 +477,6 @@ function renderPedal(pedal, posts) {
     descHtml = `
       <div class="pedal-description-wrap">
         <div class="pedal-description" id="desc-text">${desc}</div>
-        <div class="desc-fade" id="desc-fade"></div>
         <button class="desc-toggle-btn" id="desc-toggle-btn">${tr('readMore')}</button>
         ${updatedStr ? `<div class="desc-updated">${tr('updatedAt')}${updatedStr}</div>` : ''}
       </div>`;
