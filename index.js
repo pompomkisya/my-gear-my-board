@@ -671,7 +671,9 @@ function updateStepUI(){
     if(ua){
       const mainText=ua.querySelector('#upload-main-text');
       if(mainText)mainText.textContent=tr('uploadAreaText');
-      else{const divs=ua.querySelectorAll('div');if(divs[0])divs[0].textContent=tr('uploadAreaText');if(divs[1])divs[1].textContent=tr('uploadAreaSub');}
+      else{const divs=ua.querySelectorAll('div');if(divs[0])divs[0].textContent=tr('uploadAreaText');}
+      const subText=document.getElementById('upload-area-sub');
+      if(subText)subText.textContent=tr('uploadAreaSub');
     }
     const hint=document.getElementById('upload-hint');if(hint)hint.textContent=tr('uploadAreaHint');
     const skipBtn=document.getElementById('skip-photo-btn');if(skipBtn)skipBtn.style.display='none';
