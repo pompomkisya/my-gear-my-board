@@ -78,8 +78,6 @@
     .pedal-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; line-height: 1.2; margin-bottom: 10px; word-break: break-word; }
     .type-badges { display: flex; flex-wrap: wrap; gap: 6px; }
     .type-badge { background: var(--sf2); border: 1px solid var(--bd); color: var(--tm); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
-
-    /* ★ クイックナビ（横一列・均等幅） */
     .quick-nav {
       display: flex; flex-direction: row; gap: 6px;
       padding: 14px 0 4px;
@@ -98,8 +96,6 @@
     .quick-nav-chip:hover { border-color: var(--ac); color: var(--ac); background: rgba(232,85,45,.05); }
     .quick-nav-chip-icon { font-size: 16px; line-height: 1; }
     .quick-nav-chip-label { font-size: 10px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
-
-    /* ★ 説明文 アコーディオン */
     .pedal-description-wrap {
       margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bd);
       position: relative;
@@ -107,7 +103,7 @@
     .pedal-description {
       font-size: 14px; color: var(--tm); line-height: 1.7;
       font-family: 'Noto Sans JP', sans-serif;
-      max-height: 8.5em; /* 約5行 */
+      max-height: 8.5em;
       overflow: hidden;
       transition: max-height .4s ease;
     }
@@ -116,8 +112,6 @@
     .pedal-description h2 { font-size: 17px; font-weight: 700; color: var(--tx); margin: 14px 0 6px; }
     .pedal-description h3 { font-size: 14px; font-weight: 600; color: var(--tm); margin: 10px 0 4px; }
     .pedal-description b { font-weight: 700; color: var(--tx); }
-
-    /* 続きを読むボタン */
     .desc-toggle-btn {
       display: block; width: 100%; margin-top: 10px;
       padding: 9px;
@@ -129,16 +123,12 @@
     }
     .desc-toggle-btn:hover { border-color: var(--ac); background: rgba(232,85,45,.06); }
     .desc-toggle-btn.hidden { display: none; }
-
-    /* ★ 最終更新日 */
     .desc-updated {
       margin-top: 12px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px; color: var(--td);
       text-align: right;
     }
-
-    /* YouTube */
     .yt-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
     .yt-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 14px; }
     .yt-embed-wrap {
@@ -166,7 +156,6 @@
       color: #fff; text-decoration: none; transition: opacity .15s;
     }
     .yt-fallback-btn:hover { opacity: .85; }
-    /* 購入 */
     .buy-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
     .buy-card-title { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--td); margin-bottom: 12px; text-align: center; letter-spacing: 1px; }
     .buy-buttons { display: flex; flex-direction: column; gap: 10px; }
@@ -179,7 +168,6 @@
     .buy-btn.soundhouse { background: var(--soundhouse); color: #fff; }
     .buy-btn.sweetwater { background: var(--sweetwater); color: #fff; }
     .buy-btn.amazon { background: var(--amazon); color: #111; }
-    /* ボード */
     .boards-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
     .boards-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 16px; }
     .boards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -322,12 +310,10 @@ function toggleLang() {
 let cachedPedal = null;
 let cachedPosts = [];
 
-// ★ アコーディオン制御
 function initDescAccordion() {
   const desc = document.getElementById('desc-text');
   const btn = document.getElementById('desc-toggle-btn');
   if (!desc || !btn) return;
-  // テキストが短い場合はボタン不要
   if (desc.scrollHeight <= desc.clientHeight + 4) {
     btn.classList.add('hidden');
     return;
@@ -389,11 +375,47 @@ async function handleYouTube(pedal) {
   }
   renderYouTube(pedal.id, pedal.full_name, videoId);
 }
+
+// ★ 修正: gear_listのname検索をJS側でフィルタリング（contains問題を回避）
+// contains(@>)はgear_listの各要素が {name, brand, search_query} の3キー構造のとき
+// {name: "xxx"} だけでは一致しないDBバージョンがある。
+// またエイリアス（別名）でも引っかかるよう、aliasesテーブルも活用する。
+async function fetchBoardsByPedal(pedalFullName) {
+  // ★ エイリアスも含めた検索名リストを作成
+  const { data: aliases } = await db
+    .from('pedal_aliases')
+    .select('alias')
+    .eq('pedal_full_name', pedalFullName);
+  const searchNames = [pedalFullName, ...(aliases||[]).map(a => a.alias)];
+
+  // ★ 全投稿からgear_listにnameが含まれるものをJS側でフィルタ
+  // パフォーマンスのため、まず直近200件を取得してからフィルタリング
+  const { data: posts } = await db
+    .from('posts')
+    .select('id, title, username, image_urls, gear_list, created_at')
+    .order('created_at', { ascending: false })
+    .limit(200);
+
+  if (!posts) return [];
+
+  const lowerNames = searchNames.map(n => n.toLowerCase().trim());
+
+  return posts
+    .filter(post => {
+      const gear = Array.isArray(post.gear_list) ? post.gear_list : [];
+      return gear.some(g => {
+        const gName = (g.name || g || '').toLowerCase().trim();
+        return lowerNames.includes(gName);
+      });
+    })
+    .slice(0, 6);
+}
+
 async function loadPedal() {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get('slug');
   if (!slug) { showError(tr('notFound')); return; }
-  // ★ updated_atも取得
+
   const { data: pedals } = await db.from('pedals')
     .select('id, brand, model, full_name, slug, types, image_url, image_source, description, description_en, youtube_video_id, updated_at')
     .eq('slug', decodeURIComponent(slug)).limit(1);
@@ -404,18 +426,15 @@ async function loadPedal() {
   document.getElementById('bc-brand').href = `/brand?name=${encodeURIComponent(pedal.brand)}`;
   document.getElementById('bc-pedal').textContent = pedal.model;
   document.title = `${pedal.full_name} | My Gear My Board`;
-  // ★ DB側でgear_listをフィルタリング（全件取得→JS処理を廃止）
-  // gear_listはjsonb配列なので contains演算子で検索
-  const { data: posts } = await db.from('posts')
-    .select('id, title, username, image_urls, gear_list')
-    .contains('gear_list', JSON.stringify([{name: pedal.full_name}]))
-    .order('created_at', { ascending: false })
-    .limit(6);
-  cachedPosts = posts || [];
-  // ★ 描画とYouTube取得を並列実行
+
+  // ★ 修正: JS側フィルタリングに変更
+  const posts = await fetchBoardsByPedal(pedal.full_name);
+  cachedPosts = posts;
+
   renderPedal(pedal, cachedPosts);
   handleYouTube(pedal);
 }
+
 function formatUpdatedAt(isoStr) {
   if (!isoStr) return '';
   const d = new Date(isoStr);
@@ -426,7 +445,6 @@ function formatUpdatedAt(isoStr) {
 }
 function renderPedal(pedal, posts) {
   const typesHtml = (pedal.types||[]).map(t => `<span class="type-badge">${getTypeLabel(t)}</span>`).join('');
-  // 画像ブロック
   let imageBlockHtml = '';
   if (pedal.image_url) {
     const hasSource = !!pedal.image_source;
@@ -438,7 +456,6 @@ function renderPedal(pedal, posts) {
         ${hasSource?`<div class="image-source">出典: ${pedal.image_source}</div>`:''}
       </div>`;
   } else {
-    // ★ タイプに応じたアイコン画像をフォールバック表示
     const firstType = (pedal.types && pedal.types[0]) ? pedal.types[0] : null;
     const typeIconUrl = firstType
       ? 'https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_' + firstType + '.png'
@@ -454,8 +471,6 @@ function renderPedal(pedal, posts) {
       </div>`;
   }
 
-  // ★ クイックナビ
-  // クイックナビのアイコンとラベルを分離（横一列対応）
   const navItems = [
     {href:'#section-video', icon:'📺', labelJa:'デモ動画', labelEn:'Demo'},
     {href:'#section-buy',   icon:'🛒', labelJa:'在庫を調べる', labelEn:'Buy'},
@@ -470,7 +485,6 @@ function renderPedal(pedal, posts) {
         </a>`).join('')}
     </nav>`;
 
-  // ★ 説明文（アコーディオン + 最終更新日）
   const desc = lang === 'en' ? (pedal.description_en || pedal.description) : pedal.description;
   const updatedStr = formatUpdatedAt(pedal.updated_at);
   let descHtml = '';
@@ -488,7 +502,6 @@ function renderPedal(pedal, posts) {
       </div>`;
   }
 
-  // ボード一覧
   let boardsHtml = '';
   if (posts.length > 0) {
     boardsHtml = posts.map(post => {
@@ -548,7 +561,6 @@ function renderPedal(pedal, posts) {
       <div class="boards-grid">${boardsHtml}</div>
     </div>`;
 
-  // ★ アコーディオン初期化（DOM挿入後に実行）
   initDescAccordion();
 }
 function showError(msg) {
