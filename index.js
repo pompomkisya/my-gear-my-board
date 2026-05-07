@@ -12,11 +12,9 @@ function detectLang(){
 }
 let lang=detectLang();
 let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentFxFilter=null,currentTab='all',currentSort='new',currentDBPost=null;
-// ── ペダルslugマップ（正規化キー → slug）
 let pedalSlugMap={};
 function normalizeName(name){return(name||'').toLowerCase().trim().replace(/\s+/g,' ');}
 function getSlugByName(name){return pedalSlugMap[normalizeName(name)]||null;}
-// ── 翻訳辞書
 const I18N={
   ja:{
     postBannerTitle:'あなたのボードや機材を投稿しよう！',postBannerSub:'登録不要・匿名OK。写真1枚から投稿できます。',
@@ -29,12 +27,14 @@ const I18N={
     posts:'件の投稿',noData:'データなし',noPost:'まだ投稿がありません',noPostGeneral:'投稿がありません',
     footerPrivacy:'プライバシーポリシー',footerContact:'お問い合わせ',footerCopy:'© 2026 My Gear My Board. All rights reserved.',
     postDropBoard:'🎛 &nbsp;ボードを投稿',postDropGear:'🎸 &nbsp;機材を投稿',headerPost:'＋ &nbsp;投稿する ▾',
-    uploadAreaText:'クリックして写真を選択',uploadAreaSub:'最大3枚 · 1枚目がサムネイル',uploadAreaHint:'番号をつけると伝わりやすくなります',
+    uploadAreaText:'ここをクリックして写真をアップロード',
+    uploadAreaSub:'最大3枚 · 1枚目がサムネイル',uploadAreaHint:'番号をつけると伝わりやすくなります',
     photoEditBtn:'🎯 機材に番号をつける',skipPhoto:'スキップ（写真なしで続ける）',
     lblUsername:'ユーザー名（任意）',phUsername:'名前をつけると自分の投稿を探せます',
     lblTitle:'タイトル',phTitle:'例：ライブ用最強ボード',phTitleGear:'例：My New Gear！',lblYoutube:'YouTube URL（任意）',
     lblGear:'使用機材（1つ以上推奨）',gearHint1:'※入力すると閲覧数が上がります',
-    gearHint2:'候補からタップで簡単に追加できます',gearHint3:'まずは1つだけでOKです',
+    gearHint2:'ローマ字入力で自動予測変換できます。<br>候補をクリックで簡単追加！',
+    gearHint3:'まずは1つだけでOKです',
     gearPlaceholder:'機材名を入力（例: DS-1, Big Muff）',laterInput:'あとで入力する',
     lblGenre:'ジャンル（複数選択OK）',lblDesc:'コメント・説明（任意）',phDesc:'機材の選び方、こだわりなど...',
     passTitle:'🔑 編集用4桁パスワードを設定',
@@ -86,13 +86,15 @@ const I18N={
     posts:' posts',noData:'No data',noPost:'No posts yet',noPostGeneral:'No posts',
     footerPrivacy:'Privacy Policy',footerContact:'Contact',footerCopy:'© 2026 My Gear My Board. All rights reserved.',
     postDropBoard:'🎛 &nbsp;Post Pedalboard',postDropGear:'🎸 &nbsp;Post Gear',headerPost:'＋ &nbsp;POST ▾',
-    uploadAreaText:'Tap to select photos',uploadAreaSub:'Up to 3 photos · First photo is thumbnail',
+    uploadAreaText:'Click here to upload photos',
+    uploadAreaSub:'Up to 3 photos · First photo is thumbnail',
     uploadAreaHint:'Adding numbers makes it easier to understand',
     photoEditBtn:'🎯 Number your gear',skipPhoto:'Skip (continue without photo)',
     lblUsername:'Username (optional)',phUsername:'Add a name to find your posts later (blank = anonymous)',
     lblTitle:'Title',phTitle:'e.g. My Live Pedalboard',phTitleGear:'e.g. My New Gear！',lblYoutube:'YouTube URL (optional)',
     lblGear:'Gear (1+ recommended)',gearHint1:'※ Adding gear increases views',
-    gearHint2:'Tap a suggestion to add easily',gearHint3:'Just one is fine to start',
+    gearHint2:'Type to search and autocomplete.<br>Click a suggestion to add!',
+    gearHint3:'Just one is fine to start',
     gearPlaceholder:'Enter gear name (e.g. DS-1, Big Muff)',laterInput:'Add later',
     lblGenre:'Genre (multiple OK)',lblDesc:'Description (optional)',phDesc:'Your setup story, preferences...',
     passTitle:'🔑 Set a 4-digit edit password',
@@ -135,7 +137,6 @@ const I18N={
   }
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
-// ── 報告モーダル
 let _reportGearName='';
 function openGearReportModal(name){
   _reportGearName=name;
@@ -162,7 +163,6 @@ async function submitGearReport(){
   closeGearReportModal();
   showToast(tr('reportDone'));
 }
-// ── ギアウィジェット共通HTML生成
 function renderGearWidgetHTML(name,count){
   const slug=getSlugByName(name);
   const btnLabel=tr('gearWidgetLink');
@@ -186,12 +186,10 @@ function renderGearWidgetHTML(name,count){
       +'</div>';
   }
 }
-// ── ブランドセレクトを生成する関数
 function populateBrandSelects(pedals){
   const brands=[...new Set(pedals.map(p=>p.brand).filter(Boolean))].sort();
   const pcSelect=document.getElementById('pc-brand-select');
   const mobSelect=document.getElementById('mob-brand-select');
-  // 既存オプションをデフォルト以外削除
   if(pcSelect)pcSelect.querySelectorAll('option:not(#pc-brand-select-default)').forEach(el=>el.remove());
   if(mobSelect)mobSelect.querySelectorAll('option:not(#mob-brand-select-default)').forEach(el=>el.remove());
   brands.forEach(brand=>{
@@ -259,7 +257,6 @@ function applyLangUI(){
     else if(txt.match(/ジャンル|Genre/))el.textContent=tr('slGenre');
     else if(txt.match(/ブランド$|^Brand$/))el.textContent=tr('slBrandTitle');
   });
-  // ブランドセレクトのデフォルトオプションテキストを言語に合わせて更新
   const pcDef=document.getElementById('pc-brand-select-default');if(pcDef)pcDef.textContent=tr('brandSelectDefault');
   const mobDef=document.getElementById('mob-brand-select-default');if(mobDef)mobDef.textContent=tr('brandSelectDefault');
   ['tag-tagroku-pc','tag-tagroku-mob','gs-tagroku'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tr('tagHomRec');});
@@ -323,13 +320,11 @@ function buildTicker(posts){
   const doubled=[...items,...items];
   inner.innerHTML=doubled.map(x=>'<span class="ti" onclick="location.href=\'/post?id='+x.id+'\'">'+x.text+'</span>').join('');
 }
-// ★ ペダルデータのロード状態管理
 let pedalDataLoaded=false;
 let pedalDataLoading=false;
 let pedalTypesMap={};
 
 async function loadPostsFromDB(){
-  // ── フェーズ1：posts + comments のみ取得して即座に表示（高速）
   const[postsResult,ccResult]=await Promise.all([
     sb.from('posts').select('*').order('created_at',{ascending:false}),
     sb.from('comments').select('post_id')
@@ -338,8 +333,6 @@ async function loadPostsFromDB(){
   const posts=postsResult.data||[];
   const cm={};
   if(ccResult.data)ccResult.data.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-
-  // 投稿カードをペダルデータなしで即描画
   allDBPosts=posts.map(p=>({
     ...p,
     comment_count:cm[p.id]||0,
@@ -352,8 +345,6 @@ async function loadPostsFromDB(){
   buildTicker(allDBPosts);
   renderRankingWidget(allDBPosts);renderGearWidget(allDBPosts);
   renderRankingWidgetMob(allDBPosts);renderGearWidgetMob(allDBPosts);
-
-  // ── フェーズ2：ペダルデータをバックグラウンドで取得（遅延）
   loadPedalDataBackground(posts,cm);
 }
 
@@ -361,7 +352,6 @@ async function loadPedalDataBackground(posts,cm){
   if(pedalDataLoading||pedalDataLoaded)return;
   pedalDataLoading=true;
   try{
-    // posts + comments は既に表示済みなのでペダルデータだけ取得
     let pedals=[];
     let offset=0;
     while(true){
@@ -377,15 +367,12 @@ async function loadPedalDataBackground(posts,cm){
       pedalTypesMap[p.full_name]=(p.types||[]);
       if(p.slug)pedalSlugMap[normalizeName(p.full_name)]=p.slug;
     });
-    // エイリアステーブルでslugマップを補完
     const{data:aliases}=await sb.from('pedal_aliases').select('alias,pedal_full_name');
     if(aliases)aliases.forEach(a=>{
       const targetSlug=pedalSlugMap[normalizeName(a.pedal_full_name)];
       if(targetSlug)pedalSlugMap[normalizeName(a.alias)]=targetSlug;
     });
-    // ブランドセレクトを生成
     populateBrandSelects(pedals);
-    // 投稿カードのgear_list.typesをペダルデータで補完して再描画
     allDBPosts=allDBPosts.map(p=>({
       ...p,
       gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
@@ -393,7 +380,6 @@ async function loadPedalDataBackground(posts,cm){
         types:pedalTypesMap[g.name]||g.types||[]
       }))
     }));
-    // ウィジェット類を更新（投稿カード自体は変化しないので再描画不要）
     renderGearWidget(allDBPosts);
     renderGearWidgetMob(allDBPosts);
     pedalDataLoaded=true;
@@ -467,7 +453,6 @@ function getEmptyHTML(){
 function clearFilter(){
   currentGenreFilter='ALL';currentBrandFilter=null;currentFxFilter=null;
   document.querySelectorAll('.sl .tag, #swipe-ui .tag').forEach(t2=>{t2.classList.toggle('on',t2.getAttribute('data-genre')==='ALL');});
-  // ブランドセレクトをデフォルトに戻す
   const pcSelect=document.getElementById('pc-brand-select');if(pcSelect)pcSelect.value='';
   const mobSelect=document.getElementById('mob-brand-select');if(mobSelect)mobSelect.value='';
   clearSearch();updateMobFilterClear();
@@ -498,9 +483,6 @@ function renderDBPosts(posts){
       +'<div class="st">💬 <span>'+(p.comment_count||0)+'</span></div></div></div></div>';
   }
 
-  // ★ PC版：gacha-feed-wrap内のcard-grid(display:contents)に投稿カードを挿入
-  // ガチャカード(gacha-card-pc)はgrid-column:2,grid-row:1固定
-  // 1枚目の投稿カードはgrid-column:1,grid-row:1に入る
   if(grid){
     if(!posts.length){
       grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
@@ -509,15 +491,10 @@ function renderDBPosts(posts){
     }
   }
 
-  // ★ モバイル版：mob-gacha-grid内のcard-grid-mob(display:contents)に投稿カードを挿入
-  // ガチャカード(gacha-card-mob)はgrid-column:2,grid-row:1固定
-  // 1枚目の投稿カードはgrid-column:1,grid-row:1に入る（左上）
-  // 2枚目以降は通常フローで左右交互に並ぶ
   if(gridMob){
     if(!posts.length){
       gridMob.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
     }else{
-      // 1枚目は明示的にgrid-column:1,grid-row:1を指定してガチャの隣に配置
       const firstCard=makeCardHTML(posts[0],0).replace('<div class="card"','<div class="card" style="grid-column:1;grid-row:1;animation-delay:0s"');
       const restCards=posts.slice(1).map((p,i)=>makeCardHTML(p,i+1)).join('');
       gridMob.innerHTML=firstCard+restCards;
@@ -641,9 +618,7 @@ async function openPost(type){
   document.querySelectorAll('#post-genre-select .gs').forEach(g=>g.classList.remove('on'));
   ['post-username','post-desc','post-youtube','post-title'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
-  // ★ ペダルデータがまだの場合はバックグラウンドで取得開始（機材入力のため）
   if(!pedalDataLoaded&&!pedalDataLoading)loadPedalDataBackground(allDBPosts,[]);
-  // ★ ログイン済みならユーザー名を自動入力・入力欄を非表示
   const{data:{session}}=await sb.auth.getSession();
   const usernameRow=document.getElementById('username-form-row');
   const loginBadge=document.getElementById('login-user-badge');
@@ -693,14 +668,18 @@ function updateStepUI(){
   const gearNextBtn=document.getElementById('gear-next-btn');if(gearNextBtn)gearNextBtn.textContent=tr('btnNext');
   if(currentStep===1){
     const ua=document.getElementById('upload-area-main');
-    if(ua){const divs=ua.querySelectorAll('div');if(divs[0])divs[0].textContent=tr('uploadAreaText');if(divs[1])divs[1].textContent=tr('uploadAreaSub');}
+    if(ua){
+      const mainText=ua.querySelector('#upload-main-text');
+      if(mainText)mainText.textContent=tr('uploadAreaText');
+      else{const divs=ua.querySelectorAll('div');if(divs[0])divs[0].textContent=tr('uploadAreaText');if(divs[1])divs[1].textContent=tr('uploadAreaSub');}
+    }
     const hint=document.getElementById('upload-hint');if(hint)hint.textContent=tr('uploadAreaHint');
     const skipBtn=document.getElementById('skip-photo-btn');if(skipBtn)skipBtn.style.display='none';
   }
   if(currentStep===3){
     const gs=document.getElementById('gear-search');if(gs)gs.placeholder=tr('gearPlaceholder');
     const h1=document.getElementById('gear-hint1');if(h1)h1.textContent=tr('gearHint1');
-    const h2=document.getElementById('gear-hint2');if(h2)h2.textContent=tr('gearHint2');
+    const h2=document.getElementById('gear-hint2');if(h2)h2.innerHTML=tr('gearHint2');
     const h3=document.getElementById('gear-hint3');if(h3)h3.textContent=tr('gearHint3');
     const later=document.getElementById('later-input-btn');if(later)later.textContent=tr('laterInput');
     updateGearFeedback();
@@ -783,7 +762,6 @@ async function submitPostToDB(){
     for(let i=0;i<finals.length;i++){if(finals[i]){const url=await uploadPhoto(finals[i],i,total);if(url)image_urls.push(url);}}
     hideUploadProgress();
   }
-  // ★ ログイン済みならuser_idを取得
   const{data:{session:postSession}}=await sb.auth.getSession();
   const postUserId=postSession?postSession.user.id:null;
   const postUsername=document.getElementById('post-username').value.trim()||(lang==='en'?'Anonymous':'匿名ユーザー');
