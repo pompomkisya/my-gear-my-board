@@ -1120,7 +1120,7 @@ const RR={
   SSR:{l:'SSR',n:'LEGENDARY',  nEn:'LEGENDARY',  c:'#ffd700',gw:'rgba(255,215,0,.85)', bd:'#ffd700',rb:true, w:5,  pc:20,ga:'gGlowGold 1.4s ease-in-out infinite,gRainbow 2s linear infinite',gr:'linear-gradient(135deg,#ffd700 0%,#ff6b35 25%,#a855f7 50%,#06b6d4 75%,#ffd700 100%)'},
   SR: {l:'SR', n:'EXPERT',     nEn:'EXPERT',     c:'#a855f7',gw:'rgba(168,85,247,.8)',  bd:'#a855f7',rb:false,w:10, pc:12,ga:'gGlowPurple 1.8s ease-in-out infinite',gr:'linear-gradient(135deg,#a855f7,#7c3aed)'},
   Sp: {l:'Sp', n:'SPECIALIST', nEn:'SPECIALIST', c:'#f97316',gw:'rgba(249,115,22,.75)', bd:'#f97316',rb:false,w:20, pc:6, ga:'gGlowOrange 1.8s ease-in-out infinite',gr:'linear-gradient(135deg,#f97316,#c2410c)'},
-  Std:{l:'Std',n:'STANDARD',   nEn:'STANDARD',   c:'#9a9890',gw:'rgba(154,152,144,.3)', bd:'#272729',rb:false,w:65, pc:1, ga:'gGlowGray 2s ease-in-out infinite',   gr:'linear-gradient(135deg,#9a9890,#6e6c68)'},
+  Std:{l:'Std',n:'STANDARD',   nEn:'STANDARD',   c:'#9a9890',gw:'rgba(154,152,144,.5)', bd:'#4a4845',rb:false,w:65, pc:3, ga:'gGlowGray 2s ease-in-out infinite',   gr:'linear-gradient(135deg,#9a9890,#6e6c68)'},
 };
 const SL=['BOSS','MXR','EHX','STRYMON','KLON','TC ELEC','WALRUS','JHS','WAMPLER','KEELEY','FULLTONE','CAROLINE','EVENTIDE','CHASE BLISS'];
 
@@ -1270,7 +1270,7 @@ function gStartRoll(){
     setTimeout(()=>{if(gPhase==='idle')loadGachaPedals();},800);
     return;
   }
-  const dur={SSR:2800,SR:2000,Sp:1400,Std:900}[p._rk]||900;
+  const dur={SSR:2800,SR:2000,Sp:1500,Std:1200}[p._rk]||1200;
   gRollT=setTimeout(()=>{
     clearInterval(gSlotT);
     gResult=p;gPhase='result';gCnt++;
@@ -1292,7 +1292,7 @@ function gSpawnPts(p){
     d.style.cssText=`left:${10+Math.random()*80}%;top:${15+Math.random()*70}%;width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;background:${rk.c};animation-delay:${Math.random()*.35}s;`;
     el.appendChild(d);
   }
-  if(['SSR','SR'].includes(p._rk)){
+  if(['SSR','SR','Std'].includes(p._rk)){
     const n=p._rk==='SSR'?14:8;
     for(let i=0;i<n;i++){
       const d=document.createElement('div');d.className='g-sp';
