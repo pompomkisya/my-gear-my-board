@@ -352,6 +352,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 .g-tooltip-box{width:200px;left:auto;right:0;transform:none}
 .gacha-feed-wrap{grid-template-columns:1fr 1fr}
 }
+@keyframes encyclopediaGlow{0%,100%{box-shadow:0 0 8px rgba(232,85,45,.3),inset 0 0 8px rgba(232,85,45,.05)}50%{box-shadow:0 0 18px rgba(232,85,45,.6),inset 0 0 12px rgba(232,85,45,.1)}}
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PRZL59FSGZ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-PRZL59FSGZ');</script>
@@ -413,8 +414,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </a>
       <div style="height:1px;background:var(--bd);margin-bottom:16px"></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:10px;color:var(--ac);display:flex;align-items:center;gap:8px" id="mob-title-encyclopedia">エフェクター図鑑<span style="flex:1;height:1px;background:var(--bd);display:inline-block;vertical-align:middle"></span></div>
-      <a href="/pedals" class="sl-item" style="display:flex;margin-bottom:10px;font-size:13px;font-weight:500;color:var(--tx)">
-        🎛 &nbsp;<span id="mob-encyclopedia-link-text">2,300件以上のペダルを見る</span>
+      <a href="/pedals" id="mob-encyclopedia-btn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:12px;padding:12px 10px;border:1.5px solid var(--ac);border-radius:6px;text-decoration:none;background:rgba(232,85,45,.06);animation:encyclopediaGlow 2.5s ease-in-out infinite;touch-action:manipulation">
+        <span id="mob-encyclopedia-link-text" style="font-family:Noto Sans JP,sans-serif;font-size:13px;font-weight:700;color:var(--ac);letter-spacing:.5px">🎛️ エフェクター図鑑を開く 📚</span>
+        <span id="mob-encyclopedia-link-sub" style="font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--tm);margin-top:4px">〜 2,000件以上のペダルを随時更新中 〜</span>
       </a>
       <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px" id="mob-title-brand">ブランドで絞る</div>
       <div class="mob-select-wrap">
@@ -564,8 +566,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <div class="sl-div"></div>
   <div style="margin:16px 0">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ac);padding:0 8px;margin-bottom:8px" id="sl-encyclopedia-text">エフェクター図鑑</div>
-    <a href="/pedals" class="sl-item" style="color:var(--tx);margin-bottom:8px;font-size:12px">
-      🎛 &nbsp;<span id="sl-encyclopedia-link-text">2,300件以上のペダルを見る</span>
+    <a href="/pedals" id="pc-encyclopedia-btn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:10px;padding:10px 8px;border:1.5px solid var(--ac);border-radius:6px;text-decoration:none;background:rgba(232,85,45,.06);animation:encyclopediaGlow 2.5s ease-in-out infinite;touch-action:manipulation">
+      <span id="sl-encyclopedia-link-text" style="font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:700;color:var(--ac);letter-spacing:.5px;text-align:center">🎛️ エフェクター図鑑を開く 📚</span>
+      <span id="sl-encyclopedia-link-sub" style="font-family:Noto Sans JP,sans-serif;font-size:9px;color:var(--tm);margin-top:3px;text-align:center">〜 2,000件以上随時更新中 〜</span>
     </a>
     <div class="sl-lbl" id="sl-lbl-brand" style="margin-top:10px">ブランドで絞る</div>
     <select class="sl-select" id="pc-brand-select" onchange="if(this.value)location.href='/brand?name='+encodeURIComponent(this.value)">
@@ -1211,8 +1214,8 @@ const I18N_GACHA={
   'mob-mypage-text':{ja:'マイページ / 登録・ログイン',en:'My Page / Sign Up · Login'},
   'sl-encyclopedia-text':{ja:'エフェクター図鑑',en:'Pedal Encyclopedia'},
   'mob-title-encyclopedia':{ja:'エフェクター図鑑',en:'Pedal Encyclopedia'},
-  'sl-encyclopedia-link-text':{ja:'2,300件以上のペダルを見る',en:'Browse 2,300+ Pedals'},
-  'mob-encyclopedia-link-text':{ja:'2,300件以上のペダルを見る',en:'Browse 2,300+ Pedals'},
+  'sl-encyclopedia-link-text':{ja:'🎛️ エフェクター図鑑を開く 📚',en:'🎛️ Open Pedal Encyclopedia 📚'},
+  'mob-encyclopedia-link-text':{ja:'🎛️ エフェクター図鑑を開く 📚',en:'🎛️ Open Pedal Encyclopedia 📚'},
   'sl-lbl-brand':{ja:'ブランドで絞る',en:'Filter by Brand'},
   'mob-title-brand':{ja:'ブランドで絞る',en:'Filter by Brand'},
   'pc-brand-select-default':{ja:'ブランドを選択...',en:'Select brand...'},
@@ -1238,6 +1241,15 @@ const I18N_GACHA={
 };
 function applyGachaI18n(){
   const isEn=gLang==='en';
+  // 図鑑ボタンのサブテキスト切替
+  const jaSubMob='〜 2,000件以上のペダルを随時更新中 〜';
+  const enSubMob='〜 2,000+ pedals, updated regularly 〜';
+  const jaSubPc='〜 2,000件以上随時更新中 〜';
+  const enSubPc='〜 2,000+ pedals 〜';
+  const mobSub=document.getElementById('mob-encyclopedia-link-sub');
+  const pcSub=document.getElementById('sl-encyclopedia-link-sub');
+  if(mobSub)mobSub.textContent=isEn?enSubMob:jaSubMob;
+  if(pcSub)pcSub.textContent=isEn?enSubPc:jaSubPc;
   Object.entries(I18N_GACHA).forEach(([id,t])=>{const el=document.getElementById(id);if(el)el.textContent=isEn?t.en:t.ja;});
 }
 window.openGacha=openGacha;window.closeGacha=closeGacha;window.gDoShare=gDoShare;window.gDoSave=gDoSave;
