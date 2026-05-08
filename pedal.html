@@ -398,13 +398,13 @@ async function fetchBoardsByPedal(pedalFullName) {
 
   if (!posts) return [];
 
-  const lowerNames = searchNames.map(n => n.toLowerCase().trim());
+  const lowerNames = searchNames.map(n => n.replace(/\t/g,' ').replace(/ +/g,' ').toLowerCase().trim());
 
   return posts
     .filter(post => {
       const gear = Array.isArray(post.gear_list) ? post.gear_list : [];
       return gear.some(g => {
-        const gName = (g.name || g || '').toLowerCase().trim();
+        const gName = (g.name || g || '').replace(/\t/g,' ').replace(/ +/g,' ').toLowerCase().trim();
         return lowerNames.includes(gName);
       });
     })
