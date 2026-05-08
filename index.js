@@ -540,7 +540,7 @@ function renderRankingWidget(posts){
 function renderGearWidget(posts){
   const el=document.getElementById('gear-widget');if(!el)return;
   const count={};
-  posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
+  posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').replace(/\t/g,' ').replace(/ +/g,' ').trim();if(n)count[n]=(count[n]||0)+1;});});
   const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noData')+'</div>';return;}
   el.innerHTML=sorted.map(([n,c])=>renderGearWidgetHTML(n,c)).join('');
@@ -584,8 +584,10 @@ async function searchGear(val){
 }
 function setACFocus(i){acFocusIdx=i;document.querySelectorAll('.ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
 function selectGear(i){const x=acResults[i];if(!x)return;addGearTag({name:x.full_name,brand:x.brand,search_query:x.search_query||null});closeAC();}
+function normGearName(name){return(name||'').replace(/\t/g,' ').replace(/ +/g,' ').trim();}
 function addGearTag(g){
   if(selectedGears.length>=20){showToast(lang==='en'?'⚠️ Max 20 items':'⚠️ 最大20件まで');return;}
+  g={...g,name:normGearName(g.name)};
   selectedGears.push(g);renderGearTags();document.getElementById('gear-search').value='';updateGearFeedback();
 }
 function removeGearTag(i){selectedGears.splice(i,1);renderGearTags();updateGearFeedback();}
@@ -1101,7 +1103,7 @@ function renderRankingWidgetMob(posts){
 }
 function renderGearWidgetMob(posts){
   const el=document.getElementById('gear-widget-mob');if(!el)return;
-  const count={};posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').trim();if(n)count[n]=(count[n]||0)+1;});});
+  const count={};posts.forEach(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];g.forEach(x=>{const n=(x.name||x||'').replace(/\t/g,' ').replace(/ +/g,' ').trim();if(n)count[n]=(count[n]||0)+1;});});
   const sorted=Object.entries(count).sort((a,b)=>b[1]-a[1]).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noData')+'</div>';return;}
   el.innerHTML=sorted.map(([n,c])=>renderGearWidgetHTML(n,c)).join('');
