@@ -413,18 +413,18 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         👤 &nbsp;<span id="mob-mypage-text">マイページ / 登録・ログイン</span>
       </a>
       <div style="height:1px;background:var(--bd);margin-bottom:16px"></div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:10px;color:var(--ac);display:flex;align-items:center;gap:8px" id="mob-title-encyclopedia">エフェクター図鑑<span style="flex:1;height:1px;background:var(--bd);display:inline-block;vertical-align:middle"></span></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:10px;color:var(--ac);display:flex;align-items:center;gap:8px" id="mob-title-encyclopedia" style="justify-content:center">エフェクター図鑑</div>
       <a href="/pedals" id="mob-encyclopedia-btn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:12px;padding:12px 10px;border:1.5px solid var(--ac);border-radius:6px;text-decoration:none;background:rgba(232,85,45,.06);animation:encyclopediaGlow 2.5s ease-in-out infinite;touch-action:manipulation">
         <span id="mob-encyclopedia-link-text" style="font-family:Noto Sans JP,sans-serif;font-size:13px;font-weight:700;color:var(--ac);letter-spacing:.5px">🎛️ エフェクター図鑑を開く 📚</span>
         <span id="mob-encyclopedia-link-sub" style="font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--tm);margin-top:4px">〜 2,000件以上のペダルを随時更新中 〜</span>
       </a>
-      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px" id="mob-title-brand">ブランドで絞る</div>
+      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px;text-align:center" id="mob-title-brand">ブランドで絞る</div>
       <div class="mob-select-wrap">
         <select class="mob-sl-select" id="mob-brand-select" onchange="if(this.value)location.href='/brand?name='+encodeURIComponent(this.value)">
           <option value="" id="mob-brand-select-default">ブランドを選択...</option>
         </select>
       </div>
-      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px" id="mob-title-fxtype">エフェクタータイプ</div>
+      <div style="font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#c0bcb4;padding:0 8px;margin-bottom:6px;text-align:center" id="mob-title-fxtype">エフェクタータイプ</div>
       <div class="mob-select-wrap" style="margin-bottom:20px">
         <select class="mob-sl-select" id="mob-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
           <option value="" id="mob-type-select-default">タイプを選択...</option>
@@ -565,16 +565,16 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   </div>
   <div class="sl-div"></div>
   <div style="margin:16px 0">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ac);padding:0 8px;margin-bottom:8px" id="sl-encyclopedia-text">エフェクター図鑑</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--ac);padding:0 8px;margin-bottom:8px;text-align:center" id="sl-encyclopedia-text">エフェクター図鑑</div>
     <a href="/pedals" id="pc-encyclopedia-btn" style="display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:10px;padding:10px 8px;border:1.5px solid var(--ac);border-radius:6px;text-decoration:none;background:rgba(232,85,45,.06);animation:encyclopediaGlow 2.5s ease-in-out infinite;touch-action:manipulation">
-      <span id="sl-encyclopedia-link-text" style="font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:700;color:var(--ac);letter-spacing:.5px;text-align:center">🎛️ エフェクター図鑑を開く 📚</span>
+      <span id="sl-encyclopedia-link-text" style="font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.3px;text-align:center;white-space:nowrap">🎛️ エフェクター図鑑を開く 📚</span>
       <span id="sl-encyclopedia-link-sub" style="font-family:Noto Sans JP,sans-serif;font-size:9px;color:var(--tm);margin-top:3px;text-align:center">〜 2,000件以上随時更新中 〜</span>
     </a>
-    <div class="sl-lbl" id="sl-lbl-brand" style="margin-top:10px">ブランドで絞る</div>
+    <div class="sl-lbl" id="sl-lbl-brand" style="margin-top:10px;text-align:center">ブランドで絞る</div>
     <select class="sl-select" id="pc-brand-select" onchange="if(this.value)location.href='/brand?name='+encodeURIComponent(this.value)">
       <option value="" id="pc-brand-select-default">ブランドを選択...</option>
     </select>
-    <div class="sl-lbl" id="sl-lbl-fxtype" style="margin-top:8px">エフェクタータイプ</div>
+    <div class="sl-lbl" id="sl-lbl-fxtype" style="margin-top:8px;text-align:center">エフェクタータイプ</div>
     <select class="sl-select" id="pc-type-select" onchange="if(this.value)location.href='/type?name='+encodeURIComponent(this.value)">
       <option value="" id="pc-type-select-default">タイプを選択...</option>
       <option value="overdrive">OD（オーバードライブ）</option>
