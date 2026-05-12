@@ -1094,6 +1094,13 @@ function closeGacha(){
   document.getElementById('gacha-overlay').classList.remove('open');
   document.body.style.overflow='';
   if(gSlotT)clearInterval(gSlotT);if(gRollT)clearTimeout(gRollT);
+  // ★ 完全リセット：残留状態をすべてクリア
+  gPhase='idle';gResult=null;
+  gSetShare(false);
+  const c=document.getElementById('g-card');
+  if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
+  const pts=document.getElementById('g-pts');if(pts)pts.innerHTML='';
+  const panel=document.getElementById('g-panel');if(panel)panel.innerHTML='';
 }
 function applyGachaLang(){
   const isEn=gLang==='en';
