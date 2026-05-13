@@ -276,16 +276,25 @@ async function loadBrand() {
     db.from('pedals').select('*', { count: 'exact', head: true }).eq('brand', currentBrand),
     db.from('pedals').select('id, brand, model, full_name, slug, types, image_url')
       .eq('brand', currentBrand).order('model', { ascending: true }).range(0, PEDAL_LIMIT - 1),
-    db.from('posts').select('id, title, username, image_urls, gear_list')
-      .filter('gear_list', 'cs', `[{"brand":"${currentBrand}"}]`)
-      .order('created_at', { ascending: false }).limit(6),
+    db.from('posts').select('id, title, username, image_urls, gear_list, created_at')
+      .order('created_at', { ascending: false }).limit(200),
     db.from('brands').select('*').eq('name', currentBrand).maybeSingle()
   ]);
 
   totalPedals = countRes.count || 0;
   pedalOffset = PEDAL_LIMIT;
   cachedPedals = pedalsRes.data || [];
-  cachedPosts = postsRes.data || [];
+  // ★ JS側でブランドフィルタリング（brand空でもname検索でマッチ）
+  const allPosts = postsRes.data || [];
+  const lowerBrand = currentBrand.toLowerCase();
+  cachedPosts = allPosts.filter(post => {
+    const gear = Array.isArray(post.gear_list) ? post.gear_list : [];
+    return gear.some(g => {
+      const gBrand = (g.brand || '').toLowerCase().trim();
+      const gName = (g.name || g || '').replace(/\t/g,' ').replace(/ +/g,' ').toLowerCase().trim();
+      return gBrand === lowerBrand || gName.startsWith(lowerBrand + ' ') || gName.includes(' ' + lowerBrand + ' ');
+    });
+  }).slice(0, 6);
   cachedBrandData = brandRes.data || null;
 
   renderBrand(currentBrand, cachedPedals, cachedPosts, totalPedals, cachedBrandData);
