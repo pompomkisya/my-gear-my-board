@@ -61,16 +61,39 @@
     .type-count span { color: var(--ac); font-weight: 700; }
     .section-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
     .section-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 16px; }
-    .pedal-list { display: flex; flex-direction: column; gap: 8px; }
-    .pedal-item {
-      background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
-      padding: 12px 16px; display: flex; align-items: center; gap: 12px;
-      text-decoration: none; color: var(--tx); transition: border-color .2s;
+    /* ★ グリッド表示 */
+    .pedal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+    @media (max-width: 480px) { .pedal-grid { grid-template-columns: repeat(2, 1fr); } }
+    .pedal-card {
+      background: var(--sf2); border: 1px solid var(--bd); border-radius: 12px;
+      overflow: hidden; text-decoration: none; color: var(--tx);
+      display: block; transition: border-color .2s;
     }
-    .pedal-item:hover { border-color: var(--ac); }
-    .pedal-item-brand { font-size: 10px; color: var(--ac); font-weight: 700; text-transform: uppercase; width: 80px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .pedal-item-name { flex: 1; font-size: 14px; font-weight: 600; }
-    .pedal-item-arrow { color: var(--tm); font-size: 14px; flex-shrink: 0; }
+    .pedal-card:hover { border-color: var(--ac); }
+    .pedal-card-image {
+      width: 100%; aspect-ratio: 1; background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; border-bottom: 1px solid var(--bd);
+    }
+    .pedal-card-image img { width: 100%; height: 100%; object-fit: contain; }
+    .pedal-card-image .type-icon-img { width: 60%; height: 60%; object-fit: contain; opacity: .45; }
+    .pedal-card-image-placeholder { font-size: 28px; opacity: .2; }
+    .pedal-card-body { padding: 8px; }
+    .pedal-card-brand {
+      font-size: 10px; color: var(--ac); font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+      margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pedal-card-name {
+      font-size: 11px; font-weight: 600; line-height: 1.3; margin-bottom: 5px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .pedal-card-types { display: flex; flex-wrap: wrap; gap: 3px; }
+    .type-badge {
+      background: var(--sf); border: 1px solid var(--bd); color: var(--tm);
+      font-size: 9px; padding: 2px 6px; border-radius: 20px; white-space: nowrap;
+    }
+    /* ボード */
     .boards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .board-item {
       background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
@@ -83,14 +106,12 @@
     .board-meta { padding: 10px; }
     .board-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
     .board-user { font-size: 11px; color: var(--tm); font-family: 'Noto Sans JP', sans-serif; }
-    /* 空状態 */
     .empty-state { text-align: center; padding: 40px 20px; }
     .empty-state-icon { font-size: 36px; margin-bottom: 12px; opacity: .4; }
     .empty-state-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--tm); margin-bottom: 8px; }
     .empty-state-text { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--td); line-height: 1.6; margin-bottom: 16px; }
     .empty-state-btn {
-      display: inline-block; padding: 10px 24px;
-      background: var(--ac); border-radius: 4px;
+      display: inline-block; padding: 10px 24px; background: var(--ac); border-radius: 4px;
       font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600;
       color: #fff; text-decoration: none; transition: background .15s;
     }
@@ -118,7 +139,6 @@
     <a href="/" class="home-btn">🏠 <span id="home-text">ホーム</span></a>
   </div>
 </header>
-
 <div class="breadcrumb">
   <a href="/" id="bc-home">ホーム</a>
   <span class="sep">›</span>
@@ -126,16 +146,20 @@
   <span class="sep">›</span>
   <span id="bc-type" class="current">読み込み中...</span>
 </div>
-
 <div class="container">
-  <div id="content"><div class="loading" id="loading-msg">読み込み中...</div></div>
+  <div id="content"><div class="loading">読み込み中...</div></div>
 </div>
-
 <script>
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const SUPABASE_STORAGE = 'https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/';
+function getTypeIconUrl(types) {
+  if (!types || !types.length) return null;
+  return SUPABASE_STORAGE + 'type_' + types[0] + '.png';
+}
 
 function detectLang() {
   const saved = localStorage.getItem('mgmb_lang');
@@ -156,7 +180,11 @@ const TYPE_LABELS_JA = {
   'eq':'イコライザー','noise_gate':'ノイズゲート','looper':'ルーパー',
   'volume':'ボリューム','tuner':'チューナー','multi':'マルチエフェクター',
   'preamp':'プリアンプ','pre':'プリアンプ','switcher':'スイッチャー',
-  'buffer':'バッファー','junction_box':'ジャンクションボックス','other':'その他'
+  'buffer':'バッファー','junction_box':'ジャンクションボックス','other':'その他',
+  'pitch_octave':'ピッチ/オクターブ','wah_filter':'ワウ/フィルター',
+  'sequence_rhythm':'シークエンス/リズム','glitch':'グリッチ',
+  'acoustic':'アコースティック','vocal':'ボーカル',
+  'power_supply':'パワーサプライ','synth':'シンセ',
 };
 const TYPE_LABELS_EN = {
   'overdrive':'Overdrive (OD)','od':'Overdrive (OD)',
@@ -169,13 +197,16 @@ const TYPE_LABELS_EN = {
   'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
   'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
   'preamp':'Preamp','pre':'Preamp','switcher':'Switcher',
-  'buffer':'Buffer','junction_box':'Junction Box','other':'Other'
+  'buffer':'Buffer','junction_box':'Junction Box','other':'Other',
+  'pitch_octave':'Pitch / Octave','wah_filter':'Wah / Filter',
+  'sequence_rhythm':'Sequence / Rhythm','glitch':'Glitch',
+  'acoustic':'Acoustic','vocal':'Vocal',
+  'power_supply':'Power Supply','synth':'Synth',
 };
 function getTypeDisplayName(t) {
   const map = lang === 'ja' ? TYPE_LABELS_JA : TYPE_LABELS_EN;
   return map[t?.toLowerCase()] || t;
 }
-
 const TYPE_BADGES = {
   'overdrive':'OD','od':'OD','distortion':'Dist','dist':'Dist',
   'fuzz':'Fuzz','boost':'Boost','reverb':'Reverb','delay':'Delay',
@@ -184,7 +215,8 @@ const TYPE_BADGES = {
   'pitch':'Pitch','wah':'Wah','compressor':'Comp','comp':'Comp',
   'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
   'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer'
+  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer',
+  'pitch_octave':'Pitch/Oct','wah_filter':'Wah/Filter',
 };
 function getTypeBadge(t) { return TYPE_BADGES[t?.toLowerCase()] || t; }
 
@@ -214,7 +246,7 @@ const I18N = {
     backHome:'← Back to Home', anonUser:'Anonymous',
   }
 };
-function tr(key) { return (I18N[lang] || I18N.ja)[key] || I18N.ja[key] || key; }
+function tr(key) { return (I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key; }
 
 function applyLang() {
   document.getElementById('header-sub').textContent = tr('headerSub');
@@ -231,7 +263,7 @@ function toggleLang() {
   if (currentTypeName) renderType(getTypeDisplayName(currentTypeName), cachedPedals, cachedPosts, total);
 }
 
-const LIMIT = 20;
+const LIMIT = 24;
 let offset = 0;
 let total = 0;
 let currentTypeName = '';
@@ -247,32 +279,49 @@ async function loadType() {
   document.getElementById('bc-type').textContent = displayName;
   document.title = `${displayName} | My Gear My Board`;
 
-  const { count } = await db.from('pedals').select('*', { count: 'exact', head: true }).contains('types', [currentTypeName]);
-  total = count || 0;
+  const [countRes, pedalsRes, postsRes] = await Promise.all([
+    db.from('pedals').select('*', { count: 'exact', head: true }).contains('types', [currentTypeName]),
+    db.from('pedals').select('id, brand, model, slug, types, image_url')
+      .contains('types', [currentTypeName]).order('brand', { ascending: true }).range(0, LIMIT - 1),
+    db.from('posts').select('id, title, username, image_urls')
+      .order('created_at', { ascending: false }).limit(6)
+  ]);
 
-  const { data: pedals } = await db.from('pedals')
-    .select('id, brand, model, slug, types')
-    .contains('types', [currentTypeName])
-    .order('brand', { ascending: true }).range(0, LIMIT - 1);
+  total = countRes.count || 0;
   offset = LIMIT;
-  cachedPedals = pedals || [];
-
-  const { data: posts } = await db.from('posts')
-    .select('id, title, username, image_urls')
-    .order('created_at', { ascending: false }).limit(6);
-  cachedPosts = posts || [];
+  cachedPedals = pedalsRes.data || [];
+  cachedPosts = postsRes.data || [];
 
   renderType(displayName, cachedPedals, cachedPosts, total);
 }
 
-function renderType(displayName, pedals, posts, total) {
-  const pedalItemsHtml = pedals.map(p => `
-    <a href="/pedal?slug=${p.slug}" class="pedal-item">
-      <span class="pedal-item-brand">${p.brand}</span>
-      <span class="pedal-item-name">${p.model}</span>
-      <span class="pedal-item-arrow">›</span>
-    </a>`).join('');
+function renderPedalCard(p) {
+  const typesHtml = (p.types || []).slice(0, 2).map(t =>
+    `<span class="type-badge">${getTypeBadge(t)}</span>`
+  ).join('');
+  let imageHtml;
+  if (p.image_url) {
+    imageHtml = `<img src="${p.image_url}" alt="${p.model}" loading="lazy">`;
+  } else {
+    const iconUrl = getTypeIconUrl(p.types);
+    if (iconUrl) {
+      imageHtml = `<img class="type-icon-img" src="${iconUrl}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="pedal-card-image-placeholder" style="display:none">🎛</span>`;
+    } else {
+      imageHtml = `<span class="pedal-card-image-placeholder">🎛</span>`;
+    }
+  }
+  return `<a href="/pedal?slug=${p.slug}" class="pedal-card">
+    <div class="pedal-card-image">${imageHtml}</div>
+    <div class="pedal-card-body">
+      <div class="pedal-card-brand">${p.brand}</div>
+      <div class="pedal-card-name">${p.model}</div>
+      <div class="pedal-card-types">${typesHtml}</div>
+    </div>
+  </a>`;
+}
 
+function renderType(displayName, pedals, posts, total) {
+  const pedalCardsHtml = pedals.map(p => renderPedalCard(p)).join('');
   const remaining = total - offset;
   const loadMoreBtn = total > LIMIT
     ? `<button class="load-more" id="load-more-btn" onclick="loadMorePedals()">
@@ -280,7 +329,7 @@ function renderType(displayName, pedals, posts, total) {
        </button>` : '';
 
   const pedalsSection = pedals.length > 0
-    ? `<div class="pedal-list" id="pedal-list">${pedalItemsHtml}</div>${loadMoreBtn}`
+    ? `<div class="pedal-grid" id="pedal-grid">${pedalCardsHtml}</div>${loadMoreBtn}`
     : `<div class="empty-state"><div class="empty-state-title">${tr('emptyBoardTitle')}</div></div>`;
 
   let boardsHtml = '';
@@ -324,20 +373,16 @@ function renderType(displayName, pedals, posts, total) {
 
 async function loadMorePedals() {
   const { data: pedals } = await db.from('pedals')
-    .select('id, brand, model, slug, types')
+    .select('id, brand, model, slug, types, image_url')
     .contains('types', [currentTypeName])
     .order('brand', { ascending: true })
     .range(offset, offset + LIMIT - 1);
   offset += LIMIT;
   cachedPedals = [...cachedPedals, ...(pedals || [])];
-  const list = document.getElementById('pedal-list');
-  if (list && pedals) {
+  const grid = document.getElementById('pedal-grid');
+  if (grid && pedals) {
     pedals.forEach(p => {
-      const item = document.createElement('a');
-      item.href = `/pedal?slug=${p.slug}`;
-      item.className = 'pedal-item';
-      item.innerHTML = `<span class="pedal-item-brand">${p.brand}</span><span class="pedal-item-name">${p.model}</span><span class="pedal-item-arrow">›</span>`;
-      list.appendChild(item);
+      grid.insertAdjacentHTML('beforeend', renderPedalCard(p));
     });
   }
   const remaining = total - offset;
