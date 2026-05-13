@@ -102,11 +102,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .pf-type-select{padding:6px 28px 6px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;outline:none;transition:all .15s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 .pf-type-select:focus,.pf-type-select.active{border-color:var(--ac);color:var(--ac)}
 .pf-type-select option{background:var(--sf);color:var(--tx)}
-/* ★ rarityセレクト */
 .rarity-select{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:8px 12px;font-size:13px;color:var(--tx);font-family:'JetBrains Mono',monospace;outline:none;transition:border-color .15s;cursor:pointer}
 .rarity-select:focus{border-color:var(--ac)}
 .rarity-select option{background:var(--sf);color:var(--tx)}
-/* ★ rarityバッジ */
 .rarity-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:1px}
 .rarity-SSR{background:linear-gradient(135deg,#ffd700,#ff6b35,#a855f7);color:#fff}
 .rarity-SR{background:#a855f7;color:#fff}
@@ -175,6 +173,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-aliases')">🔗 エイリアス</div>
     <div class="tab" onclick="switchTab(this,'tab-news')">📰 機材NEWS</div>
     <div class="tab" onclick="switchTab(this,'tab-pedals')">🎛 ペダルDB</div>
+    <div class="tab" onclick="switchTab(this,'tab-brands')">🏢 ブランド説明</div>
     <div class="tab" onclick="switchTab(this,'tab-regions')">🌍 言語圏別</div>
   </div>
 
@@ -310,38 +309,22 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="pf-btn" id="pf-complete" onclick="setPedalFilter('complete')">✅ すべて入力済み</button>
       <select class="pf-type-select" id="pf-type-select" onchange="setPedalTypeFilter(this.value)">
         <option value="">🏷 タイプで絞る</option>
-        <option value="overdrive">overdrive</option>
-        <option value="distortion">distortion</option>
-        <option value="fuzz">fuzz</option>
-        <option value="boost">boost</option>
-        <option value="reverb">reverb</option>
-        <option value="delay">delay</option>
-        <option value="chorus">chorus</option>
-        <option value="flanger">flanger</option>
-        <option value="phaser">phaser</option>
-        <option value="tremolo">tremolo</option>
-        <option value="vibrato">vibrato</option>
-        <option value="pitch_octave">pitch_octave</option>
-        <option value="wah_filter">wah_filter</option>
-        <option value="comp">comp</option>
-        <option value="eq">eq</option>
-        <option value="noise_gate">noise_gate</option>
-        <option value="looper">looper</option>
-        <option value="volume">volume</option>
-        <option value="tuner">tuner</option>
-        <option value="multi">multi</option>
-        <option value="preamp">preamp</option>
-        <option value="modulation">modulation</option>
-        <option value="sequence_rhythm">sequence_rhythm</option>
-        <option value="glitch">glitch</option>
-        <option value="acoustic">acoustic</option>
-        <option value="vocal">vocal</option>
-        <option value="power_supply">power_supply</option>
-        <option value="switcher">switcher</option>
-        <option value="buffer">buffer</option>
-        <option value="synth">synth</option>
-        <option value="junction_box">junction_box</option>
-        <option value="other">other</option>
+        <option value="overdrive">overdrive</option><option value="distortion">distortion</option>
+        <option value="fuzz">fuzz</option><option value="boost">boost</option>
+        <option value="reverb">reverb</option><option value="delay">delay</option>
+        <option value="chorus">chorus</option><option value="flanger">flanger</option>
+        <option value="phaser">phaser</option><option value="tremolo">tremolo</option>
+        <option value="vibrato">vibrato</option><option value="pitch_octave">pitch_octave</option>
+        <option value="wah_filter">wah_filter</option><option value="comp">comp</option>
+        <option value="eq">eq</option><option value="noise_gate">noise_gate</option>
+        <option value="looper">looper</option><option value="volume">volume</option>
+        <option value="tuner">tuner</option><option value="multi">multi</option>
+        <option value="preamp">preamp</option><option value="modulation">modulation</option>
+        <option value="sequence_rhythm">sequence_rhythm</option><option value="glitch">glitch</option>
+        <option value="acoustic">acoustic</option><option value="vocal">vocal</option>
+        <option value="power_supply">power_supply</option><option value="switcher">switcher</option>
+        <option value="buffer">buffer</option><option value="synth">synth</option>
+        <option value="junction_box">junction_box</option><option value="other">other</option>
       </select>
       <select class="pf-type-select" id="pf-rarity-select" onchange="setPedalRarityFilter(this.value)">
         <option value="">🎰 レアリティで絞る</option>
@@ -353,6 +336,17 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </select>
     </div>
     <div id="pedals-list" class="loading">読み込み中...</div>
+  </div>
+
+  <!-- ★ ブランド説明タブ -->
+  <div class="panel" id="tab-brands">
+    <div class="section-title">🏢 ブランド説明管理</div>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">ブランドページに表示する説明文を編集します。保存すると updated_at が自動更新されます。</p>
+    <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <input class="form-input" id="brand-search-input" type="text" placeholder="🔍 ブランド名で検索..." oninput="filterBrandList()" style="max-width:320px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)" id="brand-list-count"></span>
+    </div>
+    <div id="brands-list" class="loading">読み込み中...</div>
   </div>
 
   <div class="panel" id="tab-regions">
@@ -393,8 +387,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px;margin-bottom:4px">
       💡 カンマ区切りで複数指定。入力中に候補が表示されます。
     </div>
-
-    <!-- ★ rarityセレクト -->
     <label class="pedal-edit-label">🎰 レアリティ（RARITY）― ガチャ排出設定</label>
     <select class="rarity-select" id="edit-rarity">
       <option value="">― ガチャ対象外（未設定）</option>
@@ -406,7 +398,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px;margin-bottom:8px">
       💡 未設定のペダルはガチャに出現しません。画像・説明文も設定推奨。
     </div>
-
     <label class="pedal-edit-label">画像をアップロード（iPhoneから選択可）</label>
     <input type="file" id="edit-image-file" accept="image/*" style="display:none" onchange="handlePedalImageFile(this)">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
@@ -437,7 +428,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="rich-btn" onmousedown="event.preventDefault();richCmd('edit-desc-en','br')">改行</button>
     </div>
     <div class="rich-editor" id="edit-desc-en" contenteditable="true" data-placeholder="Enter description in English..."></div>
-
     <label class="pedal-edit-label">YouTube</label>
     <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:12px;margin-top:4px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
@@ -448,11 +438,43 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <input class="form-input" id="edit-youtube-url" type="url" placeholder="https://www.youtube.com/watch?v=..." style="width:100%;margin-bottom:4px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td)">※ URL入力時はリセットより優先されます</div>
     </div>
-
     <div class="pedal-edit-actions">
       <button class="submit-btn" onclick="savePedalEdit()">💾 保存</button>
       <button class="del-btn" onclick="deletePedalFromEdit()">🗑 このペダルを削除</button>
       <button class="fetch-btn" onclick="closePedalEdit()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
+<!-- ★ ブランド編集モーダル -->
+<div class="pedal-edit-modal" id="brand-edit-modal" onclick="if(event.target===this)closeBrandEdit()">
+  <div class="pedal-edit-box">
+    <h3>🏢 ブランド説明を編集</h3>
+    <div id="brand-edit-name" style="font-size:16px;font-weight:700;color:var(--ac);margin-bottom:16px"></div>
+    <label class="pedal-edit-label">説明文（日本語）</label>
+    <div class="rich-toolbar">
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-ja','p')">標準</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-ja','h2')">見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-ja','h3')">小見出し</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-ja','b')"><b>太字</b></button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-ja','br')">改行</button>
+    </div>
+    <div class="rich-editor" id="brand-desc-ja" contenteditable="true" data-placeholder="日本語の説明文を入力..."></div>
+    <label class="pedal-edit-label">説明文（英語）</label>
+    <div class="rich-toolbar">
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-en','p')">Normal</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-en','h2')">H2</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-en','h3')">H3</button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-en','b')"><b>Bold</b></button>
+      <button class="rich-btn" onmousedown="event.preventDefault();richCmd('brand-desc-en','br')">BR</button>
+    </div>
+    <div class="rich-editor" id="brand-desc-en" contenteditable="true" data-placeholder="Enter description in English..."></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:8px">
+      💡 保存すると updated_at が自動更新され、ブランドページに更新日が表示されます。
+    </div>
+    <div class="pedal-edit-actions">
+      <button class="submit-btn" onclick="saveBrandEdit()">💾 保存</button>
+      <button class="fetch-btn" onclick="closeBrandEdit()">キャンセル</button>
     </div>
   </div>
 </div>
@@ -489,11 +511,8 @@ const TYPE_LIST=[
 let typeAcFocusIdx={};
 
 function handleTypeInput(inputEl,acId){
-  const val=inputEl.value;
-  const parts=val.split(',');
-  const current=parts[parts.length-1].trim().toLowerCase();
-  const ac=document.getElementById(acId);
-  typeAcFocusIdx[acId]=-1;
+  const val=inputEl.value;const parts=val.split(',');const current=parts[parts.length-1].trim().toLowerCase();
+  const ac=document.getElementById(acId);typeAcFocusIdx[acId]=-1;
   if(!current){ac.innerHTML='';ac.classList.remove('open');return;}
   const matches=TYPE_LIST.filter(t=>t.v.includes(current)||t.l.toLowerCase().includes(current)).slice(0,10);
   if(!matches.length){ac.innerHTML='';ac.classList.remove('open');return;}
@@ -501,81 +520,56 @@ function handleTypeInput(inputEl,acId){
     `<div class="type-ac-item" data-idx="${i}" data-val="${t.v}"
       onmousedown="selectTypeAC(event,'${acId}','${t.v}')"
       onmouseover="setTypeAcFocus('${acId}',${i})">
-      <span class="type-ac-value">${t.v}</span>
-      <span class="type-ac-label">${t.l}</span>
+      <span class="type-ac-value">${t.v}</span><span class="type-ac-label">${t.l}</span>
     </div>`
   ).join('');
   ac.classList.add('open');
 }
 
 function selectTypeAC(event,acId,val){
-  event.preventDefault();
-  const ac=document.getElementById(acId);
-  const wrap=ac.closest('.type-ac-wrap');
-  if(!wrap)return;
-  const inp=wrap.querySelector('input');
-  if(!inp)return;
-  const parts=inp.value.split(',');
-  parts[parts.length-1]=val;
-  inp.value=parts.join(',');
-  ac.innerHTML='';ac.classList.remove('open');
-  inp.focus();
+  event.preventDefault();const ac=document.getElementById(acId);
+  const wrap=ac.closest('.type-ac-wrap');if(!wrap)return;
+  const inp=wrap.querySelector('input');if(!inp)return;
+  const parts=inp.value.split(',');parts[parts.length-1]=val;
+  inp.value=parts.join(',');ac.innerHTML='';ac.classList.remove('open');inp.focus();
 }
 
 function setTypeAcFocus(acId,idx){
   typeAcFocusIdx[acId]=idx;
-  document.querySelectorAll(`#${acId} .type-ac-item`).forEach((el,i)=>{
-    el.classList.toggle('focus',i===idx);
-  });
+  document.querySelectorAll(`#${acId} .type-ac-item`).forEach((el,i)=>{el.classList.toggle('focus',i===idx);});
 }
 
-function closeTypeAC(acId){
-  const ac=document.getElementById(acId);
-  if(ac){ac.innerHTML='';ac.classList.remove('open');}
-}
+function closeTypeAC(acId){const ac=document.getElementById(acId);if(ac){ac.innerHTML='';ac.classList.remove('open');}}
 
 function typeKeyDown(event,acId){
-  const ac=document.getElementById(acId);
-  if(!ac.classList.contains('open'))return;
-  const items=ac.querySelectorAll('.type-ac-item');
-  const cur=typeAcFocusIdx[acId]||-1;
+  const ac=document.getElementById(acId);if(!ac.classList.contains('open'))return;
+  const items=ac.querySelectorAll('.type-ac-item');const cur=typeAcFocusIdx[acId]||-1;
   if(event.key==='ArrowDown'){event.preventDefault();setTypeAcFocus(acId,Math.min(cur+1,items.length-1));}
   else if(event.key==='ArrowUp'){event.preventDefault();setTypeAcFocus(acId,Math.max(cur-1,0));}
   else if(event.key==='Enter'||event.key==='Tab'){
-    if(cur>=0&&items[cur]){
-      event.preventDefault();
-      const val=items[cur].getAttribute('data-val');
-      const wrap=ac.closest('.type-ac-wrap');
-      const inp=wrap.querySelector('input');
-      const parts=inp.value.split(',');
-      parts[parts.length-1]=val;
-      inp.value=parts.join(',');
-      ac.innerHTML='';ac.classList.remove('open');
-    }
+    if(cur>=0&&items[cur]){event.preventDefault();const val=items[cur].getAttribute('data-val');
+      const wrap=ac.closest('.type-ac-wrap');const inp=wrap.querySelector('input');
+      const parts=inp.value.split(',');parts[parts.length-1]=val;
+      inp.value=parts.join(',');ac.innerHTML='';ac.classList.remove('open');}
   }else if(event.key==='Escape'){closeTypeAC(acId);}
 }
 
 let pedalTypeFilter='';
 function setPedalTypeFilter(val){
-  pedalTypeFilter=val;
-  const sel=document.getElementById('pf-type-select');
-  if(sel)sel.classList.toggle('active',!!val);
-  applyPedalFilter();
+  pedalTypeFilter=val;const sel=document.getElementById('pf-type-select');
+  if(sel)sel.classList.toggle('active',!!val);applyPedalFilter();
 }
 let pedalRarityFilter='';
 function setPedalRarityFilter(val){
-  pedalRarityFilter=val;
-  const sel=document.getElementById('pf-rarity-select');
-  if(sel)sel.classList.toggle('active',!!val);
-  applyPedalFilter();
+  pedalRarityFilter=val;const sel=document.getElementById('pf-rarity-select');
+  if(sel)sel.classList.toggle('active',!!val);applyPedalFilter();
 }
 
 function checkSession(){return sessionStorage.getItem(SESSION_KEY)==='1';}
 function setSession(){sessionStorage.setItem(SESSION_KEY,'1');}
 
 function doLogin(){
-  const input=document.getElementById('login-input');
-  const val=input.value.trim().toUpperCase();
+  const input=document.getElementById('login-input');const val=input.value.trim().toUpperCase();
   if(val===MASTER_PIN){
     setSession();
     document.getElementById('login-wrap').style.display='none';
@@ -590,9 +584,9 @@ function doLogin(){
 function switchTab(el,tabId){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById(tabId).classList.add('on');
+  el.classList.add('on');document.getElementById(tabId).classList.add('on');
   if(tabId==='tab-aliases')loadAliases();
+  if(tabId==='tab-brands')loadBrandsAdmin();
 }
 
 let allPosts=[],allPedals=[],allComments=[];
@@ -618,18 +612,14 @@ async function loadPedals(){
   while(true){
     const{data:batch}=await sb.from('pedals').select('*').order('brand').order('model').range(offset,offset+999);
     if(!batch||batch.length===0)break;
-    data=[...data,...batch];
-    if(batch.length<1000)break;
-    offset+=1000;
+    data=[...data,...batch];if(batch.length<1000)break;offset+=1000;
   }
-  allPedals=data;
-  renderPedals();
+  allPedals=data;renderPedals();
 }
 
 async function loadComments(){
   const{data}=await sb.from('comments').select('*').order('created_at',{ascending:false});
-  allComments=data||[];
-  renderCommentPostSelect();
+  allComments=data||[];renderCommentPostSelect();
 }
 
 function renderCommentPostSelect(){
@@ -711,8 +701,7 @@ async function loadStats(){
 }
 
 function renderRecentPosts(){
-  const el=document.getElementById('recent-posts');
-  const recent=allPosts.slice(0,5);
+  const el=document.getElementById('recent-posts');const recent=allPosts.slice(0,5);
   if(!recent.length){el.innerHTML='<div class="empty-msg">投稿がありません</div>';return;}
   el.innerHTML='<div class="table-wrap"><table>'
     +'<thead><tr><th>サムネ</th><th>タイトル</th><th>投稿者</th><th>いいね</th><th>日時</th></tr></thead>'
@@ -753,8 +742,7 @@ async function deletePost(postId){
   if(!confirm('この投稿を削除しますか？\nこの操作は取り消せません。'))return;
   const{error}=await sb.from('posts').delete().eq('id',postId);
   if(error){showToast('❌ 削除に失敗しました');return;}
-  showToast('🗑 投稿を削除しました');
-  await loadPosts();
+  showToast('🗑 投稿を削除しました');await loadPosts();
 }
 
 function levenshtein(a,b){
@@ -771,24 +759,18 @@ function levenshtein(a,b){
 function showSimilar(name,rowId){
   document.querySelectorAll('.sim-card-row').forEach(c=>c.remove());
   const row=document.getElementById(rowId);if(!row)return;
-  const results=allPedals
-    .map(p=>({name:p.full_name,dist:levenshtein(name,p.full_name)}))
-    .filter(r=>r.dist<=4&&r.dist>0)
-    .sort((a,b)=>a.dist-b.dist)
-    .slice(0,5);
+  const results=allPedals.map(p=>({name:p.full_name,dist:levenshtein(name,p.full_name)}))
+    .filter(r=>r.dist<=4&&r.dist>0).sort((a,b)=>a.dist-b.dist).slice(0,5);
   const itemsHtml=results.length
     ?results.map(r=>`<div class="sim-item"><span class="sim-dist">d=${r.dist}</span><span class="sim-name">${escHtml(r.name)}</span></div>`).join('')
     :'<div class="sim-none">類似候補なし（距離4以内）</div>';
-  const card=document.createElement('tr');
-  card.className='sim-card-row';
+  const card=document.createElement('tr');card.className='sim-card-row';
   card.innerHTML=`<td colspan="8" style="padding:0 12px 12px">
-    <div class="sim-card">
-      <div class="sim-card-title">🔍 「${escHtml(name)}」の類似候補</div>
-      <div class="sim-card-close" onclick="this.closest('.sim-card-row').remove()">✕</div>
-      ${itemsHtml}
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:8px">d=編集距離（数字が小さいほど類似）</div>
-    </div>
-  </td>`;
+    <div class="sim-card"><div class="sim-card-title">🔍 「${escHtml(name)}」の類似候補</div>
+    <div class="sim-card-close" onclick="this.closest('.sim-card-row').remove()">✕</div>
+    ${itemsHtml}
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:8px">d=編集距離（数字が小さいほど類似）</div>
+    </div></td>`;
   row.insertAdjacentElement('afterend',card);
 }
 
@@ -796,10 +778,8 @@ async function loadUnknownGear(){
   let pedals=[];let offset=0;
   while(true){
     const{data:batch}=await sb.from('pedals').select('full_name').range(offset,offset+999);
-    if(!batch||batch.length===0)break;
-    pedals=[...pedals,...batch];
-    if(batch.length<1000)break;
-    offset+=1000;
+    if(!batch||batch.length===0)break;pedals=[...pedals,...batch];
+    if(batch.length<1000)break;offset+=1000;
   }
   const pedalNames=new Set((pedals||[]).map(p=>p.full_name.toLowerCase()));
   const{data:hiddenData}=await sb.from('unknown_gear_hidden').select('gear_name');
@@ -815,8 +795,7 @@ async function loadUnknownGear(){
     });
   });
   const{data:reports}=await sb.from('gear_reports').select('gear_name,count');
-  const reportMap={};
-  if(reports)reports.forEach(r=>{reportMap[r.gear_name]=(r.count||0);});
+  const reportMap={};if(reports)reports.forEach(r=>{reportMap[r.gear_name]=(r.count||0);});
   const sorted=Object.entries(gearCount).sort((a,b)=>b[1]-a[1]);
   document.getElementById('unknown-count').textContent=sorted.length;
   document.getElementById('stat-unknown').textContent=sorted.length;
@@ -826,20 +805,14 @@ async function loadUnknownGear(){
     +'<thead><tr><th>機材名</th><th>使用投稿数</th><th>📣 報告数</th><th colspan="3">操作</th></tr></thead>'
     +'<tbody>'
     +sorted.map(([name,count],i)=>{
-      const rowId='unknown-row-'+i;
-      const reportCount=reportMap[name]||0;
-      const reportBadge=reportCount>0
-        ?'<span style="color:var(--ac);font-weight:700;font-family:JetBrains Mono,monospace">'+reportCount+' 件</span>'
-        :'<span style="color:var(--td)">—</span>';
+      const rowId='unknown-row-'+i;const reportCount=reportMap[name]||0;
+      const reportBadge=reportCount>0?'<span style="color:var(--ac);font-weight:700;font-family:JetBrains Mono,monospace">'+reportCount+' 件</span>':'<span style="color:var(--td)">—</span>';
       const safeName=escHtml(name).replace(/'/g,"\\'");
-      return `<tr id="${rowId}">`
-        +'<td style="font-size:13px;font-weight:500">'+escHtml(name)+'</td>'
-        +'<td style="text-align:center">'+count+' 件</td>'
-        +'<td style="text-align:center">'+reportBadge+'</td>'
+      return `<tr id="${rowId}"><td style="font-size:13px;font-weight:500">${escHtml(name)}</td>`
+        +`<td style="text-align:center">${count} 件</td><td style="text-align:center">${reportBadge}</td>`
         +`<td><button class="approve-btn" onclick="addPedalFromUnknown('${safeName}')">＋ DBに追加</button></td>`
         +`<td><button class="fetch-btn" style="font-size:10px;padding:4px 8px" onclick="showSimilar('${safeName}','${rowId}')">🔍 登録確認</button></td>`
-        +`<td><button class="del-btn" onclick="hideUnknownGear('${safeName}','${rowId}')">✕ 非表示</button></td>`
-        +'</tr>';
+        +`<td><button class="del-btn" onclick="hideUnknownGear('${safeName}','${rowId}')">✕ 非表示</button></td></tr>`;
     }).join('')
     +'</tbody></table></div>';
 }
@@ -869,18 +842,13 @@ let allAliases=[];
 
 async function loadAliases(){
   const{data}=await sb.from('pedal_aliases').select('*').order('alias');
-  allAliases=data||[];
-  renderAliases();
-  const badge=document.getElementById('aliases-count');
-  if(badge)badge.textContent=allAliases.length;
+  allAliases=data||[];renderAliases();
+  const badge=document.getElementById('aliases-count');if(badge)badge.textContent=allAliases.length;
 }
 
 function renderAliases(){
   const el=document.getElementById('aliases-list');
-  if(!allAliases.length){
-    el.innerHTML='<div class="empty-msg">エイリアスがまだありません。上のフォームから追加してください。</div>';
-    return;
-  }
+  if(!allAliases.length){el.innerHTML='<div class="empty-msg">エイリアスがまだありません。上のフォームから追加してください。</div>';return;}
   el.innerHTML='<div class="table-wrap"><table class="alias-table">'
     +'<thead><tr><th>エイリアス（ユーザー入力）</th><th></th><th>DBの正式名称</th><th>登録日</th><th>操作</th></tr></thead>'
     +'<tbody>'
@@ -895,8 +863,7 @@ function renderAliases(){
 }
 
 async function searchAliasTarget(val){
-  const q=val.trim();
-  const ac=document.getElementById('alias-ac');
+  const q=val.trim();const ac=document.getElementById('alias-ac');
   if(!q||q.length<2){ac.style.display='none';return;}
   const results=allPedals.filter(p=>p.full_name.toLowerCase().includes(q.toLowerCase())).slice(0,8);
   if(!results.length){ac.style.display='none';return;}
@@ -924,8 +891,7 @@ async function addAlias(){
     return;
   }
   showToast('✅ エイリアスを追加しました');
-  document.getElementById('alias-from').value='';
-  document.getElementById('alias-to').value='';
+  document.getElementById('alias-from').value='';document.getElementById('alias-to').value='';
   await loadAliases();
 }
 
@@ -933,8 +899,7 @@ async function deleteAlias(id,name){
   if(!confirm('「'+name+'」のエイリアスを削除しますか？'))return;
   const{error}=await sb.from('pedal_aliases').delete().eq('id',id);
   if(error){showToast('❌ 削除に失敗しました');return;}
-  showToast('🗑 削除しました');
-  await loadAliases();
+  showToast('🗑 削除しました');await loadAliases();
 }
 
 let pedalFilterMode='all';
@@ -945,7 +910,6 @@ function setPedalFilter(mode){
   applyPedalFilter();
 }
 
-// ★ rarityバッジ生成
 function rarityBadge(r){
   if(!r)return '<span style="font-size:10px;color:var(--td)">—</span>';
   const map={SSR:'rarity-SSR',SR:'rarity-SR',Sp:'rarity-Sp',Std:'rarity-Std'};
@@ -981,7 +945,6 @@ function applyPedalFilter(){
     +'</tbody></table></div>';
 }
 function renderPedals(){applyPedalFilter();}
-function filterPedals(){applyPedalFilter();}
 
 function richCmd(editorId,tag){
   const editor=document.getElementById(editorId);if(!editor)return;
@@ -1002,18 +965,13 @@ async function addPedal(){
   const{error}=await sb.from('pedals').insert({brand,model,full_name,slug,types});
   if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
   showToast('✅ ペダルを追加しました');
-  document.getElementById('new-brand').value='';
-  document.getElementById('new-model').value='';
-  document.getElementById('new-types').value='';
+  document.getElementById('new-brand').value='';document.getElementById('new-model').value='';document.getElementById('new-types').value='';
   await loadPedals();
 }
 
 function getYouTubeIdFromUrl(url){
   if(!url)return null;
-  const patterns=[
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/
-  ];
+  const patterns=[/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/];
   for(const p of patterns){const m=url.match(p);if(m)return m[1];}
   return null;
 }
@@ -1026,7 +984,7 @@ function openPedalEdit(pedalId){
   document.getElementById('edit-full-name').value=pedal.full_name||'';
   document.getElementById('edit-brand-name').value=pedal.brand||'';
   document.getElementById('edit-types-modal').value=(pedal.types||[]).join(',');
-  document.getElementById('edit-rarity').value=pedal.rarity||''; // ★
+  document.getElementById('edit-rarity').value=pedal.rarity||'';
   document.getElementById('edit-image-url').value=pedal.image_url||'';
   document.getElementById('edit-image-source').value=pedal.image_source||'';
   document.getElementById('edit-desc-ja').innerHTML=pedal.description||'';
@@ -1066,7 +1024,7 @@ async function savePedalEdit(){
   const brand=document.getElementById('edit-brand-name').value.trim();
   const typesRaw=document.getElementById('edit-types-modal').value.trim();
   const types=typesRaw?typesRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
-  const rarity=document.getElementById('edit-rarity').value||null; // ★
+  const rarity=document.getElementById('edit-rarity').value||null;
   if(!full_name||!brand){showToast('❌ 機材名とブランド名は必須です');return;}
   const model=full_name.startsWith(brand+' ')?full_name.slice(brand.length+1).trim():full_name;
   const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -1080,16 +1038,10 @@ async function savePedalEdit(){
   const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
   const ytUrlInput=document.getElementById('edit-youtube-url').value.trim();
   const resetYt=document.getElementById('reset-youtube').checked;
-  const updates={full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity}; // ★
-  // ★ 説明文が入力されている場合はupdated_atを現在時刻に更新
+  const updates={full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity};
   if(description||description_en)updates.updated_at=new Date().toISOString();
-  if(ytUrlInput){
-    const ytId=getYouTubeIdFromUrl(ytUrlInput);
-    if(ytId){updates.youtube_video_id=ytId;}
-    else{showToast('⚠️ YouTubeのURLが正しくありません');return;}
-  }else if(resetYt){
-    updates.youtube_video_id=null;
-  }
+  if(ytUrlInput){const ytId=getYouTubeIdFromUrl(ytUrlInput);if(ytId){updates.youtube_video_id=ytId;}else{showToast('⚠️ YouTubeのURLが正しくありません');return;}}
+  else if(resetYt){updates.youtube_video_id=null;}
   const{error}=await sb.from('pedals').update(updates).eq('id',editingPedalId);
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
   showToast('✅ 保存しました');closePedalEdit();await loadPedals();
@@ -1101,6 +1053,71 @@ async function deletePedalFromEdit(){
   const{error}=await sb.from('pedals').delete().eq('id',editingPedalId);
   if(error){showToast('❌ 削除に失敗しました: '+error.message);return;}
   showToast('🗑 ペダルを削除しました');closePedalEdit();await loadPedals();
+}
+
+// ★ ブランド説明管理
+let allBrandsAdmin=[];
+let editingBrandName=null;
+
+async function loadBrandsAdmin(){
+  const{data:pedalData}=await sb.from('pedals').select('brand').order('brand');
+  if(!pedalData)return;
+  const brandNames=[...new Set(pedalData.map(p=>p.brand).filter(Boolean))].sort();
+  const{data:brandData}=await sb.from('brands').select('*');
+  const brandMap={};
+  if(brandData)brandData.forEach(b=>{brandMap[b.name]=b;});
+  allBrandsAdmin=brandNames.map(name=>({name,...(brandMap[name]||{description:null,description_en:null,updated_at:null})}));
+  const countEl=document.getElementById('brand-list-count');
+  if(countEl)countEl.textContent=`全 ${allBrandsAdmin.length} ブランド`;
+  renderBrandList(allBrandsAdmin);
+}
+
+function filterBrandList(){
+  const q=(document.getElementById('brand-search-input').value||'').toLowerCase();
+  const filtered=q?allBrandsAdmin.filter(b=>b.name.toLowerCase().includes(q)):allBrandsAdmin;
+  renderBrandList(filtered);
+}
+
+function renderBrandList(brands){
+  const el=document.getElementById('brands-list');
+  if(!brands.length){el.innerHTML='<div class="empty-msg">ブランドが見つかりません</div>';return;}
+  el.innerHTML='<div class="table-wrap"><table>'
+    +'<thead><tr><th>ブランド名</th><th>説明文(JA)</th><th>説明文(EN)</th><th>最終更新</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +brands.map(b=>'<tr>'
+      +`<td style="font-size:13px;font-weight:600;color:var(--ac)">${escHtml(b.name)}</td>`
+      +`<td style="font-size:11px">${b.description?'<span style="color:#4ade80">✅ あり</span>':'<span style="color:#e05050">なし</span>'}</td>`
+      +`<td style="font-size:11px">${b.description_en?'<span style="color:#4ade80">✅ あり</span>':'<span style="color:#e05050">なし</span>'}</td>`
+      +`<td style="font-size:11px;color:var(--td)">${b.updated_at?timeAgo(b.updated_at):'—'}</td>`
+      +`<td><button class="approve-btn" onclick="openBrandEdit('${escHtml(b.name).replace(/'/g,"\\'")}')">✏️ 編集</button></td>`
+      +'</tr>'
+    ).join('')
+    +'</tbody></table></div>';
+}
+
+function openBrandEdit(brandName){
+  editingBrandName=brandName;
+  document.getElementById('brand-edit-name').textContent=brandName;
+  const brand=allBrandsAdmin.find(b=>b.name===brandName);
+  document.getElementById('brand-desc-ja').innerHTML=(brand&&brand.description)||'';
+  document.getElementById('brand-desc-en').innerHTML=(brand&&brand.description_en)||'';
+  document.getElementById('brand-edit-modal').classList.add('open');
+}
+
+function closeBrandEdit(){
+  document.getElementById('brand-edit-modal').classList.remove('open');
+  editingBrandName=null;
+}
+
+async function saveBrandEdit(){
+  if(!editingBrandName)return;
+  const description=document.getElementById('brand-desc-ja').innerHTML.trim()||null;
+  const description_en=document.getElementById('brand-desc-en').innerHTML.trim()||null;
+  const now=new Date().toISOString();
+  const{error}=await sb.from('brands').upsert({name:editingBrandName,description,description_en,updated_at:now},{onConflict:'name'});
+  if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
+  showToast('✅ 保存しました');
+  closeBrandEdit();await loadBrandsAdmin();
 }
 
 async function loadNews(){
