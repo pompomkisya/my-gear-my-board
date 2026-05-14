@@ -14,6 +14,7 @@
       --bg: #0d0d0e; --sf: #151517; --sf2: #1c1c1f;
       --bd: #272729; --ac: #e8552d; --tx: #eae8e2; --tm: #9a9890; --td: #6e6c68;
       --amazon: #f0a500; --sweetwater: #1a73e8; --soundhouse: #e8552d;
+      --rakuten: #bf0000; --reverb: #00a99d;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--tx); font-family: 'Noto Sans JP', sans-serif; font-weight: 300; min-height: 100vh; }
@@ -168,6 +169,8 @@
     .buy-btn.soundhouse { background: var(--soundhouse); color: #fff; }
     .buy-btn.sweetwater { background: var(--sweetwater); color: #fff; }
     .buy-btn.amazon { background: var(--amazon); color: #111; }
+    .buy-btn.rakuten { background: var(--rakuten); color: #fff; }
+    .buy-btn.reverb { background: var(--reverb); color: #fff; }
     .boards-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
     .boards-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 16px; }
     .boards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -236,8 +239,9 @@ const I18N = {
     descEmpty:'説明文は準備中です。',
     buyTitle:'🛒 購入・価格をチェック',
     btnSoundhouse:'🎸 サウンドハウスで探す',
-    btnSweetwater:'🎵 Sweetwaterで探す',
     btnAmazon:'📦 Amazonで探す',
+    btnRakuten:'🛍 楽天で探す',
+    btnReverb:'🎵 Reverbで探す',
     ytTitle:'▶ デモ動画',
     ytLoading:'動画を取得中...',
     ytFallbackText:'動画を自動取得できませんでした。YouTubeで検索してみましょう。',
@@ -259,9 +263,9 @@ const I18N = {
     headerSub:'Pedalboard SNS', home:'Home', langLabel:'JA', bcHome:'Home',
     descEmpty:'Description coming soon.',
     buyTitle:'🛒 Check Prices',
-    btnSoundhouse:'🎸 Find on Soundhouse',
+    btnAmazonUs:'📦 Find on Amazon',
     btnSweetwater:'🎵 Find on Sweetwater',
-    btnAmazon:'📦 Find on Amazon',
+    btnReverb:'🎵 Find on Reverb',
     ytTitle:'▶ Demo Video',
     ytLoading:'Fetching video...',
     ytFallbackText:'Could not fetch a video automatically. Try searching on YouTube.',
@@ -293,7 +297,10 @@ const TYPE_LABELS = {
 function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()]||t; }
 function soundhouseUrl(n) { return 'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(n); }
 function sweetwaterUrl(n) { return 'https://www.sweetwater.com/store/search.php?s='+encodeURIComponent(n); }
-function amazonUrl(n) { return 'https://www.amazon.co.jp/s?k='+encodeURIComponent(n); }
+function amazonJpUrl(n) { return 'https://www.amazon.co.jp/s?k='+encodeURIComponent(n); }
+function amazonUsUrl(n) { return 'https://www.amazon.com/s?k='+encodeURIComponent(n); }
+function rakutenUrl(n) { return 'https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(n)+'/'; }
+function reverbUrl(n) { return 'https://reverb.com/marketplace?query='+encodeURIComponent(n); }
 function ytSearchUrl(n) { return 'https://www.youtube.com/results?search_query='+encodeURIComponent(n+' demo'); }
 function applyLang() {
   document.getElementById('header-sub').textContent = tr('headerSub');
@@ -551,9 +558,16 @@ function renderPedal(pedal, posts) {
     <div class="buy-card" id="section-buy">
       <div class="buy-card-title">${tr('buyTitle')}</div>
       <div class="buy-buttons">
-        <a href="${soundhouseUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn soundhouse">${tr('btnSoundhouse')}</a>
-        <a href="${sweetwaterUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn sweetwater">${tr('btnSweetwater')}</a>
-        <a href="${amazonUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazon')}</a>
+        ${lang === 'ja' ? `
+          <a href="${amazonJpUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazon')}</a>
+          <a href="${soundhouseUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn soundhouse">${tr('btnSoundhouse')}</a>
+          <a href="${rakutenUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn rakuten">${tr('btnRakuten')}</a>
+          <a href="${reverbUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn reverb">${tr('btnReverb')}</a>
+        ` : `
+          <a href="${amazonUsUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazonUs')}</a>
+          <a href="${sweetwaterUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn sweetwater">${tr('btnSweetwater')}</a>
+          <a href="${reverbUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn reverb">${tr('btnReverb')}</a>
+        `}
       </div>
     </div>
     <div class="boards-card" id="section-boards">
