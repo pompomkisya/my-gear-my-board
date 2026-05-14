@@ -928,8 +928,35 @@ function applyPedalFilter(){
   if(pedalTypeFilter)filtered=filtered.filter(p=>(p.types||[]).includes(pedalTypeFilter));
   if(pedalRarityFilter==='__none__')filtered=filtered.filter(p=>!p.rarity);
   else if(pedalRarityFilter)filtered=filtered.filter(p=>p.rarity===pedalRarityFilter);
-  if(!filtered.length){el.innerHTML='<div class="empty-msg">ペダルが見つかりません</div>';return;}
-  el.innerHTML='<div class="table-wrap"><table>'
+  // ★ 進捗バー表示
+  const total = allPedals.length;
+  const withImage = allPedals.filter(p=>p.image_url).length;
+  const withDesc = allPedals.filter(p=>p.description).length;
+  const withYt = allPedals.filter(p=>p.youtube_video_id).length;
+  const withAll = allPedals.filter(p=>p.image_url&&p.description&&p.youtube_video_id).length;
+  const pct = (n) => total ? Math.round(n/total*100) : 0;
+  const progressBar = (n, t) => {
+    const p = t ? Math.round(n/t*100) : 0;
+    const color = p>=80?'#4ade80':p>=50?'#f97316':'#e05050';
+    return `<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:120px">
+      <div style="flex:1;height:6px;background:var(--sf2);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${p}%;background:${color};border-radius:3px;transition:width .3s"></div>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${color};white-space:nowrap">${n}/${t} (${p}%)</span>
+    </div>`;
+  };
+  const progressHtml = `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px 16px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;gap:12px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);white-space:nowrap">🖼 画像</span>${progressBar(withImage,total)}
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);white-space:nowrap">📝 説明文</span>${progressBar(withDesc,total)}
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);white-space:nowrap">▶ YouTube</span>${progressBar(withYt,total)}
+      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);white-space:nowrap">✅ 全完了</span>${progressBar(withAll,total)}
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td)">表示中: <span style="color:var(--tx);font-weight:600">${filtered.length}</span> / 全 <span style="color:var(--ac);font-weight:600">${total}</span> 件</div>
+  </div>`;
+
+  if(!filtered.length){el.innerHTML=progressHtml+'<div class="empty-msg">ペダルが見つかりません</div>';return;}
+  el.innerHTML=progressHtml+'<div class="table-wrap"><table>'
     +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>🎰 Rarity</th><th>操作</th></tr></thead>'
     +'<tbody>'
     +filtered.map(p=>'<tr>'
