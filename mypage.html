@@ -40,21 +40,16 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .rf-note-icon{font-size:15px;flex-shrink:0;margin-top:1px}
 .mypage-wrap{display:none}
 .mypage-wrap.show{display:block}
-
-/* ★ プロフィールカード */
 .profile-card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;margin-bottom:20px;overflow:hidden}
 .profile-card-header{display:flex;align-items:center;gap:16px;padding:20px 24px;cursor:pointer;transition:background .15s;user-select:none}
 .profile-card-header:hover{background:rgba(255,255,255,.03)}
 .profile-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex-shrink:0;position:relative;border:2px solid var(--bd)}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.profile-avatar img{width:100%;height:100%;object-fit:cover}
 .profile-info{flex:1;min-width:0}
 .profile-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:3px}
 .profile-email{font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)}
 .profile-chevron{font-size:14px;color:var(--td);transition:transform .25s;flex-shrink:0}
 .profile-chevron.open{transform:rotate(180deg)}
-
-/* ★ 折りたたみエリア */
 .profile-body{padding:0 24px;max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1),padding .35s}
 .profile-body.open{max-height:700px;padding:0 24px 20px}
 .section-title{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:var(--tm);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd)}
@@ -66,8 +61,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 textarea.edit-input{resize:vertical;min-height:70px}
 .save-btn{padding:9px 20px;background:var(--ac);border:none;border-radius:3px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:#fff;cursor:pointer;touch-action:manipulation;transition:all .15s}
 .save-btn:hover{background:#cf4c26}
-
-/* タブ */
 .tab-bar{display:flex;border-bottom:1px solid var(--bd);margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .tab{padding:10px 14px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:var(--td);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;touch-action:manipulation;white-space:nowrap;flex-shrink:0}
 .tab.on{color:var(--ac);border-bottom-color:var(--ac)}
@@ -86,8 +79,6 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .logout-btn:hover{background:rgba(224,80,80,.1);border-color:#e05050}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ★ ガチャ保存カード */
 .gacha-save-list{display:flex;flex-direction:column;gap:10px}
 .gacha-save-item{display:flex;align-items:center;gap:12px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px;cursor:pointer;transition:border-color .2s,transform .15s;touch-action:manipulation;text-decoration:none}
 .gacha-save-item:hover{border-color:rgba(232,85,45,.4);transform:translateY(-1px)}
@@ -105,7 +96,6 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .gacha-save-date{font-family:Noto Sans JP,sans-serif;font-size:10px;color:var(--td)}
 .gacha-save-arrow{font-size:14px;color:var(--td);flex-shrink:0;transition:color .15s}
 .gacha-save-item:hover .gacha-save-arrow{color:var(--ac)}
-
 .avatar-menu{position:fixed;background:var(--sf);border:1px solid var(--bd);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.7);z-index:500;min-width:180px;overflow:hidden;animation:fadeInMenu .15s ease}
 @keyframes fadeInMenu{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .avatar-menu-item{display:flex;align-items:center;gap:8px;padding:11px 14px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:var(--tx);cursor:pointer;transition:background .12s;border-bottom:1px solid var(--bd)}
@@ -113,6 +103,47 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .avatar-menu-item:hover{background:rgba(232,85,45,.08);color:var(--ac)}
 .avatar-menu-item.danger{color:#e05050}
 .avatar-menu-item.danger:hover{background:rgba(224,80,80,.08)}
+/* ★ 機材リスト */
+.gear-list-wrap{display:flex;flex-direction:column;gap:0}
+.gear-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.gear-add-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--ac);border:none;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:#fff;cursor:pointer;transition:all .15s;touch-action:manipulation}
+.gear-add-btn:hover{background:#cf4c26}
+.gear-public-toggle{display:flex;align-items:center;gap:8px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm)}
+.gear-public-toggle input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac)}
+.gear-item{display:flex;align-items:center;gap:10px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px 14px;margin-bottom:8px;transition:border-color .15s}
+.gear-item:hover{border-color:rgba(232,85,45,.3)}
+.gear-item-info{flex:1;min-width:0}
+.gear-item-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.gear-item-brand{font-size:11px;color:var(--td);margin-bottom:3px}
+.gear-item-meta{display:flex;gap:10px;flex-wrap:wrap}
+.gear-item-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac);font-weight:600}
+.gear-item-date{font-size:11px;color:var(--td)}
+.gear-item-memo{font-size:11px;color:var(--tm);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gear-item-actions{display:flex;gap:6px;flex-shrink:0}
+.gear-edit-btn{padding:5px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;font-size:11px;color:var(--tm);cursor:pointer;transition:all .15s}
+.gear-edit-btn:hover{border-color:var(--ac);color:var(--ac)}
+.gear-del-btn{padding:5px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:3px;font-size:11px;color:#e05050;cursor:pointer;transition:all .15s}
+.gear-del-btn:hover{background:rgba(224,80,80,.1)}
+.gear-total-box{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:14px 16px;margin-bottom:12px}
+.gear-total-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.gear-total-row{display:flex;justify-content:space-between;align-items:center;font-family:'JetBrains Mono',monospace;font-size:13px;margin-bottom:4px}
+.gear-total-row:last-child{margin-bottom:0}
+.gear-total-label{color:var(--tm)}
+.gear-total-value{color:var(--ac);font-weight:700;font-size:15px}
+.gear-share-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none;touch-action:manipulation}
+.gear-share-btn:hover{border-color:var(--ac);color:var(--ac)}
+.gear-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.gear-modal.open{display:flex}
+.gear-modal-box{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.gear-modal-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--ac);margin-bottom:20px}
+.gear-modal-row{margin-bottom:12px}
+.gear-modal-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#b0ada6;margin-bottom:5px;display:block}
+.gear-modal-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 12px;font-size:15px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s}
+.gear-modal-input:focus{border-color:var(--ac)}
+.gear-modal-input::placeholder{color:var(--td)}
+.gear-modal-actions{display:flex;gap:8px;margin-top:16px}
+.currency-select{background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 10px;font-size:13px;color:var(--tx);font-family:'JetBrains Mono',monospace;outline:none;cursor:pointer;flex-shrink:0}
+.currency-select:focus{border-color:var(--ac)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
 @media(max-width:600px){.page{padding:16px 14px}.form-box{padding:20px 16px}.profile-card-header{padding:16px 18px}.profile-body.open{padding:0 18px 18px}}
 </style>
@@ -137,7 +168,6 @@ textarea.edit-input{resize:vertical;min-height:70px}
   </div>
 </header>
 <div class="page" id="page">
-  <!-- 未ログイン：認証フォーム -->
   <div id="auth-wrap">
     <div class="auth-tabs">
       <div class="auth-tab on" id="tab-login" onclick="switchAuthTab('login')">ログイン</div>
@@ -193,12 +223,8 @@ textarea.edit-input{resize:vertical;min-height:70px}
     </div>
   </div>
 
-  <!-- ログイン済み：マイページ -->
   <div class="mypage-wrap" id="mypage-wrap">
-
-    <!-- ★ プロフィールカード（折りたたみ） -->
     <div class="profile-card">
-      <!-- ヘッダー（クリックで開閉） -->
       <div class="profile-card-header" id="profile-card-header">
         <div class="profile-avatar" id="profile-avatar" onclick="openAvatarMenu(event)" title="プロフィール画像を変更" style="cursor:pointer;overflow:visible">
           <div style="width:60px;height:60px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e85c2f,#b03020);position:relative">
@@ -216,7 +242,6 @@ textarea.edit-input{resize:vertical;min-height:70px}
           <div class="profile-chevron" id="profile-chevron">▼</div>
         </div>
       </div>
-      <!-- 折りたたみ本体 -->
       <div class="profile-body" id="profile-body">
         <div class="section-title" id="mp-section-profile">プロフィール編集</div>
         <div class="edit-form-row">
@@ -244,19 +269,58 @@ textarea.edit-input{resize:vertical;min-height:70px}
       </div>
     </div>
 
-    <!-- タブバー -->
     <div class="tab-bar">
       <div class="tab on" id="my-tab-posts" onclick="switchMyTab('posts')">自分の投稿</div>
+      <div class="tab" id="my-tab-gear" onclick="switchMyTab('gear')">🎸 機材リスト</div>
       <div class="tab" id="my-tab-likes" onclick="switchMyTab('likes')">いいねした投稿</div>
       <div class="tab" id="my-tab-gacha" onclick="switchMyTab('gacha')">🎰 ガチャ保存</div>
       <div class="tab" id="my-tab-notif" onclick="switchMyTab('notif')">通知 <span class="notif-badge" id="notif-badge" style="display:none">0</span></div>
     </div>
     <div id="my-panel-posts" class="post-list"></div>
+    <div id="my-panel-gear" style="display:none"></div>
     <div id="my-panel-likes" class="post-list" style="display:none"></div>
     <div id="my-panel-gacha" class="gacha-save-list" style="display:none"></div>
     <div id="my-panel-notif" style="display:none"></div>
   </div>
 </div>
+
+<!-- ★ 機材追加・編集モーダル -->
+<div class="gear-modal" id="gear-modal">
+  <div class="gear-modal-box">
+    <div class="gear-modal-title" id="gear-modal-title">機材を追加</div>
+    <div class="gear-modal-row">
+      <label class="gear-modal-lbl" id="gear-lbl-name">機材名 *</label>
+      <input class="gear-modal-input" id="gear-input-name" type="text" maxlength="100">
+    </div>
+    <div class="gear-modal-row">
+      <label class="gear-modal-lbl" id="gear-lbl-brand">ブランド</label>
+      <input class="gear-modal-input" id="gear-input-brand" type="text" maxlength="60">
+    </div>
+    <div class="gear-modal-row">
+      <label class="gear-modal-lbl" id="gear-lbl-price">購入金額</label>
+      <div style="display:flex;gap:6px">
+        <input class="gear-modal-input" id="gear-input-price" type="number" min="0" style="flex:1">
+        <select class="currency-select" id="gear-input-currency">
+          <option value="JPY">JPY ¥</option>
+          <option value="USD">USD $</option>
+        </select>
+      </div>
+    </div>
+    <div class="gear-modal-row">
+      <label class="gear-modal-lbl" id="gear-lbl-date">購入日</label>
+      <input class="gear-modal-input" id="gear-input-date" type="date">
+    </div>
+    <div class="gear-modal-row">
+      <label class="gear-modal-lbl" id="gear-lbl-memo">メモ</label>
+      <input class="gear-modal-input" id="gear-input-memo" type="text" maxlength="200">
+    </div>
+    <div class="gear-modal-actions">
+      <button class="gear-add-btn" id="gear-modal-save-btn" onclick="saveGearItem()">保存</button>
+      <button class="gear-share-btn" onclick="closeGearModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -266,8 +330,24 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 function detectLang(){const saved=localStorage.getItem('mgmb_lang');if(saved)return saved;const bl=navigator.language||navigator.userLanguage||'ja';return bl.toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
 const MP_I18N={
-  ja:{logoSub:'ペダルボードSNS',backBtn:'← ホームへ',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとマイページを持てます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'自分の投稿',tabLikes:'いいねした投稿',tabGacha:'🎰 ガチャ保存',tabNotif:'通知',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyGacha:'ガチャ保存がまだありません',gachaDeleteConfirm:'このガチャ保存を削除しますか？',gachaDeleted:'削除しました',emptyNotif:'通知はありません',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました',profileToggleOpen:'プロフィールを編集',profileToggleClose:'閉じる',avEditLbl:'変更',profileEditHint:'プロフィール編集'},
-  en:{logoSub:'Pedalboard SNS',backBtn:'← Home',tabLogin:'Login',tabRegister:'Sign Up',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email address',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Sign Up',rfSub:'You can post without registering, but signing up gives you a profile page.',rfLblName:'Username',rfLblEmail:'Email address',rfLblPw:'Password (6+ characters)',registerBtn:'Sign Up',registerBtnLoading:'Signing up...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:"We'll send a reset link to your registered email.",rstLblEmail:'Email address',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Your amp, genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Log Out',confirmLogout:'Log out?',tabPosts:'My Posts',tabLikes:'Liked Posts',tabGacha:'🎰 Gacha Saves',tabNotif:'Notifications',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyGacha:'No gacha saves yet',gachaDeleteConfirm:'Delete this gacha save?',gachaDeleted:'Deleted',emptyNotif:'No notifications',loading:'Loading...',errEmailPw:'Please enter your email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email address',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email address is already registered',errResetEmail:'Please enter your email address',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',profileToggleOpen:'Edit Profile',profileToggleClose:'Close',avEditLbl:'Edit',profileEditHint:'Edit Profile'}
+  ja:{logoSub:'ペダルボードSNS',backBtn:'← ホームへ',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとマイページを持てます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'自分の投稿',tabGear:'🎸 機材リスト',tabLikes:'いいねした投稿',tabGacha:'🎰 ガチャ保存',tabNotif:'通知',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyGacha:'ガチャ保存がまだありません',gachaDeleteConfirm:'このガチャ保存を削除しますか？',gachaDeleted:'削除しました',emptyNotif:'通知はありません',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました',profileToggleOpen:'プロフィールを編集',profileToggleClose:'閉じる',avEditLbl:'変更',profileEditHint:'プロフィール編集',
+    gearTotalTitle:'合計金額',gearTotalJpy:'円合計',gearTotalUsd:'ドル合計',
+    gearAddBtn:'＋ 機材を追加',gearPublicLabel:'リストを公開する',gearPublicOn:'公開中',gearPublicOff:'非公開',
+    gearShareBtn:'🔗 リストを共有',gearModalAddTitle:'機材を追加',gearModalEditTitle:'機材を編集',
+    gearLblName:'機材名 *',gearLblBrand:'ブランド',gearLblDate:'購入日',gearLblPrice:'購入金額',gearLblMemo:'メモ',
+    gearSaveBtn:'保存',gearCancelBtn:'キャンセル',
+    gearDeleteConfirm:'この機材をリストから削除しますか？',gearNameRequired:'機材名を入力してください',
+    gearSaved:'✅ 保存しました',gearDeleted:'🗑 削除しました',gearCopied:'🔗 URLをコピーしました',
+    gearEmpty:'まだ機材が登録されていません',gearPrivateNote:'非公開設定です。公開するとリンクでシェアできます。'},
+  en:{logoSub:'Pedalboard SNS',backBtn:'← Home',tabLogin:'Login',tabRegister:'Sign Up',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email address',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Sign Up',rfSub:'You can post without registering, but signing up gives you a profile page.',rfLblName:'Username',rfLblEmail:'Email address',rfLblPw:'Password (6+ characters)',registerBtn:'Sign Up',registerBtnLoading:'Signing up...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:"We'll send a reset link to your registered email.",rstLblEmail:'Email address',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Your amp, genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Log Out',confirmLogout:'Log out?',tabPosts:'My Posts',tabGear:'🎸 Gear List',tabLikes:'Liked Posts',tabGacha:'🎰 Gacha Saves',tabNotif:'Notifications',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyGacha:'No gacha saves yet',gachaDeleteConfirm:'Delete this gacha save?',gachaDeleted:'Deleted',emptyNotif:'No notifications',loading:'Loading...',errEmailPw:'Please enter your email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email address',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email address is already registered',errResetEmail:'Please enter your email address',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',profileToggleOpen:'Edit Profile',profileToggleClose:'Close',avEditLbl:'Edit',profileEditHint:'Edit Profile',
+    gearTotalTitle:'Total Value',gearTotalJpy:'JPY Total',gearTotalUsd:'USD Total',
+    gearAddBtn:'＋ Add Gear',gearPublicLabel:'Make list public',gearPublicOn:'Public',gearPublicOff:'Private',
+    gearShareBtn:'🔗 Share List',gearModalAddTitle:'Add Gear',gearModalEditTitle:'Edit Gear',
+    gearLblName:'Name *',gearLblBrand:'Brand',gearLblDate:'Purchase Date',gearLblPrice:'Price',gearLblMemo:'Notes',
+    gearSaveBtn:'Save',gearCancelBtn:'Cancel',
+    gearDeleteConfirm:'Remove this item from your list?',gearNameRequired:'Please enter a name',
+    gearSaved:'✅ Saved',gearDeleted:'🗑 Deleted',gearCopied:'🔗 URL copied',
+    gearEmpty:'No gear registered yet',gearPrivateNote:'List is private. Make it public to share.'}
 };
 function tr(key){return(MP_I18N[lang]||MP_I18N.ja)[key]||MP_I18N.ja[key]||key;}
 function setTxt(id,text){const el=document.getElementById(id);if(el)el.textContent=text;}
@@ -292,15 +372,14 @@ function applyLang(){
   const loginPwEl=document.getElementById('login-password');if(loginPwEl)loginPwEl.placeholder=tr('pwPh');
   const regPwEl=document.getElementById('reg-password');if(regPwEl)regPwEl.placeholder=tr('regPwPh');
   setTxt('mp-save-btn',tr('saveBtn'));setTxt('mp-logout-btn',tr('logoutBtn'));
-  setTxt('my-tab-posts',tr('tabPosts'));setTxt('my-tab-likes',tr('tabLikes'));setTxt('my-tab-gacha',tr('tabGacha'));
-  setTxt('av-edit-lbl',tr('avEditLbl'));
-  setTxt('profile-edit-hint',tr('profileEditHint'));
+  setTxt('my-tab-posts',tr('tabPosts'));setTxt('my-tab-gear',tr('tabGear'));
+  setTxt('my-tab-likes',tr('tabLikes'));setTxt('my-tab-gacha',tr('tabGacha'));
+  setTxt('av-edit-lbl',tr('avEditLbl'));setTxt('profile-edit-hint',tr('profileEditHint'));
   const notifTab=document.getElementById('my-tab-notif');
   if(notifTab){const badge=document.getElementById('notif-badge');notifTab.textContent=tr('tabNotif')+' ';if(badge)notifTab.appendChild(badge);}
 }
 function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();}
 
-// ★ プロフィール折りたたみ
 function toggleProfileBody(){
   const body=document.getElementById('profile-body');
   const chevron=document.getElementById('profile-chevron');
@@ -312,6 +391,9 @@ function toggleProfileBody(){
 let currentUser=null;
 document.addEventListener('DOMContentLoaded',async()=>{
   applyLang();
+  // モーダルのクリック外閉じ
+  const gearModal=document.getElementById('gear-modal');
+  if(gearModal)gearModal.addEventListener('click',e=>{if(e.target===gearModal)closeGearModal();});
   const hash=window.location.hash;
   if(hash.includes('type=recovery')){showResetPasswordForm();return;}
   const{data:{session}}=await sb.auth.getSession();
@@ -396,125 +478,55 @@ async function loadProfile(){
     if(inner)inner.innerHTML=`<img src="${data.avatar_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div id="av-edit-lbl" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">${lang==='en'?'Edit':'変更'}</div>`;
   }
 }
-// ★ アバターメニュー開閉
 function openAvatarMenu(e){
-  e.stopPropagation();
-  closeAvatarMenu();
-  const isEn=lang==='en';
-  const hasCustomAvatar=!!document.querySelector('#profile-avatar img');
-  const menu=document.createElement('div');
-  menu.className='avatar-menu';
-  menu.id='avatar-menu';
-  menu.innerHTML=
-    `<div class="avatar-menu-item" onclick="triggerAvatarUpload()">
-      <span>📷</span><span>${isEn?'Upload image':'画像をアップロード'}</span>
-    </div>`+
-    (hasCustomAvatar?`<div class="avatar-menu-item danger" onclick="setDefaultAvatar()">
-      <span>↩️</span><span>${isEn?'Reset to default':'デフォルトに戻す'}</span>
-    </div>`:'');
-  // アバターの位置を取得してメニューをその直下に表示
-  const av=document.getElementById('profile-avatar');
-  const rect=av.getBoundingClientRect();
-  // メニューをbodyに追加（アバターの子ではなく）
+  e.stopPropagation();closeAvatarMenu();
+  const isEn=lang==='en';const hasCustomAvatar=!!document.querySelector('#profile-avatar img');
+  const menu=document.createElement('div');menu.className='avatar-menu';menu.id='avatar-menu';
+  menu.innerHTML=`<div class="avatar-menu-item" onclick="triggerAvatarUpload()"><span>📷</span><span>${isEn?'Upload image':'画像をアップロード'}</span></div>`+(hasCustomAvatar?`<div class="avatar-menu-item danger" onclick="setDefaultAvatar()"><span>↩️</span><span>${isEn?'Reset to default':'デフォルトに戻す'}</span></div>`:'');
+  const av=document.getElementById('profile-avatar');const rect=av.getBoundingClientRect();
   document.body.appendChild(menu);
-  // 位置計算：アバターの左下、画面右端に収まるよう調整
-  const menuW=180;
-  let left=rect.left;
-  let top=rect.bottom+8;
-  // 画面右端をはみ出す場合は右寄せ
+  const menuW=180;let left=rect.left;let top=rect.bottom+8;
   if(left+menuW>window.innerWidth-8)left=window.innerWidth-menuW-8;
-  // 画面下端をはみ出す場合は上に表示
   const menuH=hasCustomAvatar?92:46;
   if(top+menuH>window.innerHeight-8)top=rect.top-menuH-8;
-  menu.style.left=Math.max(8,left)+'px';
-  menu.style.top=top+'px';
+  menu.style.left=Math.max(8,left)+'px';menu.style.top=top+'px';
   setTimeout(()=>document.addEventListener('click',closeAvatarMenu,{once:true}),10);
 }
-function closeAvatarMenu(){
-  const menu=document.getElementById('avatar-menu');
-  if(menu)menu.remove();
-}
-function triggerAvatarUpload(){
-  closeAvatarMenu();
-  document.getElementById('avatar-input').click();
-}
-
-// ★ Supabase Storageから古いアバター画像を削除するヘルパー
+function closeAvatarMenu(){const menu=document.getElementById('avatar-menu');if(menu)menu.remove();}
+function triggerAvatarUpload(){closeAvatarMenu();document.getElementById('avatar-input').click();}
 async function deleteOldAvatar(avatarUrl){
   if(!avatarUrl)return;
-  try{
-    // URLからStorageのパスを抽出
-    // 例: https://xxx.supabase.co/storage/v1/object/public/post-images/avatars/uid_xxx.jpg
-    const match=avatarUrl.match(/\/public\/post-images\/(.+)$/);
-    if(match&&match[1]){
-      await sb.storage.from('post-images').remove([match[1]]);
-    }
-  }catch(e){console.warn('古い画像削除に失敗（続行）',e);}
+  try{const match=avatarUrl.match(/\/public\/post-images\/(.+)$/);if(match&&match[1])await sb.storage.from('post-images').remove([match[1]]);}
+  catch(e){console.warn('古い画像削除に失敗',e);}
 }
-
-// ★ デフォルト（頭文字）に戻す
 async function setDefaultAvatar(){
-  closeAvatarMenu();
-  if(!currentUser)return;
-  const isEn=lang==='en';
-  // 現在のavatar_urlを取得して削除
+  closeAvatarMenu();if(!currentUser)return;const isEn=lang==='en';
   const{data}=await sb.from('users').select('avatar_url').eq('id',currentUser.id).single();
   if(data?.avatar_url)await deleteOldAvatar(data.avatar_url);
-  // DBのavatar_urlをnullに
   await sb.from('users').update({avatar_url:null}).eq('id',currentUser.id);
-  // UIをデフォルトに戻す
   const username=document.getElementById('profile-name').textContent||'U';
   const av=document.getElementById('profile-avatar');
-  av.querySelector('div').innerHTML=
-    `<span id="avatar-initial">${username[0].toUpperCase()}</span>`+
-    `<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">${isEn?'Edit':'変更'}</div>`;
+  av.querySelector('div').innerHTML=`<span id="avatar-initial">${username[0].toUpperCase()}</span><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:Noto Sans JP,sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">${isEn?'Edit':'変更'}</div>`;
   showToast(isEn?'✅ Reset to default':'✅ デフォルトに戻しました');
 }
-
 async function handleAvatarChange(e){
-  const file=e.target.files[0];if(!file)return;
-  const isEn=lang==='en';
-  const MAX=512;
-  const compressed=await new Promise(resolve=>{
-    const r=new FileReader();
-    r.onload=ev=>{
-      const img=new Image();
-      img.onload=()=>{
-        let{width,height}=img;
-        if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}
-        const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
-        canvas.getContext('2d').drawImage(img,0,0,width,height);
-        resolve(canvas.toDataURL('image/jpeg',0.85));
-      };
-      img.src=ev.target.result;
-    };
-    r.readAsDataURL(file);
-  });
+  const file=e.target.files[0];if(!file)return;const isEn=lang==='en';const MAX=512;
+  const compressed=await new Promise(resolve=>{const r=new FileReader();r.onload=ev=>{const img=new Image();img.onload=()=>{let{width,height}=img;if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;canvas.getContext('2d').drawImage(img,0,0,width,height);resolve(canvas.toDataURL('image/jpeg',0.85));};img.src=ev.target.result;};r.readAsDataURL(file);});
   showToast(isEn?'📤 Uploading...':'📤 アップロード中...');
-  // 古い画像を先に取得して後で削除
   const{data:userData}=await sb.from('users').select('avatar_url').eq('id',currentUser.id).single();
   const oldUrl=userData?.avatar_url||null;
-  const byteStr=atob(compressed.split(',')[1]);
-  const mime='image/jpeg';
-  const ab=new ArrayBuffer(byteStr.length);
-  const ia=new Uint8Array(ab);
+  const byteStr=atob(compressed.split(',')[1]);const mime='image/jpeg';
+  const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);
   for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
-  const blob=new Blob([ab],{type:mime});
-  // ユーザーIDをファイル名に使うことで常に1ファイルのみ保持（upsert:true）
-  const fn='avatars/'+currentUser.id+'.jpg';
+  const blob=new Blob([ab],{type:mime});const fn='avatars/'+currentUser.id+'.jpg';
   const{error}=await sb.storage.from('post-images').upload(fn,blob,{contentType:mime,upsert:true});
   if(error){showToast(isEn?'❌ Upload failed':'❌ アップロードに失敗しました');return;}
   const{data:u}=sb.storage.from('post-images').getPublicUrl(fn);
-  // キャッシュバスティング用にタイムスタンプ付きURLをDBに保存
   const finalUrl=u.publicUrl+'?t='+Date.now();
   await sb.from('users').update({avatar_url:finalUrl}).eq('id',currentUser.id);
-  // 旧URLが別パスだった場合は削除（ファイル名が変わった場合のみ）
-  if(oldUrl&&!oldUrl.includes('/avatars/'+currentUser.id+'.jpg')){
-    await deleteOldAvatar(oldUrl);
-  }
+  if(oldUrl&&!oldUrl.includes('/avatars/'+currentUser.id+'.jpg'))await deleteOldAvatar(oldUrl);
   showToast(isEn?'✅ Avatar updated':'✅ アバターを更新しました');
-  e.target.value='';
-  setTimeout(()=>location.reload(),1200);
+  e.target.value='';setTimeout(()=>location.reload(),1200);
 }
 async function saveProfile(){
   if(!currentUser)return;
@@ -527,16 +539,15 @@ async function saveProfile(){
   document.getElementById('profile-name').textContent=username;
   document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
   showToast(tr('toastSaveDone'));
-  // 保存後に折りたたむ
-  const body=document.getElementById('profile-body');
-  const chevron=document.getElementById('profile-chevron');
+  const body=document.getElementById('profile-body');const chevron=document.getElementById('profile-chevron');
   body.classList.remove('open');chevron.classList.remove('open');
 }
 function switchMyTab(tab){
-  ['posts','likes','gacha','notif'].forEach(t=>{
+  ['posts','gear','likes','gacha','notif'].forEach(t=>{
     document.getElementById('my-tab-'+t).classList.toggle('on',t===tab);
     document.getElementById('my-panel-'+t).style.display=t===tab?'block':'none';
   });
+  if(tab==='gear')loadGearList();
   if(tab==='likes')loadLikedPosts();
   if(tab==='gacha')loadGachaSaves();
   if(tab==='notif')loadNotifications();
@@ -555,64 +566,31 @@ async function loadLikedPosts(){
   if(!posts||!posts.length){el.innerHTML=`<div class="empty-msg">${tr('emptyLikes')}</div>`;return;}
   el.innerHTML=posts.map(p=>postItemHTML(p)).join('');
 }
-
-// ★ ガチャ保存を読み込む
 async function loadGachaSaves(){
-  if(!currentUser)return;
-  const el=document.getElementById('my-panel-gacha');
+  if(!currentUser)return;const el=document.getElementById('my-panel-gacha');
   el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
   try{
-    const{data,error}=await sb
-      .from('gacha_saves')
-      .select('id,rarity,created_at,pedals(id,brand,model,slug,image_url,types)')
-      .eq('user_id',currentUser.id)
-      .order('created_at',{ascending:false})
-      .limit(50);
+    const{data,error}=await sb.from('gacha_saves').select('id,rarity,created_at,pedals(id,brand,model,slug,image_url,types)').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
     if(error)throw error;
-    if(!data||!data.length){
-      el.innerHTML=`<div class="empty-msg">${tr('emptyGacha')}</div>`;return;
-    }
+    if(!data||!data.length){el.innerHTML=`<div class="empty-msg">${tr('emptyGacha')}</div>`;return;}
     el.innerHTML=data.map(s=>gachaSaveItemHTML(s)).join('');
-  }catch(e){
-    console.error('gacha saves error',e);
-    el.innerHTML=`<div class="empty-msg">${tr('emptyGacha')}</div>`;
-  }
+  }catch(e){el.innerHTML=`<div class="empty-msg">${tr('emptyGacha')}</div>`;}
 }
-
 function gachaSaveItemHTML(s){
-  const p=s.pedals;
-  if(!p)return'';
-  const rarity=s.rarity||'Std';
-  const rarityColors={SSR:'rarity-SSR',SR:'rarity-SR',Sp:'rarity-Sp',Std:'rarity-Std'};
-  const badgeCls=rarityColors[rarity]||'rarity-Std';
-  const imgSrc=p.image_url||'';
-  const typeIcon=p.types&&p.types[0]?`https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_${p.types[0]}.png`:'';
-  const img=imgSrc
-    ?`<img class="gacha-save-img" src="${escHtml(imgSrc)}" loading="lazy" onerror="this.src='${escHtml(typeIcon)}'">`
-    :(typeIcon?`<img class="gacha-save-img" src="${escHtml(typeIcon)}" loading="lazy">`:`<div class="gacha-save-img-empty">🎛</div>`);
+  const p=s.pedals;if(!p)return'';
+  const rarity=s.rarity||'Std';const rarityColors={SSR:'rarity-SSR',SR:'rarity-SR',Sp:'rarity-Sp',Std:'rarity-Std'};const badgeCls=rarityColors[rarity]||'rarity-Std';
+  const imgSrc=p.image_url||'';const typeIcon=p.types&&p.types[0]?`https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_${p.types[0]}.png`:'';
+  const img=imgSrc?`<img class="gacha-save-img" src="${escHtml(imgSrc)}" loading="lazy" onerror="this.src='${escHtml(typeIcon)}'">`:typeIcon?`<img class="gacha-save-img" src="${escHtml(typeIcon)}" loading="lazy">`:`<div class="gacha-save-img-empty">🎛</div>`;
   const date=timeAgo(s.created_at);
-  const rarityNames={SSR:'Legendary',SR:'Expert',Sp:'Specialist',Std:'Standard'};
-  const rarityName=lang==='en'?(rarityNames[rarity]||rarity):(rarityNames[rarity]||rarity);
-  return`<div class="gacha-save-item" style="position:relative">
-    <div style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="location.href='/pedal?slug=${escHtml(p.slug)}'">${img}<div class="gacha-save-info"><div class="gacha-save-brand">${escHtml(p.brand)}</div><div class="gacha-save-model">${escHtml(p.model)}</div><div class="gacha-save-meta"><span class="gacha-rarity-badge ${badgeCls}">${rarity}</span><span class="gacha-save-date">${date}</span></div></div><div class="gacha-save-arrow" style="font-family:Noto Sans JP,sans-serif;font-size:10px;white-space:nowrap">${lang==='en'?'Detail →':'ペダル詳細ページへ →'}</div></div>
-    <button onclick="deleteGachaSave('${s.id}',this)" style="flex-shrink:0;margin-left:8px;padding:6px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-size:11px;color:#e05050;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='rgba(224,80,80,.1)'" onmouseout="this.style.background='transparent'">✕</button>
-  </div>`;
+  return`<div class="gacha-save-item" style="position:relative"><div style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="location.href='/pedal?slug=${escHtml(p.slug)}'">${img}<div class="gacha-save-info"><div class="gacha-save-brand">${escHtml(p.brand)}</div><div class="gacha-save-model">${escHtml(p.model)}</div><div class="gacha-save-meta"><span class="gacha-rarity-badge ${badgeCls}">${rarity}</span><span class="gacha-save-date">${date}</span></div></div><div class="gacha-save-arrow" style="font-family:Noto Sans JP,sans-serif;font-size:10px;white-space:nowrap">${lang==='en'?'Detail →':'ペダル詳細ページへ →'}</div></div><button onclick="deleteGachaSave('${s.id}',this)" style="flex-shrink:0;margin-left:8px;padding:6px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-size:11px;color:#e05050;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='rgba(224,80,80,.1)'" onmouseout="this.style.background='transparent'">✕</button></div>`;
 }
-
-// ★ ガチャ保存削除
-async function deleteGachaSave(saveId, btn){
-  if(!confirm(tr('gachaDeleteConfirm')))return;
-  btn.disabled=true;btn.textContent='...';
+async function deleteGachaSave(saveId,btn){
+  if(!confirm(tr('gachaDeleteConfirm')))return;btn.disabled=true;btn.textContent='...';
   const{error}=await sb.from('gacha_saves').delete().eq('id',saveId).eq('user_id',currentUser.id);
   if(error){btn.disabled=false;btn.textContent='✕';return;}
-  // 該当行をDOMから削除
-  const item=btn.closest('.gacha-save-item');
-  if(item)item.remove();
-  // リストが空になった場合は空メッセージを表示
+  const item=btn.closest('.gacha-save-item');if(item)item.remove();
   const el=document.getElementById('my-panel-gacha');
-  if(el&&el.children.length===0){
-    el.innerHTML=`<div class="empty-msg">${tr('emptyGacha')}</div>`;
-  }
+  if(el&&el.children.length===0)el.innerHTML=`<div class="empty-msg">${tr('emptyGacha')}</div>`;
   showToast(tr('gachaDeleted'));
 }
 function postItemHTML(p){
@@ -633,6 +611,128 @@ async function loadNotifications(){
   if(!data||!data.length){el.innerHTML=`<div class="empty-msg">${tr('emptyNotif')}</div>`;return;}
   el.innerHTML=data.map(n=>`<div style="padding:14px;background:${n.is_read?'var(--sf)':'rgba(232,85,45,.06)'};border:1px solid ${n.is_read?'var(--bd)':'rgba(232,85,45,.2)'};border-radius:6px;margin-bottom:8px;cursor:pointer" onclick="${n.post_id?`location.href='/post?id=${n.post_id}'`:''}"><div style="font-size:13px;margin-bottom:4px">${escHtml(n.message)}</div><div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${timeAgo(n.created_at)}</div></div>`).join('');
 }
+
+// ★ 機材リスト
+let gearList=[];let editingGearId=null;let isGearPublic=false;
+
+async function loadGearList(){
+  if(!currentUser)return;
+  const el=document.getElementById('my-panel-gear');
+  el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
+  const{data:userData}=await sb.from('users').select('gear_list_public,username').eq('id',currentUser.id).single();
+  isGearPublic=userData?.gear_list_public||false;
+  const username=userData?.username||'';
+  const{data:gear}=await sb.from('user_gear').select('*').eq('user_id',currentUser.id).order('sort_order').order('created_at');
+  gearList=gear||[];
+  renderGearList(gearList,isGearPublic,username);
+}
+
+function renderGearList(gear,isPublic,username){
+  const el=document.getElementById('my-panel-gear');
+  let totalJpy=0,totalUsd=0,hasJpy=false,hasUsd=false;
+  gear.forEach(g=>{if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}});
+  const shareUrl=`${location.origin}/user?username=${encodeURIComponent(username)}`;
+  let totalHtml='';
+  if(gear.length>0){
+    let rows='';
+    if(hasJpy)rows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('gearTotalJpy')}</span><span class="gear-total-value">¥${totalJpy.toLocaleString()}</span></div>`;
+    if(hasUsd)rows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('gearTotalUsd')}</span><span class="gear-total-value">$${totalUsd.toLocaleString()}</span></div>`;
+    if(rows)totalHtml=`<div class="gear-total-box"><div class="gear-total-title">${tr('gearTotalTitle')}</div>${rows}</div>`;
+  }
+  let itemsHtml='';
+  if(!gear.length){itemsHtml=`<div class="empty-msg">${tr('gearEmpty')}</div>`;}
+  else{
+    itemsHtml=gear.map(g=>{
+      const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
+      const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
+      return`<div class="gear-item" id="gear-item-${g.id}">
+        <div class="gear-item-info">
+          <div class="gear-item-name">${escHtml(g.name)}</div>
+          ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
+          <div class="gear-item-meta">
+            ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
+            ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
+          </div>
+          ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
+        </div>
+        <div class="gear-item-actions">
+          <button class="gear-edit-btn" onclick="openGearModal('${g.id}')">✏️</button>
+          <button class="gear-del-btn" onclick="deleteGearItem('${g.id}')">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  const publicToggle=`<label class="gear-public-toggle"><input type="checkbox" id="gear-public-check" ${isPublic?'checked':''} onchange="toggleGearPublic(this.checked)"><span>${tr('gearPublicLabel')}</span><span style="font-weight:700;color:${isPublic?'var(--ac)':'var(--td)'}" id="gear-public-status">${isPublic?tr('gearPublicOn'):tr('gearPublicOff')}</span></label>`;
+  const shareBtn=isPublic
+    ?`<button class="gear-share-btn" onclick="copyGearShareUrl('${shareUrl}')">${tr('gearShareBtn')}</button>`
+    :`<span style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${tr('gearPrivateNote')}</span>`;
+  el.innerHTML=`<div class="gear-list-header"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${publicToggle}${shareBtn}</div><button class="gear-add-btn" onclick="openGearModal(null)">${tr('gearAddBtn')}</button></div>${totalHtml}<div class="gear-list-wrap">${itemsHtml}</div>`;
+}
+
+async function toggleGearPublic(isPublic){
+  if(!currentUser)return;
+  await sb.from('users').update({gear_list_public:isPublic}).eq('id',currentUser.id);
+  await loadGearList();
+}
+
+function copyGearShareUrl(url){
+  navigator.clipboard.writeText(url).then(()=>showToast(tr('gearCopied'))).catch(()=>prompt('URLをコピーしてください:',url));
+}
+
+function openGearModal(gearId){
+  editingGearId=gearId;const isEdit=!!gearId;
+  const gear=isEdit?gearList.find(g=>g.id===gearId):null;
+  document.getElementById('gear-modal-title').textContent=isEdit?tr('gearModalEditTitle'):tr('gearModalAddTitle');
+  document.getElementById('gear-lbl-name').textContent=tr('gearLblName');
+  document.getElementById('gear-lbl-brand').textContent=tr('gearLblBrand');
+  document.getElementById('gear-lbl-price').textContent=tr('gearLblPrice');
+  document.getElementById('gear-lbl-date').textContent=tr('gearLblDate');
+  document.getElementById('gear-lbl-memo').textContent=tr('gearLblMemo');
+  document.getElementById('gear-input-name').value=gear?.name||'';
+  document.getElementById('gear-input-brand').value=gear?.brand||'';
+  document.getElementById('gear-input-price').value=gear?.price||'';
+  document.getElementById('gear-input-currency').value=gear?.currency||'JPY';
+  document.getElementById('gear-input-date').value=gear?.purchased_at?gear.purchased_at.split('T')[0]:'';
+  document.getElementById('gear-input-memo').value=gear?.memo||'';
+  document.getElementById('gear-modal-save-btn').textContent=tr('gearSaveBtn');
+  document.getElementById('gear-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('gear-input-name').focus(),100);
+}
+
+function closeGearModal(){
+  document.getElementById('gear-modal').classList.remove('open');
+  editingGearId=null;
+}
+
+async function saveGearItem(){
+  if(!currentUser)return;
+  const name=document.getElementById('gear-input-name').value.trim();
+  if(!name){showToast(tr('gearNameRequired'));return;}
+  const brand=document.getElementById('gear-input-brand').value.trim()||null;
+  const priceRaw=document.getElementById('gear-input-price').value;
+  const price=priceRaw?parseInt(priceRaw):null;
+  const currency=document.getElementById('gear-input-currency').value;
+  const purchased_at=document.getElementById('gear-input-date').value||null;
+  const memo=document.getElementById('gear-input-memo').value.trim()||null;
+  const btn=document.getElementById('gear-modal-save-btn');btn.disabled=true;
+  if(editingGearId){
+    const{error}=await sb.from('user_gear').update({name,brand,price,currency,purchased_at,memo}).eq('id',editingGearId).eq('user_id',currentUser.id);
+    if(error){showToast('❌ '+error.message);btn.disabled=false;return;}
+  }else{
+    const maxOrder=gearList.length?Math.max(...gearList.map(g=>g.sort_order||0))+1:0;
+    const{error}=await sb.from('user_gear').insert({user_id:currentUser.id,name,brand,price,currency,purchased_at,memo,sort_order:maxOrder});
+    if(error){showToast('❌ '+error.message);btn.disabled=false;return;}
+  }
+  btn.disabled=false;closeGearModal();showToast(tr('gearSaved'));await loadGearList();
+}
+
+async function deleteGearItem(gearId){
+  if(!confirm(tr('gearDeleteConfirm')))return;
+  const{error}=await sb.from('user_gear').delete().eq('id',gearId).eq('user_id',currentUser.id);
+  if(error){showToast('❌ '+error.message);return;}
+  showToast(tr('gearDeleted'));await loadGearList();
+}
+
 function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';}
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3000);}
