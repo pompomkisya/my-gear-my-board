@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ユーザーページ — My Gear My Board</title>
+<meta name="robots" content="index, follow">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--tx:#eae8e2;--tm:#9a9890;--td:#6e6c68}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;font-weight:300;min-height:100vh}
+header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(13,13,14,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+.logo-img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.logo-main{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.logo-sub{font-size:9px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-top:2px}
+.h-right{display:flex;align-items:center;gap:8px}
+.back-btn{padding:7px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none;display:flex;align-items:center}
+.back-btn:hover{border-color:var(--ac);color:var(--ac)}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:var(--tm);transition:all .15s}
+.lang-btn:hover{border-color:var(--ac);color:var(--ac)}
+.page{max-width:680px;margin:0 auto;padding:24px 20px 60px}
+.loading{text-align:center;padding:60px;color:var(--td)}
+.error-box{text-align:center;padding:60px;color:var(--td)}
+/* プロフィール */
+.profile-hero{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;margin-bottom:16px;display:flex;gap:16px;align-items:flex-start}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;border:2px solid var(--bd);overflow:hidden}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.profile-info{flex:1;min-width:0}
+.profile-username{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;margin-bottom:4px}
+.profile-bio{font-size:13px;color:var(--tm);margin-bottom:8px;line-height:1.6}
+.profile-amp{font-size:12px;color:var(--td);margin-bottom:8px}
+.profile-links{display:flex;gap:8px;flex-wrap:wrap}
+.profile-link{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:11px;font-weight:600;color:var(--tm);text-decoration:none;transition:all .15s}
+.profile-link:hover{border-color:var(--ac);color:var(--ac)}
+/* セクション */
+.section-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:16px}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;margin-bottom:14px;color:var(--tx)}
+/* 投稿一覧 */
+.posts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.post-card{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;overflow:hidden;text-decoration:none;color:var(--tx);display:block;transition:border-color .2s}
+.post-card:hover{border-color:var(--ac)}
+.post-thumb{width:100%;aspect-ratio:4/3;background:var(--bg);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:28px;opacity:.3}
+.post-thumb img{width:100%;height:100%;object-fit:cover;opacity:1}
+.post-card-body{padding:8px}
+.post-card-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.post-card-meta{font-size:10px;color:var(--td)}
+/* 機材リスト */
+.gear-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.gear-item:last-child{border-bottom:none}
+.gear-item-info{flex:1;min-width:0}
+.gear-item-name{font-size:13px;font-weight:600;margin-bottom:2px}
+.gear-item-brand{font-size:11px;color:var(--td)}
+.gear-item-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac);font-weight:600;flex-shrink:0}
+.gear-total-box{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:12px 14px;margin-top:12px}
+.gear-total-row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;margin-bottom:4px}
+.gear-total-row:last-child{margin-bottom:0}
+.gear-total-label{color:var(--tm)}
+.gear-total-value{color:var(--ac);font-weight:700}
+.private-note{text-align:center;padding:24px;font-size:13px;color:var(--td)}
+@media(max-width:480px){.posts-grid{grid-template-columns:1fr}.profile-hero{flex-direction:column;align-items:center;text-align:center}.profile-links{justify-content:center}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/">
+    <img class="logo-img" src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
+    <div>
+      <div class="logo-main">MY GEAR MY BOARD</div>
+      <div class="logo-sub" id="logo-sub">ペダルボードSNS</div>
+    </div>
+  </a>
+  <div class="h-right">
+    <a class="back-btn" href="/" id="back-btn">← ホーム</a>
+    <div class="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
+  </div>
+</header>
+<div class="page">
+  <div id="content"><div class="loading">読み込み中...</div></div>
+</div>
+<script>
+const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+function detectLang(){const saved=localStorage.getItem('mgmb_lang');if(saved)return saved;const bl=navigator.language||'ja';return bl.toLowerCase().startsWith('ja')?'ja':'en';}
+let lang=detectLang();
+
+const I18N={
+  ja:{logoSub:'ペダルボードSNS',backBtn:'← ホーム',langLabel:'EN',
+    notFound:'ユーザーが見つかりませんでした',backHome:'← ホームに戻る',
+    sectionPosts:'投稿一覧',sectionGear:'機材リスト',
+    gearPrivate:'このユーザーの機材リストは非公開です',
+    gearEmpty:'機材が登録されていません',
+    noPosts:'まだ投稿がありません',
+    totalJpy:'円合計',totalUsd:'ドル合計',
+    ampLabel:'使用アンプ：',
+    untitled:'無題のボード',anon:'匿名'},
+  en:{logoSub:'Pedalboard SNS',backBtn:'← Home',langLabel:'JA',
+    notFound:'User not found',backHome:'← Back to Home',
+    sectionPosts:'Posts',sectionGear:'Gear List',
+    gearPrivate:'This user\'s gear list is private',
+    gearEmpty:'No gear registered',
+    noPosts:'No posts yet',
+    totalJpy:'JPY Total',totalUsd:'USD Total',
+    ampLabel:'Amp: ',
+    untitled:'Untitled Board',anon:'Anonymous'}
+};
+function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
+
+function applyLang(){
+  document.getElementById('logo-sub').textContent=tr('logoSub');
+  document.getElementById('back-btn').textContent=tr('backBtn');
+  document.getElementById('lang-label').textContent=tr('langLabel');
+}
+function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();loadUser();}
+
+function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';}
+
+async function loadUser(){
+  const params=new URLSearchParams(window.location.search);
+  const username=params.get('username');
+  if(!username){showError(tr('notFound'));return;}
+
+  // ユーザー情報取得（メールアドレス・password_hashは取得しない）
+  const{data:user}=await sb.from('users')
+    .select('id,username,bio,amp,x_url,instagram_url,avatar_url,gear_list_public,created_at')
+    .eq('username',username).maybeSingle();
+
+  if(!user){showError(tr('notFound'));return;}
+
+  document.title=`${user.username} — My Gear My Board`;
+
+  // 投稿・機材を並列取得
+  const[postsRes,gearRes]=await Promise.all([
+    sb.from('posts').select('id,title,image_urls,likes,created_at,post_type').eq('user_id',user.id).order('created_at',{ascending:false}).limit(12),
+    user.gear_list_public
+      ? sb.from('user_gear').select('*').eq('user_id',user.id).order('sort_order').order('created_at')
+      : Promise.resolve({data:null})
+  ]);
+
+  const posts=postsRes.data||[];
+  const gear=gearRes.data||null;
+
+  renderUser(user,posts,gear);
+}
+
+function renderUser(user,posts,gear){
+  const initial=(user.username||'U')[0].toUpperCase();
+  const avatarHtml=user.avatar_url
+    ?`<img src="${escHtml(user.avatar_url)}" alt="${escHtml(user.username)}">`
+    :initial;
+
+  const linksHtml=[
+    user.x_url?`<a class="profile-link" href="${escHtml(user.x_url)}" target="_blank" rel="noopener">𝕏 Twitter</a>`:'',
+    user.instagram_url?`<a class="profile-link" href="${escHtml(user.instagram_url)}" target="_blank" rel="noopener">📸 Instagram</a>`:''
+  ].filter(Boolean).join('');
+
+  // 投稿セクション
+  let postsHtml='';
+  if(!posts.length){
+    postsHtml=`<div class="private-note">${tr('noPosts')}</div>`;
+  }else{
+    postsHtml=`<div class="posts-grid">${posts.map(p=>{
+      const thumb=p.image_urls&&p.image_urls[0]
+        ?`<img src="${escHtml(p.image_urls[0])}" alt="" loading="lazy">`
+        :`${p.post_type==='gear'?'🎸':'🎛'}`;
+      return`<a href="/post?id=${p.id}" class="post-card">
+        <div class="post-thumb">${thumb}</div>
+        <div class="post-card-body">
+          <div class="post-card-title">${escHtml(p.title||tr('untitled'))}</div>
+          <div class="post-card-meta">❤️${p.likes||0} · ${timeAgo(p.created_at)}</div>
+        </div>
+      </a>`;
+    }).join('')}</div>`;
+  }
+
+  // 機材セクション
+  let gearHtml='';
+  if(!user.gear_list_public){
+    gearHtml=`<div class="private-note">🔒 ${tr('gearPrivate')}</div>`;
+  }else if(!gear||!gear.length){
+    gearHtml=`<div class="private-note">${tr('gearEmpty')}</div>`;
+  }else{
+    let totalJpy=0,totalUsd=0,hasJpy=false,hasUsd=false;
+    const items=gear.map(g=>{
+      const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
+      if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}
+      return`<div class="gear-item">
+        <div class="gear-item-info">
+          <div class="gear-item-name">${escHtml(g.name)}</div>
+          ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
+        </div>
+        ${priceStr?`<div class="gear-item-price">${priceStr}</div>`:''}
+      </div>`;
+    }).join('');
+    let totalRows='';
+    if(hasJpy)totalRows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('totalJpy')}</span><span class="gear-total-value">¥${totalJpy.toLocaleString()}</span></div>`;
+    if(hasUsd)totalRows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('totalUsd')}</span><span class="gear-total-value">$${totalUsd.toLocaleString()}</span></div>`;
+    gearHtml=items+(totalRows?`<div class="gear-total-box">${totalRows}</div>`:'');
+  }
+
+  document.getElementById('content').innerHTML=`
+    <div class="profile-hero">
+      <div class="profile-avatar">${avatarHtml}</div>
+      <div class="profile-info">
+        <div class="profile-username">${escHtml(user.username)}</div>
+        ${user.bio?`<div class="profile-bio">${escHtml(user.bio)}</div>`:''}
+        ${user.amp?`<div class="profile-amp">🎸 ${tr('ampLabel')}${escHtml(user.amp)}</div>`:''}
+        ${linksHtml?`<div class="profile-links">${linksHtml}</div>`:''}
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-title">📸 ${tr('sectionPosts')}</div>
+      ${postsHtml}
+    </div>
+    <div class="section-card">
+      <div class="section-title">🎸 ${tr('sectionGear')}</div>
+      ${gearHtml}
+    </div>`;
+}
+
+function showError(msg){
+  document.getElementById('content').innerHTML=`<div class="error-box"><p>${msg}</p><a href="/" style="color:var(--ac);display:block;margin-top:16px">${tr('backHome')}</a></div>`;
+}
+
+applyLang();
+loadUser();
+</script>
+</body>
+</html>
