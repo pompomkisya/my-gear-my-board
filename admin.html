@@ -174,6 +174,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-news')">📰 機材NEWS</div>
     <div class="tab" onclick="switchTab(this,'tab-pedals')">🎛 ペダルDB</div>
     <div class="tab" onclick="switchTab(this,'tab-brands')">🏢 ブランド説明</div>
+    <div class="tab" onclick="switchTab(this,'tab-privacy')">📄 プライバシーポリシー</div>
     <div class="tab" onclick="switchTab(this,'tab-regions')">🌍 言語圏別</div>
   </div>
 
@@ -347,6 +348,40 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)" id="brand-list-count"></span>
     </div>
     <div id="brands-list" class="loading">読み込み中...</div>
+  </div>
+
+  <!-- ★ プライバシーポリシー編集タブ -->
+  <div class="panel" id="tab-privacy">
+    <div class="section-title">📄 プライバシーポリシー編集</div>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">日本語・英語の両方を編集できます。保存するとサイトに即時反映されます。HTMLタグも使用可能です。</p>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="submit-btn" id="pp-save-btn" onclick="savePrivacyContent()">💾 保存して反映</button>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);align-self:center" id="pp-saved-at"></span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <label class="pedal-edit-label" style="margin-top:0">日本語版（content_ja）</label>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:4px">h2タグで見出し、pタグで段落、ulliタグでリスト</div>
+        <div class="rich-toolbar">
+          <button class="rich-btn" onmousedown="event.preventDefault();richCmd('pp-editor-ja','h2')">H2見出し</button>
+          <button class="rich-btn" onmousedown="event.preventDefault();richCmd('pp-editor-ja','p')">段落</button>
+          <button class="rich-btn" onmousedown="event.preventDefault();richCmd('pp-editor-ja','b')"><b>太字</b></button>
+          <button class="rich-btn" onmousedown="event.preventDefault();richCmd('pp-editor-ja','br')">改行</button>
+        </div>
+        <div class="rich-editor" id="pp-editor-ja" contenteditable="true" style="min-height:400px" data-placeholder="日本語のプライバシーポリシーを入力..."></div>
+      </div>
+      <div>
+        <label class="pedal-edit-label" style="margin-top:0">英語版（content_en）</label>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:4px">Use h2 for headings, p for paragraphs, ul/li for lists</div>
+        <div class="rich-toolbar">
+          <button class="rich-btn" onmousedown="event.preventDefault();richCmd('pp-editor-en','h2')">H2</button>
+          <button class="rich-btn" onmousedown="event.preventDefault();richCmd('pp-editor-en','p')">P</button>
+          <button class="rich-btn" onmousedown="event.preventDefault();richCmd('pp-editor-en','b')"><b>Bold</b></button>
+          <button class="rich-btn" onmousedown="event.preventDefault();richCmd('pp-editor-en','br')">BR</button>
+        </div>
+        <div class="rich-editor" id="pp-editor-en" contenteditable="true" style="min-height:400px" data-placeholder="Enter English privacy policy..."></div>
+      </div>
+    </div>
   </div>
 
   <div class="panel" id="tab-regions">
@@ -587,6 +622,7 @@ function switchTab(el,tabId){
   el.classList.add('on');document.getElementById(tabId).classList.add('on');
   if(tabId==='tab-aliases')loadAliases();
   if(tabId==='tab-brands')loadBrandsAdmin();
+  if(tabId==='tab-privacy')loadPrivacyContent();
 }
 
 let allPosts=[],allPedals=[],allComments=[];
@@ -1080,6 +1116,37 @@ async function deletePedalFromEdit(){
   const{error}=await sb.from('pedals').delete().eq('id',editingPedalId);
   if(error){showToast('❌ 削除に失敗しました: '+error.message);return;}
   showToast('🗑 ペダルを削除しました');closePedalEdit();await loadPedals();
+}
+
+// ★ プライバシーポリシー管理
+async function loadPrivacyContent(){
+  const{data}=await sb.from('site_content').select('*').eq('id','privacy').maybeSingle();
+  const jaEl=document.getElementById('pp-editor-ja');
+  const enEl=document.getElementById('pp-editor-en');
+  const savedAt=document.getElementById('pp-saved-at');
+  if(data){
+    if(jaEl)jaEl.innerHTML=data.content_ja||'';
+    if(enEl)enEl.innerHTML=data.content_en||'';
+    if(savedAt&&data.updated_at)savedAt.textContent='最終更新: '+timeAgo(data.updated_at);
+  }
+}
+
+async function savePrivacyContent(){
+  const jaEl=document.getElementById('pp-editor-ja');
+  const enEl=document.getElementById('pp-editor-en');
+  const btn=document.getElementById('pp-save-btn');
+  if(!jaEl||!enEl)return;
+  const content_ja=jaEl.innerHTML.trim()||null;
+  const content_en=enEl.innerHTML.trim()||null;
+  btn.disabled=true;btn.textContent='保存中...';
+  const{error}=await sb.from('site_content').upsert({
+    id:'privacy',content_ja,content_en,updated_at:new Date().toISOString()
+  },{onConflict:'id'});
+  btn.disabled=false;btn.textContent='💾 保存して反映';
+  if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
+  const savedAt=document.getElementById('pp-saved-at');
+  if(savedAt)savedAt.textContent='最終更新: たった今';
+  showToast('✅ プライバシーポリシーを保存しました');
 }
 
 // ★ ブランド説明管理
