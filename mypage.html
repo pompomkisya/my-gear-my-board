@@ -145,7 +145,10 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .currency-select{background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:9px 10px;font-size:13px;color:var(--tx);font-family:'JetBrains Mono',monospace;outline:none;cursor:pointer;flex-shrink:0}
 .currency-select:focus{border-color:var(--ac)}
 .gear-ac-wrap{position:relative}
-.gear-ac-dropdown{position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:600;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.gear-ac-dropdown{position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:600;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6);scrollbar-width:thin;scrollbar-color:var(--ac) var(--sf2)}
+.gear-ac-dropdown::-webkit-scrollbar{width:5px}
+.gear-ac-dropdown::-webkit-scrollbar-track{background:var(--sf2);border-radius:3px}
+.gear-ac-dropdown::-webkit-scrollbar-thumb{background:var(--ac);border-radius:3px}
 .gear-ac-dropdown.open{display:block}
 .gear-ac-item{padding:9px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--bd);transition:background .1s}
 .gear-ac-item:last-child{border-bottom:none}
@@ -305,6 +308,7 @@ textarea.edit-input{resize:vertical;min-height:70px}
           onkeydown="gearACKeyDown(event)"
           onblur="setTimeout(closeGearAC,180)">
         <div class="gear-ac-dropdown" id="gear-ac-dropdown"></div>
+        <div id="gear-ac-hint" style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);margin-top:5px">ローマ字入力で自動予測変換できます。候補をクリックで簡単追加！</div>
       </div>
     </div>
     <div class="gear-modal-row">
@@ -314,7 +318,7 @@ textarea.edit-input{resize:vertical;min-height:70px}
     <div class="gear-modal-row">
       <label class="gear-modal-lbl" id="gear-lbl-price">購入金額</label>
       <div style="display:flex;gap:6px">
-        <input class="gear-modal-input" id="gear-input-price" type="number" min="0" style="flex:1">
+        <input class="gear-modal-input" id="gear-input-price" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="0" style="flex:1">
         <select class="currency-select" id="gear-input-currency">
           <option value="JPY">JPY ¥</option>
           <option value="USD">USD $</option>
@@ -390,6 +394,8 @@ function applyLang(){
   setTxt('my-tab-posts',tr('tabPosts'));setTxt('my-tab-gear',tr('tabGear'));
   setTxt('my-tab-likes',tr('tabLikes'));setTxt('my-tab-gacha',tr('tabGacha'));
   setTxt('av-edit-lbl',tr('avEditLbl'));setTxt('profile-edit-hint',tr('profileEditHint'));
+  const acHint=document.getElementById('gear-ac-hint');
+  if(acHint)acHint.textContent=lang==='en'?'Type to search and autocomplete. Click a suggestion to add!':'ローマ字入力で自動予測変換できます。候補をクリックで簡単追加！';
   const notifTab=document.getElementById('my-tab-notif');
   if(notifTab){const badge=document.getElementById('notif-badge');notifTab.textContent=tr('tabNotif')+' ';if(badge)notifTab.appendChild(badge);}
 }
@@ -726,7 +732,7 @@ async function saveGearItem(){
   const name=document.getElementById('gear-input-name').value.trim();
   if(!name){showToast(tr('gearNameRequired'));return;}
   const brand=document.getElementById('gear-input-brand').value.trim()||null;
-  const priceRaw=document.getElementById('gear-input-price').value;
+  const priceRaw=document.getElementById('gear-input-price').value.replace(/[０-９]/g,s=>String.fromCharCode(s.charCodeAt(0)-0xFEE0)).replace(/[^0-9]/g,'');
   const price=priceRaw?parseInt(priceRaw):null;
   const currency=document.getElementById('gear-input-currency').value;
   const purchased_at=document.getElementById('gear-input-date').value||null;
