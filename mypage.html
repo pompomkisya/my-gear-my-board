@@ -335,7 +335,7 @@ textarea.edit-input{resize:vertical;min-height:70px}
     </div>
     <div class="gear-modal-actions">
       <button class="gear-add-btn" id="gear-modal-save-btn" onclick="saveGearItem()">保存</button>
-      <button class="gear-share-btn" onclick="closeGearModal()">キャンセル</button>
+      <button class="gear-share-btn" onclick="closeGearModal()" id="gear-modal-cancel-btn">キャンセル</button>
     </div>
   </div>
 </div>
@@ -357,7 +357,11 @@ const MP_I18N={
     gearSaveBtn:'保存',gearCancelBtn:'キャンセル',
     gearDeleteConfirm:'この機材をリストから削除しますか？',gearNameRequired:'機材名を入力してください',
     gearSaved:'✅ 保存しました',gearDeleted:'🗑 削除しました',gearCopied:'🔗 URLをコピーしました',
-    gearEmpty:'まだ機材が登録されていません',gearPrivateNote:'非公開設定です。公開するとリンクでシェアできます。'},
+    gearEmpty:'まだ機材が登録されていません',
+    gearSortLabel:'並べ替え：',
+    gearSortDefault:'登録順',gearSortDateAsc:'購入日（古い順）',gearSortDateDesc:'購入日（新しい順）',
+    gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',
+    gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',gearPrivateNote:'📢 公開設定にするとリンクコピーで機材リストをシェアできます！'},
   en:{logoSub:'Pedalboard SNS',backBtn:'← Home',tabLogin:'Login',tabRegister:'Sign Up',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email address',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Sign Up',rfSub:'You can post without registering, but signing up gives you a profile page.',rfLblName:'Username',rfLblEmail:'Email address',rfLblPw:'Password (6+ characters)',registerBtn:'Sign Up',registerBtnLoading:'Signing up...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:"We'll send a reset link to your registered email.",rstLblEmail:'Email address',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Your amp, genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Log Out',confirmLogout:'Log out?',tabPosts:'My Posts',tabGear:'🎸 Gear List',tabLikes:'Liked Posts',tabGacha:'🎰 Gacha Saves',tabNotif:'Notifications',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyGacha:'No gacha saves yet',gachaDeleteConfirm:'Delete this gacha save?',gachaDeleted:'Deleted',emptyNotif:'No notifications',loading:'Loading...',errEmailPw:'Please enter your email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email address',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email address is already registered',errResetEmail:'Please enter your email address',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',profileToggleOpen:'Edit Profile',profileToggleClose:'Close',avEditLbl:'Edit',profileEditHint:'Edit Profile',
     gearTotalTitle:'Total Value',gearTotalJpy:'JPY Total',gearTotalUsd:'USD Total',
     gearAddBtn:'＋ Add Gear',gearPublicLabel:'Make list public',gearPublicOn:'Public',gearPublicOff:'Private',
@@ -366,7 +370,11 @@ const MP_I18N={
     gearSaveBtn:'Save',gearCancelBtn:'Cancel',
     gearDeleteConfirm:'Remove this item from your list?',gearNameRequired:'Please enter a name',
     gearSaved:'✅ Saved',gearDeleted:'🗑 Deleted',gearCopied:'🔗 URL copied',
-    gearEmpty:'No gear registered yet',gearPrivateNote:'List is private. Make it public to share.'}
+    gearEmpty:'No gear registered yet',
+    gearSortLabel:'Sort: ',
+    gearSortDefault:'Default',gearSortDateAsc:'Date (oldest)',gearSortDateDesc:'Date (newest)',
+    gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',
+    gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',gearPrivateNote:'📢 Make it public to share your gear list with a link!'}
 };
 function tr(key){return(MP_I18N[lang]||MP_I18N.ja)[key]||MP_I18N.ja[key]||key;}
 function setTxt(id,text){const el=document.getElementById(id);if(el)el.textContent=text;}
@@ -684,10 +692,60 @@ function renderGearList(gear,isPublic,username){
     }).join('');
   }
   const publicToggle=`<label class="gear-public-toggle"><input type="checkbox" id="gear-public-check" ${isPublic?'checked':''} onchange="toggleGearPublic(this.checked)"><span>${tr('gearPublicLabel')}</span><span style="font-weight:700;color:${isPublic?'var(--ac)':'var(--td)'}" id="gear-public-status">${isPublic?tr('gearPublicOn'):tr('gearPublicOff')}</span></label>`;
+  // 並べ替えセレクト
+  const sortSelect=`<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+    <span style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${tr('gearSortLabel')}</span>
+    <select id="gear-sort-select" onchange="applyGearSort()"
+      style="background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:11px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;cursor:pointer">
+      <option value="default">${tr('gearSortDefault')}</option>
+      <option value="date_asc">${tr('gearSortDateAsc')}</option>
+      <option value="date_desc">${tr('gearSortDateDesc')}</option>
+      <option value="price_asc">${tr('gearSortPriceAsc')}</option>
+      <option value="price_desc">${tr('gearSortPriceDesc')}</option>
+      <option value="name_asc">${tr('gearSortNameAsc')}</option>
+      <option value="name_desc">${tr('gearSortNameDesc')}</option>
+    </select>
+  </div>`;
   const shareBtn=isPublic
     ?`<button class="gear-share-btn" onclick="copyGearShareUrl('${shareUrl}')">${tr('gearShareBtn')}</button>`
-    :`<span style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${tr('gearPrivateNote')}</span>`;
-  el.innerHTML=`<div class="gear-list-header"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${publicToggle}${shareBtn}</div><button class="gear-add-btn" onclick="openGearModal(null)">${tr('gearAddBtn')}</button></div>${totalHtml}<div class="gear-list-wrap">${itemsHtml}</div>`;
+    :`<span style="font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm);font-weight:500">${tr('gearPrivateNote')}</span>`;
+  el.innerHTML=`<div class="gear-list-header"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${publicToggle}${shareBtn}</div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${sortSelect}<button class="gear-add-btn" onclick="openGearModal(null)">${tr('gearAddBtn')}</button></div></div>${totalHtml}<div class="gear-list-wrap" id="gear-items-wrap">${itemsHtml}</div>`;
+}
+
+function applyGearSort(){
+  const sel=document.getElementById('gear-sort-select');
+  if(!sel||!gearList.length)return;
+  const val=sel.value;
+  let sorted=[...gearList];
+  if(val==='date_asc')sorted.sort((a,b)=>(a.purchased_at||'').localeCompare(b.purchased_at||''));
+  else if(val==='date_desc')sorted.sort((a,b)=>(b.purchased_at||'').localeCompare(a.purchased_at||''));
+  else if(val==='price_asc')sorted.sort((a,b)=>(a.price||0)-(b.price||0));
+  else if(val==='price_desc')sorted.sort((a,b)=>(b.price||0)-(a.price||0));
+  else if(val==='name_asc')sorted.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  else if(val==='name_desc')sorted.sort((a,b)=>(b.name||'').localeCompare(a.name||''));
+  else sorted=[...gearList]; // default
+  const wrap=document.getElementById('gear-items-wrap');
+  if(!wrap)return;
+  if(!sorted.length){wrap.innerHTML=`<div class="empty-msg">${tr('gearEmpty')}</div>`;return;}
+  wrap.innerHTML=sorted.map(g=>{
+    const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
+    const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
+    return`<div class="gear-item" id="gear-item-${g.id}">
+      <div class="gear-item-info">
+        <div class="gear-item-name">${escHtml(g.name)}</div>
+        ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
+        <div class="gear-item-meta">
+          ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
+          ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
+        </div>
+        ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
+      </div>
+      <div class="gear-item-actions">
+        <button class="gear-edit-btn" onclick="openGearModal('${g.id}')">✏️</button>
+        <button class="gear-del-btn" onclick="deleteGearItem('${g.id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 async function toggleGearPublic(isPublic){
@@ -717,6 +775,7 @@ function openGearModal(gearId){
   document.getElementById('gear-input-memo').value=gear?.memo||'';
   document.getElementById('gear-modal-save-btn').textContent=tr('gearSaveBtn');
   closeGearAC();
+  const cancelBtn=document.getElementById('gear-modal-cancel-btn');if(cancelBtn)cancelBtn.textContent=tr('gearCancelBtn');
   document.getElementById('gear-modal').classList.add('open');
   setTimeout(()=>document.getElementById('gear-input-name').focus(),100);
 }
