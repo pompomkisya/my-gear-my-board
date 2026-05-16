@@ -96,6 +96,10 @@ const I18N={
     gearEmpty:'機材が登録されていません',
     noPosts:'まだ投稿がありません',
     totalJpy:'円合計',totalUsd:'ドル合計',
+    gearSortLabel:'並べ替え：',
+    gearSortDefault:'登録順',gearSortDateAsc:'購入日（古い順）',gearSortDateDesc:'購入日（新しい順）',
+    gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',
+    gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',
     ampLabel:'使用アンプ：',
     untitled:'無題のボード',anon:'匿名'},
   en:{logoSub:'Pedalboard SNS',backBtn:'← Home',langLabel:'JA',
@@ -105,6 +109,10 @@ const I18N={
     gearEmpty:'No gear registered',
     noPosts:'No posts yet',
     totalJpy:'JPY Total',totalUsd:'USD Total',
+    gearSortLabel:'Sort: ',
+    gearSortDefault:'Default',gearSortDateAsc:'Date (oldest)',gearSortDateDesc:'Date (newest)',
+    gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',
+    gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',
     ampLabel:'Amp: ',
     untitled:'Untitled Board',anon:'Anonymous'}
 };
@@ -186,6 +194,21 @@ function renderUser(user,posts,gear){
     gearHtml=`<div class="private-note">${tr('gearEmpty')}</div>`;
   }else{
     let totalJpy=0,totalUsd=0,hasJpy=false,hasUsd=false;
+    // 並べ替えセレクト
+    const sortSelectHtml=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+      <span style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${tr('gearSortLabel')}</span>
+      <select id="user-gear-sort" onchange="applyUserGearSort()"
+        style="background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:11px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;cursor:pointer">
+        <option value="default">${tr('gearSortDefault')}</option>
+        <option value="date_asc">${tr('gearSortDateAsc')}</option>
+        <option value="date_desc">${tr('gearSortDateDesc')}</option>
+        <option value="price_asc">${tr('gearSortPriceAsc')}</option>
+        <option value="price_desc">${tr('gearSortPriceDesc')}</option>
+        <option value="name_asc">${tr('gearSortNameAsc')}</option>
+        <option value="name_desc">${tr('gearSortNameDesc')}</option>
+      </select>
+    </div>`;
+    window._userGearData=gear; // 並べ替え用にキャッシュ
     const items=gear.map(g=>{
       const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
       if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}
@@ -193,6 +216,7 @@ function renderUser(user,posts,gear){
         <div class="gear-item-info">
           <div class="gear-item-name">${escHtml(g.name)}</div>
           ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
+          ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px">${escHtml(g.memo)}</div>`:''}
         </div>
         ${priceStr?`<div class="gear-item-price">${priceStr}</div>`:''}
       </div>`;
@@ -200,7 +224,7 @@ function renderUser(user,posts,gear){
     let totalRows='';
     if(hasJpy)totalRows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('totalJpy')}</span><span class="gear-total-value">¥${totalJpy.toLocaleString()}</span></div>`;
     if(hasUsd)totalRows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('totalUsd')}</span><span class="gear-total-value">$${totalUsd.toLocaleString()}</span></div>`;
-    gearHtml=items+(totalRows?`<div class="gear-total-box">${totalRows}</div>`:'');
+    gearHtml=sortSelectHtml+`<div id="user-gear-items">`+items+`</div>`+(totalRows?`<div class="gear-total-box">${totalRows}</div>`:'');
   }
 
   document.getElementById('content').innerHTML=`
@@ -221,6 +245,32 @@ function renderUser(user,posts,gear){
       <div class="section-title">🎸 ${tr('sectionGear')}</div>
       ${gearHtml}
     </div>`;
+}
+
+function applyUserGearSort(){
+  const sel=document.getElementById('user-gear-sort');
+  const wrap=document.getElementById('user-gear-items');
+  if(!sel||!wrap||!window._userGearData)return;
+  const val=sel.value;
+  let sorted=[...window._userGearData];
+  if(val==='date_asc')sorted.sort((a,b)=>(a.purchased_at||'').localeCompare(b.purchased_at||''));
+  else if(val==='date_desc')sorted.sort((a,b)=>(b.purchased_at||'').localeCompare(a.purchased_at||''));
+  else if(val==='price_asc')sorted.sort((a,b)=>(a.price||0)-(b.price||0));
+  else if(val==='price_desc')sorted.sort((a,b)=>(b.price||0)-(a.price||0));
+  else if(val==='name_asc')sorted.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  else if(val==='name_desc')sorted.sort((a,b)=>(b.name||'').localeCompare(a.name||''));
+  else sorted=[...window._userGearData];
+  wrap.innerHTML=sorted.map(g=>{
+    const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
+    return`<div class="gear-item">
+      <div class="gear-item-info">
+        <div class="gear-item-name">${escHtml(g.name)}</div>
+        ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
+        ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px">${escHtml(g.memo)}</div>`:''}
+      </div>
+      ${priceStr?`<div class="gear-item-price">${priceStr}</div>`:''}
+    </div>`;
+  }).join('');
 }
 
 function showError(msg){
