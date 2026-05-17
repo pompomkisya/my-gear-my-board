@@ -296,6 +296,7 @@ function applyLangUI(){
   const grBtns=document.querySelectorAll('#gear-remind-bd button');
   if(grBtns[0])grBtns[0].textContent=tr('gearRemindAdd');
   if(grBtns[1])grBtns[1].textContent=tr('gearRemindSkip');
+  applyEncyclopediaSub(lang==='en');
   updateStepUI();
   if(allDBPosts.length){renderGearWidget(allDBPosts);renderGearWidgetMob(allDBPosts);renderRankingWidget(allDBPosts);renderRankingWidgetMob(allDBPosts);}
 }
@@ -571,11 +572,19 @@ function searchMatches(post,query){
   return title.includes(q)||username.includes(q)||desc.includes(q)||gearStr.includes(q)||genres.includes(q);
 }
 let selectedGears=[],acResults=[],acFocusIdx=-1;
+let _acComposing=false,_acTimer=null;
+function normACQuery(q){return(q||'').toLowerCase().replace(/[-_\s\.]/g,'');}
 async function searchGear(val){
   const q=val.trim();closeAC();if(!q)return;
+  const qNorm=normACQuery(q);
   const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name,search_query').or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%').limit(10);
   let results=prefixData||[];
   if(results.length<5){const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('full_name','%'+q+'%').limit(10);if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});}
+  // bd2→BD-2対応（記号除去検索）
+  if(results.length<5&&qNorm.length>=2){
+    const{data:allData}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('full_name','%'+q[0]+'%').limit(60);
+    if(allData)allData.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name)&&normACQuery(x.full_name).includes(qNorm))results.push(x);});
+  }
   results=results.slice(0,10);acResults=results;acFocusIdx=-1;
   const dd=document.getElementById('ac-dropdown');
   if(!results.length){dd.innerHTML='<div class="ac-empty">「'+q+'」— '+(lang==='en'?'No suggestions. Press Enter to add':'候補なし　Enterで追加')+'</div>';dd.classList.add('open');return;}
@@ -606,7 +615,9 @@ function gearKeyDown(e){
   const dd=document.getElementById('ac-dropdown');const open=dd.classList.contains('open');
   if(e.key==='ArrowDown'){e.preventDefault();if(open)setACFocus(Math.min(acFocusIdx+1,acResults.length-1));}
   else if(e.key==='ArrowUp'){e.preventDefault();setACFocus(Math.max(acFocusIdx-1,0));}
-  else if(e.key==='Enter'){e.preventDefault();if(open&&acFocusIdx>=0&&acResults[acFocusIdx]){selectGear(acFocusIdx);}else{const v=e.target.value.trim();if(v){addGearTag({name:v,brand:'',search_query:null});document.getElementById('gear-search').value='';closeAC();}}}
+  else if(e.key==='Enter'){
+    if(_acComposing)return; // IME変換中はEnterを無視
+    e.preventDefault();if(open&&acFocusIdx>=0&&acResults[acFocusIdx]){selectGear(acFocusIdx);}else{const v=e.target.value.trim();if(v){addGearTag({name:v,brand:'',search_query:null});document.getElementById('gear-search').value='';closeAC();}}}
   else if(e.key==='Backspace'&&!e.target.value&&selectedGears.length)removeGearTag(selectedGears.length-1);
   else if(e.key==='Escape')closeAC();
 }
