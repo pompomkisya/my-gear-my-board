@@ -105,10 +105,10 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .avatar-menu-item.danger:hover{background:rgba(224,80,80,.08)}
 /* ★ 機材リスト */
 .gear-list-wrap{display:flex;flex-direction:column;gap:0}
-.gear-list-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
-.gear-add-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--ac);border:none;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:#fff;cursor:pointer;transition:all .15s;touch-action:manipulation}
+.gear-list-header{display:flex;flex-direction:column;margin-bottom:14px;gap:0}
+.gear-add-btn{display:inline-flex;align-items:center;gap:5px;padding:0 14px;height:34px;background:var(--ac);border:none;border-radius:6px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:#fff;cursor:pointer;transition:all .15s;touch-action:manipulation;white-space:nowrap}
 .gear-add-btn:hover{background:#cf4c26}
-.gear-public-toggle{display:flex;align-items:center;gap:8px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm)}
+.gear-public-toggle{display:inline-flex;align-items:center;gap:7px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm)}
 .gear-public-toggle input[type=checkbox]{width:16px;height:16px;cursor:pointer;accent-color:var(--ac)}
 .gear-item{display:flex;align-items:center;gap:10px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px 14px;margin-bottom:8px;transition:border-color .15s}
 .gear-item:hover{border-color:rgba(232,85,45,.3)}
@@ -130,7 +130,7 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .gear-total-row:last-child{margin-bottom:0}
 .gear-total-label{color:var(--tm)}
 .gear-total-value{color:var(--ac);font-weight:700;font-size:15px}
-.gear-share-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none;touch-action:manipulation}
+.gear-share-btn{display:inline-flex;align-items:center;gap:5px;padding:0 14px;height:34px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none;touch-action:manipulation;white-space:nowrap}
 .gear-share-btn:hover{border-color:var(--ac);color:var(--ac)}
 .gear-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .gear-modal.open{display:flex}
@@ -304,7 +304,9 @@ textarea.edit-input{resize:vertical;min-height:70px}
       <label class="gear-modal-lbl" id="gear-lbl-name">機材名 *</label>
       <div class="gear-ac-wrap">
         <input class="gear-modal-input" id="gear-input-name" type="text" maxlength="100" autocomplete="off"
-          oninput="searchGearAC(this.value)"
+          oninput="onGearACInput(this.value)"
+          oncompositionstart="gearACComposing=true"
+          oncompositionend="gearACComposing=false;onGearACInput(this.value)"
           onkeydown="gearACKeyDown(event)"
           onblur="setTimeout(closeGearAC,180)">
         <div class="gear-ac-dropdown" id="gear-ac-dropdown"></div>
@@ -696,7 +698,7 @@ function renderGearList(gear,isPublic,username){
   const sortSelect=`<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
     <span style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${tr('gearSortLabel')}</span>
     <select id="gear-sort-select" onchange="applyGearSort()"
-      style="background:var(--sf2);border:1px solid var(--bd);border-radius:4px;padding:5px 8px;font-size:11px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;cursor:pointer">
+      style="background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:0 10px;height:34px;font-size:11px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;cursor:pointer">
       <option value="default">${tr('gearSortDefault')}</option>
       <option value="date_asc">${tr('gearSortDateAsc')}</option>
       <option value="date_desc">${tr('gearSortDateDesc')}</option>
@@ -709,7 +711,7 @@ function renderGearList(gear,isPublic,username){
   const shareBtn=isPublic
     ?`<button class="gear-share-btn" onclick="copyGearShareUrl('${shareUrl}')">${tr('gearShareBtn')}</button>`
     :`<span style="font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm);font-weight:500">${tr('gearPrivateNote')}</span>`;
-  el.innerHTML=`<div class="gear-list-header"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${publicToggle}${shareBtn}</div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${sortSelect}<button class="gear-add-btn" onclick="openGearModal(null)">${tr('gearAddBtn')}</button></div></div>${totalHtml}<div class="gear-list-wrap" id="gear-items-wrap">${itemsHtml}</div>`;
+  el.innerHTML=`<div class="gear-list-header"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">${publicToggle}${shareBtn}</div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${sortSelect}<button class="gear-add-btn" onclick="openGearModal(null)">${tr('gearAddBtn')}</button></div></div>${totalHtml}<div class="gear-list-wrap" id="gear-items-wrap">${itemsHtml}</div>`;
 }
 
 function applyGearSort(){
@@ -719,8 +721,8 @@ function applyGearSort(){
   let sorted=[...gearList];
   if(val==='date_asc')sorted.sort((a,b)=>(a.purchased_at||'').localeCompare(b.purchased_at||''));
   else if(val==='date_desc')sorted.sort((a,b)=>(b.purchased_at||'').localeCompare(a.purchased_at||''));
-  else if(val==='price_asc')sorted.sort((a,b)=>(a.price||0)-(b.price||0));
-  else if(val==='price_desc')sorted.sort((a,b)=>(b.price||0)-(a.price||0));
+  else if(val==='price_asc')sorted.sort((a,b)=>{const av=(a.price||0)*(a.currency==='USD'?150:1);const bv=(b.price||0)*(b.currency==='USD'?150:1);return av-bv;});
+  else if(val==='price_desc')sorted.sort((a,b)=>{const av=(a.price||0)*(a.currency==='USD'?150:1);const bv=(b.price||0)*(b.currency==='USD'?150:1);return bv-av;});
   else if(val==='name_asc')sorted.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   else if(val==='name_desc')sorted.sort((a,b)=>(b.name||'').localeCompare(a.name||''));
   else sorted=[...gearList]; // default
@@ -818,16 +820,36 @@ async function deleteGearItem(gearId){
 // ★ 機材名オートコンプリート
 let gearAcResults=[];let gearAcFocusIdx=-1;
 
+let gearACComposing=false;
+let gearACTimer=null;
+
+// ② IME対応ラッパー（変換中は検索しない）
+function onGearACInput(val){
+  clearTimeout(gearACTimer);
+  if(gearACComposing)return;
+  gearACTimer=setTimeout(()=>searchGearAC(val),150);
+}
+
+// ① bd2→BD-2 対応：記号を除去した正規化クエリを生成
+function normalizeQuery(q){
+  // 記号・スペースを除去して小文字に
+  return q.toLowerCase().replace(/[-_\s\.]/g,'');
+}
+
 async function searchGearAC(val){
   const q=val.trim();
   closeGearAC();
   if(!q||q.length<1)return;
-  // pedalsテーブルから候補取得（prefix検索 + fuzzy）
+  const qNorm=normalizeQuery(q);
+
+  // prefix検索
   const{data:prefixData}=await sb.from('pedals')
     .select('brand,model,full_name,search_query')
     .or(`brand.ilike.${q}%,model.ilike.${q}%,full_name.ilike.${q}%`)
     .limit(8);
   let results=prefixData||[];
+
+  // fuzzy検索
   if(results.length<4){
     const{data:fuzzy}=await sb.from('pedals')
       .select('brand,model,full_name,search_query')
@@ -835,7 +857,24 @@ async function searchGearAC(val){
       .limit(8);
     if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
   }
-  // エイリアスも検索
+
+  // ① 記号除去検索（bd2→BD-2）
+  if(results.length<4&&qNorm.length>=2){
+    const{data:allData}=await sb.from('pedals')
+      .select('brand,model,full_name,search_query')
+      .ilike('full_name','%'+q[0]+'%')
+      .limit(60);
+    if(allData){
+      allData.forEach(x=>{
+        if(!results.find(r=>r.full_name===x.full_name)){
+          const xNorm=normalizeQuery(x.full_name);
+          if(xNorm.includes(qNorm))results.push(x);
+        }
+      });
+    }
+  }
+
+  // エイリアス検索
   const{data:aliasData}=await sb.from('pedal_aliases')
     .select('alias,pedal_full_name')
     .ilike('alias','%'+q+'%')
@@ -848,11 +887,12 @@ async function searchGearAC(val){
       }
     }
   }
+
   results=results.slice(0,8);
   gearAcResults=results;gearAcFocusIdx=-1;
   const dd=document.getElementById('gear-ac-dropdown');
   if(!results.length){
-    dd.innerHTML=`<div class="gear-ac-empty">${lang==='en'?'No suggestions':'候補なし — そのまま入力して保存できます'}</div>`;
+    dd.innerHTML=`<div class="gear-ac-empty">${lang==='en'?'No suggestions — type freely to save':'候補なし — そのまま入力して保存できます'}</div>`;
     dd.classList.add('open');return;
   }
   dd.innerHTML=results.map((x,i)=>
