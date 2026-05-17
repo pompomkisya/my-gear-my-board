@@ -580,9 +580,9 @@ async function searchGear(val){
   const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name,search_query').or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%').limit(10);
   let results=prefixData||[];
   if(results.length<5){const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('full_name','%'+q+'%').limit(10);if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});}
-  // bd2→BD-2対応（記号除去検索）
+  // bd2→BD-2, ds1→DS-1等（記号除去検索・全件取得してJS側でフィルタ）
   if(results.length<5&&qNorm.length>=2){
-    const{data:allData}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('full_name','%'+q[0]+'%').limit(60);
+    const{data:allData}=await sb.from('pedals').select('brand,model,full_name,search_query').limit(500);
     if(allData)allData.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name)&&normACQuery(x.full_name).includes(qNorm))results.push(x);});
   }
   results=results.slice(0,10);acResults=results;acFocusIdx=-1;
