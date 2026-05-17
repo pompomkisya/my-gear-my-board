@@ -226,10 +226,12 @@ function renderUser(user,posts,gear){
         <div class="gear-item-info">
           <div class="gear-item-name">${escHtml(g.name)}</div>
           ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px">
+            ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
+            ${uPedalBtn}
+          </div>
           ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px">${escHtml(g.memo)}</div>`:''}
-          ${uPedalBtn}
         </div>
-        ${priceStr?`<div class="gear-item-price">${priceStr}</div>`:''}
       </div>`;
     }).join('');
     let totalRows='';
@@ -279,10 +281,12 @@ function applyUserGearSort(){
       <div class="gear-item-info">
         <div class="gear-item-name">${escHtml(g.name)}</div>
         ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px">
+          ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
+          ${sPedalBtn}
+        </div>
         ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px">${escHtml(g.memo)}</div>`:''}
-        ${sPedalBtn}
       </div>
-      ${priceStr?`<div class="gear-item-price">${priceStr}</div>`:''}
     </div>`;
   }).join('');
 }
