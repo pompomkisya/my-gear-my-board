@@ -48,12 +48,17 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .post-card-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
 .post-card-meta{font-size:10px;color:var(--td)}
 /* 機材リスト */
-.gear-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.gear-item{padding:12px 0;border-bottom:1px solid var(--bd)}
 .gear-item:last-child{border-bottom:none}
-.gear-item-info{flex:1;min-width:0}
-.gear-item-name{font-size:13px;font-weight:600;margin-bottom:2px}
-.gear-item-brand{font-size:11px;color:var(--td)}
-.gear-item-price{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac);font-weight:600;flex-shrink:0}
+.gear-item-row1{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.gear-item-name{font-size:13px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gear-item-brand{font-size:11px;color:var(--td);margin-bottom:5px}
+.gear-item-row3{display:flex;align-items:center;gap:8px;min-height:22px}
+.gear-item-price{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);font-weight:700;flex-shrink:0}
+.gear-item-date{font-size:11px;color:var(--td)}
+.gear-pedal-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:rgba(232,85,45,.13);border-radius:4px;font-size:11px;font-weight:600;color:var(--ac);text-decoration:none;transition:background .15s;white-space:nowrap;margin-left:auto;flex-shrink:0}
+.gear-pedal-btn:hover{background:rgba(232,85,45,.26)}
+.gear-item-model{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:5px;display:inline-block;text-decoration:underline;text-decoration-color:rgba(255,255,255,.18);text-underline-offset:4px;text-decoration-thickness:1px}
 .gear-total-box{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:12px 14px;margin-top:12px}
 .gear-total-row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;margin-bottom:4px}
 .gear-total-row:last-child{margin-bottom:0}
@@ -219,19 +224,23 @@ function renderUser(user,posts,gear){
     window._userPedalSlugMap=userPedalSlugMap;
     const items=gear.map(g=>{
       const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
+      const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
       if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}
       const uSlug=userPedalSlugMap[g.name]||null;
-      const uPedalBtn=uSlug?`<a href="/pedal?slug=${uSlug}" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ac);font-family:'JetBrains Mono',monospace;text-decoration:none;margin-top:4px" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎛 ${lang==='en'?'Pedal detail →':'ペダル詳細ページへ →'}</a>`:'';
+      const uPedalBtn=uSlug?`<a href="/pedal?slug=${uSlug}" class="gear-pedal-btn">🎛 ${lang==='en'?'Pedal detail →':'ペダル詳細ページへ →'}</a>`:'';
+      const uDispBrand=g.brand||'';
+      const uDispModel=(g.brand&&g.name.startsWith(g.brand))?g.name.slice(g.brand.length).trim():g.name;
       return`<div class="gear-item">
-        <div class="gear-item-info">
-          <div class="gear-item-name">${escHtml(g.name)}</div>
-          ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px">
-            ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
-            ${uPedalBtn}
-          </div>
-          ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px">${escHtml(g.memo)}</div>`:''}
+        <div class="gear-item-row1">
+          ${uDispBrand?`<div class="gear-item-brand">${escHtml(uDispBrand)}</div>`:'<div></div>'}
+          ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
         </div>
+        <div class="gear-item-row3">
+          <div class="gear-item-model">${escHtml(uDispModel)}</div>
+          ${uPedalBtn}
+        </div>
+        ${dateStr?`<div style="font-size:11px;color:var(--td);margin-bottom:${g.memo?'4px':'0'}">${dateStr}</div>`:''}
+        ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px;line-height:1.5">${escHtml(g.memo)}</div>`:''}
       </div>`;
     }).join('');
     let totalRows='';
@@ -275,18 +284,22 @@ function applyUserGearSort(){
   else sorted=[...window._userGearData];
   wrap.innerHTML=sorted.map(g=>{
     const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
+    const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
     const sSlug=window._userPedalSlugMap&&window._userPedalSlugMap[g.name]||null;
-    const sPedalBtn=sSlug?`<a href="/pedal?slug=${sSlug}" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ac);font-family:'JetBrains Mono',monospace;text-decoration:none;margin-top:4px" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎛 ${lang==='en'?'Pedal detail →':'ペダル詳細ページへ →'}</a>`:'';
+    const sPedalBtn=sSlug?`<a href="/pedal?slug=${sSlug}" class="gear-pedal-btn">🎛 ${lang==='en'?'Pedal detail →':'ペダル詳細ページへ →'}</a>`:'';
+    const sDispBrand=g.brand||'';
+    const sDispModel=(g.brand&&g.name.startsWith(g.brand))?g.name.slice(g.brand.length).trim():g.name;
     return`<div class="gear-item">
-      <div class="gear-item-info">
-        <div class="gear-item-name">${escHtml(g.name)}</div>
-        ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px">
-          ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
-          ${sPedalBtn}
-        </div>
-        ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px">${escHtml(g.memo)}</div>`:''}
+      <div class="gear-item-row1">
+        ${sDispBrand?`<div class="gear-item-brand">${escHtml(sDispBrand)}</div>`:'<div></div>'}
+        ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
       </div>
+      <div class="gear-item-row3">
+        <div class="gear-item-model">${escHtml(sDispModel)}</div>
+        ${sPedalBtn}
+      </div>
+      ${dateStr?`<div style="font-size:11px;color:var(--td);margin-bottom:${g.memo?'4px':'0'}">${dateStr}</div>`:''}
+      ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px;line-height:1.5">${escHtml(g.memo)}</div>`:''}
     </div>`;
   }).join('');
 }
