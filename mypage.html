@@ -653,15 +653,24 @@ async function loadGearList(){
   const{data:userData}=await sb.from('users').select('gear_list_public,username').eq('id',currentUser.id).single();
   isGearPublic=userData?.gear_list_public||false;
   const username=userData?.username||'';
+  // user_gearとpedalsをJOIN（機材名でペダルDBを検索するためfull_nameで照合）
   const{data:gear}=await sb.from('user_gear').select('*').eq('user_id',currentUser.id).order('sort_order').order('created_at');
+  // ペダルDBとの照合（公開ページ用にslugを取得）
+  let pedalSlugMap={};
+  if(gear&&gear.length){
+    const names=gear.map(g=>g.name).filter(Boolean);
+    const{data:pedals}=await sb.from('pedals').select('full_name,slug').in('full_name',names);
+    if(pedals)pedals.forEach(p=>{pedalSlugMap[p.full_name]=p.slug;});
+  }
   gearList=gear||[];
-  renderGearList(gearList,isGearPublic,username);
+  renderGearList(gearList,isGearPublic,username,pedalSlugMap);
 }
 
-function renderGearList(gear,isPublic,username){
+function renderGearList(gear,isPublic,username,pedalSlugMap={}){
   const el=document.getElementById('my-panel-gear');
   let totalJpy=0,totalUsd=0,hasJpy=false,hasUsd=false;
   gear.forEach(g=>{if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}});
+  window._pedalSlugMap=pedalSlugMap; // 並べ替え時も参照できるよう保存
   const shareUrl=`${location.origin}/user?username=${encodeURIComponent(username)}`;
   let totalHtml='';
   if(gear.length>0){
@@ -676,6 +685,8 @@ function renderGearList(gear,isPublic,username){
     itemsHtml=gear.map(g=>{
       const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
       const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
+      const slug=pedalSlugMap[g.name]||null;
+      const pedalBtn=slug?`<a href="/pedal?slug=${slug}" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ac);font-family:'JetBrains Mono',monospace;text-decoration:none;margin-top:4px;transition:opacity .15s" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎛 ${lang==='en'?'Pedal detail →':'ペダル詳細ページへ →'}</a>`:'';
       return`<div class="gear-item" id="gear-item-${g.id}">
         <div class="gear-item-info">
           <div class="gear-item-name">${escHtml(g.name)}</div>
@@ -685,6 +696,7 @@ function renderGearList(gear,isPublic,username){
             ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
           </div>
           ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
+          ${pedalBtn}
         </div>
         <div class="gear-item-actions">
           <button class="gear-edit-btn" onclick="openGearModal('${g.id}')">✏️</button>
@@ -732,6 +744,8 @@ function applyGearSort(){
   wrap.innerHTML=sorted.map(g=>{
     const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
     const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
+    const slug=window._pedalSlugMap&&window._pedalSlugMap[g.name]||null;
+    const pedalBtn=slug?`<a href="/pedal?slug=${slug}" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ac);font-family:'JetBrains Mono',monospace;text-decoration:none;margin-top:4px;transition:opacity .15s" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎛 ${lang==='en'?'Pedal detail →':'ペダル詳細ページへ →'}</a>`:'';
     return`<div class="gear-item" id="gear-item-${g.id}">
       <div class="gear-item-info">
         <div class="gear-item-name">${escHtml(g.name)}</div>
@@ -741,6 +755,7 @@ function applyGearSort(){
           ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
         </div>
         ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
+        ${pedalBtn}
       </div>
       <div class="gear-item-actions">
         <button class="gear-edit-btn" onclick="openGearModal('${g.id}')">✏️</button>
@@ -858,17 +873,19 @@ async function searchGearAC(val){
     if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
   }
 
-  // ① 記号除去検索（bd2→BD-2）
+  // ① 記号除去検索（bd2→BD-2, ds1→DS-1等）
   if(results.length<4&&qNorm.length>=2){
+    // 最初の2文字でフィルタして候補を絞る（1文字だと多すぎて漏れる）
+    const prefix2=qNorm.slice(0,2);
     const{data:allData}=await sb.from('pedals')
       .select('brand,model,full_name,search_query')
-      .ilike('full_name','%'+q[0]+'%')
-      .limit(60);
+      .limit(500);
     if(allData){
       allData.forEach(x=>{
         if(!results.find(r=>r.full_name===x.full_name)){
           const xNorm=normalizeQuery(x.full_name);
-          if(xNorm.includes(qNorm))results.push(x);
+          if(xNorm.includes(qNorm)||xNorm.startsWith(prefix2))
+            if(xNorm.includes(qNorm))results.push(x);
         }
       });
     }
