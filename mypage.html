@@ -694,9 +694,9 @@ function renderGearList(gear,isPublic,username,pedalSlugMap={}){
           <div class="gear-item-meta">
             ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
             ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
+            ${pedalBtn}
           </div>
           ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
-          ${pedalBtn}
         </div>
         <div class="gear-item-actions">
           <button class="gear-edit-btn" onclick="openGearModal('${g.id}')">✏️</button>
@@ -753,9 +753,9 @@ function applyGearSort(){
         <div class="gear-item-meta">
           ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
           ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
+          ${pedalBtn}
         </div>
         ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
-        ${pedalBtn}
       </div>
       <div class="gear-item-actions">
         <button class="gear-edit-btn" onclick="openGearModal('${g.id}')">✏️</button>
@@ -838,17 +838,26 @@ let gearAcResults=[];let gearAcFocusIdx=-1;
 let gearACComposing=false;
 let gearACTimer=null;
 
-// ② IME対応ラッパー（変換中は検索しない）
+// ② IME対応ラッパー
 function onGearACInput(val){
   clearTimeout(gearACTimer);
   if(gearACComposing)return;
-  gearACTimer=setTimeout(()=>searchGearAC(val),150);
+  gearACTimer=setTimeout(()=>searchGearAC(val),200);
 }
 
-// ① bd2→BD-2 対応：記号を除去した正規化クエリを生成
-function normalizeQuery(q){
-  // 記号・スペースを除去して小文字に
-  return q.toLowerCase().replace(/[-_\s\.]/g,'');
+// 記号除去正規化
+function normalizeQuery(q){return(q||'').toLowerCase().replace(/[-_\s\.]/g,'');}
+
+// ds1→['ds1','ds-1','ds 1'] のようにクエリを展開
+function expandQuery(q){
+  const patterns=[q];
+  const h1=q.replace(/([a-zA-Z])([0-9])/g,'$1-$2');
+  const s1=q.replace(/([a-zA-Z])([0-9])/g,'$1 $2');
+  const h2=q.replace(/([0-9])([a-zA-Z])/g,'$1-$2');
+  if(h1!==q)patterns.push(h1);
+  if(s1!==q)patterns.push(s1);
+  if(h2!==q&&h2!==h1)patterns.push(h2);
+  return [...new Set(patterns)];
 }
 
 async function searchGearAC(val){
@@ -856,46 +865,43 @@ async function searchGearAC(val){
   closeGearAC();
   if(!q||q.length<1)return;
   const qNorm=normalizeQuery(q);
+  const patterns=expandQuery(q); // 例: ['ds1','ds-1','ds 1']
 
-  // prefix検索
+  // ① 展開パターンで並列DB検索（ds-1でも ds1でもヒット）
+  const orParts=patterns.flatMap(p=>[
+    `brand.ilike.${p}%`,
+    `model.ilike.${p}%`,
+    `full_name.ilike.${p}%`
+  ]).join(',');
   const{data:prefixData}=await sb.from('pedals')
     .select('brand,model,full_name,search_query')
-    .or(`brand.ilike.${q}%,model.ilike.${q}%,full_name.ilike.${q}%`)
-    .limit(8);
+    .or(orParts).limit(10);
   let results=prefixData||[];
 
-  // fuzzy検索
-  if(results.length<4){
+  // ② fuzzy検索（全パターンで含む検索）
+  if(results.length<5){
+    const fuzzyOr=patterns.map(p=>`full_name.ilike.%${p}%`).join(',');
     const{data:fuzzy}=await sb.from('pedals')
       .select('brand,model,full_name,search_query')
-      .ilike('full_name','%'+q+'%')
-      .limit(8);
+      .or(fuzzyOr).limit(10);
     if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
   }
 
-  // ① 記号除去検索（bd2→BD-2, ds1→DS-1等）
-  if(results.length<4&&qNorm.length>=2){
-    // 最初の2文字でフィルタして候補を絞る（1文字だと多すぎて漏れる）
-    const prefix2=qNorm.slice(0,2);
+  // ③ 記号除去JS照合（上記で漏れたケースの最終手段）
+  if(results.length<5&&qNorm.length>=2){
     const{data:allData}=await sb.from('pedals')
       .select('brand,model,full_name,search_query')
-      .limit(500);
-    if(allData){
-      allData.forEach(x=>{
-        if(!results.find(r=>r.full_name===x.full_name)){
-          const xNorm=normalizeQuery(x.full_name);
-          if(xNorm.includes(qNorm)||xNorm.startsWith(prefix2))
-            if(xNorm.includes(qNorm))results.push(x);
-        }
-      });
-    }
+      .ilike('model',qNorm[0]+'%').limit(200);
+    if(allData)allData.forEach(x=>{
+      if(!results.find(r=>r.full_name===x.full_name)&&normalizeQuery(x.full_name).includes(qNorm))
+        results.push(x);
+    });
   }
 
-  // エイリアス検索
+  // ④ エイリアス検索
+  const aliasOr=patterns.map(p=>`alias.ilike.%${p}%`).join(',');
   const{data:aliasData}=await sb.from('pedal_aliases')
-    .select('alias,pedal_full_name')
-    .ilike('alias','%'+q+'%')
-    .limit(4);
+    .select('alias,pedal_full_name').or(aliasOr).limit(4);
   if(aliasData){
     for(const a of aliasData){
       if(!results.find(r=>r.full_name===a.pedal_full_name)){
