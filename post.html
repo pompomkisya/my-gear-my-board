@@ -7,7 +7,8 @@
 <title>My Gear My Board</title>
 <meta property="og:title" content="My Gear My Board">
 <meta property="og:description" content="ペダルボード・機材を投稿・共有するSNS">
-<meta property="og:image" content="">
+<meta property="og:image" content="https://mygearmyboard.com/ogp.png">
+<meta name="twitter:image" content="https://mygearmyboard.com/ogp.png">
 <meta property="og:url" content="">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="My Gear My Board">
@@ -451,7 +452,12 @@ async function loadPost(){
   document.title=data.title+' — My Gear My Board';
   document.querySelector('meta[property="og:title"]').setAttribute('content',data.title+' — My Gear My Board');
   document.querySelector('meta[property="og:url"]').setAttribute('content',location.href);
-  if(data.image_urls&&data.image_urls[0]){document.querySelector('meta[property="og:image"]').setAttribute('content',data.image_urls[0]);}
+  if(data.image_urls&&data.image_urls[0]){
+    document.querySelector('meta[property="og:image"]').setAttribute('content',data.image_urls[0]);
+    const twImg=document.querySelector('meta[name="twitter:image"]');
+    if(twImg)twImg.setAttribute('content',data.image_urls[0]);
+  }
+  // 画像なし投稿はogp.pngのまま維持（変更不要）
   renderPost(data);loadComments();
 }
 
