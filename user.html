@@ -208,15 +208,26 @@ function renderUser(user,posts,gear){
         <option value="name_desc">${tr('gearSortNameDesc')}</option>
       </select>
     </div>`;
-    window._userGearData=gear; // 並べ替え用にキャッシュ
+    window._userGearData=gear;
+    // ペダルDBとの照合（slugを取得）
+    let userPedalSlugMap={};
+    if(gear&&gear.length){
+      const names=gear.map(g=>g.name).filter(Boolean);
+      const{data:pedals}=await sb.from('pedals').select('full_name,slug').in('full_name',names);
+      if(pedals)pedals.forEach(p=>{userPedalSlugMap[p.full_name]=p.slug;});
+    }
+    window._userPedalSlugMap=userPedalSlugMap;
     const items=gear.map(g=>{
       const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
       if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}
+      const uSlug=userPedalSlugMap[g.name]||null;
+      const uPedalBtn=uSlug?`<a href="/pedal?slug=${uSlug}" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ac);font-family:'JetBrains Mono',monospace;text-decoration:none;margin-top:4px" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎛 ${lang==='en'?'Pedal detail →':'ペダル詳細ページへ →'}</a>`:'';
       return`<div class="gear-item">
         <div class="gear-item-info">
           <div class="gear-item-name">${escHtml(g.name)}</div>
           ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
           ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px">${escHtml(g.memo)}</div>`:''}
+          ${uPedalBtn}
         </div>
         ${priceStr?`<div class="gear-item-price">${priceStr}</div>`:''}
       </div>`;
@@ -262,11 +273,14 @@ function applyUserGearSort(){
   else sorted=[...window._userGearData];
   wrap.innerHTML=sorted.map(g=>{
     const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
+    const sSlug=window._userPedalSlugMap&&window._userPedalSlugMap[g.name]||null;
+    const sPedalBtn=sSlug?`<a href="/pedal?slug=${sSlug}" style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--ac);font-family:'JetBrains Mono',monospace;text-decoration:none;margin-top:4px" onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">🎛 ${lang==='en'?'Pedal detail →':'ペダル詳細ページへ →'}</a>`:'';
     return`<div class="gear-item">
       <div class="gear-item-info">
         <div class="gear-item-name">${escHtml(g.name)}</div>
         ${g.brand?`<div class="gear-item-brand">${escHtml(g.brand)}</div>`:''}
         ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:3px">${escHtml(g.memo)}</div>`:''}
+        ${sPedalBtn}
       </div>
       ${priceStr?`<div class="gear-item-price">${priceStr}</div>`:''}
     </div>`;
