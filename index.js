@@ -574,15 +574,31 @@ function searchMatches(post,query){
 let selectedGears=[],acResults=[],acFocusIdx=-1;
 let _acComposing=false,_acTimer=null;
 function normACQuery(q){return(q||'').toLowerCase().replace(/[-_\s\.]/g,'');}
+function expandACQuery(q){
+  const p=[q];
+  const h1=q.replace(/([a-zA-Z])([0-9])/g,'$1-$2');
+  const s1=q.replace(/([a-zA-Z])([0-9])/g,'$1 $2');
+  const h2=q.replace(/([0-9])([a-zA-Z])/g,'$1-$2');
+  if(h1!==q)p.push(h1);if(s1!==q)p.push(s1);if(h2!==q&&h2!==h1)p.push(h2);
+  return[...new Set(p)];
+}
 async function searchGear(val){
   const q=val.trim();closeAC();if(!q)return;
   const qNorm=normACQuery(q);
-  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name,search_query').or('brand.ilike.'+q+'%,model.ilike.'+q+'%,full_name.ilike.'+q+'%').limit(10);
+  const patterns=expandACQuery(q);
+  // ① 展開パターンで並列DB検索
+  const orParts=patterns.flatMap(p=>['brand.ilike.'+p+'%','model.ilike.'+p+'%','full_name.ilike.'+p+'%']).join(',');
+  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name,search_query').or(orParts).limit(10);
   let results=prefixData||[];
-  if(results.length<5){const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('full_name','%'+q+'%').limit(10);if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});}
-  // bd2→BD-2, ds1→DS-1等（記号除去検索・全件取得してJS側でフィルタ）
+  // ② fuzzy検索
+  if(results.length<5){
+    const fuzzyOr=patterns.map(p=>'full_name.ilike.%'+p+'%').join(',');
+    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').or(fuzzyOr).limit(10);
+    if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
+  }
+  // ③ 記号除去JS照合
   if(results.length<5&&qNorm.length>=2){
-    const{data:allData}=await sb.from('pedals').select('brand,model,full_name,search_query').limit(500);
+    const{data:allData}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('model',qNorm[0]+'%').limit(200);
     if(allData)allData.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name)&&normACQuery(x.full_name).includes(qNorm))results.push(x);});
   }
   results=results.slice(0,10);acResults=results;acFocusIdx=-1;
