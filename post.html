@@ -25,7 +25,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .logo-text{display:flex;flex-direction:column;line-height:1}
 .logo-main{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
 .logo-sub{font-family:Noto Sans JP,sans-serif;font-size:9px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-top:2px}
-.back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;transition:all .15s;touch-action:manipulation}
+.back-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--tm);cursor:pointer;transition:all .15s;touch-action:manipulation;white-space:nowrap}
 .back-btn:hover{border-color:var(--ac);color:var(--ac)}
 .page{max-width:900px;margin:0 auto;padding:32px 20px;position:relative;z-index:1;background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%);min-height:calc(100vh - 58px);overflow-x:hidden}
 .slider{position:relative;background:var(--sf2);border-radius:8px;overflow:hidden;margin-bottom:24px;border:1px solid var(--bd)}
@@ -215,7 +215,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <div class="back-btn" id="back-btn" onclick="goBack()">← ボード一覧へ</div>
+    <div class="back-btn" id="back-btn" onclick="goBack()">← ボード一覧</div>
     <div id="lang-btn" onclick="toggleLang()" title="Switch Language / 言語切替"
       style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;cursor:pointer;transition:all .15s;touch-action:manipulation;font-size:12px;font-weight:600;color:var(--tm)"
       onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'"
@@ -373,7 +373,7 @@ function toggleLang(){
   const label=document.getElementById('post-lang-label');
   if(label)label.textContent=lang==='ja'?'EN':'JA';
   const backBtn=document.getElementById('back-btn');
-  if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧へ';
+  if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧';
   const logosub=document.querySelector('.logo-sub');
   if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
   if(currentPost)renderPost(currentPost);
@@ -835,7 +835,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     c.addEventListener('touchstart',canvasPointerDown,{passive:false});c.addEventListener('touchmove',canvasPointerMove,{passive:false});c.addEventListener('touchend',canvasPointerUp,{passive:false});
   },500);
   const label=document.getElementById('post-lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
-  const backBtn=document.getElementById('back-btn');if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧へ';
+  const backBtn=document.getElementById('back-btn');if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧';
   const logosub=document.querySelector('.logo-sub');if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
   loadPost();
 });
