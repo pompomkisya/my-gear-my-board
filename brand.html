@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ブランド | My Gear My Board</title>
   <meta name="description" content="">
-  <link rel="icon" href="/IMG_0206.PNG">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/favicon.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
@@ -156,7 +157,7 @@
   </a>
   <div class="header-right">
     <div class="lang-btn" id="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
-    <a href="/" class="home-btn">🏠 <span id="home-text">ホーム</span></a>
+    <a href="/" class="home-btn" style="gap:4px">🏠 <span id="home-text">ホーム</span></a><a href="/#gacha" class="home-btn" style="gap:4px">🎲 <span id="gacha-text">ガチャ</span></a>
   </div>
 </header>
 <div class="breadcrumb">
@@ -191,7 +192,7 @@ let lang = detectLang();
 
 const I18N = {
   ja: {
-    headerSub:'ペダルボードSNS', home:'ホーム', langLabel:'EN',
+    headerSub:'ペダルボードSNS', home:'ホーム', gacha:'🎲ガチャ', langLabel:'EN',
     bcHome:'ホーム', bcPedals:'ペダル一覧',
     pedalCount:'ペダル', pedalCountUnit:'件',
     sectionPedals:'🎛 ペダル一覧', sectionBoards:'📸 を使ったボード',
@@ -206,7 +207,7 @@ const I18N = {
     updatedAt:'最終更新：',
   },
   en: {
-    headerSub:'Pedalboard SNS', home:'Home', langLabel:'JA',
+    headerSub:'Pedalboard SNS', home:'Home', gacha:'🎲 Gacha', langLabel:'JA',
     bcHome:'Home', bcPedals:'Pedal List',
     pedalCount:'', pedalCountUnit:' pedals',
     sectionPedals:'🎛 Pedals', sectionBoards:'📸 Boards using ',
@@ -226,6 +227,7 @@ function tr(key) { return (I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key; }
 function applyLang() {
   document.getElementById('header-sub').textContent = tr('headerSub');
   document.getElementById('home-text').textContent = tr('home');
+  const gt=document.getElementById('gacha-text');if(gt)gt.textContent=tr('gacha');
   document.getElementById('lang-label').textContent = tr('langLabel');
   document.getElementById('bc-home').textContent = tr('bcHome');
   document.getElementById('bc-pedals').textContent = tr('bcPedals');
