@@ -19,14 +19,22 @@
     body { background: var(--bg); color: var(--tx); font-family: 'Noto Sans JP', sans-serif; font-weight: 300; min-height: 100vh; }
     header {
       background: rgba(13,13,14,.96); backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--bd); padding: 0 20px; height: 58px;
-      display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid var(--bd); padding: 0;
+      display: flex; flex-direction: column; position: sticky; top: 0; z-index: 100;
     }
-    .header-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex: 1; min-width: 0; overflow: hidden; }
-    .header-logo img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-    .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--tx); white-space: nowrap; }
-    .header-sub { font-size: 8px; letter-spacing: 1.5px; color: var(--ac); text-transform: uppercase; margin-top: 1px; white-space: nowrap; }
-    .header-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .header-row1 {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 16px 4px; border-bottom: 1px solid rgba(39,39,41,.6);
+    }
+    .header-row2 {
+      display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+      padding: 4px 16px 6px;
+    }
+    .header-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex: 1; min-width: 0; }
+    .header-logo img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 3px; color: var(--tx); white-space: nowrap; }
+    .header-sub { font-size: 9px; letter-spacing: 2px; color: var(--ac); text-transform: uppercase; margin-top: 1px; white-space: nowrap; }
+    .header-right { display: flex; align-items: center; gap: 6px; }
     .lang-btn {
       display: flex; align-items: center; gap: 4px; padding: 6px 10px;
       background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
@@ -35,7 +43,7 @@
     }
     .lang-btn:hover { border-color: var(--ac); color: var(--ac); }
     .home-btn {
-      display: flex; align-items: center; gap: 4px; padding: 6px 10px;
+      display: flex; align-items: center; gap: 4px; padding: 5px 10px;
       background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
       font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 600;
       color: var(--tm); cursor: pointer; transition: all .15s; text-decoration: none; white-space: nowrap;
@@ -148,16 +156,19 @@
 </head>
 <body>
 <header>
-  <a href="/" class="header-logo">
-    <img src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
-    <div>
-      <div class="header-title">MY GEAR MY BOARD</div>
-      <div class="header-sub" id="header-sub">ペダルボードSNS</div>
-    </div>
-  </a>
-  <div class="header-right">
+  <div class="header-row1">
+    <a href="/" class="header-logo">
+      <img src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
+      <div>
+        <div class="header-title">MY GEAR MY BOARD</div>
+        <div class="header-sub" id="header-sub">ペダルボードSNS</div>
+      </div>
+    </a>
+  </div>
+  <div class="header-row2">
     <div class="lang-btn" id="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
-    <a href="/" class="home-btn" style="gap:4px">🏠 <span id="home-text">ホーム</span></a><a href="/#gacha" class="home-btn" style="gap:4px">🎲 <span id="gacha-text">ペダルガチャ</span></a>
+    <a href="/" class="home-btn">🏠 <span id="home-text">ホーム</span></a>
+    <a href="/#gacha" class="home-btn">🎲 <span id="gacha-text">ペダルガチャ</span></a>
   </div>
 </header>
 <div class="breadcrumb">
@@ -192,7 +203,7 @@ let lang = detectLang();
 
 const I18N = {
   ja: {
-    headerSub:'ペダルボードSNS', home:'ホーム', gacha:'🎲 ペダルガチャ', langLabel:'EN',
+    headerSub:'ペダルボードSNS', home:'ホーム', gacha:'ペダルガチャ', langLabel:'EN',
     bcHome:'ホーム', bcPedals:'ペダル一覧',
     pedalCount:'ペダル', pedalCountUnit:'件',
     sectionPedals:'🎛 ペダル一覧', sectionBoards:'📸 を使ったボード',
@@ -207,7 +218,7 @@ const I18N = {
     updatedAt:'最終更新：',
   },
   en: {
-    headerSub:'Pedalboard SNS', home:'Home', gacha:'🎲 Pedal Gacha', langLabel:'JA',
+    headerSub:'Pedalboard SNS', home:'Home', gacha:'Pedal Gacha', langLabel:'JA',
     bcHome:'Home', bcPedals:'Pedal List',
     pedalCount:'', pedalCountUnit:' pedals',
     sectionPedals:'🎛 Pedals', sectionBoards:'📸 Boards using ',
