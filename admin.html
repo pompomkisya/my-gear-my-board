@@ -185,6 +185,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="stat-card"><div class="stat-num" id="stat-comments">-</div><div class="stat-lbl">総コメント数</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-likes">-</div><div class="stat-lbl">総いいね数</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-pedals">-</div><div class="stat-lbl">ペダルDB件数</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-total-views">-</div><div class="stat-lbl">総閲覧数</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-reports">-</div><div class="stat-lbl">通報数</div></div>
       <div class="stat-card"><div class="stat-num" id="stat-unknown">-</div><div class="stat-lbl">未登録機材数</div></div>
     </div>
@@ -646,7 +647,7 @@ async function loadPedals(){
   document.getElementById('pedals-count').textContent=total;
   let data=[];let offset=0;
   while(true){
-    const{data:batch}=await sb.from('pedals').select('*').order('brand').order('model').range(offset,offset+999);
+    const{data:batch}=await sb.from('pedals').select('*').order('view_count',{ascending:false,nullsFirst:false}).order('brand').order('model').range(offset,offset+999);
     if(!batch||batch.length===0)break;
     data=[...data,...batch];if(batch.length<1000)break;offset+=1000;
   }
@@ -734,6 +735,9 @@ async function loadStats(){
   document.getElementById('stat-posts').textContent=allPosts.length;
   document.getElementById('stat-comments').textContent=allComments.length;
   document.getElementById('stat-likes').textContent=allPosts.reduce((s,p)=>s+(p.likes||0),0);
+  const totalViews=allPedals.reduce((s,p)=>s+(p.view_count||0),0);
+  const el=document.getElementById('stat-total-views');
+  if(el)el.textContent=totalViews.toLocaleString();
 }
 
 function renderRecentPosts(){
@@ -993,7 +997,7 @@ function applyPedalFilter(){
 
   if(!filtered.length){el.innerHTML=progressHtml+'<div class="empty-msg">ペダルが見つかりません</div>';return;}
   el.innerHTML=progressHtml+'<div class="table-wrap"><table>'
-    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>🎰 Rarity</th><th>操作</th></tr></thead>'
+    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>👁 閲覧数</th><th>🎰 Rarity</th><th>操作</th></tr></thead>'
     +'<tbody>'
     +filtered.map(p=>'<tr>'
       +'<td style="font-size:12px;font-weight:600;color:var(--ac)">'+escHtml(p.brand)+'</td>'
@@ -1002,7 +1006,7 @@ function applyPedalFilter(){
       +'<td>'+(p.image_url?'<img src="'+p.image_url+'" style="width:40px;height:40px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">':'<span style="font-size:10px;color:#e05050">なし</span>')+'</td>'
       +'<td style="font-size:10px">'+(p.description?'<span style="color:#4ade80">✅</span>':'<span style="color:#e05050">なし</span>')+'</td>'
       +'<td style="font-size:10px;color:var(--td)">'+(p.youtube_video_id?'<span style="color:#4ade80">✅</span>':'<span style="color:var(--td)">—</span>')+'</td>'
-      +'<td>'+rarityBadge(p.rarity)+'</td>'
+      +'<td style="text-align:center;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">'+(p.view_count||0)+'</td>'+'<td>'+rarityBadge(p.rarity)+'</td>'
       +'<td><button class="approve-btn" onclick="openPedalEdit(\''+p.id+'\')">✏️ 編集</button></td>'
       +'</tr>').join('')
     +'</tbody></table></div>';
