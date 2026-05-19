@@ -5,7 +5,9 @@
   <meta name="robots" content="index, follow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ブランド | My Gear My Board</title>
-  <meta name="description" content="">
+  <meta name="description" content="" id="meta-description">
+  <meta property="og:description" content="" id="og-description">
+  <link rel="canonical" href="" id="canonical">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/favicon.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -283,6 +285,16 @@ async function loadBrand() {
   currentBrand = decodeURIComponent(brandName);
   document.getElementById('bc-brand').textContent = currentBrand;
   document.title = `${currentBrand} | My Gear My Board`;
+  const brandUrl = `https://mygearmyboard.com/brand?name=${encodeURIComponent(currentBrand)}`;
+  const brandDescEl = document.getElementById('meta-description');
+  const brandOgEl = document.getElementById('og-description');
+  const brandCanEl = document.getElementById('canonical');
+  const brandDescText = lang==='en'
+    ? `${currentBrand} effect pedals — ${totalPedals} pedals. Browse lineup and boards.`
+    : `${currentBrand}のエフェクターペダル一覧。${totalPedals}件のペダルと使用ボードをチェック。`;
+  if(brandDescEl) brandDescEl.setAttribute('content', brandDescText);
+  if(brandOgEl) brandOgEl.setAttribute('content', brandDescText);
+  if(brandCanEl) brandCanEl.setAttribute('href', brandUrl);
 
   // ★ brandsテーブルからブランド説明を取得（並列）
   const [countRes, pedalsRes, postsRes, brandRes] = await Promise.all([
