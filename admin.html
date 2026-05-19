@@ -1110,6 +1110,8 @@ function convertPastedText(text){
     var trimmed=line.trim();
     if(!trimmed){
       if(inList){html+='</ul>';inList=false;}
+      // 空行は段落間のスペースとして保持
+      if(html.length>0)html+='<br>';
       continue;
     }
     // 【見出し】パターン
