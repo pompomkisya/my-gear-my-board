@@ -354,6 +354,32 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 .g-tooltip-box{width:200px;left:auto;right:0;transform:none}
 .gacha-feed-wrap{grid-template-columns:1fr 1fr}
 }
+/* ★ お知らせバナー */
+.notice-bar{background:linear-gradient(135deg,rgba(232,85,45,.12),rgba(240,165,0,.08));border-bottom:1px solid rgba(232,85,45,.2);padding:0;overflow:hidden;max-height:0;transition:max-height .3s ease}
+.notice-bar.show{max-height:120px}
+.notice-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 20px;flex-wrap:wrap}
+.notice-msg{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);line-height:1.5;flex:1;min-width:0}
+.notice-link-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(232,85,45,.15);border:1px solid rgba(232,85,45,.35);border-radius:3px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;color:var(--ac);text-decoration:none;white-space:nowrap;transition:background .15s;flex-shrink:0}
+.notice-link-btn:hover{background:rgba(232,85,45,.28)}
+.notice-close{width:20px;height:20px;background:transparent;border:none;color:var(--td);cursor:pointer;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:color .15s}
+.notice-close:hover{color:var(--tx)}
+/* ★ 今週のおすすめペダル */
+.featured-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.featured-card{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);display:block;transition:border-color .2s}
+.featured-card:hover{border-color:var(--ac)}
+.featured-card-img{width:100%;aspect-ratio:1;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--bd)}
+.featured-card-img img{width:100%;height:100%;object-fit:contain}
+.featured-card-body{padding:6px 8px}
+.featured-card-brand{font-size:9px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.featured-card-model{font-size:11px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.featured-card-label{font-size:9px;color:var(--tm);margin-top:3px;font-family:'JetBrains Mono',monospace}
+/* ★ 特集ページ */
+.feature-list{display:flex;flex-direction:column;gap:0}
+.feature-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);text-decoration:none;color:var(--tx);transition:color .15s;cursor:pointer}
+.feature-item:last-child{border-bottom:none}
+.feature-item:hover .feature-item-title{color:var(--ac)}
+.feature-item-title{font-size:12px;font-weight:600;flex:1;line-height:1.4}
+.feature-item-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);flex-shrink:0}
 @keyframes encyclopediaGlow{0%,100%{box-shadow:0 0 8px rgba(232,85,45,.3),inset 0 0 8px rgba(232,85,45,.05)}50%{box-shadow:0 0 18px rgba(232,85,45,.6),inset 0 0 12px rgba(232,85,45,.1)}}
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PRZL59FSGZ"></script>
@@ -394,6 +420,11 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 <div class="ticker">
   <div class="ticker-lbl">NEW</div>
   <div class="ticker-wrap"><div class="ticker-inner" id="ticker-inner"><span class="ti">読み込み中...</span></div></div>
+</div>
+
+<!-- ★ お知らせバナー -->
+<div class="notice-bar" id="notice-bar">
+  <div id="notice-items"></div>
 </div>
 
 <div id="swipe-ui" style="display:none">
@@ -547,10 +578,18 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </div>
     </div>
     <div class="swipe-panel mob-right-panel">
+      <div id="mob-featured-section" style="display:none">
+        <div class="mob-panel-title" id="mob-featured-title">⭐ 今週のおすすめ</div>
+        <div class="widget"><div class="featured-grid" id="featured-widget-mob"></div></div>
+      </div>
       <div class="mob-panel-title">今月の人気ボード</div>
       <div class="widget"><div id="ranking-widget-mob"></div></div>
       <div class="mob-panel-title">よく使われている機材</div>
       <div class="widget"><div id="gear-widget-mob"></div></div>
+      <div id="mob-features-section" style="display:none">
+        <div class="mob-panel-title" id="mob-features-title">🗂 特集</div>
+        <div class="widget"><div class="feature-list" id="features-widget-mob"></div></div>
+      </div>
       <div class="mob-panel-title">機材NEWS</div>
       <div class="widget"><div id="news-widget-mob"><div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);text-align:center;padding:12px">読み込み中...</div></div></div>
       <div class="widget ad-slot" style="height:120px"><div style="font-size:10px;opacity:.5;text-transform:uppercase;letter-spacing:1px;font-family:Noto Sans JP,sans-serif">Google AdSense</div></div>
@@ -691,8 +730,10 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   </div>
 </main>
 <aside class="sr">
+  <div class="widget" id="pc-featured-section" style="display:none"><div class="wt" id="pc-featured-title">⭐ 今週のおすすめ</div><div class="featured-grid" id="featured-widget-pc"></div></div>
   <div class="widget"><div class="wt">🔥 今月の人気ボード</div><div id="ranking-widget"></div></div>
   <div class="widget"><div class="wt">🎛 よく使われている機材</div><div id="gear-widget"></div></div>
+  <div class="widget" id="pc-features-section" style="display:none"><div class="wt" id="pc-features-title">🗂 特集</div><div class="feature-list" id="features-widget-pc"></div></div>
   <div class="widget"><div class="wt">📰 機材NEWS</div>
     <div id="news-widget"><div style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);text-align:center;padding:12px">読み込み中...</div></div>
   </div>
@@ -982,6 +1023,140 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ★ お知らせ・おすすめ・特集 ローダー
+(function(){
+const SUPA_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
+const TYPE_ICON='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_';
+
+function getLang(){try{return localStorage.getItem('mgmb_lang')||((navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en');}catch(e){return 'ja';}}
+
+// ── お知らせ ──
+async function loadNotices(){
+  try{
+    const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+    const{data}=await sb.from('site_notices').select('*').eq('is_active',true).order('sort_order').limit(3);
+    if(!data||!data.length)return;
+    const lang=getLang();
+    const bar=document.getElementById('notice-bar');
+    const items=document.getElementById('notice-items');
+    if(!bar||!items)return;
+    // 複数の場合は最初の1件だけ表示（シンプルに）
+    const n=data[0];
+    const msg=lang==='en'?(n.message_en||n.message):n.message;
+    const label=lang==='en'?(n.link_label_en||n.link_label||'詳細'):( n.link_label||'詳細');
+    const linkHtml=n.link_url
+      ?`<a href="${n.link_url}" class="notice-link-btn" target="_blank">${label} →</a>`:'';
+    const dismissKey='notice_dismissed_'+n.id;
+    if(sessionStorage.getItem(dismissKey))return;
+    items.innerHTML=`<div class="notice-inner">
+      <div class="notice-msg">${msg}</div>
+      ${linkHtml}
+      <button class="notice-close" onclick="dismissNotice('${n.id}')" title="閉じる">✕</button>
+    </div>`;
+    setTimeout(()=>bar.classList.add('show'),100);
+  }catch(e){console.warn('notice load error',e);}
+}
+window.dismissNotice=function(id){
+  sessionStorage.setItem('notice_dismissed_'+id,'1');
+  const bar=document.getElementById('notice-bar');
+  if(bar)bar.classList.remove('show');
+};
+
+// ── 今週のおすすめペダル ──
+async function loadFeatured(){
+  try{
+    const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+    const{data}=await sb.from('featured_pedals')
+      .select('*,pedals(id,brand,model,slug,image_url,types)')
+      .eq('is_active',true).order('sort_order').limit(6);
+    if(!data||!data.length)return;
+    const lang=getLang();
+    const labelKey=lang==='en'?'label_en':'label';
+    const html=data.map(f=>{
+      const p=f.pedals;if(!p)return'';
+      const imgSrc=p.image_url||(p.types&&p.types[0]?TYPE_ICON+p.types[0]+'.png':'');
+      const imgHtml=imgSrc
+        ?`<img src="${imgSrc}" alt="${p.model}" loading="lazy" onerror="this.style.display='none'">`
+        :`<span style="font-size:28px;opacity:.2">🎛</span>`;
+      const lbl=f[labelKey]||f.label||'';
+      return `<a href="/pedal?slug=${p.slug}" class="featured-card">
+        <div class="featured-card-img">${imgHtml}</div>
+        <div class="featured-card-body">
+          <div class="featured-card-brand">${p.brand}</div>
+          <div class="featured-card-model">${p.model}</div>
+          ${lbl?`<div class="featured-card-label">${lbl}</div>`:''}
+        </div>
+      </a>`;
+    }).join('');
+    const title=lang==='en'?'⭐ Featured Pedals':'⭐ 今週のおすすめ';
+    // PC
+    const pcEl=document.getElementById('featured-widget-pc');
+    const pcSec=document.getElementById('pc-featured-section');
+    const pcTitle=document.getElementById('pc-featured-title');
+    if(pcEl){pcEl.innerHTML=html;}
+    if(pcSec)pcSec.style.display='block';
+    if(pcTitle)pcTitle.textContent=title;
+    // スマホ
+    const mobEl=document.getElementById('featured-widget-mob');
+    const mobSec=document.getElementById('mob-featured-section');
+    const mobTitle=document.getElementById('mob-featured-title');
+    if(mobEl){mobEl.innerHTML=html;}
+    if(mobSec)mobSec.style.display='block';
+    if(mobTitle)mobTitle.textContent=title;
+  }catch(e){console.warn('featured load error',e);}
+}
+
+// ── 特集ページ ──
+async function loadFeatures(){
+  try{
+    const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+    const{data}=await sb.from('special_features')
+      .select('id,title,title_en,slug,pedal_ids')
+      .eq('is_active',true).order('sort_order').limit(8);
+    if(!data||!data.length)return;
+    const lang=getLang();
+    const html=data.map(f=>{
+      const title=lang==='en'?(f.title_en||f.title):f.title;
+      const count=(f.pedal_ids||[]).length;
+      return`<a href="/feature?slug=${f.slug}" class="feature-item">
+        <div class="feature-item-title">${title}</div>
+        <div class="feature-item-count">${count}件</div>
+        <span style="color:var(--td);font-size:12px">›</span>
+      </a>`;
+    }).join('');
+    const title=lang==='en'?'🗂 Features':'🗂 特集';
+    // PC
+    const pcEl=document.getElementById('features-widget-pc');
+    const pcSec=document.getElementById('pc-features-section');
+    const pcTitle=document.getElementById('pc-features-title');
+    if(pcEl)pcEl.innerHTML=html;
+    if(pcSec)pcSec.style.display='block';
+    if(pcTitle)pcTitle.textContent=title;
+    // スマホ
+    const mobEl=document.getElementById('features-widget-mob');
+    const mobSec=document.getElementById('mob-features-section');
+    const mobTitle=document.getElementById('mob-features-title');
+    if(mobEl)mobEl.innerHTML=html;
+    if(mobSec)mobSec.style.display='block';
+    if(mobTitle)mobTitle.textContent=title;
+  }catch(e){console.warn('features load error',e);}
+}
+
+window.addEventListener('DOMContentLoaded',function(){
+  loadNotices();
+  loadFeatured();
+  loadFeatures();
+  // 言語切替時に再レンダリング
+  const orig=window.toggleLang;
+  window.toggleLang=function(){
+    if(orig)orig.apply(this,arguments);
+    setTimeout(function(){loadNotices();loadFeatured();loadFeatures();},100);
+  };
+});
+})();
+</script>
 <script src="index.js"></script>
 
 <!-- ★修正3: パスワード入力制御（ダブル入力防止） JP/EN両対応 -->
