@@ -175,6 +175,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-pedals')">🎛 ペダルDB</div>
     <div class="tab" onclick="switchTab(this,'tab-brands')">🏢 ブランド説明</div>
     <div class="tab" onclick="switchTab(this,'tab-privacy')">📄 プライバシーポリシー</div>
+    <div class="tab" onclick="switchTab(this,'tab-notices')">📢 お知らせ</div>
+    <div class="tab" onclick="switchTab(this,'tab-featured')">⭐ 今週のおすすめ</div>
+    <div class="tab" onclick="switchTab(this,'tab-features')">🗂 特集ページ</div>
     <div class="tab" onclick="switchTab(this,'tab-regions')">🌍 言語圏別</div>
   </div>
 
@@ -383,6 +386,73 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <div class="rich-editor" id="pp-editor-en" contenteditable="true" style="min-height:400px" data-placeholder="Enter English privacy policy..."></div>
       </div>
     </div>
+  </div>
+
+  <!-- ★ お知らせ管理 -->
+  <div class="panel" id="tab-notices">
+    <div class="section-title">📢 お知らせ管理</div>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">トップページに表示するお知らせを管理します。ON/OFFで表示切り替え可能です。</p>
+    <div class="add-news-form">
+      <div class="add-news-title">＋ お知らせを追加</div>
+      <div class="form-row">
+        <input class="form-input" id="notice-msg-ja" type="text" placeholder="お知らせ本文（日本語）">
+      </div>
+      <div class="form-row">
+        <input class="form-input" id="notice-msg-en" type="text" placeholder="Message (English)">
+      </div>
+      <div class="form-row">
+        <input class="form-input" id="notice-url" type="url" placeholder="リンクURL（任意）">
+        <input class="form-input" id="notice-label-ja" type="text" placeholder="ボタンテキスト（日本語）" style="max-width:160px">
+        <input class="form-input" id="notice-label-en" type="text" placeholder="Button text (EN)" style="max-width:160px">
+      </div>
+      <button class="add-btn" onclick="addNotice()">＋ 追加する</button>
+    </div>
+    <div id="notices-list" class="loading">読み込み中...</div>
+  </div>
+
+  <!-- ★ 今週のおすすめペダル管理 -->
+  <div class="panel" id="tab-featured">
+    <div class="section-title">⭐ 今週のおすすめペダル管理</div>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">トップページに表示するおすすめペダルを手動でピックアップします。最大6件まで。</p>
+    <div class="add-news-form">
+      <div class="add-news-title">＋ ペダルを追加</div>
+      <div class="form-row">
+        <div style="flex:1;position:relative">
+          <input class="form-input" id="featured-pedal-input" type="text" placeholder="ペダル名で検索..."
+            oninput="searchFeaturedPedal(this.value)" onblur="setTimeout(closeFeaturedAC,180)" autocomplete="off">
+          <div id="featured-pedal-ac" style="position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:200;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)"></div>
+        </div>
+        <input class="form-input" id="featured-label-ja" type="text" placeholder="ラベル（例: 今月注目）" style="max-width:160px">
+        <input class="form-input" id="featured-label-en" type="text" placeholder="Label (EN)" style="max-width:160px">
+      </div>
+      <input type="hidden" id="featured-pedal-id">
+      <button class="add-btn" onclick="addFeatured()">＋ 追加する</button>
+    </div>
+    <div id="featured-list" class="loading">読み込み中...</div>
+  </div>
+
+  <!-- ★ 特集ページ管理 -->
+  <div class="panel" id="tab-features">
+    <div class="section-title">🗂 特集ページ管理</div>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">「ブルース向けOD特集」などキュレーションページを作成します。</p>
+    <div class="add-news-form">
+      <div class="add-news-title">＋ 特集を作成</div>
+      <div class="form-row">
+        <input class="form-input" id="feature-title-ja" type="text" placeholder="特集タイトル（日本語）">
+        <input class="form-input" id="feature-title-en" type="text" placeholder="Feature title (EN)">
+      </div>
+      <div class="form-row">
+        <input class="form-input" id="feature-slug" type="text" placeholder="URL用スラッグ（例: blues-od）">
+      </div>
+      <div class="form-row">
+        <textarea class="form-input" id="feature-desc-ja" placeholder="説明文（日本語）" style="min-height:60px;resize:vertical"></textarea>
+      </div>
+      <div class="form-row">
+        <textarea class="form-input" id="feature-desc-en" placeholder="Description (EN)" style="min-height:60px;resize:vertical"></textarea>
+      </div>
+      <button class="add-btn" onclick="addFeature()">＋ 作成する</button>
+    </div>
+    <div id="features-list" class="loading">読み込み中...</div>
   </div>
 
   <div class="panel" id="tab-regions">
@@ -624,6 +694,9 @@ function switchTab(el,tabId){
   if(tabId==='tab-aliases')loadAliases();
   if(tabId==='tab-brands')loadBrandsAdmin();
   if(tabId==='tab-privacy')loadPrivacyContent();
+  if(tabId==='tab-notices')loadNotices();
+  if(tabId==='tab-featured')loadFeatured();
+  if(tabId==='tab-features')loadFeatures();
 }
 
 let allPosts=[],allPedals=[],allComments=[];
@@ -1120,6 +1193,224 @@ async function deletePedalFromEdit(){
   const{error}=await sb.from('pedals').delete().eq('id',editingPedalId);
   if(error){showToast('❌ 削除に失敗しました: '+error.message);return;}
   showToast('🗑 ペダルを削除しました');closePedalEdit();await loadPedals();
+}
+
+// ★ お知らせ管理
+async function loadNotices(){
+  const{data}=await sb.from('site_notices').select('*').order('sort_order').order('created_at',{ascending:false});
+  const el=document.getElementById('notices-list');
+  if(!data||!data.length){el.innerHTML='<div class="empty-msg">お知らせがありません</div>';return;}
+  el.innerHTML='<div class="table-wrap"><table>'
+    +'<thead><tr><th>本文(JA)</th><th>本文(EN)</th><th>リンク</th><th>状態</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +data.map(n=>'<tr>'
+      +`<td style="font-size:12px">${escHtml(n.message||'')}</td>`
+      +`<td style="font-size:12px;color:var(--td)">${escHtml(n.message_en||'')}</td>`
+      +`<td style="font-size:11px;color:var(--td)">${n.link_url?`<a href="${escHtml(n.link_url)}" target="_blank" style="color:var(--ac)">リンクあり</a>`:'—'}</td>`
+      +`<td><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" ${n.is_active?'checked':''} onchange="toggleNotice('${n.id}',this.checked)" style="accent-color:var(--ac)"><span style="font-size:11px">${n.is_active?'表示中':'非表示'}</span></label></td>`
+      +`<td><button class="del-btn" onclick="deleteNotice('${n.id}')">🗑 削除</button></td>`
+      +'</tr>'
+    ).join('')
+    +'</tbody></table></div>';
+}
+
+async function addNotice(){
+  const message=document.getElementById('notice-msg-ja').value.trim();
+  const message_en=document.getElementById('notice-msg-en').value.trim();
+  const link_url=document.getElementById('notice-url').value.trim()||null;
+  const link_label=document.getElementById('notice-label-ja').value.trim()||null;
+  const link_label_en=document.getElementById('notice-label-en').value.trim()||null;
+  if(!message){showToast('❌ 日本語の本文は必須です');return;}
+  const{error}=await sb.from('site_notices').insert({message,message_en:message_en||null,link_url,link_label,link_label_en,is_active:true,sort_order:0});
+  if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
+  showToast('✅ お知らせを追加しました');
+  ['notice-msg-ja','notice-msg-en','notice-url','notice-label-ja','notice-label-en'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  await loadNotices();
+}
+
+async function toggleNotice(id,val){
+  await sb.from('site_notices').update({is_active:val}).eq('id',id);
+  showToast(val?'✅ 表示中に変更':'✅ 非表示に変更');
+  await loadNotices();
+}
+
+async function deleteNotice(id){
+  if(!confirm('このお知らせを削除しますか？'))return;
+  await sb.from('site_notices').delete().eq('id',id);
+  showToast('🗑 削除しました');await loadNotices();
+}
+
+// ★ 今週のおすすめペダル管理
+let featuredAcResults=[];
+
+async function searchFeaturedPedal(val){
+  const q=val.trim();const ac=document.getElementById('featured-pedal-ac');
+  if(!q||q.length<1){ac.style.display='none';return;}
+  const{data}=await sb.from('pedals').select('id,brand,model,full_name').or(`brand.ilike.${q}%,model.ilike.${q}%,full_name.ilike.${q}%`).limit(8);
+  featuredAcResults=data||[];
+  if(!featuredAcResults.length){ac.style.display='none';return;}
+  ac.innerHTML=featuredAcResults.map((p,i)=>
+    `<div onclick="selectFeaturedPedal(${i})" style="padding:8px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--bd);transition:background .12s" onmouseover="this.style.background='rgba(232,85,45,.1)'" onmouseout="this.style.background=''">${escHtml(p.full_name)}</div>`
+  ).join('');
+  ac.style.display='block';
+}
+
+function selectFeaturedPedal(i){
+  const p=featuredAcResults[i];if(!p)return;
+  document.getElementById('featured-pedal-input').value=p.full_name;
+  document.getElementById('featured-pedal-id').value=p.id;
+  document.getElementById('featured-pedal-ac').style.display='none';
+}
+
+function closeFeaturedAC(){document.getElementById('featured-pedal-ac').style.display='none';}
+
+async function loadFeatured(){
+  const{data}=await sb.from('featured_pedals').select('*,pedals(brand,model,full_name,image_url)').order('sort_order').order('created_at',{ascending:false});
+  const el=document.getElementById('featured-list');
+  if(!data||!data.length){el.innerHTML='<div class="empty-msg">おすすめペダルが登録されていません</div>';return;}
+  const STORAGE='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/';
+  el.innerHTML='<div class="table-wrap"><table>'
+    +'<thead><tr><th>画像</th><th>ペダル</th><th>ラベル(JA)</th><th>ラベル(EN)</th><th>状態</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +data.map(f=>{
+      const p=f.pedals||{};
+      const thumb=p.image_url?`<img src="${p.image_url}" style="width:40px;height:40px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">`:'<span style="font-size:20px">🎛</span>';
+      return '<tr>'
+        +`<td>${thumb}</td>`
+        +`<td style="font-size:13px;font-weight:600">${escHtml(p.full_name||'')}</td>`
+        +`<td style="font-size:12px">${escHtml(f.label||'')}</td>`
+        +`<td style="font-size:12px;color:var(--td)">${escHtml(f.label_en||'')}</td>`
+        +`<td><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" ${f.is_active?'checked':''} onchange="toggleFeatured('${f.id}',this.checked)" style="accent-color:var(--ac)"><span style="font-size:11px">${f.is_active?'表示中':'非表示'}</span></label></td>`
+        +`<td><button class="del-btn" onclick="deleteFeatured('${f.id}')">🗑 削除</button></td>`
+        +'</tr>';
+    }).join('')
+    +'</tbody></table></div>';
+}
+
+async function addFeatured(){
+  const pedal_id=document.getElementById('featured-pedal-id').value;
+  const label=document.getElementById('featured-label-ja').value.trim()||null;
+  const label_en=document.getElementById('featured-label-en').value.trim()||null;
+  if(!pedal_id){showToast('❌ ペダルを選択してください');return;}
+  const{error}=await sb.from('featured_pedals').insert({pedal_id:parseInt(pedal_id),label,label_en,is_active:true,sort_order:0});
+  if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
+  showToast('✅ おすすめペダルを追加しました');
+  document.getElementById('featured-pedal-input').value='';document.getElementById('featured-pedal-id').value='';
+  document.getElementById('featured-label-ja').value='';document.getElementById('featured-label-en').value='';
+  await loadFeatured();
+}
+
+async function toggleFeatured(id,val){
+  await sb.from('featured_pedals').update({is_active:val}).eq('id',id);
+  showToast(val?'✅ 表示中':'✅ 非表示');await loadFeatured();
+}
+
+async function deleteFeatured(id){
+  if(!confirm('このおすすめペダルを削除しますか？'))return;
+  await sb.from('featured_pedals').delete().eq('id',id);
+  showToast('🗑 削除しました');await loadFeatured();
+}
+
+// ★ 特集ページ管理
+async function loadFeatures(){
+  const{data}=await sb.from('special_features').select('*').order('sort_order').order('created_at',{ascending:false});
+  const el=document.getElementById('features-list');
+  if(!data||!data.length){el.innerHTML='<div class="empty-msg">特集がまだありません</div>';return;}
+  el.innerHTML='<div class="table-wrap"><table>'
+    +'<thead><tr><th>タイトル</th><th>スラッグ</th><th>ペダル数</th><th>状態</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +data.map(f=>'<tr>'
+      +`<td style="font-size:13px;font-weight:600">${escHtml(f.title)}</td>`
+      +`<td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac)">${escHtml(f.slug)}</td>`
+      +`<td style="text-align:center;font-size:12px">${(f.pedal_ids||[]).length}件</td>`
+      +`<td><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" ${f.is_active?'checked':''} onchange="toggleFeature('${f.id}',this.checked)" style="accent-color:var(--ac)"><span style="font-size:11px">${f.is_active?'公開中':'非公開'}</span></label></td>`
+      +`<td style="display:flex;gap:6px"><button class="approve-btn" onclick="editFeaturePedals(${f.id})">✏️ ペダル編集</button><button class="del-btn" onclick="deleteFeature('${f.id}')">🗑</button></td>`
+      +'</tr>'
+    ).join('')
+    +'</tbody></table></div>';
+}
+
+async function addFeature(){
+  const title=document.getElementById('feature-title-ja').value.trim();
+  const title_en=document.getElementById('feature-title-en').value.trim()||null;
+  const slug=document.getElementById('feature-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g,'-');
+  const description=document.getElementById('feature-desc-ja').value.trim()||null;
+  const description_en=document.getElementById('feature-desc-en').value.trim()||null;
+  if(!title||!slug){showToast('❌ タイトルとスラッグは必須です');return;}
+  const{error}=await sb.from('special_features').insert({title,title_en,slug,description,description_en,is_active:true,pedal_ids:[],sort_order:0});
+  if(error){showToast('❌ 作成に失敗しました: '+(error.code==='23505'?'スラッグが重複しています':error.message));return;}
+  showToast('✅ 特集を作成しました');
+  ['feature-title-ja','feature-title-en','feature-slug','feature-desc-ja','feature-desc-en'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  await loadFeatures();
+}
+
+async function toggleFeature(id,val){
+  await sb.from('special_features').update({is_active:val}).eq('id',id);
+  showToast(val?'✅ 公開中':'✅ 非公開');await loadFeatures();
+}
+
+async function deleteFeature(id){
+  if(!confirm('この特集を削除しますか？'))return;
+  await sb.from('special_features').delete().eq('id',id);
+  showToast('🗑 削除しました');await loadFeatures();
+}
+
+async function editFeaturePedals(featureId){
+  // ペダル追加UI（簡易版：ペダル名検索で追加）
+  const{data:feature}=await sb.from('special_features').select('*').eq('id',featureId).single();
+  if(!feature)return;
+  const currentIds=feature.pedal_ids||[];
+  let pedalsList=[];
+  if(currentIds.length>0){
+    const{data:pedals}=await sb.from('pedals').select('id,full_name,brand').in('id',currentIds);
+    pedalsList=pedals||[];
+  }
+  const listHtml=pedalsList.map(p=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)"><span style="flex:1;font-size:13px">${escHtml(p.full_name)}</span><button onclick="removePedalFromFeature(${featureId},${p.id})" class="del-btn" style="padding:3px 8px;font-size:11px">✕</button></div>`).join('');
+  const html=`<div style="padding:16px;max-width:480px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--ac);margin-bottom:12px">✏️ ${escHtml(feature.title)} — ペダル編集</div>
+    <div style="margin-bottom:12px;position:relative">
+      <input class="form-input" id="feature-add-pedal-input" type="text" placeholder="追加するペダルを検索..." oninput="searchFeaturePedal(this.value,${featureId})" onblur="setTimeout(closeFeaturePedalAC,180)" autocomplete="off">
+      <div id="feature-pedal-ac" style="position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:600;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)"></div>
+    </div>
+    <div id="feature-pedals-list">${listHtml||'<div class="empty-msg" style="padding:16px">ペダルが追加されていません</div>'}</div>
+  </div>`;
+  // モーダルに表示
+  const modal=document.getElementById('brand-edit-modal');
+  if(modal){
+    modal.querySelector('.gear-modal-box,.pedal-edit-box').innerHTML=html;
+    modal.classList.add('open');
+  }
+}
+
+let featurePedalAcResults=[];
+async function searchFeaturePedal(val,featureId){
+  const q=val.trim();const ac=document.getElementById('feature-pedal-ac');
+  if(!q){ac.style.display='none';return;}
+  const{data}=await sb.from('pedals').select('id,full_name,brand').or(`brand.ilike.${q}%,model.ilike.${q}%,full_name.ilike.${q}%`).limit(8);
+  featurePedalAcResults=data||[];
+  if(!featurePedalAcResults.length){ac.style.display='none';return;}
+  ac.innerHTML=featurePedalAcResults.map((p,i)=>
+    `<div onclick="addPedalToFeature(${i},${featureId})" style="padding:8px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--bd)" onmouseover="this.style.background='rgba(232,85,45,.1)'" onmouseout="this.style.background=''">${escHtml(p.full_name)}</div>`
+  ).join('');
+  ac.style.display='block';
+}
+function closeFeaturePedalAC(){const ac=document.getElementById('feature-pedal-ac');if(ac)ac.style.display='none';}
+
+async function addPedalToFeature(idx,featureId){
+  const p=featurePedalAcResults[idx];if(!p)return;
+  const{data:f}=await sb.from('special_features').select('pedal_ids').eq('id',featureId).single();
+  const ids=[...new Set([...(f.pedal_ids||[]),p.id])];
+  await sb.from('special_features').update({pedal_ids:ids}).eq('id',featureId);
+  showToast('✅ ペダルを追加しました');
+  closeFeaturePedalAC();
+  editFeaturePedals(featureId);
+}
+
+async function removePedalFromFeature(featureId,pedalId){
+  const{data:f}=await sb.from('special_features').select('pedal_ids').eq('id',featureId).single();
+  const ids=(f.pedal_ids||[]).filter(id=>id!==pedalId);
+  await sb.from('special_features').update({pedal_ids:ids}).eq('id',featureId);
+  showToast('🗑 削除しました');editFeaturePedals(featureId);
 }
 
 // ★ プライバシーポリシー管理
