@@ -5,7 +5,17 @@
   <meta name="robots" content="index, follow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ペダル詳細 | My Gear My Board</title>
-  <meta name="description" content="">
+  <meta name="description" content="" id="meta-description">
+  <meta property="og:title" content="My Gear My Board" id="og-title">
+  <meta property="og:description" content="" id="og-description">
+  <meta property="og:image" content="" id="og-image">
+  <meta property="og:url" content="" id="og-url">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="" id="tw-title">
+  <meta name="twitter:description" content="" id="tw-description">
+  <meta name="twitter:image" content="" id="tw-image">
+  <link rel="canonical" href="" id="canonical">
+  <script type="application/ld+json" id="json-ld"></script>
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/favicon.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -528,6 +538,42 @@ async function loadPedal() {
   document.getElementById('bc-brand').href = `/brand?name=${encodeURIComponent(pedal.brand)}`;
   document.getElementById('bc-pedal').textContent = pedal.model;
   document.title = `${pedal.full_name} | My Gear My Board`;
+
+  // ★ SEO: meta description・OGP・canonical・JSON-LD動的更新
+  const pedalDesc = pedal.description
+    ? pedal.description.replace(/<[^>]+>/g,'').slice(0, 120) + '...'
+    : `${pedal.full_name}のペダル詳細ページ。使用ボードや購入リンクをチェック。`;
+  const pedalDescEn = pedal.description_en
+    ? pedal.description_en.replace(/<[^>]+>/g,'').slice(0, 120) + '...'
+    : `${pedal.full_name} pedal details. Check boards and purchase links.`;
+  const finalDesc = lang === 'en' ? pedalDescEn : pedalDesc;
+  const pedalUrl = `https://mygearmyboard.com/pedal?slug=${pedal.slug}`;
+  const pedalImg = pedal.image_url || 'https://mygearmyboard.com/ogp.png';
+
+  const setMeta = (id, attr, val) => { const el=document.getElementById(id); if(el) el.setAttribute(attr, val); };
+  setMeta('meta-description','content', finalDesc);
+  setMeta('og-title','content', `${pedal.full_name} | My Gear My Board`);
+  setMeta('og-description','content', finalDesc);
+  setMeta('og-image','content', pedalImg);
+  setMeta('og-url','content', pedalUrl);
+  setMeta('tw-title','content', `${pedal.full_name} | My Gear My Board`);
+  setMeta('tw-description','content', finalDesc);
+  setMeta('tw-image','content', pedalImg);
+  setMeta('canonical','href', pedalUrl);
+
+  // JSON-LD（構造化データ）
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": pedal.full_name,
+    "brand": { "@type": "Brand", "name": pedal.brand },
+    "description": pedalDesc,
+    "image": pedalImg,
+    "url": pedalUrl,
+    "category": (pedal.types||[]).join(', ')
+  };
+  const ldEl = document.getElementById('json-ld');
+  if(ldEl) ldEl.textContent = JSON.stringify(jsonLd);
 
   // ★ 修正: JS側フィルタリングに変更
   const posts = await fetchBoardsByPedal(pedal.full_name);
