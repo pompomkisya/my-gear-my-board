@@ -5,7 +5,9 @@
   <meta name="robots" content="index, follow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>タイプ別エフェクター | My Gear My Board</title>
-  <meta name="description" content="">
+  <meta name="description" content="" id="meta-description">
+  <meta property="og:description" content="" id="og-description">
+  <link rel="canonical" href="" id="canonical">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/favicon.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -291,6 +293,16 @@ async function loadType() {
   const displayName = getTypeDisplayName(currentTypeName);
   document.getElementById('bc-type').textContent = displayName;
   document.title = `${displayName} | My Gear My Board`;
+  const typeUrl = `https://mygearmyboard.com/type?name=${encodeURIComponent(currentTypeName)}`;
+  const typeDescEl = document.getElementById('meta-description');
+  const typeOgEl = document.getElementById('og-description');
+  const typeCanEl = document.getElementById('canonical');
+  const typeDescText = lang==='en'
+    ? `${displayName} pedals — ${total} pedals in this category. Browse lineup and boards.`
+    : `${displayName}のエフェクターペダル一覧。${total}件のペダルと使用ボードをチェック。`;
+  if(typeDescEl) typeDescEl.setAttribute('content', typeDescText);
+  if(typeOgEl) typeOgEl.setAttribute('content', typeDescText);
+  if(typeCanEl) typeCanEl.setAttribute('href', typeUrl);
 
   const [countRes, pedalsRes, postsRes] = await Promise.all([
     db.from('pedals').select('*', { count: 'exact', head: true }).contains('types', [currentTypeName]),
