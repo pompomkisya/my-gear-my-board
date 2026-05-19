@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>特集 | My Gear My Board</title>
+<meta name="description" content="" id="meta-description">
+<meta property="og:title" content="" id="og-title">
+<meta property="og:description" content="" id="og-description">
+<meta property="og:image" content="https://mygearmyboard.com/ogp.png">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--tx:#eae8e2;--tm:#9a9890;--td:#6e6c68}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;font-weight:300;min-height:100vh}
+header{position:sticky;top:0;z-index:300;display:flex;flex-direction:column;background:rgba(13,13,14,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.header-row1{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 16px 4px;border-bottom:1px solid rgba(39,39,41,.6)}
+.header-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex:1;min-width:0}
+.header-logo img{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.header-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:3px;color:var(--tx);white-space:nowrap}
+.header-sub{font-size:9px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-top:1px;white-space:nowrap}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:var(--tm);transition:all .15s;white-space:nowrap}
+.lang-btn:hover{border-color:var(--ac);color:var(--ac)}
+.header-row2{display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:4px 16px 6px}
+.home-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none;white-space:nowrap}
+.home-btn:hover{border-color:var(--ac);color:var(--ac)}
+.breadcrumb{background:var(--sf);border-bottom:1px solid var(--bd);padding:10px 16px;font-size:12px;color:var(--tm);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.breadcrumb a{color:var(--tm);text-decoration:none}
+.breadcrumb a:hover{color:var(--tx)}
+.breadcrumb .sep{color:var(--bd)}
+.breadcrumb .current{color:var(--tx)}
+.container{max-width:760px;margin:0 auto;padding:28px 16px 60px}
+.loading{text-align:center;padding:60px;color:var(--td)}
+.error-box{text-align:center;padding:60px;color:var(--td)}
+/* ヒーロー */
+.feature-hero{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:32px 28px;margin-bottom:24px}
+.feature-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.3);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--ac);letter-spacing:1px;margin-bottom:14px}
+.feature-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;margin-bottom:12px;line-height:1.2}
+.feature-count{font-size:13px;color:var(--tm);margin-bottom:0}
+.feature-count span{color:var(--ac);font-weight:700}
+/* 本文 */
+.feature-body{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;margin-bottom:24px;line-height:1.9}
+.feature-body h2{font-size:16px;font-weight:700;color:var(--ac);margin:24px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.feature-body h2:first-child{margin-top:0}
+.feature-body h3{font-size:14px;font-weight:700;color:var(--tm);margin:18px 0 8px}
+.feature-body p{font-size:14px;color:#b8b5ae;margin-bottom:10px}
+.feature-body ul{font-size:14px;color:#b8b5ae;padding-left:20px;margin-bottom:10px}
+.feature-body ul li{margin-bottom:6px}
+.feature-body strong{color:var(--tx);font-weight:700}
+.feature-body a{color:var(--ac);text-decoration:none}
+.feature-body a:hover{text-decoration:underline}
+/* ペダルグリッド */
+.section-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:16px}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;margin-bottom:14px}
+.pedal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:480px){.pedal-grid{grid-template-columns:repeat(2,1fr)}}
+.pedal-card{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--tx);display:block;transition:border-color .2s}
+.pedal-card:hover{border-color:var(--ac)}
+.pedal-card-image{width:100%;aspect-ratio:1;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--bd)}
+.pedal-card-image img{width:100%;height:100%;object-fit:contain}
+.pedal-card-image .type-icon{width:60%;height:60%;object-fit:contain;opacity:.4}
+.pedal-card-image-placeholder{font-size:28px;opacity:.2}
+.pedal-card-body{padding:8px}
+.pedal-card-brand{font-size:10px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pedal-card-model{font-size:11px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.empty-state{text-align:center;padding:40px;color:var(--td)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-row1">
+    <a href="/" class="header-logo">
+      <img src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
+      <div>
+        <div class="header-title">MY GEAR MY BOARD</div>
+        <div class="header-sub" id="header-sub">ペダルボードSNS</div>
+      </div>
+    </a>
+    <div class="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
+  </div>
+  <div class="header-row2">
+    <a href="/" class="home-btn">🏠 <span id="home-text">ホーム</span></a>
+    <a href="/#gacha" class="home-btn">🎲 <span id="gacha-text">ペダルガチャ</span></a>
+  </div>
+</header>
+<div class="breadcrumb">
+  <a href="/" id="bc-home">ホーム</a>
+  <span class="sep">›</span>
+  <span class="current" id="bc-current">特集</span>
+</div>
+<div class="container">
+  <div id="content"><div class="loading">読み込み中...</div></div>
+</div>
+<script>
+const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const TYPE_ICON_BASE='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_';
+
+function detectLang(){const s=localStorage.getItem('mgmb_lang');if(s)return s;const b=navigator.language||'ja';return b.toLowerCase().startsWith('ja')?'ja':'en';}
+let lang=detectLang();
+
+const I18N={
+  ja:{headerSub:'ペダルボードSNS',home:'ホーム',gacha:'🎲 ペダルガチャ',langLabel:'EN',
+      bcHome:'ホーム',featureTag:'✨ 特集',pedalSection:'🎛 収録ペダル',
+      pedalCount:'ペダル',pedalCountUnit:'件',
+      notFound:'特集が見つかりませんでした',backHome:'← ホームに戻る',
+      empty:'ペダルが登録されていません'},
+  en:{headerSub:'Pedalboard SNS',home:'Home',gacha:'🎲 Pedal Gacha',langLabel:'JA',
+      bcHome:'Home',featureTag:'✨ Feature',pedalSection:'🎛 Pedals in this feature',
+      pedalCount:'',pedalCountUnit:' pedals',
+      notFound:'Feature not found',backHome:'← Back to Home',
+      empty:'No pedals registered yet'}
+};
+function tr(k){return(I18N[lang]||I18N.ja)[k]||I18N.ja[k]||k;}
+
+function applyLang(){
+  document.getElementById('header-sub').textContent=tr('headerSub');
+  document.getElementById('home-text').textContent=tr('home');
+  document.getElementById('gacha-text').textContent=tr('gacha');
+  document.getElementById('lang-label').textContent=tr('langLabel');
+  document.getElementById('bc-home').textContent=tr('bcHome');
+}
+function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();loadFeature();}
+
+async function loadFeature(){
+  const params=new URLSearchParams(window.location.search);
+  const slug=params.get('slug');
+  if(!slug){showError(tr('notFound'));return;}
+
+  const{data:feature}=await sb.from('special_features')
+    .select('*').eq('slug',slug).eq('is_active',true).maybeSingle();
+  if(!feature){showError(tr('notFound'));return;}
+
+  const title=lang==='en'?(feature.title_en||feature.title):feature.title;
+  const body=lang==='en'?(feature.description_en||feature.description):feature.description;
+  const pedalIds=feature.pedal_ids||[];
+
+  document.title=`${title} | My Gear My Board`;
+  document.getElementById('bc-current').textContent=title;
+  document.getElementById('meta-description').setAttribute('content',
+    body?body.replace(/<[^>]+>/g,'').slice(0,120)+'...':title);
+  document.getElementById('og-title').setAttribute('content',`${title} | My Gear My Board`);
+  document.getElementById('og-description').setAttribute('content',
+    body?body.replace(/<[^>]+>/g,'').slice(0,120)+'...':title);
+
+  // ペダル取得
+  let pedals=[];
+  if(pedalIds.length>0){
+    const{data}=await sb.from('pedals')
+      .select('id,brand,model,slug,image_url,types')
+      .in('id',pedalIds);
+    if(data){
+      // pedalIdsの順番を維持
+      const map=Object.fromEntries(data.map(p=>[p.id,p]));
+      pedals=pedalIds.map(id=>map[id]).filter(Boolean);
+    }
+  }
+
+  renderFeature(feature,title,body,pedals);
+}
+
+function renderFeature(feature,title,body,pedals){
+  const count=pedals.length;
+
+  // 本文HTML
+  const bodyHtml=body
+    ?`<div class="feature-body">${body}</div>`
+    :'';
+
+  // ペダルグリッド
+  let pedalGridHtml='';
+  if(!count){
+    pedalGridHtml=`<div class="empty-state">${tr('empty')}</div>`;
+  }else{
+    pedalGridHtml=`<div class="pedal-grid">${pedals.map(p=>{
+      const typeIcon=p.types&&p.types[0]?TYPE_ICON_BASE+p.types[0]+'.png':null;
+      let imgHtml;
+      if(p.image_url){
+        imgHtml=`<img src="${p.image_url}" alt="${p.model}" loading="lazy">`;
+      }else if(typeIcon){
+        imgHtml=`<img class="type-icon" src="${typeIcon}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+      }else{
+        imgHtml=`<span class="pedal-card-image-placeholder">🎛</span>`;
+      }
+      return`<a href="/pedal?slug=${p.slug}" class="pedal-card">
+        <div class="pedal-card-image">${imgHtml}</div>
+        <div class="pedal-card-body">
+          <div class="pedal-card-brand">${p.brand}</div>
+          <div class="pedal-card-model">${p.model}</div>
+        </div>
+      </a>`;
+    }).join('')}</div>`;
+  }
+
+  document.getElementById('content').innerHTML=`
+    <div class="feature-hero">
+      <div class="feature-tag">${tr('featureTag')}</div>
+      <div class="feature-title">${title}</div>
+      <div class="feature-count">${tr('pedalCount')}<span>${count}</span>${tr('pedalCountUnit')}</div>
+    </div>
+    ${bodyHtml}
+    <div class="section-card">
+      <div class="section-title">${tr('pedalSection')}</div>
+      ${pedalGridHtml}
+    </div>`;
+}
+
+function showError(msg){
+  document.getElementById('content').innerHTML=`
+    <div class="error-box">
+      <p>${msg}</p>
+      <a href="/" style="color:var(--ac);display:block;margin-top:16px">${tr('backHome')}</a>
+    </div>`;
+}
+
+applyLang();
+loadFeature();
+</script>
+</body>
+</html>
