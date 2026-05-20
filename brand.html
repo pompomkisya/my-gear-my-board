@@ -147,6 +147,10 @@
       color: #fff; text-decoration: none; transition: background .15s;
     }
     .empty-state-btn:hover { background: #cf4c26; }
+    .type-filter-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+    .type-filter-btn{padding:4px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;white-space:nowrap}
+    .type-filter-btn:hover{border-color:var(--ac);color:var(--ac)}
+    .type-filter-btn.on{background:rgba(232,85,45,.12);border-color:var(--ac);color:var(--ac)}
     .load-more {
       width: 100%; margin-top: 12px; padding: 12px;
       background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
@@ -357,8 +361,15 @@ function renderBrand(brandName, pedals, posts, total, brandData) {
         ${tr('loadMore')}（${tr('remaining')} ${remaining > 0 ? remaining : total - cachedPedals.length} 件）
        </button>` : '';
 
+  // タイプ一覧を収集（全ペダルから）
+  const allTypes=[...new Set(pedals.flatMap(p=>p.types||[]))].sort();
+  const typeFilterHtml=allTypes.length>1?`<div class="type-filter-wrap" id="type-filter-wrap">
+    <button class="type-filter-btn on" onclick="filterByType(this,'__all__')">${lang==='ja'?'すべて':'All'}</button>
+    ${allTypes.map(t=>`<button class="type-filter-btn" onclick="filterByType(this,'${t}')">${getTypeLabel(t)}</button>`).join('')}
+  </div>`:'';
+
   const pedalsSection = pedals.length > 0
-    ? `<div class="pedal-grid" id="pedal-grid">${pedalCardsHtml}</div>${loadMoreBtn}`
+    ? typeFilterHtml+`<div class="pedal-grid" id="pedal-grid">${pedalCardsHtml}</div>${loadMoreBtn}`
     : `<div class="empty-state"><div class="empty-state-title">${tr('emptyBoardTitle')}</div></div>`;
 
   // ★ ブランド説明HTML
@@ -440,6 +451,39 @@ function initDescAccordion() {
     const expanded = desc.classList.toggle('expanded');
     btn.textContent = expanded ? tr('readLess') : tr('readMore');
   };
+}
+
+function filterByType(btnEl, typeVal){
+  // ボタンのon状態切り替え
+  document.querySelectorAll('.type-filter-btn').forEach(b=>b.classList.remove('on'));
+  btnEl.classList.add('on');
+  // ペダルグリッドをフィルタリング
+  const grid=document.getElementById('pedal-grid');
+  if(!grid)return;
+  const allCards=grid.querySelectorAll('a.pedal-card');
+  allCards.forEach(card=>{
+    if(typeVal==='__all__'){card.style.display='block';return;}
+    // カードのタイプを確認（type-badgeから）
+    const badges=card.querySelectorAll('.type-badge');
+    const types=[...badges].map(b=>b.textContent.trim().toLowerCase());
+    const typeKey=typeVal.toLowerCase();
+    // TYPE_LABELSの逆引き
+    const labelMatch=Object.entries({
+      'overdrive':['od','overdrive'],'distortion':['dist','distortion'],
+      'fuzz':['fuzz'],'boost':['boost'],'reverb':['reverb'],'delay':['delay'],
+      'chorus':['chorus'],'flanger':['flanger'],'phaser':['phaser'],
+      'modulation':['mod','modulation'],'tremolo':['tremolo'],'vibrato':['vibrato'],
+      'pitch_octave':['pitch/oct'],'wah_filter':['wah/filter'],
+      'comp':['comp'],'eq':['eq'],'noise_gate':['noise gate'],
+      'looper':['looper'],'volume':['volume'],'tuner':['tuner'],
+      'multi':['multi fx'],'preamp':['preamp'],'switcher':['switcher'],
+      'buffer':['buffer'],'junction_box':['junction box'],'power_supply':['power supply'],
+      'synth':['synth'],'other':['other']
+    }).find(([k])=>k===typeKey);
+    const searchLabels=labelMatch?labelMatch[1]:[typeKey];
+    const match=types.some(t=>searchLabels.some(sl=>t.includes(sl)));
+    card.style.display=match?'block':'none';
+  });
 }
 
 async function loadMorePedals() {
