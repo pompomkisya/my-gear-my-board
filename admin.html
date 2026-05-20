@@ -1114,7 +1114,7 @@ async function searchPedalsFromDB(q){
       +'<td style="font-size:10px">'+(p.youtube_video_id?'<span style="color:#4ade80">✅</span>':'<span style="color:var(--td)">—</span>')+'</td>'
       +'<td style="text-align:center;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">'+(p.view_count||0)+'</td>'
       +'<td>'+rarityBadge(p.rarity)+'</td>'
-      +'<td><button class="approve-btn" onclick="openPedalEdit('+p.id+')">✏️ 編集</button></td>'
+      +'<td><button class="approve-btn" data-pid="'+p.id+'" onclick="openPedalEdit(parseInt(this.getAttribute(\'data-pid\')))">✏️ 編集</button></td>'
       +'</tr>';
   });
   el.innerHTML='<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td);margin-bottom:8px">🔍 DB検索結果: '+results.length+'件</div>'
@@ -1175,7 +1175,7 @@ function applyPedalFilter(){
       +'<td style="font-size:10px">'+(p.description?'<span style="color:#4ade80">✅</span>':'<span style="color:#e05050">なし</span>')+'</td>'
       +'<td style="font-size:10px;color:var(--td)">'+(p.youtube_video_id?'<span style="color:#4ade80">✅</span>':'<span style="color:var(--td)">—</span>')+'</td>'
       +'<td style="text-align:center;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">'+(p.view_count||0)+'</td>'+'<td>'+rarityBadge(p.rarity)+'</td>'
-      +'<td><button class="approve-btn" onclick="openPedalEdit('+p.id+')">✏️ 編集</button></td>'
+      +'<td><button class="approve-btn" data-pid="'+p.id+'" onclick="openPedalEdit(parseInt(this.getAttribute(\'data-pid\')))">✏️ 編集</button></td>'
       +'</tr>').join('')
     +'</tbody></table></div>';
 }
