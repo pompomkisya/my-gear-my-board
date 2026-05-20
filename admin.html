@@ -1293,7 +1293,15 @@ async function addPedal(){
   if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
   showToast('✅ ペダルを追加しました');
   document.getElementById('new-brand').value='';document.getElementById('new-model').value='';document.getElementById('new-types').value='';
-  await loadPedals();
+  // 追加したペダルをDBから取得してallPedalsの先頭に追加（リセットしない）
+  const{data:newPedal}=await sb.from('pedals').select('*').eq('full_name',full_name).maybeSingle();
+  if(newPedal){
+    allPedals.unshift(newPedal);
+    allPedalsTotal+=1;
+    document.getElementById('pedals-count').textContent=allPedalsTotal;
+  }
+  renderPedals();
+  updateLoadAllBtn();
 }
 
 function getYouTubeIdFromUrl(url){
@@ -1379,7 +1387,14 @@ async function savePedalEdit(){
   else if(resetYt){updates.youtube_video_id=null;}
   const{error}=await sb.from('pedals').update(updates).eq('id',editingPedalId);
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
-  showToast('✅ 保存しました');closePedalEdit();await loadPedals();
+  showToast('✅ 保存しました');
+  // allPedalsの該当レコードをローカル更新（リセットしない）
+  const idx=allPedals.findIndex(p=>p.id==editingPedalId);
+  if(idx>=0){
+    allPedals[idx]={...allPedals[idx],...updates,full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity};
+  }
+  closePedalEdit();
+  renderPedals();
 }
 
 async function deletePedalFromEdit(){
@@ -1387,7 +1402,13 @@ async function deletePedalFromEdit(){
   if(!confirm('「'+(pedal?.full_name||'このペダル')+'」を削除しますか？\nこの操作は取り消せません。'))return;
   const{error}=await sb.from('pedals').delete().eq('id',editingPedalId);
   if(error){showToast('❌ 削除に失敗しました: '+error.message);return;}
-  showToast('🗑 ペダルを削除しました');closePedalEdit();await loadPedals();
+  showToast('🗑 ペダルを削除しました');
+  // allPedalsからローカル削除（リセットしない）
+  allPedals=allPedals.filter(p=>p.id!=editingPedalId);
+  allPedalsTotal=Math.max(0,allPedalsTotal-1);
+  closePedalEdit();
+  renderPedals();
+  updateLoadAllBtn();
 }
 
 // ★ お知らせ管理
