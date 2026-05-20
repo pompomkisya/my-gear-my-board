@@ -304,7 +304,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="submit-btn" onclick="addPedal()">＋ DBに追加</button>
     </div>
     <div style="margin-bottom:8px">
-      <input class="form-input" id="pedal-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="applyPedalFilter()" style="max-width:360px">
+      <input class="form-input" id="pedal-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="onPedalSearchInput()" style="max-width:360px">
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+      <button id="load-all-pedals-btn" onclick="loadAllPedals()" style="display:none;align-items:center;gap:5px;padding:6px 12px;background:var(--sf2);border:1px solid rgba(240,165,0,.4);border-radius:4px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:600;color:var(--ac2);cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--ac2)'" onmouseout="this.style.borderColor='rgba(240,165,0,.4)'">📥 全件を読み込む</button>
+      <span id="pedal-load-status" style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--td)"></span>
     </div>
     <div class="pedal-filter-bar">
       <button class="pf-btn on" id="pf-all" onclick="setPedalFilter('all')">すべて</button>
@@ -727,18 +731,54 @@ async function loadPosts(){
   renderPosts();renderRecentPosts();loadUnknownGear();renderRegionStats();renderRegionPosts();
 }
 
+let allPedalsTotal=0;
+let allPedalsLoaded=false;
+const PEDAL_PAGE=300;
+
 async function loadPedals(){
   const countRes=await sb.from('pedals').select('id',{count:'exact',head:true});
-  const total=countRes.count||0;
-  document.getElementById('stat-pedals').textContent=total;
-  document.getElementById('pedals-count').textContent=total;
+  allPedalsTotal=countRes.count||0;
+  document.getElementById('stat-pedals').textContent=allPedalsTotal;
+  document.getElementById('pedals-count').textContent=allPedalsTotal;
+  // まず300件だけ読み込む
+  const{data}=await sb.from('pedals').select('*')
+    .order('view_count',{ascending:false,nullsFirst:false})
+    .order('brand').order('model')
+    .range(0,PEDAL_PAGE-1);
+  allPedals=data||[];
+  allPedalsLoaded=false;
+  renderPedals();
+  updateLoadAllBtn();
+}
+
+async function loadAllPedals(){
+  const btn=document.getElementById('load-all-pedals-btn');
+  if(btn){btn.disabled=true;btn.textContent='読み込み中...';}
   let data=[];let offset=0;
   while(true){
-    const{data:batch}=await sb.from('pedals').select('*').order('view_count',{ascending:false,nullsFirst:false}).order('brand').order('model').range(offset,offset+999);
+    const{data:batch}=await sb.from('pedals').select('*')
+      .order('view_count',{ascending:false,nullsFirst:false})
+      .order('brand').order('model')
+      .range(offset,offset+999);
     if(!batch||batch.length===0)break;
     data=[...data,...batch];if(batch.length<1000)break;offset+=1000;
   }
-  allPedals=data;renderPedals();
+  allPedals=data;allPedalsLoaded=true;
+  renderPedals();
+  updateLoadAllBtn();
+  showToast('✅ 全'+allPedals.length+'件を読み込みました');
+}
+
+function updateLoadAllBtn(){
+  const btn=document.getElementById('load-all-pedals-btn');
+  if(!btn)return;
+  if(allPedalsLoaded){
+    btn.style.display='none';
+  }else{
+    btn.style.display='inline-flex';
+    btn.disabled=false;
+    btn.textContent='📥 全件を読み込む（残り'+(allPedalsTotal-allPedals.length)+'件）';
+  }
 }
 
 async function loadComments(){
@@ -1043,6 +1083,44 @@ function rarityBadge(r){
   return `<span class="rarity-badge ${map[r]||''}">${r}</span>`;
 }
 
+let _pedalSearchTimer=null;
+function onPedalSearchInput(){
+  clearTimeout(_pedalSearchTimer);
+  const val=document.getElementById('pedal-search').value||'';
+  if(val.trim().length>=2){
+    // 2文字以上ならDB直接検索
+    _pedalSearchTimer=setTimeout(()=>searchPedalsFromDB(val.trim()),300);
+  }else{
+    applyPedalFilter();
+  }
+}
+
+async function searchPedalsFromDB(q){
+  const el=document.getElementById('pedals-list');
+  el.innerHTML='<div class="loading">検索中...</div>';
+  const{data}=await sb.from('pedals').select('*')
+    .or('brand.ilike.%'+q+'%,model.ilike.%'+q+'%,full_name.ilike.%'+q+'%')
+    .order('brand').order('model').limit(200);
+  const results=data||[];
+  if(!results.length){el.innerHTML='<div class="empty-msg">「'+q+'」に一致するペダルが見つかりません</div>';return;}
+  el.innerHTML='<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td);margin-bottom:8px">🔍 DB検索結果: '+results.length+'件</div>'
+    +'<div class="table-wrap"><table>'
+    +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>👁 閲覧数</th><th>🎰 Rarity</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +results.map(p=>'<tr>'
+      +'<td style="font-size:12px;font-weight:600;color:var(--ac)">'+escHtml(p.brand)+'</td>'
+      +'<td style="font-size:13px">'+escHtml(p.model)+'</td>'
+      +'<td>'+(p.types||[]).map(t=>'<span class="tag-chip">'+t+'</span>').join('')+'</td>'
+      +'<td>'+(p.image_url?'<img src="'+p.image_url+'" style="width:40px;height:40px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">':'<span style="font-size:10px;color:#e05050">なし</span>')+'</td>'
+      +'<td style="font-size:10px">'+(p.description?'<span style="color:#4ade80">✅</span>':'<span style="color:#e05050">なし</span>')+'</td>'
+      +'<td style="font-size:10px">'+(p.youtube_video_id?'<span style="color:#4ade80">✅</span>':'<span style="color:var(--td)">—</span>')+'</td>'
+      +'<td style="text-align:center;font-family:JetBrains Mono,monospace;font-size:11px;color:var(--td)">'+(p.view_count||0)+'</td>'
+      +'<td>'+rarityBadge(p.rarity)+'</td>'
+      +'<td><button class="approve-btn" onclick="openPedalEdit(''+p.id+'')">✏️ 編集</button></td>'
+      +'</tr>').join('')
+    +'</tbody></table></div>';
+}
+
 function applyPedalFilter(){
   const search=(document.getElementById('pedal-search').value||'').toLowerCase();
   const el=document.getElementById('pedals-list');
@@ -1098,7 +1176,17 @@ function applyPedalFilter(){
       +'</tr>').join('')
     +'</tbody></table></div>';
 }
-function renderPedals(){applyPedalFilter();}
+function renderPedals(){
+  const statusEl=document.getElementById('pedal-load-status');
+  if(statusEl){
+    if(allPedalsLoaded){
+      statusEl.textContent='全'+allPedals.length+'件読み込み済み';
+    }else{
+      statusEl.textContent=allPedals.length+'件表示中（全'+allPedalsTotal+'件）';
+    }
+  }
+  applyPedalFilter();
+}
 
 // ★ ペースト変換（Gemini出力対応）
 function convertPastedText(text){
