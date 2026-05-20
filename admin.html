@@ -1304,8 +1304,14 @@ function getYouTubeIdFromUrl(url){
 }
 
 let editingPedalId=null;
-function openPedalEdit(pedalId){
-  const pedal=allPedals.find(p=>p.id==pedalId);if(!pedal)return;
+async function openPedalEdit(pedalId){
+  let pedal=allPedals.find(p=>p.id==pedalId);
+  if(!pedal){
+    // 段階読み込みで未取得の場合はDBから直接取得
+    const{data}=await sb.from('pedals').select('*').eq('id',pedalId).maybeSingle();
+    if(!data)return;
+    pedal=data;
+  }
   editingPedalId=pedal.id;
   document.getElementById('pedal-edit-name').textContent=pedal.full_name;
   document.getElementById('edit-full-name').value=pedal.full_name||'';
