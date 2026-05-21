@@ -1394,7 +1394,13 @@ async function savePedalEdit(){
     allPedals[idx]={...allPedals[idx],...updates,full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity};
   }
   closePedalEdit();
-  renderPedals();
+  // DB検索中だった場合は検索を再実行、それ以外は通常描画
+  const searchVal=document.getElementById('pedal-search').value||'';
+  if(searchVal.trim().length>=2){
+    await searchPedalsFromDB(searchVal.trim());
+  }else{
+    renderPedals();
+  }
 }
 
 async function deletePedalFromEdit(){
@@ -1407,7 +1413,13 @@ async function deletePedalFromEdit(){
   allPedals=allPedals.filter(p=>p.id!=editingPedalId);
   allPedalsTotal=Math.max(0,allPedalsTotal-1);
   closePedalEdit();
-  renderPedals();
+  // DB検索中だった場合は検索を再実行
+  const searchValDel=document.getElementById('pedal-search').value||'';
+  if(searchValDel.trim().length>=2){
+    await searchPedalsFromDB(searchValDel.trim());
+  }else{
+    renderPedals();
+  }
   updateLoadAllBtn();
 }
 
