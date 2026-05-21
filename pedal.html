@@ -419,7 +419,6 @@ async function loadRecommendedPedals(pedal) {
   recommendOffset = 0;
   recommendPedalId = pedal.id;
   recommendTypes = pedal.types || [];
-  // おすすめセクションをDOMに追加
   const detailEl = document.getElementById('content');
   if (!detailEl) return;
   const recSection = document.createElement('div');
@@ -486,30 +485,19 @@ async function loadMoreRecommended() {
   await fetchRecommended();
 }
 
-// ★ 修正: gear_listのname検索をJS側でフィルタリング（contains問題を回避）
-// contains(@>)はgear_listの各要素が {name, brand, search_query} の3キー構造のとき
-// {name: "xxx"} だけでは一致しないDBバージョンがある。
-// またエイリアス（別名）でも引っかかるよう、aliasesテーブルも活用する。
 async function fetchBoardsByPedal(pedalFullName) {
-  // ★ エイリアスも含めた検索名リストを作成
   const { data: aliases } = await db
     .from('pedal_aliases')
     .select('alias')
     .eq('pedal_full_name', pedalFullName);
   const searchNames = [pedalFullName, ...(aliases||[]).map(a => a.alias)];
-
-  // ★ 全投稿からgear_listにnameが含まれるものをJS側でフィルタ
-  // パフォーマンスのため、まず直近200件を取得してからフィルタリング
   const { data: posts } = await db
     .from('posts')
     .select('id, title, username, image_urls, gear_list, created_at')
     .order('created_at', { ascending: false })
     .limit(200);
-
   if (!posts) return [];
-
   const lowerNames = searchNames.map(n => n.replace(/\t/g,' ').replace(/ +/g,' ').toLowerCase().trim());
-
   return posts
     .filter(post => {
       const gear = Array.isArray(post.gear_list) ? post.gear_list : [];
@@ -532,7 +520,7 @@ async function loadPedal() {
   if (!pedals?.length) { showError(tr('notFound')); return; }
   const pedal = pedals[0];
   cachedPedal = pedal;
-  // ★ view_countをインクリメント（非同期・エラーは無視）
+  // ★ view_countをインクリメント
   db.from('pedals').update({ view_count: (pedal.view_count||0) + 1 }).eq('id', pedal.id).then(() => {});
   document.getElementById('bc-brand').textContent = pedal.brand;
   document.getElementById('bc-brand').href = `/brand?name=${encodeURIComponent(pedal.brand)}`;
@@ -561,21 +549,24 @@ async function loadPedal() {
   setMeta('tw-image','content', pedalImg);
   setMeta('canonical','href', pedalUrl);
 
-  // JSON-LD（構造化データ）
+  // JSON-LD（構造化データ）★ WebPageスキーマに変更（Productはレビュー機能実装時に戻す）
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
-    "name": pedal.full_name,
-    "brand": { "@type": "Brand", "name": pedal.brand },
-    "description": pedalDesc,
+    "@type": "WebPage",
+    "name": pedal.full_name + " | My Gear My Board",
+    "description": finalDesc,
     "image": pedalImg,
     "url": pedalUrl,
-    "category": (pedal.types||[]).join(', ')
+    "about": {
+      "@type": "Product",
+      "name": pedal.full_name,
+      "brand": { "@type": "Brand", "name": pedal.brand },
+      "category": (pedal.types||[]).join(', ')
+    }
   };
   const ldEl = document.getElementById('json-ld');
   if(ldEl) ldEl.textContent = JSON.stringify(jsonLd);
 
-  // ★ 修正: JS側フィルタリングに変更
   const posts = await fetchBoardsByPedal(pedal.full_name);
   cachedPosts = posts;
 
