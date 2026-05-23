@@ -568,6 +568,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div style="display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:20px">
       <div class="tab on" id="rb-tab-batch" onclick="rbSwitchTab('batch')" style="margin-bottom:-1px">⚡ バッチ実行</div>
       <div class="tab" id="rb-tab-results" onclick="rbSwitchTab('results')" style="margin-bottom:-1px">📋 結果確認</div>
+      <div class="tab" id="rb-tab-manage" onclick="rbSwitchTab('manage')" style="margin-bottom:-1px">🖼 画像管理</div>
       <div class="tab" id="rb-tab-linkcheck" onclick="rbSwitchTab('linkcheck')" style="margin-bottom:-1px">🔗 リンク切れチェック</div>
     </div>
 
@@ -639,6 +640,31 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <span id="rb-result-count" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)"></span>
       </div>
       <div id="rb-results-list"><div class="empty-msg">バッチを実行すると結果が表示されます</div></div>
+    </div>
+
+    <!-- ★ 画像管理パネル -->
+    <div id="rb-panel-manage" style="display:none">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">
+        楽天で取得済みの画像を一覧表示します。チェックして再取得・削除・手動URL入力ができます。
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+        <button class="submit-btn" onclick="rbManageLoad()">🔄 DBから読み込む</button>
+        <button class="fetch-btn" onclick="rbManageCheckAll()">☑ 全選択</button>
+        <button class="fetch-btn" onclick="rbManageUncheckAll()">☐ 全解除</button>
+        <button class="fetch-btn" onclick="rbManageReSearch()" id="rb-manage-research-btn" style="display:none">🔍 選択項目を再取得</button>
+        <button class="del-btn" onclick="rbManageDeleteChecked()" id="rb-manage-delete-btn" style="display:none" style="padding:6px 12px">🗑 選択項目の画像を削除</button>
+        <span id="rb-manage-count" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)"></span>
+      </div>
+      <!-- 再取得時のカスタムキーワード入力 -->
+      <div id="rb-manage-kw-row" style="display:none;background:var(--sf);border:1px solid rgba(240,165,0,.3);border-radius:6px;padding:12px;margin-bottom:12px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac2);margin-bottom:8px">🔍 再取得時の検索キーワード（空欄なら「ペダル名+エフェクター」で検索）</div>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="rb-manage-kw" type="text" placeholder="例: BOSS HM-2W Waza Craft エフェクター" style="flex:1;font-size:13px">
+          <button class="submit-btn" onclick="rbManageReSearchExec()">▶ 実行</button>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:6px">複数選択時はこのキーワードが全項目に適用されます</div>
+      </div>
+      <div id="rb-manage-list"><div class="empty-msg">「DBから読み込む」を押してください</div></div>
     </div>
 
     <!-- ③ リンク切れチェックパネル -->
@@ -1449,7 +1475,7 @@ function previewPedalImg(url){const preview=document.getElementById('pedal-img-p
 
 async function handlePedalImageFile(input){
   const file=input.files[0];if(!file)return;const msg=document.getElementById('upload-progress-msg');msg.textContent='🔄 画像を変換中...';
-  try{const compressed=await compressPedalImage(file);const preview=document.getElementById('pedal-img-preview');preview.src=compressed;preview.classList.add('show');document.getElementById('edit-image-url').value='__pending__';window._pendingPedalImageB64=compressed;msg.textContent='✅ 変換完了。「保存」を押すとアップロードします。';}
+  try{const compressed=await compressPedalImage(file);const preview=document.getElementById('pedal-img-preview');preview.src=compressed;preview.classList.add('show');document.getElementById('edit-image-url').value='__pending__';window._pendingPedalImageB64=compressed;msg.textContent='✅ 変換完了。「保存」を押すとアップロードします。';document.getElementById('edit-image-file').dataset.uploaded='1';}
   catch(e){msg.textContent='❌ 変換に失敗しました';}
 }
 function compressPedalImage(file){
@@ -1478,7 +1504,11 @@ async function savePedalEdit(){
     if(window._pendingPedalImageB64){msg.textContent='📤 アップロード中...';try{image_url=await uploadPedalImage(window._pendingPedalImageB64,editingPedalId);window._pendingPedalImageB64=null;msg.textContent='✅ アップロード完了';}catch(e){msg.textContent='❌ '+(e?.message||'不明なエラー');return;}}
     else{image_url=null;}
   }
-  const image_source=document.getElementById('edit-image-source').value.trim()||null;
+  // ★ 写真アップロード時はimage_sourceを'manual'に自動セット
+  let image_source=document.getElementById('edit-image-source').value.trim()||null;
+  if(image_url && image_url !== '__pending__' && !image_source && document.getElementById('edit-image-file').dataset.uploaded === '1') {
+    image_source = 'manual';
+  }
   const description=document.getElementById('edit-desc-ja').innerHTML.trim()||null;
   const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
   const ytUrlInput=document.getElementById('edit-youtube-url').value.trim();
@@ -1939,7 +1969,7 @@ let rbLcRunning = false;
 let rbLcStopFlag = false;
 
 function rbSwitchTab(name) {
-  ['batch','results','linkcheck'].forEach(t => {
+  ['batch','results','manage','linkcheck'].forEach(t => {
     document.getElementById('rb-panel-'+t).style.display = t===name ? 'block' : 'none';
     const tab = document.getElementById('rb-tab-'+t);
     if(tab) { tab.classList.toggle('on', t===name); }
@@ -1964,8 +1994,10 @@ async function rbPreviewCount() {
 }
 
 // Netlify Function経由で楽天APIを呼ぶ（CORSのため）
-async function rbSearchRakuten(pedalName) {
-  const res = await fetch('/.netlify/functions/rakuten?q=' + encodeURIComponent(pedalName));
+async function rbSearchRakuten(pedalName, customKeyword) {
+  let url = '/.netlify/functions/rakuten?q=' + encodeURIComponent(pedalName);
+  if(customKeyword) url += '&kw=' + encodeURIComponent(customKeyword);
+  const res = await fetch(url);
   if(!res.ok) throw new Error('HTTP ' + res.status);
   return await res.json();
 }
@@ -2026,11 +2058,18 @@ async function rbStartBatch() {
     document.getElementById('rb-progress-msg').textContent =
       `[${i+1}/${pedals.length}] 検索中: ${pedal.full_name}`;
 
-    // 画像あり かつ 手動入力済みはスキップ
-    if(skipExisting && pedal.image_url && pedal.image_source !== 'rakuten') {
+    // 画像あり かつ 手動入力済みはスキップ（skipExistingがONの場合のみ）
+    if(skipExisting && pedal.image_url && pedal.image_source === 'manual') {
       skip++;
       document.getElementById('rb-stat-skip').textContent = skip;
-      rbResults.push({pedal, status:'skip', reason:'画像あり（手動）'});
+      rbResults.push({pedal, status:'skip', reason:'画像あり（手動・保護）'});
+      continue;
+    }
+    // 楽天取得済み画像はスキップ（skipExistingがONの場合のみ）
+    if(skipExisting && pedal.image_url && pedal.image_source === 'rakuten') {
+      skip++;
+      document.getElementById('rb-stat-skip').textContent = skip;
+      rbResults.push({pedal, status:'skip', reason:'画像あり（楽天取得済）'});
       continue;
     }
 
@@ -2061,7 +2100,9 @@ async function rbStartBatch() {
         } else {
           // success or warn → 保存
           const updates = {rakuten_searched:true};
-          if(imageUrl && !pedal.image_url) {
+          // ★ 手動アップロード済み(manual)は上書きしない。それ以外は上書きOK
+          const isManual = pedal.image_source === 'manual';
+          if(imageUrl && !isManual) {
             updates.image_url = imageUrl;
             updates.image_source = 'rakuten';
           }
@@ -2136,7 +2177,7 @@ function rbRenderResults() {
     '<tbody>' +
     filtered.map((r,i) => {
       const imgHtml = r.imageUrl
-        ? `<img src="${r.imageUrl}" style="width:48px;height:48px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">`
+        ? `<img src="${r.imageUrl}" style="width:48px;height:48px;object-fit:contain;border-radius:4px;border:1px solid var(--bd);cursor:zoom-in" onclick="rbOpenLightbox('${r.imageUrl.replace(/'/g,"\\'")}') ">`
         : '<span style="font-size:10px;color:var(--td)">なし</span>';
       const btnHtml = (r.status==='warn'||r.status==='fail') && r.imageUrl
         ? `<button class="approve-btn" onclick="rbManualApply(${i})" style="font-size:10px;padding:3px 8px">適用</button>`
@@ -2266,6 +2307,205 @@ async function rbLcApplyUrl(pedalId, name) {
   const { error } = await sb.from('pedals').update({image_url:newUrl}).eq('id',pedalId);
   if(error) { showToast('❌ 保存失敗'); return; }
   showToast('✅ ' + name + ' を更新しました');
+}
+
+
+// ★ 画像lightbox（admin用）
+function rbOpenLightbox(src) {
+  let lb = document.getElementById('rb-lightbox');
+  if(!lb) {
+    lb = document.createElement('div');
+    lb.id = 'rb-lightbox';
+    lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out';
+    lb.onclick = () => lb.style.display = 'none';
+    lb.innerHTML = '<button onclick="event.stopPropagation();this.parentElement.style.display=\'none\'" style="position:absolute;top:16px;right:16px;width:38px;height:38px;background:rgba(255,255,255,.12);border:none;border-radius:50%;color:#fff;font-size:18px;cursor:pointer">✕</button><img id="rb-lightbox-img" style="max-width:92vw;max-height:86vh;object-fit:contain;border-radius:8px">';
+    document.body.appendChild(lb);
+  }
+  document.getElementById('rb-lightbox-img').src = src;
+  lb.style.display = 'flex';
+}
+
+// ★ 画像管理タブ
+let rbManageItems = [];
+let rbManageChecked = new Set();
+
+async function rbManageLoad() {
+  const el = document.getElementById('rb-manage-list');
+  const countEl = document.getElementById('rb-manage-count');
+  el.innerHTML = '<div class="loading">読み込み中...</div>';
+  rbManageChecked.clear();
+  rbUpdateManageButtons();
+
+  // 画像があるペダルを全件取得（ページネーション）
+  let all = [];
+  let offset = 0;
+  while(true) {
+    const { data: batch } = await sb.from('pedals')
+      .select('id,brand,model,full_name,image_url,image_source,rakuten_item_url,rakuten_searched')
+      .not('image_url','is',null)
+      .order('brand').order('model')
+      .range(offset, offset + 999);
+    if(!batch || !batch.length) break;
+    all = all.concat(batch);
+    if(batch.length < 1000) break;
+    offset += 1000;
+  }
+  rbManageItems = all;
+  if(countEl) countEl.textContent = all.length + '件';
+  rbManageRender();
+}
+
+function rbManageRender() {
+  const el = document.getElementById('rb-manage-list');
+  if(!rbManageItems.length) { el.innerHTML = '<div class="empty-msg">画像あきのペダルがありません</div>'; return; }
+
+  const sourceColor = { manual:'#4ade80', rakuten:'var(--ac2)', null:'var(--td)' };
+  const sourceLabel = { manual:'手動', rakuten:'楽天', null:'不明' };
+
+  el.innerHTML = '<div class="table-wrap"><table>' +
+    '<thead><tr><th style="width:32px"><input type="checkbox" id="rb-manage-all-cb" onchange="rbManageToggleAll(this.checked)" style="accent-color:var(--ac)"></th><th>画像</th><th>ペダル名</th><th>出典</th><th>手動URL入力</th></tr></thead>' +
+    '<tbody>' +
+    rbManageItems.map((p, i) => {
+      const src = p.image_source || null;
+      const srcColor = src === 'manual' ? '#4ade80' : src === 'rakuten' ? 'var(--ac2)' : 'var(--td)';
+      const srcLabel = src === 'manual' ? '手動' : src === 'rakuten' ? '楽天' : '不明';
+      const checked = rbManageChecked.has(p.id) ? 'checked' : '';
+      return `<tr id="rb-manage-row-${p.id}">
+        <td><input type="checkbox" ${checked} data-id="${p.id}" data-idx="${i}" onchange="rbManageToggle(this)" style="accent-color:var(--ac)"></td>
+        <td><img src="${escHtml(p.image_url)}" style="width:56px;height:56px;object-fit:contain;border-radius:4px;border:1px solid var(--bd);cursor:zoom-in" onclick="rbOpenLightbox('${p.image_url.replace(/'/g,"\\'")}')"></td>
+        <td style="font-size:12px;font-weight:500">${escHtml(p.full_name)}</td>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${srcColor}">${srcLabel}</span></td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <input type="text" id="rb-manage-url-${p.id}" class="form-input" placeholder="画像URLを直接入力" style="min-width:0;flex:1;font-size:11px;padding:5px 8px">
+            <button onclick="rbManageApplyUrl(${p.id})" class="approve-btn" style="font-size:10px;padding:3px 8px;white-space:nowrap">適用</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') +
+    '</tbody></table></div>';
+}
+
+function rbManageToggle(cb) {
+  const id = parseInt(cb.dataset.id);
+  if(cb.checked) rbManageChecked.add(id);
+  else rbManageChecked.delete(id);
+  rbUpdateManageButtons();
+}
+
+function rbManageToggleAll(checked) {
+  rbManageChecked.clear();
+  if(checked) rbManageItems.forEach(p => rbManageChecked.add(p.id));
+  document.querySelectorAll('[data-id]').forEach(cb => { cb.checked = checked; });
+  rbUpdateManageButtons();
+}
+
+function rbManageCheckAll() {
+  const allCb = document.getElementById('rb-manage-all-cb');
+  if(allCb) allCb.checked = true;
+  rbManageToggleAll(true);
+}
+
+function rbManageUncheckAll() {
+  const allCb = document.getElementById('rb-manage-all-cb');
+  if(allCb) allCb.checked = false;
+  rbManageToggleAll(false);
+}
+
+function rbUpdateManageButtons() {
+  const hasChecked = rbManageChecked.size > 0;
+  const researchBtn = document.getElementById('rb-manage-research-btn');
+  const deleteBtn = document.getElementById('rb-manage-delete-btn');
+  const kwRow = document.getElementById('rb-manage-kw-row');
+  if(researchBtn) researchBtn.style.display = hasChecked ? 'inline-block' : 'none';
+  if(deleteBtn) deleteBtn.style.display = hasChecked ? 'inline-block' : 'none';
+  if(kwRow) kwRow.style.display = hasChecked ? 'block' : 'none';
+}
+
+function rbManageReSearch() {
+  // キーワード入力欄を表示して待機（rbManageReSearchExecで実行）
+  const kwRow = document.getElementById('rb-manage-kw-row');
+  if(kwRow) kwRow.style.display = 'block';
+}
+
+async function rbManageReSearchExec() {
+  const customKw = document.getElementById('rb-manage-kw').value.trim() || null;
+  const delay = 1200;
+  const targets = rbManageItems.filter(p => rbManageChecked.has(p.id));
+  if(!targets.length) { showToast('❌ 項目を選択してください'); return; }
+
+  showToast('🔍 再取得開始: ' + targets.length + '件');
+
+  for(let i=0; i<targets.length; i++) {
+    const pedal = targets[i];
+    try {
+      const data = await rbSearchRakuten(pedal.full_name, customKw);
+      const items = data.items || [];
+      if(items.length) {
+        const item = items[0];
+        const imageUrl = item.imageUrl || null;
+        const itemUrl = item.itemUrl || '';
+        if(imageUrl) {
+          await sb.from('pedals').update({
+            image_url: imageUrl,
+            image_source: 'rakuten',
+            rakuten_item_url: itemUrl || null,
+            rakuten_searched: true
+          }).eq('id', pedal.id);
+          // ローカルも更新
+          const idx = rbManageItems.findIndex(p => p.id === pedal.id);
+          if(idx >= 0) { rbManageItems[idx].image_url = imageUrl; rbManageItems[idx].image_source = 'rakuten'; }
+          showToast('✅ ' + pedal.full_name + ' を更新しました');
+        } else {
+          showToast('⚠️ ' + pedal.full_name + ' 画像なし');
+        }
+      } else {
+        showToast('❌ ' + pedal.full_name + ' ヒットなし');
+      }
+    } catch(e) {
+      showToast('❌ エラー: ' + pedal.full_name);
+    }
+    if(i < targets.length-1) await new Promise(r=>setTimeout(r, delay));
+  }
+
+  rbManageChecked.clear();
+  rbUpdateManageButtons();
+  rbManageRender();
+  showToast('✅ 再取得完了');
+}
+
+async function rbManageDeleteChecked() {
+  const targets = rbManageItems.filter(p => rbManageChecked.has(p.id));
+  if(!targets.length) { showToast('❌ 項目を選択してください'); return; }
+  if(!confirm(targets.length + '件の画像データを削除しますか？
+（image_url・image_source・rakuten_item_urlをnullにします）')) return;
+
+  for(const pedal of targets) {
+    await sb.from('pedals').update({
+      image_url: null,
+      image_source: null,
+      rakuten_item_url: null,
+      rakuten_searched: false
+    }).eq('id', pedal.id);
+  }
+
+  showToast('🗑 ' + targets.length + '件の画像を削除しました');
+  await rbManageLoad();
+}
+
+async function rbManageApplyUrl(pedalId) {
+  const input = document.getElementById('rb-manage-url-' + pedalId);
+  const newUrl = input ? input.value.trim() : '';
+  if(!newUrl) { showToast('❌ URLを入力してください'); return; }
+  const { error } = await sb.from('pedals').update({
+    image_url: newUrl,
+    image_source: 'manual'
+  }).eq('id', pedalId);
+  if(error) { showToast('❌ 保存失敗: ' + error.message); return; }
+  const idx = rbManageItems.findIndex(p => p.id === pedalId);
+  if(idx >= 0) { rbManageItems[idx].image_url = newUrl; rbManageItems[idx].image_source = 'manual'; }
+  showToast('✅ 更新しました（manual）');
+  rbManageRender();
 }
 
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
