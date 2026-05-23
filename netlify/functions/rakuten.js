@@ -1,9 +1,11 @@
 exports.handler = async function(event) {
-  const appId = process.env.RAKUTEN_ACCESS_KEY;
-  if (!appId) {
+  const applicationId = process.env.RAKUTEN_APP_ID;
+  const accessKey = process.env.RAKUTEN_ACCESS_KEY;
+
+  if (!applicationId || !accessKey) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'RAKUTEN_ACCESS_KEY not configured' })
+      body: JSON.stringify({ error: 'RAKUTEN_APP_ID or RAKUTEN_ACCESS_KEY not configured' })
     };
   }
 
@@ -16,8 +18,9 @@ exports.handler = async function(event) {
   }
 
   try {
-    const url = 'https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706' +
-      '?applicationId=' + appId +
+    const url = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601' +
+      '?applicationId=' + applicationId +
+      '&accessKey=' + accessKey +
       '&keyword=' + encodeURIComponent(query) +
       '&hits=3' +
       '&imageFlag=1' +
@@ -31,8 +34,7 @@ exports.handler = async function(event) {
         statusCode: res.status,
         body: JSON.stringify({
           error: 'Rakuten API error: ' + res.status,
-          detail: responseText,
-          url_used: url.replace(appId, '***')
+          detail: responseText
         })
       };
     }
