@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>メンテナンス中 | My Gear My Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--tx:#eae8e2;--tm:#9a9890;--td:#6e6c68}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:40px 32px;width:100%;max-width:480px;text-align:center}
+.logo{width:72px;height:72px;border-radius:50%;object-fit:contain;margin:0 auto 20px;display:block}
+.icon{font-size:48px;margin-bottom:16px;animation:spin 3s linear infinite;display:block}
+@keyframes spin{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-10deg)}75%{transform:rotate(10deg)}}
+.title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:var(--ac);margin-bottom:8px}
+.subtitle{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);letter-spacing:2px;text-transform:uppercase;margin-bottom:28px}
+.divider{height:1px;background:var(--bd);margin:24px 0}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.time-block{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;margin-bottom:12px;text-align:left}
+.time-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.time-row:last-child{margin-bottom:0}
+.time-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);width:36px;flex-shrink:0}
+.time-val{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--tx);font-weight:600}
+.message-block{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:14px 16px;margin-bottom:12px;text-align:left;font-size:13px;color:var(--tm);line-height:1.7}
+.message-block-en{background:var(--sf2);border:1px solid rgba(232,85,45,.2);border-radius:8px;padding:14px 16px;margin-bottom:0;text-align:left;font-size:13px;color:var(--tm);line-height:1.7}
+.lang-tag{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ac);border:1px solid rgba(232,85,45,.3);border-radius:3px;padding:1px 6px;margin-bottom:6px}
+.footer-note{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:20px;line-height:1.6}
+.sns-link{color:var(--ac);text-decoration:none}
+.sns-link:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="card">
+  <img src="/IMG_0206.PNG" alt="MGMB" class="logo" onerror="this.style.display='none'">
+  <span class="icon">🔧</span>
+  <div class="title" id="main-title">MAINTENANCE</div>
+  <div class="subtitle" id="main-subtitle">ただいまメンテナンス中です</div>
+  <div id="time-section" style="display:none">
+    <div class="divider"></div>
+    <div class="section-label" id="label-schedule">メンテナンス予定</div>
+    <div class="time-block">
+      <div class="time-row"><span class="time-label" id="label-start">開始</span><span class="time-val" id="start-time">—</span></div>
+      <div class="time-row"><span class="time-label" id="label-end">終了</span><span class="time-val" id="end-time">—</span></div>
+    </div>
+  </div>
+  <div id="message-section" style="display:none">
+    <div class="divider"></div>
+    <div id="message-ja-wrap" style="margin-bottom:8px">
+      <div class="lang-tag">JA</div>
+      <div class="message-block" id="message-ja"></div>
+    </div>
+    <div id="message-en-wrap">
+      <div class="lang-tag">EN</div>
+      <div class="message-block-en" id="message-en"></div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="footer-note" id="footer-note">
+    MY GEAR MY BOARD<br>
+    <a href="https://twitter.com/MGMBpedalboard" target="_blank" rel="noopener" class="sns-link">@MGMBpedalboard</a>
+  </div>
+</div>
+<script>
+const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const PREVIEW_KEY='MSTR0198';
+
+// プレビューモード：?preview=MSTR0198 でそのまま表示
+const params=new URLSearchParams(location.search);
+if(params.get('preview')===PREVIEW_KEY){
+  // previewパラメータを除いた元のURLに戻す
+  params.delete('preview');
+  const newSearch=params.toString();
+  const newUrl=location.pathname+(newSearch?'?'+newSearch:'');
+  location.replace(newUrl);
+}
+
+async function loadContent(){
+  try{
+    const{data}=await sb.from('site_content').select('*').eq('id','maintenance').maybeSingle();
+    if(!data)return;
+    let info={};
+    try{info=JSON.parse(data.content_ja||'{}');}catch(e){}
+    let infoEn={};
+    try{infoEn=JSON.parse(data.content_en||'{}');}catch(e){}
+
+    // 時間表示
+    if(info.start||info.end){
+      document.getElementById('time-section').style.display='block';
+      document.getElementById('start-time').textContent=info.start||'—';
+      document.getElementById('end-time').textContent=info.end||'—';
+    }
+    // メッセージ表示
+    const hasJa=info.message&&info.message.trim();
+    const hasEn=infoEn.message&&infoEn.message.trim();
+    if(hasJa||hasEn){
+      document.getElementById('message-section').style.display='block';
+      if(hasJa){
+        document.getElementById('message-ja').textContent=info.message;
+      }else{
+        document.getElementById('message-ja-wrap').style.display='none';
+      }
+      if(hasEn){
+        document.getElementById('message-en').textContent=infoEn.message;
+      }else{
+        document.getElementById('message-en-wrap').style.display='none';
+      }
+    }
+  }catch(e){console.warn('maintenance content load error',e);}
+}
+loadContent();
+</script>
+</body>
+</html>
