@@ -18,10 +18,9 @@ exports.handler = async function(event) {
   try {
     const url = 'https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706' +
       '?applicationId=' + appId +
-      '&keyword=' + encodeURIComponent('"' + query + '"') +
+      '&keyword=' + encodeURIComponent(query) +
       '&hits=3' +
       '&imageFlag=1' +
-      '&sort=%2BitemPrice' +
       '&formatVersion=2';
 
     const res = await fetch(url);
