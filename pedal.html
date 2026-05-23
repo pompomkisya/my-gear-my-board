@@ -230,7 +230,7 @@ function amazonJpUrl(n) { return 'https://www.amazon.co.jp/s?k='+encodeURICompon
 function amazonUsUrl(n) { return 'https://www.amazon.com/s?k='+encodeURIComponent(n)+'&tag=mgmb-20'; }
 // ★ もしもアフィリエイト対応
 function rakutenUrl(n, itemUrl) {
-  if(itemUrl) return 'https://af.moshimo.com/af/c/click?a_id=5580518&p_id=54&url=' + encodeURIComponent(itemUrl);
+  if(itemUrl) return 'https://af.moshimo.com/af/c/click?a_id=5580518&p_id=54&pc_id=54&pl_id=616&url=' + encodeURIComponent(itemUrl);
   return 'https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(n)+'/';
 }
 function reverbUrl(n) { return 'https://reverb.com/marketplace?query='+encodeURIComponent(n); }
