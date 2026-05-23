@@ -1,9 +1,9 @@
 exports.handler = async function(event) {
-  const appId = process.env.RAKUTEN_APP_ID;
+  const appId = process.env.RAKUTEN_ACCESS_KEY;
   if (!appId) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'RAKUTEN_APP_ID not configured' })
+      body: JSON.stringify({ error: 'RAKUTEN_ACCESS_KEY not configured' })
     };
   }
 
