@@ -2390,9 +2390,12 @@ function rbManageRender() {
         <td style="font-size:12px;font-weight:500">${escHtml(p.full_name)}</td>
         <td><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${srcColor}">${srcLabel}</span></td>
         <td>
-          <div style="display:flex;gap:4px">
-            <input type="text" id="rb-manage-url-${p.id}" class="form-input" placeholder="画像URLを直接入力" style="min-width:0;flex:1;font-size:11px;padding:5px 8px">
-            <button onclick="rbManageApplyUrl(${p.id})" class="approve-btn" style="font-size:10px;padding:3px 8px;white-space:nowrap">適用</button>
+          <div style="display:flex;gap:4px;flex-direction:column">
+            <div style="display:flex;gap:4px">
+              <input type="text" id="rb-manage-url-${p.id}" class="form-input" placeholder="楽天商品ページURL（item.rakuten.co.jp/...）" style="min-width:0;flex:1;font-size:11px;padding:5px 8px">
+              <button onclick="rbManageApplyUrl(${p.id})" class="approve-btn" style="font-size:10px;padding:3px 8px;white-space:nowrap">取得＆保存</button>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)">楽天商品ページURLを貼るだけで画像＋商品URLを自動取得</div>
           </div>
         </td>
       </tr>`;
@@ -2508,16 +2511,57 @@ async function rbManageDeleteChecked() {
 
 async function rbManageApplyUrl(pedalId) {
   const input = document.getElementById('rb-manage-url-' + pedalId);
-  const newUrl = input ? input.value.trim() : '';
-  if(!newUrl) { showToast('❌ URLを入力してください'); return; }
-  const { error } = await sb.from('pedals').update({
-    image_url: newUrl,
-    image_source: 'manual'
-  }).eq('id', pedalId);
-  if(error) { showToast('❌ 保存失敗: ' + error.message); return; }
-  const idx = rbManageItems.findIndex(p => p.id === pedalId);
-  if(idx >= 0) { rbManageItems[idx].image_url = newUrl; rbManageItems[idx].image_source = 'manual'; }
-  showToast('✅ 更新しました（manual）');
+  const inputUrl = input ? input.value.trim() : '';
+  if(!inputUrl) { showToast('❌ URLを入力してください'); return; }
+
+  const pedal = rbManageItems.find(p => p.id === pedalId);
+  if(!pedal) return;
+
+  // 楽天商品ページURLかどうか判定
+  const isRakutenItemPage = inputUrl.includes('item.rakuten.co.jp/');
+
+  if(isRakutenItemPage) {
+    // ★ 楽天APIで画像・商品URLを取得
+    showToast('🔍 楽天から画像を取得中...');
+    try {
+      const res = await fetch('/.netlify/functions/rakuten?q=' + encodeURIComponent(pedal.full_name) + '&item_url=' + encodeURIComponent(inputUrl));
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const items = data.items || [];
+      if(!items.length || !items[0].imageUrl) {
+        showToast('⚠️ 画像を取得できませんでした。URLを確認してください');
+        return;
+      }
+      const item = items[0];
+      const { error } = await sb.from('pedals').update({
+        image_url: item.imageUrl,
+        image_source: 'manual',
+        rakuten_item_url: inputUrl,
+        rakuten_searched: true
+      }).eq('id', pedalId);
+      if(error) { showToast('❌ 保存失敗: ' + error.message); return; }
+      const idx = rbManageItems.findIndex(p => p.id === pedalId);
+      if(idx >= 0) {
+        rbManageItems[idx].image_url = item.imageUrl;
+        rbManageItems[idx].image_source = 'manual';
+        rbManageItems[idx].rakuten_item_url = inputUrl;
+      }
+      showToast('✅ 画像・商品URLを保存しました');
+    } catch(e) {
+      showToast('❌ エラー: ' + e.message);
+      return;
+    }
+  } else {
+    // 画像URLの直接入力として扱う
+    const { error } = await sb.from('pedals').update({
+      image_url: inputUrl,
+      image_source: 'manual'
+    }).eq('id', pedalId);
+    if(error) { showToast('❌ 保存失敗: ' + error.message); return; }
+    const idx = rbManageItems.findIndex(p => p.id === pedalId);
+    if(idx >= 0) { rbManageItems[idx].image_url = inputUrl; rbManageItems[idx].image_source = 'manual'; }
+    showToast('✅ 画像URLを保存しました（manual）');
+  }
   rbManageRender();
 }
 
