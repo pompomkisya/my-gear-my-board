@@ -26,7 +26,13 @@ exports.handler = async function(event) {
       '&imageFlag=1' +
       '&formatVersion=2';
 
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      headers: {
+        'Origin': 'https://mygearmyboard.com',
+        'Referer': 'https://mygearmyboard.com/',
+        'User-Agent': 'Mozilla/5.0'
+      }
+    });
     const responseText = await res.text();
 
     if (!res.ok) {
