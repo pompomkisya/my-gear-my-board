@@ -180,6 +180,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-features')">🗂 特集ページ</div>
     <div class="tab" onclick="switchTab(this,'tab-regions')">🌍 言語圏別</div>
     <div class="tab" onclick="switchTab(this,'tab-maintenance')">🔧 メンテナンス</div>
+    <div class="tab" onclick="switchTab(this,'tab-rakuten')">🛒 楽天画像バッチ</div>
   </div>
 
   <div class="panel on" id="tab-dashboard">
@@ -559,6 +560,109 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
 
 
+  <!-- ★ 楽天画像バッチタブ -->
+  <div class="panel" id="tab-rakuten">
+    <div class="section-title">🛒 楽天画像バッチ</div>
+
+    <!-- タブ切替 -->
+    <div style="display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:20px">
+      <div class="tab on" id="rb-tab-batch" onclick="rbSwitchTab('batch')" style="margin-bottom:-1px">⚡ バッチ実行</div>
+      <div class="tab" id="rb-tab-results" onclick="rbSwitchTab('results')" style="margin-bottom:-1px">📋 結果確認</div>
+      <div class="tab" id="rb-tab-linkcheck" onclick="rbSwitchTab('linkcheck')" style="margin-bottom:-1px">🔗 リンク切れチェック</div>
+    </div>
+
+    <!-- ① バッチ実行パネル -->
+    <div id="rb-panel-batch">
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:16px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);margin-bottom:14px">🔑 API設定</div>
+        <div style="margin-bottom:10px">
+          <label class="pedal-edit-label" style="margin-top:0">楽天 Application ID</label>
+          <input class="form-input" id="rb-api-key" type="password" placeholder="楽天デベロッパーのApplication ID" style="width:100%;font-family:'JetBrains Mono',monospace">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px">このページを閉じると消えます。DBには保存されません。</div>
+        </div>
+
+      </div>
+
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:16px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);margin-bottom:14px">⚙️ 実行オプション</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)">
+            <input type="checkbox" id="rb-opt-skip-existing" checked style="accent-color:var(--ac)">
+            画像あり（手動入力済み）はスキップ
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)">
+            <input type="checkbox" id="rb-opt-skip-searched" checked style="accent-color:var(--ac)">
+            検索済み（rakuten_searched=true）はスキップ
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">待機時間:</div>
+          <select id="rb-delay" style="background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);outline:none">
+            <option value="1200">1.2秒（推奨）</option>
+            <option value="1500">1.5秒</option>
+            <option value="2000">2秒（安全）</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 進捗表示 -->
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:16px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);margin-bottom:14px">📊 進捗</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px">
+          <div class="stat-card"><div class="stat-num" id="rb-stat-total" style="font-size:24px">-</div><div class="stat-lbl">対象件数</div></div>
+          <div class="stat-card"><div class="stat-num" id="rb-stat-done" style="font-size:24px;color:#4ade80">0</div><div class="stat-lbl">✅ 取得成功</div></div>
+          <div class="stat-card"><div class="stat-num" id="rb-stat-warn" style="font-size:24px;color:var(--ac2)">0</div><div class="stat-lbl">⚠️ 精度不安</div></div>
+          <div class="stat-card"><div class="stat-num" id="rb-stat-fail" style="font-size:24px;color:#e05050">0</div><div class="stat-lbl">❌ 未取得</div></div>
+          <div class="stat-card"><div class="stat-num" id="rb-stat-skip" style="font-size:24px;color:var(--td)">0</div><div class="stat-lbl">⏭ スキップ</div></div>
+        </div>
+        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:4px;height:8px;overflow:hidden;margin-bottom:8px">
+          <div id="rb-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--ac),var(--ac2));border-radius:4px;transition:width .3s"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div id="rb-progress-msg" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">待機中</div>
+          <div id="rb-countdown" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="submit-btn" id="rb-start-btn" onclick="rbStartBatch()">▶ バッチ開始</button>
+        <button class="fetch-btn" id="rb-stop-btn" onclick="rbStopBatch()" style="display:none">⏹ 停止</button>
+        <button class="fetch-btn" onclick="rbPreviewCount()">対象件数を確認</button>
+      </div>
+    </div>
+
+    <!-- ② 結果確認パネル -->
+    <div id="rb-panel-results" style="display:none">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+        <select id="rb-result-filter" onchange="rbRenderResults()" style="background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);outline:none">
+          <option value="all">すべて表示</option>
+          <option value="success">✅ 取得成功のみ</option>
+          <option value="warn">⚠️ 精度不安のみ</option>
+          <option value="fail">❌ 未取得のみ</option>
+          <option value="skip">⏭ スキップのみ</option>
+        </select>
+        <button class="fetch-btn" onclick="rbExportCsv()">📥 CSVエクスポート</button>
+        <span id="rb-result-count" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)"></span>
+      </div>
+      <div id="rb-results-list"><div class="empty-msg">バッチを実行すると結果が表示されます</div></div>
+    </div>
+
+    <!-- ③ リンク切れチェックパネル -->
+    <div id="rb-panel-linkcheck" style="display:none">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">
+        image_source が「rakuten」の画像URLに対してHEADリクエストを送り、リンク切れを検出します。<br>
+        ⚠️ 数が多い場合は時間がかかります。
+      </p>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="submit-btn" id="rb-lc-start-btn" onclick="rbStartLinkCheck()">🔗 リンク切れチェック開始</button>
+        <button class="fetch-btn" id="rb-lc-stop-btn" onclick="rbStopLinkCheck()" style="display:none">⏹ 停止</button>
+      </div>
+      <div id="rb-lc-progress" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:12px"></div>
+      <div id="rb-lc-results"><div class="empty-msg">チェックを実行すると結果が表示されます</div></div>
+    </div>
+  </div>
+
+
 <!-- ペダル編集モーダル -->
 <div class="pedal-edit-modal" id="pedal-edit-modal" onclick="if(event.target===this)closePedalEdit()">
   <div class="pedal-edit-box">
@@ -785,6 +889,7 @@ function switchTab(el,tabId){
   if(tabId==='tab-featured')loadFeatured();
   if(tabId==='tab-features')loadFeatures();
   if(tabId==='tab-maintenance')loadMaintenance();
+  if(tabId==='tab-rakuten')initRakutenTab();
 }
 
 let allPosts=[],allPedals=[],allComments=[];
@@ -1827,6 +1932,360 @@ function renderRegionPosts(){
       +'<td style="font-size:11px;color:var(--td)">'+timeAgo(p.created_at)+'</td>'
       +'</tr>').join('')
     +'</tbody></table></div>';
+}
+
+
+// ★ 楽天画像バッチ
+
+let rbResults = [];
+let rbRunning = false;
+let rbStopFlag = false;
+let rbLcRunning = false;
+let rbLcStopFlag = false;
+
+function rbSwitchTab(name) {
+  ['batch','results','linkcheck'].forEach(t => {
+    document.getElementById('rb-panel-'+t).style.display = t===name ? 'block' : 'none';
+    const tab = document.getElementById('rb-tab-'+t);
+    if(tab) { tab.classList.toggle('on', t===name); }
+  });
+  if(name==='results') rbRenderResults();
+}
+
+function initRakutenTab() {
+  rbSwitchTab('batch');
+  rbPreviewCount();
+}
+
+async function rbPreviewCount() {
+  const skipExisting = document.getElementById('rb-opt-skip-existing').checked;
+  const skipSearched = document.getElementById('rb-opt-skip-searched').checked;
+  let query = sb.from('pedals').select('id', {count:'exact', head:true});
+  if(skipExisting) query = query.is('image_url', null);
+  if(skipSearched) query = query.eq('rakuten_searched', false);
+  const { count } = await query;
+  document.getElementById('rb-stat-total').textContent = count || 0;
+  showToast('対象: ' + (count||0) + '件');
+}
+
+// 楽天APIはCORSの制限があるためNetlify Function経由で呼ぶ
+// → ただし今回はadminページ（自分だけ使う）なので直接呼ぶ方式も検討
+// 楽天商品検索APIはCORS対応しているため直接呼べる
+async function rbSearchRakuten(pedalName, appId) {
+  const q = encodeURIComponent('"' + pedalName + '"');
+  const url = 'https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706' +
+    '?applicationId=' + appId +
+    '&keyword=' + q +
+    '&hits=3' +
+    '&imageFlag=1' +
+    '&sort=+reviewCount' +
+    '&formatVersion=2';
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return await res.json();
+}
+
+function rbJudgeResult(pedalName, item) {
+  const itemName = (item.itemName || '').toLowerCase();
+  const brand = pedalName.split(' ')[0].toLowerCase();
+  const model = pedalName.split(' ').slice(1).join(' ').toLowerCase();
+  // ブランド名とモデル名の両方が商品名に含まれているか
+  const hasBrand = itemName.includes(brand);
+  const hasModel = model.length > 1 && itemName.includes(model);
+  if(hasBrand && hasModel) return 'success';
+  if(hasBrand || hasModel) return 'warn';
+  return 'fail';
+}
+
+function rbUpgradeImageUrl(url) {
+  if(!url) return url;
+  // 楽天の画像URLのサイズ指定を高画質に変換
+  return url.replace(/_ex=\d+x\d+/, '_ex=400x400');
+}
+
+async function rbStartBatch() {
+  const appId = document.getElementById('rb-api-key').value.trim();
+  if(!appId) { showToast('❌ 楽天Application IDを入力してください'); return; }
+
+  const skipExisting = document.getElementById('rb-opt-skip-existing').checked;
+  const skipSearched = document.getElementById('rb-opt-skip-searched').checked;
+  const delay = parseInt(document.getElementById('rb-delay').value) || 1200;
+
+  // 対象ペダルを取得
+  let query = sb.from('pedals').select('id,brand,model,full_name,image_url,image_source,rakuten_searched');
+  if(skipExisting) query = query.is('image_url', null);
+  if(skipSearched) query = query.eq('rakuten_searched', false);
+  query = query.order('brand').order('model');
+  const { data: pedals } = await query;
+  if(!pedals || !pedals.length) { showToast('対象ペダルがありません'); return; }
+
+  rbResults = [];
+  rbRunning = true;
+  rbStopFlag = false;
+  document.getElementById('rb-start-btn').style.display = 'none';
+  document.getElementById('rb-stop-btn').style.display = 'inline-block';
+  document.getElementById('rb-stat-total').textContent = pedals.length;
+  document.getElementById('rb-stat-done').textContent = '0';
+  document.getElementById('rb-stat-warn').textContent = '0';
+  document.getElementById('rb-stat-fail').textContent = '0';
+  document.getElementById('rb-stat-skip').textContent = '0';
+
+  let done=0, warn=0, fail=0, skip=0;
+
+  for(let i=0; i<pedals.length; i++) {
+    if(rbStopFlag) { showToast('⏹ 停止しました'); break; }
+
+    const pedal = pedals[i];
+    const progress = Math.round((i+1)/pedals.length*100);
+    document.getElementById('rb-progress-bar').style.width = progress + '%';
+    document.getElementById('rb-progress-msg').textContent =
+      `[${i+1}/${pedals.length}] 検索中: ${pedal.full_name}`;
+
+    // 画像あり かつ 手動入力済みはスキップ
+    if(skipExisting && pedal.image_url && pedal.image_source !== 'rakuten') {
+      skip++;
+      document.getElementById('rb-stat-skip').textContent = skip;
+      rbResults.push({pedal, status:'skip', reason:'画像あり（手動）'});
+      continue;
+    }
+
+    try {
+      const data = await rbSearchRakuten(pedal.full_name, appId);
+      const items = data.Items || [];
+
+      if(!items.length) {
+        // 0件ヒット
+        await sb.from('pedals').update({rakuten_searched:true}).eq('id',pedal.id);
+        fail++;
+        document.getElementById('rb-stat-fail').textContent = fail;
+        rbResults.push({pedal, status:'fail', reason:'楽天0件ヒット'});
+      } else {
+        const item = items[0];
+        const status = rbJudgeResult(pedal.full_name, item);
+        const rawImageUrl = item.mediumImageUrls && item.mediumImageUrls[0]
+          ? (item.mediumImageUrls[0].imageUrl || item.mediumImageUrls[0])
+          : null;
+        const imageUrl = rbUpgradeImageUrl(
+          typeof rawImageUrl === 'string' ? rawImageUrl :
+          (rawImageUrl && rawImageUrl.imageUrl ? rawImageUrl.imageUrl : null)
+        );
+        const itemUrl = item.itemUrl || '';
+        const itemName = item.itemName || '';
+
+        if(status === 'fail') {
+          // ヒットしたが商品名が一致しない
+          await sb.from('pedals').update({rakuten_searched:true}).eq('id',pedal.id);
+          fail++;
+          document.getElementById('rb-stat-fail').textContent = fail;
+          rbResults.push({pedal, status:'fail', reason:'商品名不一致', itemName, imageUrl, itemUrl});
+        } else {
+          // success or warn → 保存
+          const updates = {rakuten_searched:true};
+          if(imageUrl && !pedal.image_url) {
+            updates.image_url = imageUrl;
+            updates.image_source = 'rakuten';
+          }
+          if(itemUrl) updates.rakuten_item_url = itemUrl;
+          await sb.from('pedals').update(updates).eq('id',pedal.id);
+
+          if(status === 'warn') {
+            warn++;
+            document.getElementById('rb-stat-warn').textContent = warn;
+          } else {
+            done++;
+            document.getElementById('rb-stat-done').textContent = done;
+          }
+          rbResults.push({pedal, status, itemName, imageUrl, itemUrl});
+        }
+      }
+    } catch(e) {
+      // APIエラー（429等）
+      const errMsg = e.message || '不明なエラー';
+      fail++;
+      document.getElementById('rb-stat-fail').textContent = fail;
+      rbResults.push({pedal, status:'fail', reason:'APIエラー: '+errMsg});
+      // 429の場合は追加待機
+      if(errMsg.includes('429')) await new Promise(r=>setTimeout(r, 5000));
+    }
+
+    // 待機（カウントダウン表示）
+    if(i < pedals.length-1 && !rbStopFlag) {
+      const countEl = document.getElementById('rb-countdown');
+      for(let t=Math.ceil(delay/1000); t>0; t--) {
+        if(rbStopFlag) break;
+        if(countEl) countEl.textContent = '次まで ' + t + '秒...';
+        await new Promise(r=>setTimeout(r, 1000));
+      }
+      if(countEl) countEl.textContent = '';
+      // 端数待機
+      await new Promise(r=>setTimeout(r, delay % 1000));
+    }
+  }
+
+  rbRunning = false;
+  document.getElementById('rb-start-btn').style.display = 'inline-block';
+  document.getElementById('rb-stop-btn').style.display = 'none';
+  document.getElementById('rb-progress-msg').textContent =
+    rbStopFlag ? '停止しました' : '✅ バッチ完了！';
+  showToast('バッチ完了: 成功'+done+' 精度不安'+warn+' 未取得'+fail);
+  rbSwitchTab('results');
+}
+
+function rbStopBatch() {
+  rbStopFlag = true;
+  showToast('停止中...');
+}
+
+function rbRenderResults() {
+  const filter = document.getElementById('rb-result-filter').value;
+  const filtered = filter === 'all' ? rbResults : rbResults.filter(r => r.status === filter);
+  const el = document.getElementById('rb-results-list');
+  const countEl = document.getElementById('rb-result-count');
+  if(countEl) countEl.textContent = filtered.length + '件';
+
+  if(!filtered.length) {
+    el.innerHTML = '<div class="empty-msg">該当する結果がありません</div>';
+    return;
+  }
+
+  const statusIcon = {success:'✅', warn:'⚠️', fail:'❌', skip:'⏭'};
+  const statusColor = {success:'#4ade80', warn:'var(--ac2)', fail:'#e05050', skip:'var(--td)'};
+
+  el.innerHTML = '<div class="table-wrap"><table>' +
+    '<thead><tr><th>状態</th><th>ペダル名</th><th>楽天商品名</th><th>画像</th><th>操作</th></tr></thead>' +
+    '<tbody>' +
+    filtered.map((r,i) => {
+      const imgHtml = r.imageUrl
+        ? `<img src="${r.imageUrl}" style="width:48px;height:48px;object-fit:contain;border-radius:4px;border:1px solid var(--bd)">`
+        : '<span style="font-size:10px;color:var(--td)">なし</span>';
+      const btnHtml = (r.status==='warn'||r.status==='fail') && r.imageUrl
+        ? `<button class="approve-btn" onclick="rbManualApply(${i})" style="font-size:10px;padding:3px 8px">適用</button>`
+        : '';
+      const reason = r.reason ? `<div style="font-size:10px;color:var(--td)">${escHtml(r.reason)}</div>` : '';
+      return `<tr>
+        <td><span style="color:${statusColor[r.status]};font-size:14px">${statusIcon[r.status]}</span></td>
+        <td style="font-size:12px;font-weight:500">${escHtml(r.pedal.full_name)}</td>
+        <td style="font-size:11px;color:var(--td);max-width:200px;word-break:break-all">${escHtml(r.itemName||'')}${reason}</td>
+        <td>${imgHtml}</td>
+        <td>${btnHtml}</td>
+      </tr>`;
+    }).join('') +
+    '</tbody></table></div>';
+}
+
+async function rbManualApply(idx) {
+  const r = rbResults[idx];
+  if(!r || !r.imageUrl) return;
+  if(!confirm(`「${r.pedal.full_name}」にこの画像を適用しますか？`)) return;
+  const { error } = await sb.from('pedals').update({
+    image_url: r.imageUrl,
+    image_source: 'rakuten',
+    rakuten_item_url: r.itemUrl || null,
+    rakuten_searched: true
+  }).eq('id', r.pedal.id);
+  if(error) { showToast('❌ 保存失敗: '+error.message); return; }
+  rbResults[idx].status = 'success';
+  showToast('✅ 適用しました');
+  rbRenderResults();
+}
+
+function rbExportCsv() {
+  if(!rbResults.length) { showToast('結果がありません'); return; }
+  const rows = [['status','brand','model','full_name','reason','item_name','image_url','affiliate_url']];
+  rbResults.forEach(r => {
+    rows.push([
+      r.status,
+      r.pedal.brand,
+      r.pedal.model,
+      r.pedal.full_name,
+      r.reason||'',
+      r.itemName||'',
+      r.imageUrl||'',
+      r.affiliateUrl||''
+    ]);
+  });
+  const csv = rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'rakuten_batch_result.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ③ リンク切れチェック
+async function rbStartLinkCheck() {
+  const progEl = document.getElementById('rb-lc-progress');
+  const resEl = document.getElementById('rb-lc-results');
+  rbLcStopFlag = false;
+  rbLcRunning = true;
+  document.getElementById('rb-lc-start-btn').style.display = 'none';
+  document.getElementById('rb-lc-stop-btn').style.display = 'inline-block';
+
+  // rakuten が image_source のペダルを取得
+  const { data: pedals } = await sb.from('pedals')
+    .select('id,full_name,brand,model,image_url,image_source')
+    .eq('image_source','rakuten');
+
+  if(!pedals || !pedals.length) {
+    resEl.innerHTML = '<div class="empty-msg">楽天画像のペダルがありません</div>';
+    document.getElementById('rb-lc-start-btn').style.display = 'inline-block';
+    document.getElementById('rb-lc-stop-btn').style.display = 'none';
+    return;
+  }
+
+  progEl.textContent = `チェック対象: ${pedals.length}件`;
+  const broken = [];
+
+  for(let i=0; i<pedals.length; i++) {
+    if(rbLcStopFlag) break;
+    const p = pedals[i];
+    progEl.textContent = `[${i+1}/${pedals.length}] チェック中: ${p.full_name}`;
+    try {
+      const res = await fetch(p.image_url, {method:'HEAD', mode:'no-cors'});
+      // no-corsでは常にtype:opaqueなので200とは判定できないが
+      // エラーがthrowされなければ生きていると判断
+    } catch(e) {
+      broken.push(p);
+    }
+    await new Promise(r=>setTimeout(r,100));
+  }
+
+  rbLcRunning = false;
+  document.getElementById('rb-lc-start-btn').style.display = 'inline-block';
+  document.getElementById('rb-lc-stop-btn').style.display = 'none';
+  progEl.textContent = `完了: ${pedals.length}件チェック / リンク切れ疑い: ${broken.length}件`;
+
+  if(!broken.length) {
+    resEl.innerHTML = '<div class="empty-msg" style="color:#4ade80">✅ リンク切れは検出されませんでした</div>';
+    return;
+  }
+
+  resEl.innerHTML = '<div class="table-wrap"><table>' +
+    '<thead><tr><th>ペダル名</th><th>現在の画像URL</th><th>手動修正</th></tr></thead>' +
+    '<tbody>' +
+    broken.map(p => `<tr>
+      <td style="font-size:12px;font-weight:500">${escHtml(p.full_name)}</td>
+      <td style="font-size:10px;color:var(--td);max-width:160px;word-break:break-all">${escHtml(p.image_url||'')}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <input type="text" id="lc-url-${p.id}" class="form-input" placeholder="新しい画像URL" style="min-width:0;flex:1;font-size:11px;padding:5px 8px">
+          <button onclick="rbLcApplyUrl(${p.id},'${escHtml(p.full_name)}')" class="approve-btn" style="font-size:10px;padding:3px 8px;white-space:nowrap">適用</button>
+        </div>
+      </td>
+    </tr>`).join('') +
+    '</tbody></table></div>';
+}
+
+function rbStopLinkCheck() {
+  rbLcStopFlag = true;
+}
+
+async function rbLcApplyUrl(pedalId, name) {
+  const newUrl = document.getElementById('lc-url-'+pedalId).value.trim();
+  if(!newUrl) { showToast('❌ URLを入力してください'); return; }
+  const { error } = await sb.from('pedals').update({image_url:newUrl}).eq('id',pedalId);
+  if(error) { showToast('❌ 保存失敗'); return; }
+  showToast('✅ ' + name + ' を更新しました');
 }
 
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
