@@ -573,14 +573,8 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
     <!-- ① バッチ実行パネル -->
     <div id="rb-panel-batch">
-      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:16px">
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);margin-bottom:14px">🔑 API設定</div>
-        <div style="margin-bottom:10px">
-          <label class="pedal-edit-label" style="margin-top:0">楽天 Application ID</label>
-          <input class="form-input" id="rb-api-key" type="password" placeholder="楽天デベロッパーのApplication ID" style="width:100%;font-family:'JetBrains Mono',monospace">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px">このページを閉じると消えます。DBには保存されません。</div>
-        </div>
-
+      <div style="background:var(--sf);border:1px solid rgba(74,222,128,.2);border-radius:8px;padding:16px;margin-bottom:16px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#4ade80">✅ 楽天APIキーはNetlify環境変数（RAKUTEN_APP_ID）で管理されています。入力不要です。</div>
       </div>
 
       <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:16px">
@@ -1965,22 +1959,12 @@ async function rbPreviewCount() {
   if(skipSearched) query = query.eq('rakuten_searched', false);
   const { count } = await query;
   document.getElementById('rb-stat-total').textContent = count || 0;
-  showToast('対象: ' + (count||0) + '件');
+  showToast('対象: ' + (count||0) + '件（全件取得して処理します）');
 }
 
-// 楽天APIはCORSの制限があるためNetlify Function経由で呼ぶ
-// → ただし今回はadminページ（自分だけ使う）なので直接呼ぶ方式も検討
-// 楽天商品検索APIはCORS対応しているため直接呼べる
-async function rbSearchRakuten(pedalName, appId) {
-  const q = encodeURIComponent('"' + pedalName + '"');
-  const url = 'https://app.rakuten.co.jp/services/api/IchibaItem/Search/20170706' +
-    '?applicationId=' + appId +
-    '&keyword=' + q +
-    '&hits=3' +
-    '&imageFlag=1' +
-    '&sort=+reviewCount' +
-    '&formatVersion=2';
-  const res = await fetch(url);
+// Netlify Function経由で楽天APIを呼ぶ（CORSのため）
+async function rbSearchRakuten(pedalName) {
+  const res = await fetch('/.netlify/functions/rakuten?q=' + encodeURIComponent(pedalName));
   if(!res.ok) throw new Error('HTTP ' + res.status);
   return await res.json();
 }
@@ -2004,20 +1988,26 @@ function rbUpgradeImageUrl(url) {
 }
 
 async function rbStartBatch() {
-  const appId = document.getElementById('rb-api-key').value.trim();
-  if(!appId) { showToast('❌ 楽天Application IDを入力してください'); return; }
-
   const skipExisting = document.getElementById('rb-opt-skip-existing').checked;
   const skipSearched = document.getElementById('rb-opt-skip-searched').checked;
   const delay = parseInt(document.getElementById('rb-delay').value) || 1200;
 
-  // 対象ペダルを取得
-  let query = sb.from('pedals').select('id,brand,model,full_name,image_url,image_source,rakuten_searched');
-  if(skipExisting) query = query.is('image_url', null);
-  if(skipSearched) query = query.eq('rakuten_searched', false);
-  query = query.order('brand').order('model');
-  const { data: pedals } = await query;
-  if(!pedals || !pedals.length) { showToast('対象ペダルがありません'); return; }
+  // 対象ペダルを全件取得（ページネーション対応）
+  let allPedalsRb = [];
+  let offset = 0;
+  while(true) {
+    let query = sb.from('pedals').select('id,brand,model,full_name,image_url,image_source,rakuten_searched');
+    if(skipExisting) query = query.is('image_url', null);
+    if(skipSearched) query = query.eq('rakuten_searched', false);
+    query = query.order('brand').order('model').range(offset, offset + 999);
+    const { data: batch } = await query;
+    if(!batch || batch.length === 0) break;
+    allPedalsRb = allPedalsRb.concat(batch);
+    if(batch.length < 1000) break;
+    offset += 1000;
+  }
+  const pedals = allPedalsRb;
+  if(!pedals.length) { showToast('対象ペダルがありません'); return; }
 
   rbResults = [];
   rbRunning = true;
@@ -2050,8 +2040,8 @@ async function rbStartBatch() {
     }
 
     try {
-      const data = await rbSearchRakuten(pedal.full_name, appId);
-      const items = data.Items || [];
+      const data = await rbSearchRakuten(pedal.full_name);
+      const items = data.items || [];
 
       if(!items.length) {
         // 0件ヒット
