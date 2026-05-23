@@ -179,6 +179,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-featured')">⭐ 今週のおすすめ</div>
     <div class="tab" onclick="switchTab(this,'tab-features')">🗂 特集ページ</div>
     <div class="tab" onclick="switchTab(this,'tab-regions')">🌍 言語圏別</div>
+    <div class="tab" onclick="switchTab(this,'tab-maintenance')">🔧 メンテナンス</div>
   </div>
 
   <div class="panel on" id="tab-dashboard">
@@ -347,7 +348,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="pedals-list" class="loading">読み込み中...</div>
   </div>
 
-  <!-- ★ ブランド説明タブ -->
   <div class="panel" id="tab-brands">
     <div class="section-title">🏢 ブランド説明管理</div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">ブランドページに表示する説明文を編集します。保存すると updated_at が自動更新されます。</p>
@@ -358,7 +358,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="brands-list" class="loading">読み込み中...</div>
   </div>
 
-  <!-- ★ プライバシーポリシー編集タブ -->
   <div class="panel" id="tab-privacy">
     <div class="section-title">📄 プライバシーポリシー編集</div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">日本語・英語の両方を編集できます。保存するとサイトに即時反映されます。HTMLタグも使用可能です。</p>
@@ -392,7 +391,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
 
-  <!-- ★ お知らせ管理 -->
   <div class="panel" id="tab-notices">
     <div class="section-title">📢 お知らせ管理</div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">トップページに表示するお知らせを管理します。ON/OFFで表示切り替え可能です。</p>
@@ -414,7 +412,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="notices-list" class="loading">読み込み中...</div>
   </div>
 
-  <!-- ★ 今週のおすすめペダル管理 -->
   <div class="panel" id="tab-featured">
     <div class="section-title">⭐ 今週のおすすめペダル管理</div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">トップページに表示するおすすめペダルを手動でピックアップします。最大6件まで。</p>
@@ -435,7 +432,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div id="featured-list" class="loading">読み込み中...</div>
   </div>
 
-  <!-- ★ 特集ページ管理 -->
   <div class="panel" id="tab-features">
     <div class="section-title">🗂 特集ページ管理</div>
     <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">「ブルース向けOD特集」などキュレーションページを作成します。</p>
@@ -488,7 +484,80 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
     <div id="region-posts-list" class="loading">投稿を読み込み中...</div>
   </div>
-</div>
+
+  <!-- ★ メンテナンス管理タブ -->
+  <div class="panel" id="tab-maintenance">
+    <div class="section-title">🔧 メンテナンス管理</div>
+    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:20px">
+      メンテナンスモードのON/OFFと表示内容を管理します。<br>
+      ON後は <code style="background:var(--sf2);padding:2px 6px;border-radius:3px;font-size:11px">_redirects</code> に
+      <code style="background:var(--sf2);padding:2px 6px;border-radius:3px;font-size:11px">/* /maintenance.html 302</code> を追加してGitHubにプッシュすると有効になります。
+    </p>
+
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--tx);margin-bottom:4px">MAINTENANCE MODE</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)" id="maint-status-label">読み込み中...</div>
+        </div>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">OFF</span>
+          <div style="position:relative;width:52px;height:28px">
+            <input type="checkbox" id="maint-toggle" style="opacity:0;width:0;height:0;position:absolute" onchange="onMaintenanceToggle(this.checked)">
+            <div id="maint-toggle-track" style="position:absolute;inset:0;background:var(--sf2);border:1px solid var(--bd);border-radius:14px;transition:all .2s;cursor:pointer" onclick="document.getElementById('maint-toggle').click()">
+              <div id="maint-toggle-thumb" style="position:absolute;top:3px;left:3px;width:20px;height:20px;background:var(--td);border-radius:50%;transition:all .2s"></div>
+            </div>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac)">ON</span>
+        </label>
+      </div>
+      <div id="maint-active-warning" style="display:none;margin-top:12px;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.4);border-radius:6px;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac)">
+        ⚠️ メンテナンスモードがONです。_redirectsに <code>/* /maintenance.html 302</code> を追加してGitHubにプッシュするとサイト全体がメンテナンス画面になります。
+      </div>
+    </div>
+
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:20px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);margin-bottom:14px">📅 メンテナンス期間・時間</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label class="pedal-edit-label" style="margin-top:0">開始（Start）</label>
+          <input class="form-input" id="maint-start" type="text" placeholder="例: 2025/06/01 02:00 JST" style="width:100%">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px">自由形式のテキストで入力</div>
+        </div>
+        <div>
+          <label class="pedal-edit-label" style="margin-top:0">終了（End）</label>
+          <input class="form-input" id="maint-end" type="text" placeholder="例: 2025/06/01 05:00 JST" style="width:100%">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:4px">自由形式のテキストで入力</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:20px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);margin-bottom:14px">💬 メンテナンス内容メッセージ</div>
+      <div>
+        <label class="pedal-edit-label" style="margin-top:0">日本語メッセージ</label>
+        <textarea class="form-input" id="maint-msg-ja" rows="3" placeholder="例: 機能改善のためメンテナンスを行っています。ご不便をおかけして申し訳ありません。" style="width:100%;resize:vertical;line-height:1.6"></textarea>
+      </div>
+      <div style="margin-top:12px">
+        <label class="pedal-edit-label">English Message</label>
+        <textarea class="form-input" id="maint-msg-en" rows="3" placeholder="e.g. We are currently performing maintenance. We apologize for the inconvenience." style="width:100%;resize:vertical;line-height:1.6"></textarea>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="submit-btn" onclick="saveMaintenance()">💾 保存して反映</button>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)" id="maint-saved-at"></span>
+    </div>
+
+    <div style="margin-top:20px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:14px 16px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:8px;letter-spacing:1px;text-transform:uppercase">🔍 メンテナンス画面プレビュー</div>
+      <a href="/maintenance?preview=MSTR0198" target="_blank" class="back-btn" style="display:inline-flex;text-decoration:none">
+        maintenance.html をプレビュー →
+      </a>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-top:8px">保存後にプレビューしてください。?preview=MSTR0198 パラメータで管理者のみ閲覧できます。</div>
+    </div>
+  </div>
+
 
 <!-- ペダル編集モーダル -->
 <div class="pedal-edit-modal" id="pedal-edit-modal" onclick="if(event.target===this)closePedalEdit()">
@@ -604,9 +673,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+
 const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -715,6 +784,7 @@ function switchTab(el,tabId){
   if(tabId==='tab-notices')loadNotices();
   if(tabId==='tab-featured')loadFeatured();
   if(tabId==='tab-features')loadFeatures();
+  if(tabId==='tab-maintenance')loadMaintenance();
 }
 
 let allPosts=[],allPedals=[],allComments=[];
@@ -740,7 +810,6 @@ async function loadPedals(){
   allPedalsTotal=countRes.count||0;
   document.getElementById('stat-pedals').textContent=allPedalsTotal;
   document.getElementById('pedals-count').textContent=allPedalsTotal;
-  // まず300件だけ読み込む
   const{data}=await sb.from('pedals').select('*')
     .order('view_count',{ascending:false,nullsFirst:false})
     .order('brand').order('model')
@@ -1088,7 +1157,6 @@ function onPedalSearchInput(){
   clearTimeout(_pedalSearchTimer);
   const val=document.getElementById('pedal-search').value||'';
   if(val.trim().length>=2){
-    // 2文字以上ならDB直接検索
     _pedalSearchTimer=setTimeout(()=>searchPedalsFromDB(val.trim()),300);
   }else{
     applyPedalFilter();
@@ -1135,16 +1203,14 @@ function applyPedalFilter(){
   if(pedalTypeFilter)filtered=filtered.filter(p=>(p.types||[]).includes(pedalTypeFilter));
   if(pedalRarityFilter==='__none__')filtered=filtered.filter(p=>!p.rarity);
   else if(pedalRarityFilter)filtered=filtered.filter(p=>p.rarity===pedalRarityFilter);
-  // ★ 進捗バー表示
-  const total = allPedals.length;
-  const withImage = allPedals.filter(p=>p.image_url).length;
-  const withDesc = allPedals.filter(p=>p.description).length;
-  const withYt = allPedals.filter(p=>p.youtube_video_id).length;
-  const withAll = allPedals.filter(p=>p.image_url&&p.description&&p.youtube_video_id).length;
-  const pct = (n) => total ? Math.round(n/total*100) : 0;
-  const progressBar = (n, t) => {
-    const p = t ? Math.round(n/t*100) : 0;
-    const color = p>=80?'#4ade80':p>=50?'#f97316':'#e05050';
+  const total=allPedals.length;
+  const withImage=allPedals.filter(p=>p.image_url).length;
+  const withDesc=allPedals.filter(p=>p.description).length;
+  const withYt=allPedals.filter(p=>p.youtube_video_id).length;
+  const withAll=allPedals.filter(p=>p.image_url&&p.description&&p.youtube_video_id).length;
+  const progressBar=(n,t)=>{
+    const p=t?Math.round(n/t*100):0;
+    const color=p>=80?'#4ade80':p>=50?'#f97316':'#e05050';
     return `<div style="display:flex;align-items:center;gap:8px;flex:1;min-width:120px">
       <div style="flex:1;height:6px;background:var(--sf2);border-radius:3px;overflow:hidden">
         <div style="height:100%;width:${p}%;background:${color};border-radius:3px;transition:width .3s"></div>
@@ -1152,7 +1218,7 @@ function applyPedalFilter(){
       <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${color};white-space:nowrap">${n}/${t} (${p}%)</span>
     </div>`;
   };
-  const progressHtml = `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px 16px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+  const progressHtml=`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:12px 16px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center">
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;gap:12px">
       <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);white-space:nowrap">🖼 画像</span>${progressBar(withImage,total)}
       <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);white-space:nowrap">📝 説明文</span>${progressBar(withDesc,total)}
@@ -1161,7 +1227,6 @@ function applyPedalFilter(){
     </div>
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td)">表示中: <span style="color:var(--tx);font-weight:600">${filtered.length}</span> / 全 <span style="color:var(--ac);font-weight:600">${total}</span> 件</div>
   </div>`;
-
   if(!filtered.length){el.innerHTML=progressHtml+'<div class="empty-msg">ペダルが見つかりません</div>';return;}
   el.innerHTML=progressHtml+'<div class="table-wrap"><table>'
     +'<thead><tr><th>ブランド</th><th>モデル</th><th>タイプ</th><th>画像</th><th>説明文</th><th>YouTube</th><th>👁 閲覧数</th><th>🎰 Rarity</th><th>操作</th></tr></thead>'
@@ -1178,98 +1243,48 @@ function applyPedalFilter(){
       +'</tr>').join('')
     +'</tbody></table></div>';
 }
+
 function renderPedals(){
   const statusEl=document.getElementById('pedal-load-status');
   if(statusEl){
-    if(allPedalsLoaded){
-      statusEl.textContent='全'+allPedals.length+'件読み込み済み';
-    }else{
-      statusEl.textContent=allPedals.length+'件表示中（全'+allPedalsTotal+'件）';
-    }
+    if(allPedalsLoaded){statusEl.textContent='全'+allPedals.length+'件読み込み済み';}
+    else{statusEl.textContent=allPedals.length+'件表示中（全'+allPedalsTotal+'件）';}
   }
   applyPedalFilter();
 }
 
-// ★ ペースト変換（Gemini出力対応）
 function convertPastedText(text){
-  var lines=text.split('\n');
-  var html='';
-  var inList=false;
+  var lines=text.split('\n');var html='';var inList=false;
   for(var i=0;i<lines.length;i++){
-    var line=lines[i];
-    var trimmed=line.trim();
-    if(!trimmed){
-      if(inList){html+='</ul>';inList=false;}
-      // 空行は段落間のスペースとして保持
-      if(html.length>0)html+='<br>';
-      continue;
-    }
-    // 【見出し】パターン
-    if(trimmed.charAt(0)==='【'&&trimmed.charAt(trimmed.length-1)==='】'){
-      if(inList){html+='</ul>';inList=false;}
-      var heading=trimmed.slice(1,trimmed.length-1);
-      html+='<h2>'+heading+'</h2>';
-      continue;
-    }
-    // ## 見出し（Markdown）
-    if(trimmed.charAt(0)==='#'){
-      if(inList){html+='</ul>';inList=false;}
-      var heading2=trimmed;while(heading2.length>0&&(heading2.charAt(0)==='#'||heading2.charAt(0)===' '))heading2=heading2.slice(1);
-      html+='<h2>'+heading2+'</h2>';
-      continue;
-    }
-    // 箇条書き：行頭が全角スペース・半角スペース・タブ、または ・- •
+    var line=lines[i];var trimmed=line.trim();
+    if(!trimmed){if(inList){html+='</ul>';inList=false;}if(html.length>0)html+='<br>';continue;}
+    if(trimmed.charAt(0)==='【'&&trimmed.charAt(trimmed.length-1)==='】'){if(inList){html+='</ul>';inList=false;}var heading=trimmed.slice(1,trimmed.length-1);html+='<h2>'+heading+'</h2>';continue;}
+    if(trimmed.charAt(0)==='#'){if(inList){html+='</ul>';inList=false;}var heading2=trimmed;while(heading2.length>0&&(heading2.charAt(0)==='#'||heading2.charAt(0)===' '))heading2=heading2.slice(1);html+='<h2>'+heading2+'</h2>';continue;}
     var firstChar=line.length>0?line.charAt(0):'';
     var isIndented=(firstChar==='\u3000'||firstChar===' '||firstChar==='\t')&&trimmed.length>0;
     var isBullet=trimmed.charAt(0)==='\u30fb'||trimmed.charAt(0)==='\u2022'||trimmed.charAt(0)==='\u00b7';
     var isDash=trimmed.charAt(0)==='-'&&trimmed.length>1&&trimmed.charAt(1)===' ';
     if(isIndented||isBullet||isDash){
       var item=trimmed;while(item.length>0&&(item.charAt(0)==='・'||item.charAt(0)==='•'||item.charAt(0)==='·'||item.charAt(0)==='-'||item.charAt(0)===' '||item.charAt(0)==='	'||item.charAt(0)==='　'))item=item.slice(1);
-      if(!inList){html+='<ul>';inList=true;}
-      html+='<li>'+item+'</li>';
-      continue;
+      if(!inList){html+='<ul>';inList=true;}html+='<li>'+item+'</li>';continue;
     }
-    // 通常段落
-    if(inList){html+='</ul>';inList=false;}
-    html+='<p>'+trimmed+'</p>';
+    if(inList){html+='</ul>';inList=false;}html+='<p>'+trimmed+'</p>';
   }
-  if(inList)html+='</ul>';
-  return html;
+  if(inList)html+='</ul>';return html;
 }
-// ★ リッチエディタにペーストイベントを設定
+
 function initRichEditorPaste(editorId){
-  const el=document.getElementById(editorId);
-  if(!el||el._pasteInited)return;
-  el._pasteInited=true;
+  const el=document.getElementById(editorId);if(!el||el._pasteInited)return;el._pasteInited=true;
   el.addEventListener('paste',function(e){
-    // Cmd+Shift+V（プレーンテキスト）またはCtrl+Shift+V
-    // plainTextの場合はClipboardDataからtext/plainのみ取得される
     const plain=e.clipboardData&&e.clipboardData.getData('text/plain');
     const html=e.clipboardData&&e.clipboardData.getData('text/html');
-    // HTMLが入っていない＝プレーンテキスト貼り付けと判断
-    if(plain&&(!html||html.trim()==='')){ 
-      e.preventDefault();
-      const converted=convertPastedText(plain);
-      document.execCommand('insertHTML',false,converted);
-      return;
-    }
-    // HTML貼り付けの場合もGemini形式を変換
-    if(plain&&html){
-      e.preventDefault();
-      const converted=convertPastedText(plain);
-      document.execCommand('insertHTML',false,converted);
-    }
+    if(plain&&(!html||html.trim()==='')){ e.preventDefault();const converted=convertPastedText(plain);document.execCommand('insertHTML',false,converted);return;}
+    if(plain&&html){e.preventDefault();const converted=convertPastedText(plain);document.execCommand('insertHTML',false,converted);}
   });
 }
 
-// ★ 全リッチエディタにペースト設定を適用
 function initAllRichEditors(){
-  const ids=[
-    'edit-desc-ja','edit-desc-en',
-    'brand-desc-ja','brand-desc-en',
-    'pp-editor-ja','pp-editor-en',
-    'feature-body-ja','feature-body-en'
-  ];
+  const ids=['edit-desc-ja','edit-desc-en','brand-desc-ja','brand-desc-en','pp-editor-ja','pp-editor-en','feature-body-ja','feature-body-en'];
   ids.forEach(id=>initRichEditorPaste(id));
 }
 
@@ -1293,33 +1308,21 @@ async function addPedal(){
   if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
   showToast('✅ ペダルを追加しました');
   document.getElementById('new-brand').value='';document.getElementById('new-model').value='';document.getElementById('new-types').value='';
-  // 追加したペダルをDBから取得してallPedalsの先頭に追加（リセットしない）
   const{data:newPedal}=await sb.from('pedals').select('*').eq('full_name',full_name).maybeSingle();
-  if(newPedal){
-    allPedals.unshift(newPedal);
-    allPedalsTotal+=1;
-    document.getElementById('pedals-count').textContent=allPedalsTotal;
-  }
-  renderPedals();
-  updateLoadAllBtn();
+  if(newPedal){allPedals.unshift(newPedal);allPedalsTotal+=1;document.getElementById('pedals-count').textContent=allPedalsTotal;}
+  renderPedals();updateLoadAllBtn();
 }
 
 function getYouTubeIdFromUrl(url){
   if(!url)return null;
   const patterns=[/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/];
-  for(const p of patterns){const m=url.match(p);if(m)return m[1];}
-  return null;
+  for(const p of patterns){const m=url.match(p);if(m)return m[1];}return null;
 }
 
 let editingPedalId=null;
 async function openPedalEdit(pedalId){
   let pedal=allPedals.find(p=>p.id==pedalId);
-  if(!pedal){
-    // 段階読み込みで未取得の場合はDBから直接取得
-    const{data}=await sb.from('pedals').select('*').eq('id',pedalId).maybeSingle();
-    if(!data)return;
-    pedal=data;
-  }
+  if(!pedal){const{data}=await sb.from('pedals').select('*').eq('id',pedalId).maybeSingle();if(!data)return;pedal=data;}
   editingPedalId=pedal.id;
   document.getElementById('pedal-edit-name').textContent=pedal.full_name;
   document.getElementById('edit-full-name').value=pedal.full_name||'';
@@ -1338,7 +1341,6 @@ async function openPedalEdit(pedalId){
   const preview=document.getElementById('pedal-img-preview');
   if(pedal.image_url){preview.src=pedal.image_url;preview.classList.add('show');}
   else{preview.src='';preview.classList.remove('show');}
-  // ペーストイベント初期化
   ['edit-desc-ja','edit-desc-en'].forEach(id=>initRichEditorPaste(id));
   document.getElementById('pedal-edit-modal').classList.add('open');
 }
@@ -1388,19 +1390,11 @@ async function savePedalEdit(){
   const{error}=await sb.from('pedals').update(updates).eq('id',editingPedalId);
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
   showToast('✅ 保存しました');
-  // allPedalsの該当レコードをローカル更新（リセットしない）
   const idx=allPedals.findIndex(p=>p.id==editingPedalId);
-  if(idx>=0){
-    allPedals[idx]={...allPedals[idx],...updates,full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity};
-  }
+  if(idx>=0){allPedals[idx]={...allPedals[idx],...updates,full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity};}
   closePedalEdit();
-  // DB検索中だった場合は検索を再実行、それ以外は通常描画
   const searchVal=document.getElementById('pedal-search').value||'';
-  if(searchVal.trim().length>=2){
-    await searchPedalsFromDB(searchVal.trim());
-  }else{
-    renderPedals();
-  }
+  if(searchVal.trim().length>=2){await searchPedalsFromDB(searchVal.trim());}else{renderPedals();}
 }
 
 async function deletePedalFromEdit(){
@@ -1409,18 +1403,70 @@ async function deletePedalFromEdit(){
   const{error}=await sb.from('pedals').delete().eq('id',editingPedalId);
   if(error){showToast('❌ 削除に失敗しました: '+error.message);return;}
   showToast('🗑 ペダルを削除しました');
-  // allPedalsからローカル削除（リセットしない）
   allPedals=allPedals.filter(p=>p.id!=editingPedalId);
   allPedalsTotal=Math.max(0,allPedalsTotal-1);
   closePedalEdit();
-  // DB検索中だった場合は検索を再実行
   const searchValDel=document.getElementById('pedal-search').value||'';
-  if(searchValDel.trim().length>=2){
-    await searchPedalsFromDB(searchValDel.trim());
-  }else{
-    renderPedals();
-  }
+  if(searchValDel.trim().length>=2){await searchPedalsFromDB(searchValDel.trim());}else{renderPedals();}
   updateLoadAllBtn();
+}
+
+// ★ メンテナンス管理
+async function loadMaintenance(){
+  try{
+    const{data}=await sb.from('site_content').select('*').eq('id','maintenance').maybeSingle();
+    const savedAt=document.getElementById('maint-saved-at');
+    if(!data){updateMaintenanceToggleUI(false);return;}
+    let info={};try{info=JSON.parse(data.content_ja||'{}');}catch(e){}
+    let infoEn={};try{infoEn=JSON.parse(data.content_en||'{}');}catch(e){}
+    const active=!!info.active;
+    document.getElementById('maint-toggle').checked=active;
+    updateMaintenanceToggleUI(active);
+    document.getElementById('maint-start').value=info.start||'';
+    document.getElementById('maint-end').value=info.end||'';
+    document.getElementById('maint-msg-ja').value=info.message||'';
+    document.getElementById('maint-msg-en').value=infoEn.message||'';
+    if(savedAt&&data.updated_at)savedAt.textContent='最終更新: '+timeAgo(data.updated_at);
+  }catch(e){showToast('❌ メンテナンス設定の読み込みに失敗しました');}
+}
+
+function onMaintenanceToggle(checked){updateMaintenanceToggleUI(checked);}
+
+function updateMaintenanceToggleUI(active){
+  const track=document.getElementById('maint-toggle-track');
+  const thumb=document.getElementById('maint-toggle-thumb');
+  const warning=document.getElementById('maint-active-warning');
+  const label=document.getElementById('maint-status-label');
+  if(!track||!thumb)return;
+  if(active){
+    track.style.background='rgba(232,85,45,.3)';track.style.borderColor='rgba(232,85,45,.6)';
+    thumb.style.left='29px';thumb.style.background='var(--ac)';
+    if(warning)warning.style.display='block';
+    if(label)label.textContent='🔴 メンテナンスモード ON — _redirectsに /* /maintenance.html 302 を追加してプッシュすると有効になります';
+  }else{
+    track.style.background='var(--sf2)';track.style.borderColor='var(--bd)';
+    thumb.style.left='3px';thumb.style.background='var(--td)';
+    if(warning)warning.style.display='none';
+    if(label)label.textContent='🟢 通常営業中';
+  }
+}
+
+async function saveMaintenance(){
+  const active=document.getElementById('maint-toggle').checked;
+  const start=document.getElementById('maint-start').value.trim();
+  const end=document.getElementById('maint-end').value.trim();
+  const msgJa=document.getElementById('maint-msg-ja').value.trim();
+  const msgEn=document.getElementById('maint-msg-en').value.trim();
+  const content_ja=JSON.stringify({active,start,end,message:msgJa});
+  const content_en=JSON.stringify({message:msgEn});
+  const now=new Date().toISOString();
+  const{error}=await sb.from('site_content').upsert(
+    {id:'maintenance',content_ja,content_en,updated_at:now},{onConflict:'id'}
+  );
+  if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
+  const savedAt=document.getElementById('maint-saved-at');
+  if(savedAt)savedAt.textContent='最終更新: たった今';
+  showToast('✅ メンテナンス設定を保存しました');
 }
 
 // ★ お知らせ管理
@@ -1458,8 +1504,7 @@ async function addNotice(){
 
 async function toggleNotice(id,val){
   await sb.from('site_notices').update({is_active:val}).eq('id',id);
-  showToast(val?'✅ 表示中に変更':'✅ 非表示に変更');
-  await loadNotices();
+  showToast(val?'✅ 表示中に変更':'✅ 非表示に変更');await loadNotices();
 }
 
 async function deleteNotice(id){
@@ -1496,7 +1541,6 @@ async function loadFeatured(){
   const{data}=await sb.from('featured_pedals').select('*,pedals(brand,model,full_name,image_url)').order('sort_order').order('created_at',{ascending:false});
   const el=document.getElementById('featured-list');
   if(!data||!data.length){el.innerHTML='<div class="empty-msg">おすすめペダルが登録されていません</div>';return;}
-  const STORAGE='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/';
   el.innerHTML='<div class="table-wrap"><table>'
     +'<thead><tr><th>画像</th><th>ペダル</th><th>ラベル(JA)</th><th>ラベル(EN)</th><th>状態</th><th>操作</th></tr></thead>'
     +'<tbody>'
@@ -1586,7 +1630,6 @@ async function deleteFeature(id){
 }
 
 async function editFeaturePedals(featureId){
-  // ペダル追加UI（簡易版：ペダル名検索で追加）
   const{data:feature}=await sb.from('special_features').select('*').eq('id',featureId).single();
   if(!feature)return;
   const currentIds=feature.pedal_ids||[];
@@ -1604,12 +1647,8 @@ async function editFeaturePedals(featureId){
     </div>
     <div id="feature-pedals-list">${listHtml||'<div class="empty-msg" style="padding:16px">ペダルが追加されていません</div>'}</div>
   </div>`;
-  // モーダルに表示
   const modal=document.getElementById('brand-edit-modal');
-  if(modal){
-    modal.querySelector('.gear-modal-box,.pedal-edit-box').innerHTML=html;
-    modal.classList.add('open');
-  }
+  if(modal){modal.querySelector('.pedal-edit-box').innerHTML=html;modal.classList.add('open');}
 }
 
 let featurePedalAcResults=[];
@@ -1631,9 +1670,7 @@ async function addPedalToFeature(idx,featureId){
   const{data:f}=await sb.from('special_features').select('pedal_ids').eq('id',featureId).single();
   const ids=[...new Set([...(f.pedal_ids||[]),p.id])];
   await sb.from('special_features').update({pedal_ids:ids}).eq('id',featureId);
-  showToast('✅ ペダルを追加しました');
-  closeFeaturePedalAC();
-  editFeaturePedals(featureId);
+  showToast('✅ ペダルを追加しました');closeFeaturePedalAC();editFeaturePedals(featureId);
 }
 
 async function removePedalFromFeature(featureId,pedalId){
@@ -1646,50 +1683,36 @@ async function removePedalFromFeature(featureId,pedalId){
 // ★ プライバシーポリシー管理
 async function loadPrivacyContent(){
   const{data}=await sb.from('site_content').select('*').eq('id','privacy').maybeSingle();
-  const jaEl=document.getElementById('pp-editor-ja');
-  const enEl=document.getElementById('pp-editor-en');
-  const savedAt=document.getElementById('pp-saved-at');
+  const jaEl=document.getElementById('pp-editor-ja');const enEl=document.getElementById('pp-editor-en');const savedAt=document.getElementById('pp-saved-at');
   if(data){
-    if(jaEl)jaEl.innerHTML=data.content_ja||'';
-    if(enEl)enEl.innerHTML=data.content_en||'';
-    initRichEditorPaste('pp-editor-ja');
-    initRichEditorPaste('pp-editor-en');
+    if(jaEl)jaEl.innerHTML=data.content_ja||'';if(enEl)enEl.innerHTML=data.content_en||'';
+    initRichEditorPaste('pp-editor-ja');initRichEditorPaste('pp-editor-en');
     if(savedAt&&data.updated_at)savedAt.textContent='最終更新: '+timeAgo(data.updated_at);
   }
 }
 
 async function savePrivacyContent(){
-  const jaEl=document.getElementById('pp-editor-ja');
-  const enEl=document.getElementById('pp-editor-en');
-  const btn=document.getElementById('pp-save-btn');
+  const jaEl=document.getElementById('pp-editor-ja');const enEl=document.getElementById('pp-editor-en');const btn=document.getElementById('pp-save-btn');
   if(!jaEl||!enEl)return;
-  const content_ja=jaEl.innerHTML.trim()||null;
-  const content_en=enEl.innerHTML.trim()||null;
+  const content_ja=jaEl.innerHTML.trim()||null;const content_en=enEl.innerHTML.trim()||null;
   btn.disabled=true;btn.textContent='保存中...';
-  const{error}=await sb.from('site_content').upsert({
-    id:'privacy',content_ja,content_en,updated_at:new Date().toISOString()
-  },{onConflict:'id'});
+  const{error}=await sb.from('site_content').upsert({id:'privacy',content_ja,content_en,updated_at:new Date().toISOString()},{onConflict:'id'});
   btn.disabled=false;btn.textContent='💾 保存して反映';
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
-  const savedAt=document.getElementById('pp-saved-at');
-  if(savedAt)savedAt.textContent='最終更新: たった今';
+  const savedAt=document.getElementById('pp-saved-at');if(savedAt)savedAt.textContent='最終更新: たった今';
   showToast('✅ プライバシーポリシーを保存しました');
 }
 
 // ★ ブランド説明管理
-let allBrandsAdmin=[];
-let editingBrandName=null;
+let allBrandsAdmin=[];let editingBrandName=null;
 
 async function loadBrandsAdmin(){
-  const{data:pedalData}=await sb.from('pedals').select('brand').order('brand');
-  if(!pedalData)return;
+  const{data:pedalData}=await sb.from('pedals').select('brand').order('brand');if(!pedalData)return;
   const brandNames=[...new Set(pedalData.map(p=>p.brand).filter(Boolean))].sort();
-  const{data:brandData}=await sb.from('brands').select('*');
-  const brandMap={};
+  const{data:brandData}=await sb.from('brands').select('*');const brandMap={};
   if(brandData)brandData.forEach(b=>{brandMap[b.name]=b;});
   allBrandsAdmin=brandNames.map(name=>({name,...(brandMap[name]||{description:null,description_en:null,updated_at:null})}));
-  const countEl=document.getElementById('brand-list-count');
-  if(countEl)countEl.textContent=`全 ${allBrandsAdmin.length} ブランド`;
+  const countEl=document.getElementById('brand-list-count');if(countEl)countEl.textContent=`全 ${allBrandsAdmin.length} ブランド`;
   renderBrandList(allBrandsAdmin);
 }
 
@@ -1726,10 +1749,7 @@ function openBrandEdit(brandName){
   document.getElementById('brand-edit-modal').classList.add('open');
 }
 
-function closeBrandEdit(){
-  document.getElementById('brand-edit-modal').classList.remove('open');
-  editingBrandName=null;
-}
+function closeBrandEdit(){document.getElementById('brand-edit-modal').classList.remove('open');editingBrandName=null;}
 
 async function saveBrandEdit(){
   if(!editingBrandName)return;
@@ -1738,8 +1758,7 @@ async function saveBrandEdit(){
   const now=new Date().toISOString();
   const{error}=await sb.from('brands').upsert({name:editingBrandName,description,description_en,updated_at:now},{onConflict:'name'});
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
-  showToast('✅ 保存しました');
-  closeBrandEdit();await loadBrandsAdmin();
+  showToast('✅ 保存しました');closeBrandEdit();await loadBrandsAdmin();
 }
 
 async function loadNews(){
@@ -1815,10 +1834,10 @@ function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(d<60)
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 
 window.addEventListener('DOMContentLoaded',()=>{
-  // ペーストイベントは各モーダルopen時に初期化（遅延初期化）
   if(checkSession()){document.getElementById('login-wrap').style.display='none';document.getElementById('admin-wrap').classList.add('show');loadAll();}
   else{setTimeout(()=>document.getElementById('login-input').focus(),100);}
 });
+
 </script>
 </body>
 </html>
