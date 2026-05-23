@@ -24,34 +24,40 @@ exports.handler = async function(event) {
       '&keyword=' + encodeURIComponent(query) +
       '&hits=3' +
       '&imageFlag=1' +
+      '&format=json' +
       '&formatVersion=2';
 
     const res = await fetch(url, {
       headers: {
         'Origin': 'https://mygearmyboard.com',
         'Referer': 'https://mygearmyboard.com/',
-        'User-Agent': 'Mozilla/5.0'
+        'User-Agent': 'Mozilla/5.0',
+        'Accept-Charset': 'utf-8'
       }
     });
-    const responseText = await res.text();
 
     if (!res.ok) {
+      const errorText = await res.text();
       return {
         statusCode: res.status,
         body: JSON.stringify({
           error: 'Rakuten API error: ' + res.status,
-          detail: responseText
+          detail: errorText
         })
       };
     }
 
+    // 文字コードをUTF-8で明示的にデコード
+    const buffer = await res.arrayBuffer();
+    const decoder = new TextDecoder('utf-8');
+    const responseText = decoder.decode(buffer);
     const data = JSON.parse(responseText);
     const items = data.Items || [];
 
     if (!items.length) {
       return {
         statusCode: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
         body: JSON.stringify({ items: [] })
       };
     }
@@ -69,7 +75,7 @@ exports.handler = async function(event) {
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
       body: JSON.stringify({ items: result })
     };
 
