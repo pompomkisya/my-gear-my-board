@@ -24,15 +24,20 @@ exports.handler = async function(event) {
       '&formatVersion=2';
 
     const res = await fetch(url);
+    const responseText = await res.text();
 
     if (!res.ok) {
       return {
         statusCode: res.status,
-        body: JSON.stringify({ error: 'Rakuten API error: ' + res.status })
+        body: JSON.stringify({
+          error: 'Rakuten API error: ' + res.status,
+          detail: responseText,
+          url_used: url.replace(appId, '***')
+        })
       };
     }
 
-    const data = await res.json();
+    const data = JSON.parse(responseText);
     const items = data.Items || [];
 
     if (!items.length) {
@@ -43,16 +48,14 @@ exports.handler = async function(event) {
       };
     }
 
-    // 必要な情報だけ返す
     const result = items.map(item => ({
       itemName: item.itemName || '',
       itemUrl: item.itemUrl || '',
       imageUrl: (() => {
         const raw = item.mediumImageUrls && item.mediumImageUrls[0];
         if (!raw) return null;
-        const url = typeof raw === 'string' ? raw : (raw.imageUrl || null);
-        // サイズを400x400に変換
-        return url ? url.replace(/_ex=\d+x\d+/, '_ex=400x400') : null;
+        const u = typeof raw === 'string' ? raw : (raw.imageUrl || null);
+        return u ? u.replace(/_ex=\d+x\d+/, '_ex=400x400') : null;
       })()
     }));
 
