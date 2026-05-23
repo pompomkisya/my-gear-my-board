@@ -1981,12 +1981,6 @@ function rbJudgeResult(pedalName, item) {
   return 'fail';
 }
 
-function rbUpgradeImageUrl(url) {
-  if(!url) return url;
-  // 楽天の画像URLのサイズ指定を高画質に変換
-  return url.replace(/_ex=\d+x\d+/, '_ex=400x400');
-}
-
 async function rbStartBatch() {
   const skipExisting = document.getElementById('rb-opt-skip-existing').checked;
   const skipSearched = document.getElementById('rb-opt-skip-searched').checked;
@@ -2052,13 +2046,8 @@ async function rbStartBatch() {
       } else {
         const item = items[0];
         const status = rbJudgeResult(pedal.full_name, item);
-        const rawImageUrl = item.mediumImageUrls && item.mediumImageUrls[0]
-          ? (item.mediumImageUrls[0].imageUrl || item.mediumImageUrls[0])
-          : null;
-        const imageUrl = rbUpgradeImageUrl(
-          typeof rawImageUrl === 'string' ? rawImageUrl :
-          (rawImageUrl && rawImageUrl.imageUrl ? rawImageUrl.imageUrl : null)
-        );
+        // Netlify Functionがすでに変換済みのimageUrlを返す
+        const imageUrl = item.imageUrl || null;
         const itemUrl = item.itemUrl || '';
         const itemName = item.itemName || '';
 
