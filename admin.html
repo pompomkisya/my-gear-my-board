@@ -2477,8 +2477,7 @@ async function rbManageReSearchExec() {
 async function rbManageDeleteChecked() {
   const targets = rbManageItems.filter(p => rbManageChecked.has(p.id));
   if(!targets.length) { showToast('❌ 項目を選択してください'); return; }
-  if(!confirm(targets.length + '件の画像データを削除しますか？
-（image_url・image_source・rakuten_item_urlをnullにします）')) return;
+  if(!confirm(targets.length + '件の画像データを削除しますか？（image_url・image_source・rakuten_item_urlをnullにします）')) return;
 
   for(const pedal of targets) {
     await sb.from('pedals').update({
