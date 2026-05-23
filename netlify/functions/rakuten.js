@@ -17,6 +17,9 @@ exports.handler = async function(event) {
     };
   }
 
+  // デバッグモード：?debug=1 で生データを返す
+  const debug = event.queryStringParameters?.debug === '1';
+
   try {
     const url = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601' +
       '?applicationId=' + applicationId +
@@ -40,19 +43,24 @@ exports.handler = async function(event) {
       const errorText = await res.text();
       return {
         statusCode: res.status,
-        body: JSON.stringify({
-          error: 'Rakuten API error: ' + res.status,
-          detail: errorText
-        })
+        body: JSON.stringify({ error: 'Rakuten API error: ' + res.status, detail: errorText })
       };
     }
 
-    // 文字コードをUTF-8で明示的にデコード
     const buffer = await res.arrayBuffer();
     const decoder = new TextDecoder('utf-8');
     const responseText = decoder.decode(buffer);
     const data = JSON.parse(responseText);
     const items = data.Items || [];
+
+    // デバッグ：最初の商品の生データをそのまま返す
+    if (debug && items.length > 0) {
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: JSON.stringify({ debug: true, firstItem: items[0] })
+      };
+    }
 
     if (!items.length) {
       return {
