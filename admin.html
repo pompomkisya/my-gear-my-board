@@ -647,12 +647,17 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">
         楽天で取得済みの画像を一覧表示します。チェックして再取得・削除・手動URL入力ができます。
       </p>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-        <button class="submit-btn" onclick="rbManageLoad()">🔄 DBから読み込む</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+        <select id="rb-manage-filter" onchange="rbManageLoad()" style="background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);outline:none">
+          <option value="has_image">🖼 画像あり</option>
+          <option value="no_image">❌ 画像なし（未取得・失敗）</option>
+          <option value="all">📋 すべて</option>
+        </select>
+        <button class="submit-btn" onclick="rbManageLoad()">🔄 読み込む</button>
         <button class="fetch-btn" onclick="rbManageCheckAll()">☑ 全選択</button>
         <button class="fetch-btn" onclick="rbManageUncheckAll()">☐ 全解除</button>
         <button class="fetch-btn" onclick="rbManageReSearch()" id="rb-manage-research-btn" style="display:none">🔍 選択項目を再取得</button>
-        <button class="del-btn" onclick="rbManageDeleteChecked()" id="rb-manage-delete-btn" style="display:none" style="padding:6px 12px">🗑 選択項目の画像を削除</button>
+        <button class="del-btn" onclick="rbManageDeleteChecked()" id="rb-manage-delete-btn" style="display:none;padding:6px 12px">🗑 選択項目の画像を削除</button>
         <span id="rb-manage-count" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)"></span>
       </div>
       <!-- 再取得時のカスタムキーワード入力 -->
@@ -2336,15 +2341,21 @@ async function rbManageLoad() {
   rbManageChecked.clear();
   rbUpdateManageButtons();
 
-  // 画像があるペダルを全件取得（ページネーション）
+  // フィルター設定を取得
+  const filterEl = document.getElementById('rb-manage-filter');
+  const filterMode = filterEl ? filterEl.value : 'has_image';
+
+  // ペダルを全件取得（ページネーション）
   let all = [];
   let offset = 0;
   while(true) {
-    const { data: batch } = await sb.from('pedals')
+    let query = sb.from('pedals')
       .select('id,brand,model,full_name,image_url,image_source,rakuten_item_url,rakuten_searched')
-      .not('image_url','is',null)
       .order('brand').order('model')
       .range(offset, offset + 999);
+    if(filterMode === 'has_image') query = query.not('image_url','is',null);
+    else if(filterMode === 'no_image') query = query.is('image_url', null);
+    const { data: batch } = await query;
     if(!batch || !batch.length) break;
     all = all.concat(batch);
     if(batch.length < 1000) break;
@@ -2370,9 +2381,12 @@ function rbManageRender() {
       const srcColor = src === 'manual' ? '#4ade80' : src === 'rakuten' ? 'var(--ac2)' : 'var(--td)';
       const srcLabel = src === 'manual' ? '手動' : src === 'rakuten' ? '楽天' : '不明';
       const checked = rbManageChecked.has(p.id) ? 'checked' : '';
+      const imgCell = p.image_url
+        ? `<img src="${escHtml(p.image_url)}" style="width:56px;height:56px;object-fit:contain;border-radius:4px;border:1px solid var(--bd);cursor:zoom-in" onclick="rbOpenLightbox('${p.image_url.replace(/'/g,"\\'")}'">`
+        : `<span style="font-size:10px;color:var(--td)">なし</span>`;
       return `<tr id="rb-manage-row-${p.id}">
         <td><input type="checkbox" ${checked} data-id="${p.id}" data-idx="${i}" onchange="rbManageToggle(this)" style="accent-color:var(--ac)"></td>
-        <td><img src="${escHtml(p.image_url)}" style="width:56px;height:56px;object-fit:contain;border-radius:4px;border:1px solid var(--bd);cursor:zoom-in" onclick="rbOpenLightbox('${p.image_url.replace(/'/g,"\\'")}')"></td>
+        <td>${imgCell}</td>
         <td style="font-size:12px;font-weight:500">${escHtml(p.full_name)}</td>
         <td><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${srcColor}">${srcLabel}</span></td>
         <td>
