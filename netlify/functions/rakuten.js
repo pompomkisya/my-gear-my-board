@@ -17,9 +17,6 @@ exports.handler = async function(event) {
     };
   }
 
-  // デバッグモード：?debug=1 で生データを返す
-  const debug = event.queryStringParameters?.debug === '1';
-
   try {
     const url = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601' +
       '?applicationId=' + applicationId +
@@ -49,18 +46,8 @@ exports.handler = async function(event) {
 
     const buffer = await res.arrayBuffer();
     const decoder = new TextDecoder('utf-8');
-    const responseText = decoder.decode(buffer);
-    const data = JSON.parse(responseText);
+    const data = JSON.parse(decoder.decode(buffer));
     const items = data.Items || [];
-
-    // デバッグ：最初の商品の生データをそのまま返す
-    if (debug && items.length > 0) {
-      return {
-        statusCode: 200,
-        headers: { 'Content-Type': 'application/json; charset=utf-8' },
-        body: JSON.stringify({ debug: true, firstItem: items[0] })
-      };
-    }
 
     if (!items.length) {
       return {
@@ -74,10 +61,13 @@ exports.handler = async function(event) {
       itemName: item.itemName || '',
       itemUrl: item.itemUrl || '',
       imageUrl: (() => {
-        const raw = item.mediumImageUrls && item.mediumImageUrls[0];
-        if (!raw) return null;
-        const u = typeof raw === 'string' ? raw : (raw.imageUrl || null);
-        return u ? u.replace(/_ex=\d+x\d+/, '_ex=400x400') : null;
+        // mediumImageUrlsは文字列の配列
+        const urls = item.mediumImageUrls;
+        if (!urls || !urls.length) return null;
+        const raw = urls[0];
+        if (!raw || typeof raw !== 'string') return null;
+        // _ex=128x128 → _ex=400x400 に変換して高画質化
+        return raw.replace(/_ex=\d+x\d+/, '_ex=400x400');
       })()
     }));
 
