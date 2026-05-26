@@ -2320,6 +2320,19 @@ async function rbLcApplyUrl(pedalId, name) {
 // ★ 出典オートコンプリート（localStorageで候補を管理）
 const RB_SOURCE_KEY = 'mgmb_image_sources';
 
+
+async function rbManageSaveSource(pedalId) {
+  const input = document.getElementById('rb-manage-source-' + pedalId);
+  const val = input ? input.value.trim() : '';
+  if(!val) { showToast('❌ 出典を入力してください'); return; }
+  const { error } = await sb.from('pedals').update({ image_source: val }).eq('id', pedalId);
+  if(error) { showToast('❌ 保存失敗: ' + error.message); return; }
+  rbSourceAcSave(val);
+  const idx = rbManageItems.findIndex(p => p.id === pedalId);
+  if(idx >= 0) rbManageItems[idx].image_source = val;
+  showToast('✅ 出典を保存しました: ' + val);
+}
+
 function rbSourceAcGetAll() {
   try { return JSON.parse(localStorage.getItem(RB_SOURCE_KEY) || '[]'); } catch(e) { return []; }
 }
@@ -2440,13 +2453,16 @@ function rbManageRender() {
               <button onclick="rbManageApplyUrl(${p.id})" class="approve-btn" style="font-size:10px;padding:3px 8px;white-space:nowrap">取得＆保存</button>
             </div>
             <div style="position:relative">
-              <input type="text" id="rb-manage-source-${p.id}" class="form-input"
-                placeholder="出典（例: 楽天市場（イシバシ楽器））"
-                style="width:100%;font-size:11px;padding:5px 8px"
-                value="${escHtml(p.image_source && p.image_source !== 'rakuten' && p.image_source !== 'manual' ? p.image_source : '')}"
-                oninput="rbSourceAcShow(this, '${p.id}')"
-                onblur="setTimeout(()=>rbSourceAcHide('${p.id}'),200)"
-                autocomplete="off">
+              <div style="display:flex;gap:4px">
+                <input type="text" id="rb-manage-source-${p.id}" class="form-input"
+                  placeholder="出典（例: 楽天市場（イシバシ楽器））"
+                  style="flex:1;font-size:11px;padding:5px 8px"
+                  value="${escHtml(p.image_source && p.image_source !== 'rakuten' && p.image_source !== 'manual' ? p.image_source : '')}"
+                  oninput="rbSourceAcShow(this, '${p.id}')"
+                  onblur="setTimeout(()=>rbSourceAcHide('${p.id}'),200)"
+                  autocomplete="off">
+                <button onclick="rbManageSaveSource(${p.id})" class="fetch-btn" style="font-size:10px;padding:3px 8px;white-space:nowrap">出典保存</button>
+              </div>
               <div id="rb-source-ac-${p.id}" style="position:absolute;top:100%;left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:200;display:none;max-height:140px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.5)"></div>
             </div>
           </div>
