@@ -649,7 +649,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
         <select id="rb-manage-filter" onchange="rbManageLoad()" style="background:var(--sf2);border:1px solid var(--bd);border-radius:3px;padding:7px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx);outline:none">
-          <option value="has_image">🖼 画像あり</option>
+          <option value="has_image">🖼 画像あり（全て）</option>
+          <option value="manual">✋ 手動入力のみ</option>
+          <option value="rakuten">🛒 楽天取得のみ</option>
           <option value="no_image">❌ 画像なし（未取得・失敗）</option>
           <option value="all">📋 すべて</option>
         </select>
@@ -2355,7 +2357,7 @@ function rbSourceAcShow(input, pedalId) {
   const matches = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
   if(!matches.length) { ac.style.display = 'none'; return; }
   ac.innerHTML = matches.map(s =>
-    `<div onclick="rbSourceAcSelect('${pedalId}','${s.replace(/'/g,"\\'")}');event.preventDefault()"
+    `<div onmousedown="event.preventDefault();event.stopPropagation();rbSourceAcSelect('${pedalId}','${s.replace(/'/g,"\\'")}');return false"
       style="padding:7px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--bd)"
       onmouseover="this.style.background='rgba(232,85,45,.1)'" onmouseout="this.style.background=''">${escHtml(s)}</div>`
   ).join('');
@@ -2412,6 +2414,8 @@ async function rbManageLoad() {
       .range(offset, offset + 999);
     if(filterMode === 'has_image') query = query.not('image_url','is',null);
     else if(filterMode === 'no_image') query = query.is('image_url', null);
+    else if(filterMode === 'manual') query = query.not('image_url','is',null).eq('image_source','manual');
+    else if(filterMode === 'rakuten') query = query.not('image_url','is',null).eq('image_source','rakuten');
     const { data: batch } = await query;
     if(!batch || !batch.length) break;
     all = all.concat(batch);
