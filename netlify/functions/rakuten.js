@@ -13,12 +13,11 @@ exports.handler = async function(event) {
     'Accept-Charset': 'utf-8'
   };
 
-  // ★ 商品ページURL直接指定モード
   const itemPageUrl = event.queryStringParameters?.item_url;
+
+  // ★ 商品ページURL直接指定モード（qなしでも動作）
   if (itemPageUrl) {
     try {
-      // URLからshopCode・itemCodeを抽出
-      // 例: https://item.rakuten.co.jp/key-shibuya/10016012/
       const match = itemPageUrl.match(/item\.rakuten\.co\.jp\/([^\/]+)\/([^\/\?]+)/);
       if (!match) {
         return { statusCode: 400, body: JSON.stringify({ error: 'Invalid Rakuten item URL' }) };
@@ -35,6 +34,7 @@ exports.handler = async function(event) {
         '&formatVersion=2';
 
       const res = await fetch(url, { headers });
+
       if (!res.ok) {
         const errorText = await res.text();
         return { statusCode: res.status, body: JSON.stringify({ error: 'Rakuten API error: ' + res.status, detail: errorText }) };
@@ -74,7 +74,7 @@ exports.handler = async function(event) {
     }
   }
 
-  // ★ キーワード検索モード（既存）
+  // ★ キーワード検索モード
   const query = event.queryStringParameters?.q;
   if (!query) {
     return { statusCode: 400, body: JSON.stringify({ error: 'Missing query parameter: q or item_url' }) };
