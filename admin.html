@@ -2316,6 +2316,50 @@ async function rbLcApplyUrl(pedalId, name) {
 
 
 // ★ 画像lightbox（admin用）
+
+// ★ 出典オートコンプリート（localStorageで候補を管理）
+const RB_SOURCE_KEY = 'mgmb_image_sources';
+
+function rbSourceAcGetAll() {
+  try { return JSON.parse(localStorage.getItem(RB_SOURCE_KEY) || '[]'); } catch(e) { return []; }
+}
+
+function rbSourceAcSave(val) {
+  if(!val || val === 'manual' || val === 'rakuten') return;
+  const list = rbSourceAcGetAll();
+  if(!list.includes(val)) {
+    list.unshift(val);
+    if(list.length > 20) list.pop();
+    localStorage.setItem(RB_SOURCE_KEY, JSON.stringify(list));
+  }
+}
+
+function rbSourceAcShow(input, pedalId) {
+  const val = input.value.trim().toLowerCase();
+  const ac = document.getElementById('rb-source-ac-' + pedalId);
+  if(!ac) return;
+  const all = rbSourceAcGetAll();
+  const matches = val ? all.filter(s => s.toLowerCase().includes(val)) : all;
+  if(!matches.length) { ac.style.display = 'none'; return; }
+  ac.innerHTML = matches.map(s =>
+    `<div onclick="rbSourceAcSelect('${pedalId}','${s.replace(/'/g,"\\'")}');event.preventDefault()"
+      style="padding:7px 12px;font-size:12px;cursor:pointer;border-bottom:1px solid var(--bd)"
+      onmouseover="this.style.background='rgba(232,85,45,.1)'" onmouseout="this.style.background=''">${escHtml(s)}</div>`
+  ).join('');
+  ac.style.display = 'block';
+}
+
+function rbSourceAcSelect(pedalId, val) {
+  const input = document.getElementById('rb-manage-source-' + pedalId);
+  if(input) input.value = val;
+  rbSourceAcHide(pedalId);
+}
+
+function rbSourceAcHide(pedalId) {
+  const ac = document.getElementById('rb-source-ac-' + pedalId);
+  if(ac) ac.style.display = 'none';
+}
+
 function rbOpenLightbox(src) {
   let lb = document.getElementById('rb-lightbox');
   if(!lb) {
@@ -2374,7 +2418,7 @@ function rbManageRender() {
   const sourceLabel = { manual:'手動', rakuten:'楽天', null:'不明' };
 
   el.innerHTML = '<div class="table-wrap"><table>' +
-    '<thead><tr><th style="width:32px"><input type="checkbox" id="rb-manage-all-cb" onchange="rbManageToggleAll(this.checked)" style="accent-color:var(--ac)"></th><th>画像</th><th>ペダル名</th><th>出典</th><th>手動URL入力</th></tr></thead>' +
+    '<thead><tr><th style="width:32px"><input type="checkbox" id="rb-manage-all-cb" onchange="rbManageToggleAll(this.checked)" style="accent-color:var(--ac)"></th><th>画像</th><th>ペダル名</th><th>出典</th><th>URL入力 / 出典入力</th></tr></thead>' +
     '<tbody>' +
     rbManageItems.map((p, i) => {
       const src = p.image_source || null;
@@ -2382,7 +2426,7 @@ function rbManageRender() {
       const srcLabel = src === 'manual' ? '手動' : src === 'rakuten' ? '楽天' : '不明';
       const checked = rbManageChecked.has(p.id) ? 'checked' : '';
       const imgCell = p.image_url
-        ? `<img src="${escHtml(p.image_url)}" style="width:56px;height:56px;object-fit:contain;border-radius:4px;border:1px solid var(--bd);cursor:zoom-in" onclick="rbOpenLightbox('${p.image_url.replace(/'/g,"\\'")}'">`
+        ? `<img src="${escHtml(p.image_url)}" style="width:56px;height:56px;object-fit:contain;border-radius:4px;border:1px solid var(--bd);cursor:zoom-in" data-src="${escHtml(p.image_url)}" onclick="rbOpenLightbox(this.dataset.src)">`
         : `<span style="font-size:10px;color:var(--td)">なし</span>`;
       return `<tr id="rb-manage-row-${p.id}">
         <td><input type="checkbox" ${checked} data-id="${p.id}" data-idx="${i}" onchange="rbManageToggle(this)" style="accent-color:var(--ac)"></td>
@@ -2390,12 +2434,21 @@ function rbManageRender() {
         <td style="font-size:12px;font-weight:500">${escHtml(p.full_name)}</td>
         <td><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${srcColor}">${srcLabel}</span></td>
         <td>
-          <div style="display:flex;gap:4px;flex-direction:column">
+          <div style="display:flex;gap:6px;flex-direction:column">
             <div style="display:flex;gap:4px">
-              <input type="text" id="rb-manage-url-${p.id}" class="form-input" placeholder="楽天商品ページURL（item.rakuten.co.jp/...）" style="min-width:0;flex:1;font-size:11px;padding:5px 8px">
+              <input type="text" id="rb-manage-url-${p.id}" class="form-input" placeholder="楽天商品ページURL or 画像URL" style="min-width:0;flex:1;font-size:11px;padding:5px 8px">
               <button onclick="rbManageApplyUrl(${p.id})" class="approve-btn" style="font-size:10px;padding:3px 8px;white-space:nowrap">取得＆保存</button>
             </div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--td)">楽天商品ページURLを貼るだけで画像＋商品URLを自動取得</div>
+            <div style="position:relative">
+              <input type="text" id="rb-manage-source-${p.id}" class="form-input"
+                placeholder="出典（例: 楽天市場（イシバシ楽器））"
+                style="width:100%;font-size:11px;padding:5px 8px"
+                value="${escHtml(p.image_source && p.image_source !== 'rakuten' && p.image_source !== 'manual' ? p.image_source : '')}"
+                oninput="rbSourceAcShow(this, '${p.id}')"
+                onblur="setTimeout(()=>rbSourceAcHide('${p.id}'),200)"
+                autocomplete="off">
+              <div id="rb-source-ac-${p.id}" style="position:absolute;top:100%;left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:200;display:none;max-height:140px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.5)"></div>
+            </div>
           </div>
         </td>
       </tr>`;
@@ -2533,9 +2586,12 @@ async function rbManageApplyUrl(pedalId) {
         return;
       }
       const item = items[0];
+      const sourceInputR = document.getElementById('rb-manage-source-' + pedalId);
+      const imageSourceR = sourceInputR ? sourceInputR.value.trim() || 'manual' : 'manual';
+      if(imageSourceR && imageSourceR !== 'manual' && imageSourceR !== 'rakuten') rbSourceAcSave(imageSourceR);
       const { error } = await sb.from('pedals').update({
         image_url: item.imageUrl,
-        image_source: 'manual',
+        image_source: imageSourceR,
         rakuten_item_url: inputUrl,
         rakuten_searched: true
       }).eq('id', pedalId);
@@ -2543,24 +2599,27 @@ async function rbManageApplyUrl(pedalId) {
       const idx = rbManageItems.findIndex(p => p.id === pedalId);
       if(idx >= 0) {
         rbManageItems[idx].image_url = item.imageUrl;
-        rbManageItems[idx].image_source = 'manual';
+        rbManageItems[idx].image_source = imageSourceR;
         rbManageItems[idx].rakuten_item_url = inputUrl;
       }
-      showToast('✅ 画像・商品URLを保存しました');
+      showToast('✅ 画像・商品URLを保存しました（出典: ' + imageSourceR + '）');
     } catch(e) {
       showToast('❌ エラー: ' + e.message);
       return;
     }
   } else {
     // 画像URLの直接入力として扱う
+    const sourceInputD = document.getElementById('rb-manage-source-' + pedalId);
+    const imageSourceD = sourceInputD ? sourceInputD.value.trim() || 'manual' : 'manual';
+    if(imageSourceD && imageSourceD !== 'manual' && imageSourceD !== 'rakuten') rbSourceAcSave(imageSourceD);
     const { error } = await sb.from('pedals').update({
       image_url: inputUrl,
-      image_source: 'manual'
+      image_source: imageSourceD
     }).eq('id', pedalId);
     if(error) { showToast('❌ 保存失敗: ' + error.message); return; }
     const idx = rbManageItems.findIndex(p => p.id === pedalId);
-    if(idx >= 0) { rbManageItems[idx].image_url = inputUrl; rbManageItems[idx].image_source = 'manual'; }
-    showToast('✅ 画像URLを保存しました（manual）');
+    if(idx >= 0) { rbManageItems[idx].image_url = inputUrl; rbManageItems[idx].image_source = imageSourceD; }
+    showToast('✅ 画像URLを保存しました（出典: ' + imageSourceD + '）');
   }
   rbManageRender();
 }
