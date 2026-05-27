@@ -200,18 +200,27 @@ function populateBrandSelects(pedals){
 }
 
 function applyLangUI(){
-  const label=document.getElementById('lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
+  const isEn=lang==='en';
+  const set=(id,txt)=>{const el=document.getElementById(id);if(el)el.textContent=txt;};
+  const setHTML=(id,html)=>{const el=document.getElementById(id);if(el)el.innerHTML=html;};
+
+  // ヘッダー
+  set('lang-label',isEn?'JA':'EN');
   document.querySelectorAll('.logo-sub').forEach(el=>el.textContent=tr('logoSub'));
   const hbtn=document.querySelector('.h-btn');if(hbtn)hbtn.innerHTML=tr('headerPost');
   const ddItems=document.querySelectorAll('.post-dropdown-item');
   if(ddItems[0])ddItems[0].innerHTML=tr('postDropBoard');
   if(ddItems[1])ddItems[1].innerHTML=tr('postDropGear');
+
+  // 投稿バナー
   document.querySelectorAll('.post-banner').forEach((banner,i)=>{
     const txt=banner.querySelector('.post-banner-text');
     if(txt)txt.innerHTML='<strong>'+(i===0?tr('postBannerTitle2'):tr('postBannerTitle'))+'</strong><br>'+tr('postBannerSub');
     banner.querySelectorAll('.pb-btn.board').forEach(el=>el.textContent=tr('btnPostBoard'));
     banner.querySelectorAll('.pb-btn.gear-b').forEach(el=>el.textContent=tr('btnPostGear'));
   });
+
+  // フィードタブ・ソート
   document.querySelectorAll('.feed-tab').forEach(el=>{
     const v=el.getAttribute('onclick')||'';
     if(v.includes("'all'"))el.textContent=tr('feedAll');
@@ -223,20 +232,35 @@ function applyLangUI(){
     if(v.includes("'new'"))el.textContent=tr('sortNew');
     else if(v.includes("'likes'"))el.textContent=tr('sortLikes');
   });
-  document.querySelectorAll('.wt').forEach(el=>{
-    const txt=el.textContent;
-    if(txt.match(/今月の人気|Top Boards/))el.textContent=tr('widgetRanking');
-    else if(txt.match(/よく使われ|Popular Gear/))el.textContent=tr('widgetGear');
-    else if(txt.match(/機材NEWS|Gear News/))el.textContent=tr('widgetNews');
-  });
-  document.querySelectorAll('.mob-panel-title').forEach(el=>{
-    const txt=el.textContent.trim();let key=null;
-    if(txt.match(/今月の人気|Top Boards/))key='widgetRankingMob';
-    else if(txt.match(/よく使われ|Popular Gear/))key='widgetGearMob';
-    else if(txt.match(/機材NEWS|Gear News/))key='widgetNewsMob';
-    else if(txt.match(/^広告$|^Ad$/))key='adMob';
-    if(key)el.innerHTML=tr(key)+'<span style="flex:1;height:1px;background:var(--bd);margin-left:8px;display:inline-block;vertical-align:middle"></span>';
-  });
+
+  // PC右サイドウィジェットタイトル（IDで直接指定）
+  const wtRanking=document.querySelector('#ranking-widget')?.closest('.widget')?.querySelector('.wt');
+  if(wtRanking)wtRanking.textContent=tr('widgetRanking');
+  const wtGear=document.querySelector('#gear-widget')?.closest('.widget')?.querySelector('.wt');
+  if(wtGear)wtGear.textContent=tr('widgetGear');
+  const wtNews=document.querySelector('#news-widget')?.closest('.widget')?.querySelector('.wt');
+  if(wtNews)wtNews.textContent=tr('widgetNews');
+
+  // スマホパネルタイトル（IDで直接指定）
+  const mobSpan='<span style="flex:1;height:1px;background:var(--bd);margin-left:8px;display:inline-block;vertical-align:middle"></span>';
+  const mobRanking=document.querySelector('#ranking-widget-mob')?.closest('.widget')?.previousElementSibling;
+  if(mobRanking&&mobRanking.classList.contains('mob-panel-title'))mobRanking.innerHTML=tr('widgetRankingMob')+mobSpan;
+  const mobGear=document.querySelector('#gear-widget-mob')?.closest('.widget')?.previousElementSibling;
+  if(mobGear&&mobGear.classList.contains('mob-panel-title'))mobGear.innerHTML=tr('widgetGearMob')+mobSpan;
+  const mobNews=document.querySelector('#news-widget-mob')?.closest('.widget')?.previousElementSibling;
+  if(mobNews&&mobNews.classList.contains('mob-panel-title'))mobNews.innerHTML=tr('widgetNewsMob')+mobSpan;
+
+  // 今週のおすすめタイトル（PC・スマホ）
+  const featuredTitle=isEn?'⭐ Featured Pedals':'⭐ 今週のおすすめ';
+  set('pc-featured-title',featuredTitle);
+  set('mob-featured-title',featuredTitle);
+
+  // 特集タイトル（PC・スマホ）
+  const featuresTitle=isEn?'🗂 Features':'🗂 特集';
+  set('pc-features-title',featuresTitle);
+  set('mob-features-title',featuresTitle);
+
+  // ニュースリンク
   document.querySelectorAll('.news-link').forEach(el=>{
     const t1=el.querySelector('.nr-t');const t2=el.querySelector('.nr-d');if(!t1||!t2)return;
     const txt=t1.textContent;
@@ -244,14 +268,17 @@ function applyLangUI(){
     else if(txt.match(/セール|Sale/)){t1.textContent=tr('newsSale');t2.textContent=tr('newsSaleSub');}
     else if(txt.match(/新着|New Effects/)){t1.textContent=tr('newsNew');t2.textContent=tr('newsNewSub');}
   });
+
+  // フッター
   document.querySelectorAll('.footer-link').forEach(el=>{
     if(el.textContent.match(/プライバシー|Privacy/))el.textContent=tr('footerPrivacy');
     else if(el.textContent.match(/お問い合わせ|Contact/)){el.textContent=tr('footerContact');el.setAttribute('onclick',"showToast('"+tr('contactMsg')+"')");}
   });
   const fcopy=document.querySelector('.footer-copy');if(fcopy)fcopy.textContent=tr('footerCopy');
-  const mpGenre=document.getElementById('mob-title-genre');if(mpGenre)mpGenre.textContent=tr('panelGenre');
-  const mpBrand=document.getElementById('mob-title-brand');if(mpBrand)mpBrand.textContent=tr('panelBrand');
-  const mpFx=document.getElementById('mob-title-fxtype');if(mpFx)mpFx.textContent=tr('panelFxType');
+
+  // サイドバー（スマホ・PC）
+  set('mob-title-brand',tr('panelBrand'));
+  set('mob-title-fxtype',tr('panelFxType'));
   document.querySelectorAll('.sl-lbl').forEach(el=>{
     const txt=el.textContent;
     if(txt.match(/ブランドで絞る|Filter by Brand/))el.textContent=tr('slBrand');
@@ -259,10 +286,12 @@ function applyLangUI(){
     else if(txt.match(/ジャンル|Genre/))el.textContent=tr('slGenre');
     else if(txt.match(/ブランド$|^Brand$/))el.textContent=tr('slBrandTitle');
   });
-  const pcDef=document.getElementById('pc-brand-select-default');if(pcDef)pcDef.textContent=tr('brandSelectDefault');
-  const mobDef=document.getElementById('mob-brand-select-default');if(mobDef)mobDef.textContent=tr('brandSelectDefault');
-  ['tag-tagroku-pc','tag-tagroku-mob','gs-tagroku'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tr('tagHomRec');});
-  ['tag-shoshinsha-pc','tag-shoshinsha-mob','gs-shoshinsha'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=tr('tagBeginner');});
+  set('pc-brand-select-default',tr('brandSelectDefault'));
+  set('mob-brand-select-default',tr('brandSelectDefault'));
+
+  // ジャンルタグ
+  ['tag-tagroku-pc','tag-tagroku-mob','gs-tagroku'].forEach(id=>{set(id,tr('tagHomRec'));});
+  ['tag-shoshinsha-pc','tag-shoshinsha-mob','gs-shoshinsha'].forEach(id=>{set(id,tr('tagBeginner'));});
   document.querySelectorAll('.brand-group-lbl').forEach(el=>{
     const txt=el.textContent.trim();
     if(txt.match(/^定番$|^Classics$/))el.textContent=tr('subStandard');
@@ -272,33 +301,49 @@ function applyLangUI(){
     else if(txt.match(/^モジュレーション$|^Modulation$/))el.textContent=tr('subModulation');
     else if(txt.match(/^その他$|^Other$/))el.textContent=tr('subOther');
   });
-  document.querySelectorAll('#post-genre-select [style*="font-size"]').forEach(el=>{
-    const txt=el.textContent.trim();
-    if(txt.match(/^定番$|^Classics$/))el.textContent=tr('subStandard');
-    else if(txt.match(/^空間系$|^Ambient$/))el.textContent=tr('subAmbient');
-    else if(txt.match(/^オルタナ系$|^Alternative$/))el.textContent=tr('subAlterna');
-  });
-  const lblGearStep=document.getElementById('gear-step-lbl');if(lblGearStep)lblGearStep.textContent=tr('lblGear');
-  const lblPhoto=document.getElementById('lbl-photo');if(lblPhoto)lblPhoto.textContent=tr('lblPhoto');
-  const lblUser=document.getElementById('lbl-username');if(lblUser)lblUser.textContent=tr('lblUsername');
-  const lblTitle=document.getElementById('lbl-title');if(lblTitle)lblTitle.textContent=tr('lblTitle');
-  const lblYt=document.getElementById('lbl-youtube');if(lblYt)lblYt.textContent=tr('lblYoutube');
-  const lblGenreF=document.getElementById('lbl-genre');if(lblGenreF)lblGenreF.textContent=tr('lblGenre');
-  const lblDesc=document.getElementById('lbl-desc');if(lblDesc)lblDesc.textContent=tr('lblDesc');
-  const passTitle=document.getElementById('pass-box-title');if(passTitle)passTitle.textContent=tr('passTitle');
-  const passWarn=document.getElementById('pass-warn');if(passWarn)passWarn.innerHTML=tr('passWarn');
-  const anonNote=document.getElementById('anon-note');if(anonNote)anonNote.textContent=tr('anonNote');
+
+  // エンサイクロペディア関連
+  ['sl-encyclopedia-text','mob-title-encyclopedia'].forEach(id=>set(id,tr(isEn?'slEncyclopediaEn':'slEncyclopediaJa')||( isEn?'Pedal Encyclopedia':'エフェクター図鑑')));
+  ['sl-encyclopedia-link-text','mob-encyclopedia-link-text'].forEach(id=>set(id,isEn?'🎛️ Open Pedal Encyclopedia 📚':'🎛️ エフェクター図鑑を開く 📚'));
+  ['sl-encyclopedia-link-sub'].forEach(id=>set(id,isEn?'〜 2,000+ pedals 〜':'〜 2,000件以上随時更新中 〜'));
+  set('mob-encyclopedia-link-sub',isEn?'〜 2,000+ pedals, updated regularly 〜':'〜 2,000件以上のペダルを随時更新中 〜');
+
+  // マイページリンク
+  set('sl-mypage-text',isEn?'My Page / Sign Up · Login':'マイページ / 登録・ログイン');
+  set('mob-mypage-text',isEn?'My Page / Sign Up · Login':'マイページ / 登録・ログイン');
+
+  // 投稿フォーム
+  set('gear-step-lbl',tr('lblGear'));
+  set('lbl-photo',tr('lblPhoto'));
+  set('lbl-username',tr('lblUsername'));
+  set('lbl-title',tr('lblTitle'));
+  set('lbl-youtube',tr('lblYoutube'));
+  set('lbl-genre',tr('lblGenre'));
+  set('lbl-desc',tr('lblDesc'));
+  set('pass-box-title',tr('passTitle'));
+  const passWarnEl=document.getElementById('pass-warn');if(passWarnEl)passWarnEl.innerHTML=tr('passWarn');
+  set('anon-note',tr('anonNote'));
   const pusr=document.getElementById('post-username');if(pusr)pusr.placeholder=tr('phUsername');
   const ptitle=document.getElementById('post-title');if(ptitle)ptitle.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
   const pdesc=document.getElementById('post-desc');if(pdesc)pdesc.placeholder=tr('phDesc');
-  const hsearch=document.getElementById('h-search');if(hsearch)hsearch.placeholder=lang==='en'?'Search...':'フリーワード';
-  const msearch=document.getElementById('mob-search');if(msearch)msearch.placeholder=lang==='en'?'Search...':'フリーワード検索...';
+  const hsearch=document.getElementById('h-search');if(hsearch)hsearch.placeholder=isEn?'Search...':'フリーワード';
+  const msearch=document.getElementById('mob-search');if(msearch)msearch.placeholder=isEn?'Search...':'フリーワード検索...';
+
+  // フォームテキスト（写真・機材ヒント）
+  const t1=document.getElementById('upload-main-text');if(t1)t1.textContent=tr('uploadAreaText');
+  const t2=document.getElementById('gear-hint2');if(t2)t2.innerHTML=tr('gearHint2');
+
+  // 機材リマインド
   const grTitle=document.querySelector('#gear-remind-bd div[style*="font-size:20px"]');if(grTitle)grTitle.textContent=tr('gearRemindTitle');
   const grSub=document.querySelector('#gear-remind-bd div[style*="font-size:12px"]');if(grSub)grSub.textContent=tr('gearRemindSub');
   const grBtns=document.querySelectorAll('#gear-remind-bd button');
   if(grBtns[0])grBtns[0].textContent=tr('gearRemindAdd');
   if(grBtns[1])grBtns[1].textContent=tr('gearRemindSkip');
-  applyEncyclopediaSub(lang==='en');
+
+  // ガチャ言語更新
+  if(typeof applyGachaLang==='function')applyGachaLang();
+  if(typeof applyGachaI18n==='function')applyGachaI18n();
+
   updateStepUI();
   if(allDBPosts.length){renderGearWidget(allDBPosts);renderGearWidgetMob(allDBPosts);renderRankingWidget(allDBPosts);renderRankingWidgetMob(allDBPosts);}
 }
@@ -308,17 +353,8 @@ document.addEventListener('click',()=>document.getElementById('post-dropdown').c
 function toggleLang(){
   lang=lang==='ja'?'en':'ja';
   localStorage.setItem('mgmb_lang',lang);
-  const label=document.getElementById('lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
   applyLangUI();
   if(allDBPosts.length)applyFilter();
-  // ★ ガチャ・お知らせ・フォームテキストを一元更新
-  const isEn=lang==='en';
-  // フォームテキスト更新
-  const t1=document.getElementById('upload-main-text');if(t1)t1.textContent=isEn?'Click here to upload photos':'ここをクリックして写真をアップロード';
-  const t2=document.getElementById('gear-hint2');if(t2)t2.innerHTML=isEn?'Type to search and autocomplete.<br>Click a suggestion to add!':'ローマ字入力で自動予測変換できます。<br>候補をクリックで簡単追加！';
-  // ガチャ言語更新
-  if(typeof applyGachaLang==='function')applyGachaLang();
-  if(typeof applyGachaI18n==='function')applyGachaI18n();
   // お知らせ・おすすめ・特集の再レンダリング
   if(typeof loadNotices==='function')loadNotices();
   if(typeof loadFeatured==='function')loadFeatured();
@@ -1182,7 +1218,7 @@ function renderGearWidgetMob(posts){
   el.innerHTML=sorted.map(([n,c])=>renderGearWidgetHTML(n,c)).join('');
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeGearReportModal();}});
-document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();initPCScrollSync();});
+document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();initPCScrollSync();applyLangUI();});
 function openLightbox(src){
   const lb=document.getElementById('lightbox');const img=document.getElementById('lightbox-img');
   if(!lb||!img)return;img.src=src;lb.classList.add('open');document.body.style.overflow='hidden';
