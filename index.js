@@ -311,6 +311,18 @@ function toggleLang(){
   const label=document.getElementById('lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
   applyLangUI();
   if(allDBPosts.length)applyFilter();
+  // ★ ガチャ・お知らせ・フォームテキストを一元更新
+  const isEn=lang==='en';
+  // フォームテキスト更新
+  const t1=document.getElementById('upload-main-text');if(t1)t1.textContent=isEn?'Click here to upload photos':'ここをクリックして写真をアップロード';
+  const t2=document.getElementById('gear-hint2');if(t2)t2.innerHTML=isEn?'Type to search and autocomplete.<br>Click a suggestion to add!':'ローマ字入力で自動予測変換できます。<br>候補をクリックで簡単追加！';
+  // ガチャ言語更新
+  if(typeof applyGachaLang==='function')applyGachaLang();
+  if(typeof applyGachaI18n==='function')applyGachaI18n();
+  // お知らせ・おすすめ・特集の再レンダリング
+  if(typeof loadNotices==='function')loadNotices();
+  if(typeof loadFeatured==='function')loadFeatured();
+  if(typeof loadFeatures==='function')loadFeatures();
 }
 function buildTicker(posts){
   const inner=document.getElementById('ticker-inner');if(!inner)return;
