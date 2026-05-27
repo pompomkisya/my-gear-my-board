@@ -1097,8 +1097,7 @@ async function loadFeatures(){
 }
 window.addEventListener('DOMContentLoaded',function(){
   loadNotices();loadFeatured();loadFeatures();
-  const orig=window.toggleLang;
-  window.toggleLang=function(){if(orig)orig.apply(this,arguments);setTimeout(function(){loadNotices();loadFeatured();loadFeatures();},100);};
+  // toggleLangはindex.jsで一元管理（loadNotices/loadFeatured/loadFeaturesも呼ばれる）
 });
 })();
 </script>
@@ -1127,8 +1126,7 @@ window.addEventListener('DOMContentLoaded',function(){
   }
   document.addEventListener('DOMContentLoaded',function(){
     var initLang=localStorage.getItem('mgmb_lang')||'ja';updateFormTexts(initLang==='en');
-    var orig=window.toggleLang;
-    window.toggleLang=function(){if(orig)orig.apply(this,arguments);setTimeout(function(){updateFormTexts((localStorage.getItem('mgmb_lang')||'ja')==='en');},80);};
+    // toggleLangはindex.jsで一元管理（updateFormTextsも呼ばれる）
   });
 })();
 </script>
@@ -1305,11 +1303,7 @@ async function gDoSave(){
     alert(isEn?'Saved to My Page!':'マイページに保存しました！');
   }catch(e){console.error('save error',e);alert(isEn?'Could not save.':'保存に失敗しました。');}
 }
-const _origToggleLang=window.toggleLang;
-window.toggleLang=function(){
-  if(_origToggleLang)_origToggleLang();
-  setTimeout(()=>{gLang=getGLang();applyGachaLang();applyGachaI18n();},60);
-};
+// toggleLangはindex.jsで一元管理（applyGachaLang/applyGachaI18nも呼ばれる）
 const I18N_GACHA={
   'sl-mypage-text':{ja:'マイページ / 登録・ログイン',en:'My Page / Sign Up · Login'},
   'mob-mypage-text':{ja:'マイページ / 登録・ログイン',en:'My Page / Sign Up · Login'},
