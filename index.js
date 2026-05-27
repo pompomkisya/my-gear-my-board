@@ -302,6 +302,37 @@ function applyLangUI(){
     else if(txt.match(/^その他$|^Other$/))el.textContent=tr('subOther');
   });
 
+  // ジャンルラベル（スマホ・PC両方IDで直接指定）
+  set('mob-title-board-genre',isEn?'Board Genre':'投稿ボードジャンル');
+  set('sl-lbl-genre',isEn?'Board Genre':'投稿ボードジャンル');
+  set('mob-lbl-standard',tr('subStandard'));
+  set('mob-lbl-ambient',tr('subAmbient'));
+  set('mob-lbl-alterna',tr('subAlterna'));
+  set('sl-sub-standard',tr('subStandard'));
+  set('sl-sub-ambient',tr('subAmbient'));
+  set('sl-sub-alterna',tr('subAlterna'));
+
+  // エフェクタータイプセレクト デフォルト
+  set('mob-type-select-default',isEn?'Select type...':'タイプを選択...');
+  set('pc-type-select-default',isEn?'Select type...':'タイプを選択...');
+
+  // ガチャカード内テキスト（PC・スマホ）
+  set('g-gc-sub1-mob',isEn?'Find your next pedal':'次の相棒に出会おう');
+  set('g-gc-sub2-mob',isEn?'From our gear database':'ペダル図鑑から厳選紹介');
+  set('g-gc-sub1-pc',isEn?'Find your next pedal':'次の相棒に出会おう');
+  set('g-gc-sub2-pc',isEn?'From our gear database':'ペダル図鑑から厳選紹介');
+
+  // 写真アップロード補足テキスト
+  const uploadAreaSub=document.getElementById('upload-area-sub');
+  if(uploadAreaSub)uploadAreaSub.textContent=isEn?'Up to 3 photos · First photo is thumbnail':'最大3枚 · 1枚目がサムネイル';
+  const uploadHint=document.getElementById('upload-hint');
+  if(uploadHint)uploadHint.textContent=isEn?'Adding numbers makes it easier to understand':'番号をつけると伝わりやすくなります';
+
+  // 機材入力ヒント
+  set('gear-hint1',tr('gearHint1'));
+  set('gear-hint3',tr('gearHint3'));
+  set('later-input-btn',tr('laterInput'));
+
   // エンサイクロペディア関連
   ['sl-encyclopedia-text','mob-title-encyclopedia'].forEach(id=>set(id,tr(isEn?'slEncyclopediaEn':'slEncyclopediaJa')||( isEn?'Pedal Encyclopedia':'エフェクター図鑑')));
   ['sl-encyclopedia-link-text','mob-encyclopedia-link-text'].forEach(id=>set(id,isEn?'🎛️ Open Pedal Encyclopedia 📚':'🎛️ エフェクター図鑑を開く 📚'));
