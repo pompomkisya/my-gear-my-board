@@ -354,7 +354,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 .g-tooltip-box{width:200px;left:auto;right:0;transform:none}
 .gacha-feed-wrap{grid-template-columns:1fr 1fr}
 }
-/* ★ お知らせバナー */
 .notice-bar{background:linear-gradient(135deg,rgba(232,85,45,.12),rgba(240,165,0,.08));border-bottom:1px solid rgba(232,85,45,.2);padding:0;overflow:hidden;max-height:0;transition:max-height .3s ease}
 .notice-bar.show{max-height:120px}
 .notice-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 20px;flex-wrap:wrap}
@@ -363,7 +362,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 .notice-link-btn:hover{background:rgba(232,85,45,.28)}
 .notice-close{width:20px;height:20px;background:transparent;border:none;color:var(--td);cursor:pointer;font-size:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:color .15s}
 .notice-close:hover{color:var(--tx)}
-/* ★ 今週のおすすめペダル */
 .featured-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .featured-card{background:var(--sf2);border:1px solid var(--bd);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);display:block;transition:border-color .2s}
 .featured-card:hover{border-color:var(--ac)}
@@ -373,7 +371,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 .featured-card-brand{font-size:9px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .featured-card-model{font-size:11px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .featured-card-label{font-size:9px;color:var(--tm);margin-top:3px;font-family:'JetBrains Mono',monospace}
-/* ★ 特集ページ */
 .feature-list{display:flex;flex-direction:column;gap:0}
 .feature-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);text-decoration:none;color:var(--tx);transition:color .15s;cursor:pointer}
 .feature-item:last-child{border-bottom:none}
@@ -381,6 +378,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 .feature-item-title{font-size:12px;font-weight:600;flex:1;line-height:1.4}
 .feature-item-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);flex-shrink:0}
 @keyframes encyclopediaGlow{0%,100%{box-shadow:0 0 8px rgba(232,85,45,.3),inset 0 0 8px rgba(232,85,45,.05)}50%{box-shadow:0 0 18px rgba(232,85,45,.6),inset 0 0 12px rgba(232,85,45,.1)}}
+@keyframes skeletonPulse{0%,100%{opacity:.4}50%{opacity:.8}}
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PRZL59FSGZ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-PRZL59FSGZ');</script>
@@ -421,8 +419,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <div class="ticker-lbl">NEW</div>
   <div class="ticker-wrap"><div class="ticker-inner" id="ticker-inner"><span class="ti">読み込み中...</span></div></div>
 </div>
-
-<!-- ★ お知らせバナー -->
 <div class="notice-bar" id="notice-bar">
   <div id="notice-items"></div>
 </div>
@@ -597,6 +593,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </div>
   </div>
 </div>
+
 <div class="wrap">
 <aside class="sl">
   <div style="margin-bottom:16px">
@@ -761,7 +758,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="step-panel on" id="step-1">
       <label class="form-lbl" id="lbl-photo">写真（最大3枚・任意）</label>
       <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="handlePhotos(event)">
-      <!-- ★修正1: テキストをid付きに変更 JP/EN切替対応 -->
       <div class="upload-area" id="upload-area-main" onclick="document.getElementById('photo-input').click()">
         <span class="upload-icon">📷</span>
         <div id="upload-main-text">ここをクリックして写真をアップロード</div>
@@ -818,7 +814,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           </div>
           <div class="ac-dropdown" id="ac-dropdown"></div>
         </div>
-        <!-- ★修正2: ヒントテキストをid付きに変更 JP/EN切替対応 -->
         <div id="gear-hint2" style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:#9a9890;margin-top:5px">ローマ字入力で自動予測変換できます。<br>候補をクリックで簡単追加！</div>
         <div id="gear-feedback" style="font-family:Noto Sans JP,sans-serif;font-size:12px;color:#4caf50;margin-top:6px;display:none"></div>
         <div id="gear-hint3" style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);margin-top:4px">まずは1つだけでOKです</div>
@@ -865,7 +860,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div class="pass-box-title" id="pass-box-title">🔑 編集用4桁パスワードを設定</div>
         <div class="pass-warn" id="pass-warn">投稿後に<strong>編集・削除</strong>するときに必要です。<strong>忘れると変更できません。</strong></div>
         <div class="pass-digits">
-          <!-- ★修正3: type="number"→type="tel" ダブル入力防止 -->
           <input class="pass-digit" id="pd1" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1">
           <input class="pass-digit" id="pd2" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1">
           <input class="pass-digit" id="pd3" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1">
@@ -884,7 +878,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </div>
   </div>
 </div>
-
 <!-- EDIT MODAL -->
 <div class="ebd" id="edit-bd" onclick="closeOnBd(event,'edit-bd')">
   <div class="eform">
@@ -927,7 +920,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </div>
   </div>
 </div>
-
 <!-- DONE -->
 <div class="done-bd" id="done-bd">
   <div class="done-box">
@@ -937,7 +929,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <button class="done-close-btn" onclick="document.getElementById('done-bd').classList.remove('open');document.body.style.overflow=''">閉じる</button>
   </div>
 </div>
-
 <!-- GEAR REMIND -->
 <div id="gear-remind-bd" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:800;align-items:center;justify-content:center;padding:16px">
   <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;max-width:340px;width:100%;padding:28px 24px;text-align:center">
@@ -950,16 +941,13 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </div>
   </div>
 </div>
-
 <!-- LIGHTBOX -->
 <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()">✕</button>
   <img class="lightbox-img" id="lightbox-img" src="" alt="">
 </div>
-
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
-
 <!-- IMAGE EDITOR -->
 <div class="img-editor-bd" id="img-editor-bd">
   <div class="img-editor-header">
@@ -975,6 +963,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <div class="img-editor-hint" id="editor-hint"></div>
   <div class="img-editor-toolbar" id="img-editor-toolbar"></div>
 </div>
+
 <!-- ★ ガチャ モーダル -->
 <div class="gacha-modal-overlay" id="gacha-overlay" onclick="if(event.target===this)closeGacha()">
   <div class="gacha-modal-inner">
@@ -1029,10 +1018,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 const SUPA_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const TYPE_ICON='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_';
-
 function getLang(){try{return localStorage.getItem('mgmb_lang')||((navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en');}catch(e){return 'ja';}}
-
-// ── お知らせ ──
 async function loadNotices(){
   try{
     const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -1042,12 +1028,10 @@ async function loadNotices(){
     const bar=document.getElementById('notice-bar');
     const items=document.getElementById('notice-items');
     if(!bar||!items)return;
-    // 複数の場合は最初の1件だけ表示（シンプルに）
     const n=data[0];
     const msg=lang==='en'?(n.message_en||n.message):n.message;
-    const label=lang==='en'?(n.link_label_en||n.link_label||'詳細'):( n.link_label||'詳細');
-    const linkHtml=n.link_url
-      ?`<a href="${n.link_url}" class="notice-link-btn" target="_blank">${label} →</a>`:'';
+    const label=lang==='en'?(n.link_label_en||n.link_label||'詳細'):(n.link_label||'詳細');
+    const linkHtml=n.link_url?`<a href="${n.link_url}" class="notice-link-btn" target="_blank">${label} →</a>`:'';
     const dismissKey='notice_dismissed_'+n.id;
     if(sessionStorage.getItem(dismissKey))return;
     items.innerHTML=`<div class="notice-inner">
@@ -1063,8 +1047,6 @@ window.dismissNotice=function(id){
   const bar=document.getElementById('notice-bar');
   if(bar)bar.classList.remove('show');
 };
-
-// ── 今週のおすすめペダル ──
 async function loadFeatured(){
   try{
     const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -1077,9 +1059,7 @@ async function loadFeatured(){
     const html=data.map(f=>{
       const p=f.pedals;if(!p)return'';
       const imgSrc=p.image_url||(p.types&&p.types[0]?TYPE_ICON+p.types[0]+'.png':'');
-      const imgHtml=imgSrc
-        ?`<img src="${imgSrc}" alt="${p.model}" loading="lazy" onerror="this.style.display='none'">`
-        :`<span style="font-size:28px;opacity:.2">🎛</span>`;
+      const imgHtml=imgSrc?`<img src="${imgSrc}" alt="${p.model}" loading="lazy" onerror="this.style.display='none'">`:`<span style="font-size:28px;opacity:.2">🎛</span>`;
       const lbl=f[labelKey]||f.label||'';
       return `<a href="/pedal?slug=${p.slug}" class="featured-card">
         <div class="featured-card-img">${imgHtml}</div>
@@ -1091,125 +1071,64 @@ async function loadFeatured(){
       </a>`;
     }).join('');
     const title=lang==='en'?'⭐ Featured Pedals':'⭐ 今週のおすすめ';
-    // PC
-    const pcEl=document.getElementById('featured-widget-pc');
-    const pcSec=document.getElementById('pc-featured-section');
-    const pcTitle=document.getElementById('pc-featured-title');
-    if(pcEl){pcEl.innerHTML=html;}
-    if(pcSec)pcSec.style.display='block';
-    if(pcTitle)pcTitle.textContent=title;
-    // スマホ
-    const mobEl=document.getElementById('featured-widget-mob');
-    const mobSec=document.getElementById('mob-featured-section');
-    const mobTitle=document.getElementById('mob-featured-title');
-    if(mobEl){mobEl.innerHTML=html;}
-    if(mobSec)mobSec.style.display='block';
-    if(mobTitle)mobTitle.textContent=title;
+    const pcEl=document.getElementById('featured-widget-pc');const pcSec=document.getElementById('pc-featured-section');const pcTitle=document.getElementById('pc-featured-title');
+    if(pcEl){pcEl.innerHTML=html;}if(pcSec)pcSec.style.display='block';if(pcTitle)pcTitle.textContent=title;
+    const mobEl=document.getElementById('featured-widget-mob');const mobSec=document.getElementById('mob-featured-section');const mobTitle=document.getElementById('mob-featured-title');
+    if(mobEl){mobEl.innerHTML=html;}if(mobSec)mobSec.style.display='block';if(mobTitle)mobTitle.textContent=title;
   }catch(e){console.warn('featured load error',e);}
 }
-
-// ── 特集ページ ──
 async function loadFeatures(){
   try{
     const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
-    const{data}=await sb.from('special_features')
-      .select('id,title,title_en,slug,pedal_ids')
-      .eq('is_active',true).order('sort_order').limit(8);
+    const{data}=await sb.from('special_features').select('id,title,title_en,slug,pedal_ids').eq('is_active',true).order('sort_order').limit(8);
     if(!data||!data.length)return;
     const lang=getLang();
     const html=data.map(f=>{
       const title=lang==='en'?(f.title_en||f.title):f.title;
       const count=(f.pedal_ids||[]).length;
-      return`<a href="/feature?slug=${f.slug}" class="feature-item">
-        <div class="feature-item-title">${title}</div>
-        <div class="feature-item-count">${count}件</div>
-        <span style="color:var(--td);font-size:12px">›</span>
-      </a>`;
+      return`<a href="/feature?slug=${f.slug}" class="feature-item"><div class="feature-item-title">${title}</div><div class="feature-item-count">${count}件</div><span style="color:var(--td);font-size:12px">›</span></a>`;
     }).join('');
     const title=lang==='en'?'🗂 Features':'🗂 特集';
-    // PC
-    const pcEl=document.getElementById('features-widget-pc');
-    const pcSec=document.getElementById('pc-features-section');
-    const pcTitle=document.getElementById('pc-features-title');
-    if(pcEl)pcEl.innerHTML=html;
-    if(pcSec)pcSec.style.display='block';
-    if(pcTitle)pcTitle.textContent=title;
-    // スマホ
-    const mobEl=document.getElementById('features-widget-mob');
-    const mobSec=document.getElementById('mob-features-section');
-    const mobTitle=document.getElementById('mob-features-title');
-    if(mobEl)mobEl.innerHTML=html;
-    if(mobSec)mobSec.style.display='block';
-    if(mobTitle)mobTitle.textContent=title;
+    const pcEl=document.getElementById('features-widget-pc');const pcSec=document.getElementById('pc-features-section');const pcTitle=document.getElementById('pc-features-title');
+    if(pcEl)pcEl.innerHTML=html;if(pcSec)pcSec.style.display='block';if(pcTitle)pcTitle.textContent=title;
+    const mobEl=document.getElementById('features-widget-mob');const mobSec=document.getElementById('mob-features-section');const mobTitle=document.getElementById('mob-features-title');
+    if(mobEl)mobEl.innerHTML=html;if(mobSec)mobSec.style.display='block';if(mobTitle)mobTitle.textContent=title;
   }catch(e){console.warn('features load error',e);}
 }
-
 window.addEventListener('DOMContentLoaded',function(){
-  loadNotices();
-  loadFeatured();
-  loadFeatures();
-  // 言語切替時に再レンダリング
+  loadNotices();loadFeatured();loadFeatures();
   const orig=window.toggleLang;
-  window.toggleLang=function(){
-    if(orig)orig.apply(this,arguments);
-    setTimeout(function(){loadNotices();loadFeatured();loadFeatures();},100);
-  };
+  window.toggleLang=function(){if(orig)orig.apply(this,arguments);setTimeout(function(){loadNotices();loadFeatured();loadFeatures();},100);};
 });
 })();
 </script>
 <script src="index.js"></script>
-
-<!-- ★修正3: パスワード入力制御（ダブル入力防止） JP/EN両対応 -->
 <script>
 (function(){
   function initPassDigits(ids){
     ids.forEach(function(id,i,arr){
-      var el=document.getElementById(id);
-      if(!el)return;
+      var el=document.getElementById(id);if(!el)return;
       var composing=false;
       el.addEventListener('compositionstart',function(){composing=true;});
-      el.addEventListener('compositionend',function(){
-        composing=false;
-        el.value=el.value.replace(/\D/g,'').slice(-1);
-        if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();
-      });
-      el.addEventListener('keydown',function(e){
-        if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();
-        if(!/^\d$/.test(e.key)&&e.key!=='Backspace'&&e.key!=='Tab'&&!e.key.startsWith('Arrow'))e.preventDefault();
-      });
-      el.addEventListener('input',function(){
-        if(composing)return;
-        el.value=el.value.replace(/\D/g,'').slice(-1);
-        if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();
-      });
+      el.addEventListener('compositionend',function(){composing=false;el.value=el.value.replace(/\D/g,'').slice(-1);if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();});
+      el.addEventListener('keydown',function(e){if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();if(!/^\d$/.test(e.key)&&e.key!=='Backspace'&&e.key!=='Tab'&&!e.key.startsWith('Arrow'))e.preventDefault();});
+      el.addEventListener('input',function(){if(composing)return;el.value=el.value.replace(/\D/g,'').slice(-1);if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();});
       el.addEventListener('focus',function(){if(el.select)el.select();});
     });
   }
-  document.addEventListener('DOMContentLoaded',function(){
-    initPassDigits(['pd1','pd2','pd3','pd4']);
-  });
+  document.addEventListener('DOMContentLoaded',function(){initPassDigits(['pd1','pd2','pd3','pd4']);});
 })();
 </script>
-
-<!-- ★修正1・2: 言語切替時フォームテキスト更新 JP/EN対応 -->
 <script>
 (function(){
   function updateFormTexts(isEn){
-    var t1=document.getElementById('upload-main-text');
-    if(t1)t1.textContent=isEn?'Click here to upload photos':'ここをクリックして写真をアップロード';
-    var t2=document.getElementById('gear-hint2');
-    if(t2)t2.innerHTML=isEn?'Type to search and autocomplete.<br>Click a suggestion to add!':'ローマ字入力で自動予測変換できます。<br>候補をクリックで簡単追加！';
+    var t1=document.getElementById('upload-main-text');if(t1)t1.textContent=isEn?'Click here to upload photos':'ここをクリックして写真をアップロード';
+    var t2=document.getElementById('gear-hint2');if(t2)t2.innerHTML=isEn?'Type to search and autocomplete.<br>Click a suggestion to add!':'ローマ字入力で自動予測変換できます。<br>候補をクリックで簡単追加！';
   }
   document.addEventListener('DOMContentLoaded',function(){
-    var initLang=localStorage.getItem('mgmb_lang')||'ja';
-    updateFormTexts(initLang==='en');
+    var initLang=localStorage.getItem('mgmb_lang')||'ja';updateFormTexts(initLang==='en');
     var orig=window.toggleLang;
-    window.toggleLang=function(){
-      if(orig)orig.apply(this,arguments);
-      setTimeout(function(){
-        updateFormTexts((localStorage.getItem('mgmb_lang')||'ja')==='en');
-      },80);
-    };
+    window.toggleLang=function(){if(orig)orig.apply(this,arguments);setTimeout(function(){updateFormTexts((localStorage.getItem('mgmb_lang')||'ja')==='en');},80);};
   });
 })();
 </script>
@@ -1273,11 +1192,9 @@ function closeGacha(){
   document.getElementById('gacha-overlay').classList.remove('open');
   document.body.style.overflow='';
   if(gSlotT)clearInterval(gSlotT);if(gRollT)clearTimeout(gRollT);
-  // ★ 完全リセット：残留状態をすべてクリア
   gPhase='idle';gResult=null;
   gSetShare(false);
-  const c=document.getElementById('g-card');
-  if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
+  const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
   const pts=document.getElementById('g-pts');if(pts)pts.innerHTML='';
   const panel=document.getElementById('g-panel');if(panel)panel.innerHTML='';
 }
@@ -1303,8 +1220,7 @@ window.gHandleTap=function(){
 };
 function gSetIdle(){
   gPhase='idle';gResult=null;
-  const c=document.getElementById('g-card');
-  if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
+  const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
   gSetShare(false);gRenderIdle();
   const isEn=gLang==='en';
   const ht=document.getElementById('g-ht');if(ht)ht.textContent=isEn?'Tap card to roll':'カードをタップして引く';
@@ -1312,8 +1228,7 @@ function gSetIdle(){
 }
 function gStartRoll(){
   gPhase='rolling';
-  const c=document.getElementById('g-card');
-  if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
+  const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
   gSetShare(false);gRenderRolling();
   const gh=document.getElementById('g-hint');if(gh)gh.style.display='none';
   let tick=0;
@@ -1427,22 +1342,16 @@ const I18N_GACHA={
 };
 function applyGachaI18n(){
   const isEn=gLang==='en';
-  // 図鑑ボタンのサブテキスト切替
-  const jaSubMob='〜 2,000件以上のペダルを随時更新中 〜';
-  const enSubMob='〜 2,000+ pedals, updated regularly 〜';
-  const jaSubPc='〜 2,000件以上随時更新中 〜';
-  const enSubPc='〜 2,000+ pedals 〜';
-  const mobSub=document.getElementById('mob-encyclopedia-link-sub');
-  const pcSub=document.getElementById('sl-encyclopedia-link-sub');
-  if(mobSub)mobSub.textContent=isEn?enSubMob:jaSubMob;
-  if(pcSub)pcSub.textContent=isEn?enSubPc:jaSubPc;
+  const jaSubMob='〜 2,000件以上のペダルを随時更新中 〜';const enSubMob='〜 2,000+ pedals, updated regularly 〜';
+  const jaSubPc='〜 2,000件以上随時更新中 〜';const enSubPc='〜 2,000+ pedals 〜';
+  const mobSub=document.getElementById('mob-encyclopedia-link-sub');const pcSub=document.getElementById('sl-encyclopedia-link-sub');
+  if(mobSub)mobSub.textContent=isEn?enSubMob:jaSubMob;if(pcSub)pcSub.textContent=isEn?enSubPc:jaSubPc;
   Object.entries(I18N_GACHA).forEach(([id,t])=>{const el=document.getElementById(id);if(el)el.textContent=isEn?t.en:t.ja;});
 }
 window.openGacha=openGacha;window.closeGacha=closeGacha;window.gDoShare=gDoShare;window.gDoSave=gDoSave;
 window.addEventListener('DOMContentLoaded',()=>{gLang=getGLang();applyGachaLang();applyGachaI18n();});
 })();
 </script>
-
 <!-- 機材報告モーダル -->
 <div id="gear-report-modal" style="position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:700;display:none;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeGearReportModal()">
   <div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:24px;width:100%;max-width:380px;position:relative">
