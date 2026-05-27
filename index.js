@@ -408,8 +408,9 @@ let pedalTypesMap={};
 
 // ★ スケルトンカード表示（データ取得前に枠を先行表示）
 function showSkeletonCards(count){
-  const card=()=>`<div class="card" style="pointer-events:none">
-    <div class="iw" style="background:var(--sf2);animation:skeletonPulse 1.4s ease-in-out infinite"></div>
+  const card=(i)=>`<div class="card" style="pointer-events:none">
+    <div class="iw" style="background:var(--sf2);animation:skeletonPulse 1.4s ease-in-out infinite;flex-direction:column;gap:6px">${i===0?`<span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--td);animation:skeletonPulse 1.4s ease-in-out infinite">LOADING</span><span class="g-db" style="width:3px;height:3px"></span>`:''}
+    </div>
     <div class="body">
       <div class="cu">
         <div class="av" style="background:var(--sf2);animation:skeletonPulse 1.4s ease-in-out infinite"></div>
@@ -421,7 +422,7 @@ function showSkeletonCards(count){
   </div>`;
   const grid=document.getElementById('card-grid');
   const gridMob=document.getElementById('card-grid-mob');
-  const html=Array.from({length:count},card).join('');
+  const html=Array.from({length:count},(_,i)=>card(i)).join('');
   if(grid)grid.innerHTML=html;
   if(gridMob)gridMob.innerHTML=html;
 }
