@@ -137,6 +137,7 @@ const I18N={
   }
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
+
 let _reportGearName='';
 function openGearReportModal(name){
   _reportGearName=name;
@@ -197,6 +198,7 @@ function populateBrandSelects(pedals){
     if(mobSelect){const opt=document.createElement('option');opt.value=brand;opt.textContent=brand;mobSelect.appendChild(opt);}
   });
 }
+
 function applyLangUI(){
   const label=document.getElementById('lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
   document.querySelectorAll('.logo-sub').forEach(el=>el.textContent=tr('logoSub'));
@@ -325,7 +327,46 @@ let pedalDataLoaded=false;
 let pedalDataLoading=false;
 let pedalTypesMap={};
 
+// ★ スケルトンカード表示（データ取得前に枠を先行表示）
+function showSkeletonCards(count){
+  const card=()=>`<div class="card" style="pointer-events:none">
+    <div class="iw" style="background:var(--sf2);animation:skeletonPulse 1.4s ease-in-out infinite"></div>
+    <div class="body">
+      <div class="cu">
+        <div class="av" style="background:var(--sf2);animation:skeletonPulse 1.4s ease-in-out infinite"></div>
+        <div style="height:12px;width:80px;background:var(--sf2);border-radius:2px;margin-left:6px;animation:skeletonPulse 1.4s ease-in-out infinite"></div>
+      </div>
+      <div style="height:16px;width:90%;background:var(--sf2);border-radius:2px;margin-bottom:8px;animation:skeletonPulse 1.4s ease-in-out infinite"></div>
+      <div style="height:10px;width:60%;background:var(--sf2);border-radius:2px;animation:skeletonPulse 1.4s ease-in-out infinite"></div>
+    </div>
+  </div>`;
+  const grid=document.getElementById('card-grid');
+  const gridMob=document.getElementById('card-grid-mob');
+  const html=Array.from({length:count},card).join('');
+  if(grid)grid.innerHTML=html;
+  if(gridMob)gridMob.innerHTML=html;
+}
+
+// ★ 修正: 先行8件表示 → バックグラウンドで全件取得
 async function loadPostsFromDB(){
+  showSkeletonCards(6);
+  const{data:firstBatch,error:firstError}=await sb.from('posts')
+    .select('*').order('created_at',{ascending:false}).limit(8);
+  if(firstError){console.error(firstError);return;}
+  allDBPosts=(firstBatch||[]).map(p=>({
+    ...p,
+    comment_count:0,
+    gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
+      ...g,
+      types:pedalTypesMap[g.name]||[]
+    }))
+  }));
+  applyFilter();
+  buildTicker(allDBPosts);
+  loadAllPostsBackground();
+}
+
+async function loadAllPostsBackground(){
   const[postsResult,ccResult]=await Promise.all([
     sb.from('posts').select('*').order('created_at',{ascending:false}),
     sb.from('comments').select('post_id')
@@ -462,7 +503,6 @@ function renderDBPosts(posts){
   const grid=document.getElementById('card-grid');
   const gridMob=document.getElementById('card-grid-mob');
   const anonName=lang==='en'?'Anonymous':'匿名ユーザー';
-
   function makeCardHTML(p,i){
     const init=(p.username||'匿')[0].toUpperCase();
     const gear=Array.isArray(p.gear_list)?p.gear_list:[];
@@ -483,25 +523,20 @@ function renderDBPosts(posts){
       +'<div class="cf"><div class="st" onclick="toggleDBLike(event,\''+p.id+'\',this)">❤️ <span>'+(p.likes||0)+'</span></div>'
       +'<div class="st">💬 <span>'+(p.comment_count||0)+'</span></div></div></div></div>';
   }
-
   if(grid){
-    if(!posts.length){
-      grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
-    }else{
-      grid.innerHTML=posts.map((p,i)=>makeCardHTML(p,i)).join('');
-    }
+    if(!posts.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';}
+    else{grid.innerHTML=posts.map((p,i)=>makeCardHTML(p,i)).join('');}
   }
-
   if(gridMob){
-    if(!posts.length){
-      gridMob.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
-    }else{
+    if(!posts.length){gridMob.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';}
+    else{
       const firstCard=makeCardHTML(posts[0],0).replace('<div class="card"','<div class="card" style="grid-column:1;grid-row:1;animation-delay:0s"');
       const restCards=posts.slice(1).map((p,i)=>makeCardHTML(p,i+1)).join('');
       gridMob.innerHTML=firstCard+restCards;
     }
   }
 }
+
 async function toggleDBLike(e,postId,el){
   e.stopPropagation();const cnt=el.querySelector('span');
   const{data:ex}=await sb.from('likes').select('id').eq('post_id',postId).eq('session_id',SESSION_ID);
@@ -586,17 +621,14 @@ async function searchGear(val){
   const q=val.trim();closeAC();if(!q)return;
   const qNorm=normACQuery(q);
   const patterns=expandACQuery(q);
-  // ① 展開パターンで並列DB検索
   const orParts=patterns.flatMap(p=>['brand.ilike.'+p+'%','model.ilike.'+p+'%','full_name.ilike.'+p+'%']).join(',');
   const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name,search_query').or(orParts).limit(10);
   let results=prefixData||[];
-  // ② fuzzy検索
   if(results.length<5){
     const fuzzyOr=patterns.map(p=>'full_name.ilike.%'+p+'%').join(',');
     const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').or(fuzzyOr).limit(10);
     if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
   }
-  // ③ 記号除去JS照合
   if(results.length<5&&qNorm.length>=2){
     const{data:allData}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('model',qNorm[0]+'%').limit(200);
     if(allData)allData.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name)&&normACQuery(x.full_name).includes(qNorm))results.push(x);});
@@ -632,13 +664,14 @@ function gearKeyDown(e){
   if(e.key==='ArrowDown'){e.preventDefault();if(open)setACFocus(Math.min(acFocusIdx+1,acResults.length-1));}
   else if(e.key==='ArrowUp'){e.preventDefault();setACFocus(Math.max(acFocusIdx-1,0));}
   else if(e.key==='Enter'){
-    if(_acComposing)return; // IME変換中はEnterを無視
+    if(_acComposing)return;
     e.preventDefault();if(open&&acFocusIdx>=0&&acResults[acFocusIdx]){selectGear(acFocusIdx);}else{const v=e.target.value.trim();if(v){addGearTag({name:v,brand:'',search_query:null});document.getElementById('gear-search').value='';closeAC();}}}
   else if(e.key==='Backspace'&&!e.target.value&&selectedGears.length)removeGearTag(selectedGears.length-1);
   else if(e.key==='Escape')closeAC();
 }
 function closeAC(){document.getElementById('ac-dropdown').classList.remove('open');}
 function toggleGenre(el){el.classList.toggle('on');}
+
 let currentStep=1,currentPostType='board';
 const TOTAL_STEPS=5;
 const STEP_SUBS=['stepPhotoSub','stepInfoSub','stepGearSub','stepGenreSub','stepConfirmSub'];
@@ -815,6 +848,7 @@ async function submitPostToDB(){
   document.getElementById('done-bd').classList.add('open');
   await loadPostsFromDB();
 }
+
 let editGearList=[];
 function openEditModal(){
   if(!currentDBPost)return;
