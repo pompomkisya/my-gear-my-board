@@ -45,13 +45,15 @@
     .breadcrumb a:hover { color: var(--tx); }
     .breadcrumb .sep { color: var(--bd); }
     .breadcrumb .current { color: var(--tx); }
-    /* ★ PCレイアウト：2カラム */
-    .page-layout { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1120px; margin: 0 auto; padding: 20px 16px 60px; align-items: start; }
-    .page-main { min-width: 0; }
-    .page-side { position: sticky; top: 90px; }
-    @media(max-width: 900px) {
-      .page-layout { grid-template-columns: 1fr; }
-      .page-side { display: none; }
+    /* ★ PCレイアウト：中央ペダル情報 + 右サイドレビュー */
+    .page-wrapper { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+    .page-layout { position: relative; }
+    .page-main { width: 100%; }
+    .page-side { display: none; }
+    @media(min-width: 1100px) {
+      .page-wrapper { margin-left: auto; margin-right: auto; }
+      .page-layout { display: grid; grid-template-columns: 720px 320px; gap: 24px; max-width: 1064px; margin: 0 auto; align-items: start; }
+      .page-side { display: block; position: sticky; top: 90px; max-height: calc(100vh - 110px); overflow-y: auto; }
     }
     /* ★ スマホタブUI */
     .mob-tabs { display: none; position: sticky; top: 78px; z-index: 50; background: var(--bg); border-bottom: 1px solid var(--bd); }
@@ -158,7 +160,7 @@
     /* レビュー */
     .review-form-wrap { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--bd); }
     .review-form-title { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 700; color: var(--tm); margin-bottom: 10px; }
-    .review-textarea { width: 100%; background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px; padding: 10px 12px; font-size: 13px; color: var(--tx); font-family: 'Noto Sans JP', sans-serif; outline: none; transition: border-color .15s; resize: vertical; min-height: 80px; }
+    .review-textarea { width: 100%; background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px; padding: 10px 12px; font-size: 16px; color: var(--tx); font-family: 'Noto Sans JP', sans-serif; outline: none; transition: border-color .15s; resize: vertical; min-height: 80px; }
     .review-textarea:focus { border-color: var(--ac); }
     .review-textarea::placeholder { color: var(--td); }
     .review-form-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 8px; }
@@ -228,8 +230,9 @@
   <span id="bc-pedal" class="current">読み込み中...</span>
 </div>
 
-<!-- ★ PCレイアウト：2カラム -->
-<div class="page-layout">
+<!-- ★ PCレイアウト -->
+<div class="page-wrapper">
+  <div class="page-layout">
   <!-- 左：メインコンテンツ -->
   <div class="page-main">
     <!-- スマホ：パネル切り替え -->
@@ -304,7 +307,7 @@ const I18N = {
     readMore:'続きを読む ▼', readLess:'閉じる ▲', updatedAt:'紹介文最終更新日：',
     // ★ レビュー
     tabInfo:'ペダル情報', tabReview:'レビュー・評価',
-    ratingTitle:'評価', ratingYours:'あなたの評価', ratingVotes:'件の評価',
+    ratingTitle:'評価', ratingYours:'ユーザー平均評価', ratingVotes:'件の評価', ratingMine:'あなたの評価', ratingReset:'評価をリセット',
     reviewTitle:'レビュー', reviewPlaceholder:'このペダルの感想・レビューを書いてください...',
     reviewSubmit:'投稿する', reviewEdit:'編集', reviewSave:'保存', reviewCancel:'キャンセル',
     reviewLoginMsg:'レビューを投稿するにはマイページ登録が必要です',
@@ -330,7 +333,7 @@ const I18N = {
     readMore:'Read more ▼', readLess:'Close ▲', updatedAt:'Last updated: ',
     // ★ レビュー
     tabInfo:'Pedal Info', tabReview:'Reviews',
-    ratingTitle:'Rating', ratingYours:'Your Rating', ratingVotes:'ratings',
+    ratingTitle:'Rating', ratingYours:'User Average', ratingVotes:'ratings', ratingMine:'Your Rating', ratingReset:'Reset rating',
     reviewTitle:'Reviews', reviewPlaceholder:'Write your review for this pedal...',
     reviewSubmit:'Post', reviewEdit:'Edit', reviewSave:'Save', reviewCancel:'Cancel',
     reviewLoginMsg:'Sign up for a My Page account to post reviews.',
@@ -519,6 +522,16 @@ function hoverStar(val, prefix){
   _hoverRating=val;
 }
 
+async function resetRating(){
+  if(!cachedPedal)return;
+  await db.from('pedal_ratings').delete().eq('pedal_id',cachedPedal.id).eq('session_id',SESSION_ID);
+  _myRating=0;
+  showToast(lang==='en'?'Rating removed':'評価をリセットしました');
+  const pcWrap=document.getElementById('pc-review-panel-wrap');
+  if(pcWrap)renderReviewPanel(pcWrap,cachedPedal,currentSession);
+  if(_mobReviewLoaded){const mobWrap=document.getElementById('mob-review-panel-wrap');if(mobWrap)renderReviewPanel(mobWrap,cachedPedal,currentSession);}
+}
+
 async function submitRating(score){
   if(!cachedPedal)return;
   _myRating=score;
@@ -646,12 +659,14 @@ async function renderReviewPanel(wrapEl, pedal, session){
   // 星評価セクション
   const ratingPrefix='rating-input-'+Math.random().toString(36).slice(2,7);
   html+=`<div class="rating-display">
+    <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-bottom:4px">${tr('ratingYours')}</div>
     <div class="rating-avg">${avgScore>0?avgScore:'—'}</div>
     <div class="rating-stars-display">${starHTML(Math.round(avgScore))}</div>
     <div class="rating-count">${ratings.length}${lang==='en'?' '+tr('ratingVotes'):tr('ratingVotes')}</div>
   </div>
-  <div class="rating-input-label">${tr('ratingYours')}</div>
+  <div class="rating-input-label">${tr('ratingMine')}</div>
   ${renderStarInput(_myRating,'submitRating',ratingPrefix)}
+  ${_myRating>0?`<div style="text-align:center;margin-top:4px"><button onclick="resetRating()" style="background:none;border:none;font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);cursor:pointer;text-decoration:underline">${tr('ratingReset')}</button></div>`:''}
   <div style="height:16px"></div>`;
 
   // レビューフォームセクション
