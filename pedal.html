@@ -46,13 +46,13 @@
     .breadcrumb .sep { color: var(--bd); }
     .breadcrumb .current { color: var(--tx); }
     /* ★ PCレイアウト：中央ペダル情報 + 右サイドレビュー */
-    .page-wrapper { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
-    .page-layout { position: relative; }
+    .page-wrapper { padding: 20px 16px 60px; }
+    .page-layout { max-width: 760px; margin: 0 auto; }
     .page-main { width: 100%; }
     .page-side { display: none; }
-    @media(min-width: 1100px) {
-      .page-wrapper { margin-left: auto; margin-right: auto; }
-      .page-layout { display: grid; grid-template-columns: 720px 320px; gap: 24px; max-width: 1064px; margin: 0 auto; align-items: start; }
+    @media(min-width: 900px) {
+      .page-wrapper { padding: 24px 24px 60px; }
+      .page-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; max-width: 1160px; margin: 0 auto; align-items: start; }
       .page-side { display: block; position: sticky; top: 90px; max-height: calc(100vh - 110px); overflow-y: auto; }
     }
     /* ★ スマホタブUI */
@@ -62,7 +62,7 @@
     .mob-tab.on { color: var(--ac); border-bottom-color: var(--ac); }
     .mob-panel { display: block; }
     .mob-panel.hidden { display: none; }
-    @media(max-width: 900px) {
+    @media(max-width: 899px) {
       .mob-tabs { display: block; }
       .page-main { padding-top: 0; }
     }
@@ -74,6 +74,16 @@
     .pedal-top { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
     .pedal-image-block { width: 120px; flex-shrink: 0; }
     .pedal-image { width: 120px; height: 120px; background: var(--sf2); border: 1px solid var(--bd); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: zoom-in; }
+    @media(min-width: 900px) {
+      .pedal-card { padding: 32px; }
+      .pedal-image-block { width: 200px; }
+      .pedal-image { width: 200px; height: 200px; }
+      .pedal-image.has-source { border-radius: 16px 16px 0 0; }
+      .pedal-image.no-source { border-radius: 16px; }
+      .image-source { width: 200px; }
+      .pedal-top { gap: 28px; }
+      .pedal-name { font-size: 32px; }
+    }
     .pedal-image.has-source { border-radius: 12px 12px 0 0; border-bottom-color: #2a2a2a; }
     .pedal-image.no-source { border-radius: 12px; }
     .pedal-image.no-img { cursor: default; }
@@ -528,8 +538,8 @@ async function resetRating(){
   _myRating=0;
   showToast(lang==='en'?'Rating removed':'評価をリセットしました');
   const pcWrap=document.getElementById('pc-review-panel-wrap');
-  if(pcWrap)renderReviewPanel(pcWrap,cachedPedal,currentSession);
-  if(_mobReviewLoaded){const mobWrap=document.getElementById('mob-review-panel-wrap');if(mobWrap)renderReviewPanel(mobWrap,cachedPedal,currentSession);}
+  if(pcWrap)await renderReviewPanel(pcWrap,cachedPedal,currentSession);
+  if(_mobReviewLoaded){const mobWrap=document.getElementById('mob-review-panel-wrap');if(mobWrap)await renderReviewPanel(mobWrap,cachedPedal,currentSession);}
 }
 
 async function submitRating(score){
@@ -636,7 +646,8 @@ async function renderReviewPanel(wrapEl, pedal, session){
   const reviews=reviewsRes.data||[];
   const myRating=myRatingRes.data?.score||0;
   const myLikedIds=new Set((myLikesRes.data||[]).map(l=>l.review_id));
-  if(!_myRating)_myRating=myRating;
+  // DBの最新値を常に反映（リセット・投票後も正しく表示）
+  _myRating=myRating;
 
   // レビュー件数更新
   _reviewCount=reviews.length;
