@@ -71,17 +71,21 @@
     .loading { text-align: center; padding: 60px 20px; color: var(--tm); }
     .error-box { background: var(--sf); border: 1px solid #c0392b; border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--tm); }
     .pedal-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
-    .pedal-top { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
-    .pedal-image-block { width: 120px; flex-shrink: 0; }
-    .pedal-image { width: 120px; height: 120px; background: var(--sf2); border: 1px solid var(--bd); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: zoom-in; }
+    .pedal-top { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 20px; text-align: center; }
+    .pedal-image-block { width: 150px; flex-shrink: 0; }
+    .pedal-image { width: 150px; height: 150px; background: var(--sf2); border: 1px solid var(--bd); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: zoom-in; }
+    .pedal-info { width: 100%; }
+    .type-badges { justify-content: center; }
     @media(min-width: 900px) {
       .pedal-card { padding: 32px; }
+      .pedal-top { flex-direction: row; align-items: flex-start; gap: 28px; text-align: left; }
       .pedal-image-block { width: 200px; }
       .pedal-image { width: 200px; height: 200px; }
       .pedal-image.has-source { border-radius: 16px 16px 0 0; }
       .pedal-image.no-source { border-radius: 16px; }
       .image-source { width: 200px; }
-      .pedal-top { gap: 28px; }
+      .pedal-info { width: auto; }
+      .type-badges { justify-content: flex-start; }
       .pedal-name { font-size: 32px; }
     }
     .pedal-image.has-source { border-radius: 12px 12px 0 0; border-bottom-color: #2a2a2a; }
@@ -89,7 +93,7 @@
     .pedal-image.no-img { cursor: default; }
     .pedal-image img { width: 100%; height: 100%; object-fit: contain; }
     .pedal-image-placeholder { font-size: 40px; opacity: .3; }
-    .image-source { width: 120px; background: var(--sf2); border: 1px solid var(--bd); border-top: none; border-radius: 0 0 12px 12px; padding: 3px 6px; text-align: center; font-size: 8px; color: #555; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .image-source { width: 150px; background: var(--sf2); border: 1px solid var(--bd); border-top: none; border-radius: 0 0 12px 12px; padding: 3px 6px; text-align: center; font-size: 8px; color: #555; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .pedal-info { flex: 1; min-width: 0; }
     .pedal-brand { font-size: 12px; font-weight: 700; color: var(--ac); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
     .pedal-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; line-height: 1.2; margin-bottom: 10px; word-break: break-word; }
@@ -271,6 +275,7 @@
 <div class="pedal-lightbox" id="pedal-lightbox" onclick="closePedalLightbox()">
   <button class="pedal-lightbox-close" onclick="closePedalLightbox()">✕</button>
   <img id="pedal-lightbox-img" src="" alt="">
+  <div id="pedal-lightbox-source" style="position:absolute;bottom:16px;right:16px;background:rgba(0,0,0,.7);color:#888;font-size:11px;font-family:'Noto Sans JP',sans-serif;padding:4px 10px;border-radius:4px;display:none;max-width:80vw;text-align:right;line-height:1.5"></div>
 </div>
 
 <!-- Toast -->
@@ -377,9 +382,16 @@ function rakutenUrl(n, itemUrl) {
 function reverbUrl(n) { return 'https://reverb.com/marketplace?query='+encodeURIComponent(n); }
 function ytSearchUrl(n) { return 'https://www.youtube.com/results?search_query='+encodeURIComponent(n+' demo'); }
 
-function openPedalLightbox(src) {
+function openPedalLightbox(src, source) {
   const lb=document.getElementById('pedal-lightbox');const img=document.getElementById('pedal-lightbox-img');
-  if(!lb||!img)return;img.src=src;lb.classList.add('open');document.body.style.overflow='hidden';
+  const srcEl=document.getElementById('pedal-lightbox-source');
+  if(!lb||!img)return;
+  img.src=src;
+  if(srcEl){
+    if(source){srcEl.textContent='出典: '+source;srcEl.style.display='block';}
+    else{srcEl.style.display='none';}
+  }
+  lb.classList.add('open');document.body.style.overflow='hidden';
 }
 function closePedalLightbox() {
   const lb=document.getElementById('pedal-lightbox');if(!lb)return;lb.classList.remove('open');document.body.style.overflow='';
@@ -859,7 +871,8 @@ function renderPedal(pedal,posts){
   if(pedal.image_url){
     const hasSource=!!pedal.image_source;
     const safeUrl=pedal.image_url.replace(/'/g,"\\'");
-    imageBlockHtml=`<div class="pedal-image-block"><div class="pedal-image ${hasSource?'has-source':'no-source'}" onclick="openPedalLightbox('${safeUrl}')"><img src="${pedal.image_url}" alt="${pedal.model}" loading="lazy"></div>${hasSource?`<div class="image-source">出典: ${pedal.image_source}</div>`:''}</div>`;
+    const safeSource=(pedal.image_source||'').replace(/'/g,"\\'");
+    imageBlockHtml=`<div class="pedal-image-block"><div class="pedal-image ${hasSource?'has-source':'no-source'}" onclick="openPedalLightbox('${safeUrl}','${safeSource}')"><img src="${pedal.image_url}" alt="${pedal.model}" loading="lazy"></div>${hasSource?`<div class="image-source">出典: ${pedal.image_source}</div>`:''}</div>`;
   }else{
     const firstType=pedal.types&&pedal.types[0]?pedal.types[0]:null;
     const typeIconUrl=firstType?'https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_'+firstType+'.png':null;
