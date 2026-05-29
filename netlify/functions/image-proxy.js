@@ -2,7 +2,7 @@
 // 外部URLの画像をサーバー側でフェッチしてBase64で返す（CORSを回避）
 
 const MAX_SIZE_BYTES = 4 * 1024 * 1024; // 4MB制限（Netlifyレスポンス6MB上限の安全圏）
-const FETCH_TIMEOUT_MS = 8000;          // 8秒タイムアウト（Netlify 10秒制限の安全圏）
+const FETCH_TIMEOUT_MS = 14000;         // 14秒タイムアウト（Netlify 26秒制限の安全圏）
 
 exports.handler = async function(event) {
   const url = event.queryStringParameters && event.queryStringParameters.url;
