@@ -571,6 +571,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="tab" id="rb-tab-manage" onclick="rbSwitchTab('manage')" style="margin-bottom:-1px">🖼 画像管理</div>
       <div class="tab" id="rb-tab-linkcheck" onclick="rbSwitchTab('linkcheck')" style="margin-bottom:-1px">🔗 リンク切れチェック</div>
       <div class="tab" id="rb-tab-migrate" onclick="rbSwitchTab('migrate')" style="margin-bottom:-1px">🔄 一括ストレージ変換</div>
+      <div class="tab" id="rb-tab-cleanup" onclick="rbSwitchTab('cleanup')" style="margin-bottom:-1px">🗑 孤立ファイル掃除</div>
     </div>
 
     <!-- ① バッチ実行パネル -->
@@ -727,6 +728,27 @@ tr:hover td{background:rgba(255,255,255,.02)}
         <button class="fetch-btn" id="mg-stop-btn" onclick="mgStopMigrate()" style="display:none">⏹ 停止</button>
       </div>
       <div id="mg-fail-list" style="margin-top:16px"></div>
+    </div>
+
+    <!-- ⑤ 孤立ファイル掃除パネル -->
+    <div id="rb-panel-cleanup" style="display:none">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">
+        pedal-imagesストレージ内のファイルのうち、DBのimage_urlに使われていないものを検出・削除します。<br>
+        ⚠️ 削除前に必ず「検出のみ」で確認してから削除してください。
+      </p>
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:12px">
+          <div class="stat-card"><div class="stat-num" id="cu-stat-total" style="font-size:24px">-</div><div class="stat-lbl">ストレージ総ファイル数</div></div>
+          <div class="stat-card"><div class="stat-num" id="cu-stat-used" style="font-size:24px;color:#4ade80">-</div><div class="stat-lbl">✅ DB使用中</div></div>
+          <div class="stat-card"><div class="stat-num" id="cu-stat-orphan" style="font-size:24px;color:#e05050">-</div><div class="stat-lbl">🗑 孤立（未使用）</div></div>
+        </div>
+        <div id="cu-progress-msg" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">待機中</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <button class="fetch-btn" id="cu-scan-btn" onclick="cuScan(false)">🔍 検出のみ（削除しない）</button>
+        <button class="del-btn" id="cu-delete-btn" onclick="cuScan(true)" style="display:none;padding:8px 16px">🗑 孤立ファイルを削除</button>
+      </div>
+      <div id="cu-orphan-list"></div>
     </div>
   </div>
 </div><!-- /admin-wrap -->
@@ -2139,7 +2161,7 @@ let rbLcRunning = false;
 let rbLcStopFlag = false;
 
 function rbSwitchTab(name) {
-  ['batch','results','manage','linkcheck','migrate'].forEach(t => {
+  ['batch','results','manage','linkcheck','migrate','cleanup'].forEach(t => {
     document.getElementById('rb-panel-'+t).style.display = t===name ? 'block' : 'none';
     const tab = document.getElementById('rb-tab-'+t);
     if(tab) { tab.classList.toggle('on', t===name); }
@@ -2919,6 +2941,106 @@ function mgStopMigrate() {
   mgStopFlag = true;
   showToast('停止中...');
 }
+
+// ★★ 孤立ファイル掃除バッチ
+async function cuScan(doDelete) {
+  const msgEl = document.getElementById('cu-progress-msg');
+  const orphanEl = document.getElementById('cu-orphan-list');
+  const deleteBtn = document.getElementById('cu-delete-btn');
+  const scanBtn = document.getElementById('cu-scan-btn');
+
+  if(doDelete && !confirm('孤立ファイルを削除しますか？この操作は取り消せません。')) return;
+
+  scanBtn.disabled = true;
+  orphanEl.innerHTML = '';
+  document.getElementById('cu-stat-total').textContent = '-';
+  document.getElementById('cu-stat-used').textContent = '-';
+  document.getElementById('cu-stat-orphan').textContent = '-';
+  if(deleteBtn) deleteBtn.style.display = 'none';
+
+  // ① ストレージのファイル一覧を全件取得
+  msgEl.textContent = '📂 ストレージのファイル一覧を取得中...';
+  let storageFiles = [];
+  let offset = 0;
+  while(true) {
+    const { data, error } = await sb.storage.from('pedal-images').list('', {
+      limit: 1000,
+      offset,
+      sortBy: { column: 'name', order: 'asc' }
+    });
+    if(error) { msgEl.textContent = '❌ ストレージ取得失敗: ' + error.message; scanBtn.disabled = false; return; }
+    if(!data || !data.length) break;
+    // フォルダ（.folderプレースホルダー）を除外
+    storageFiles = storageFiles.concat(data.filter(f => f.id && !f.name.endsWith('/')));
+    if(data.length < 1000) break;
+    offset += 1000;
+  }
+  document.getElementById('cu-stat-total').textContent = storageFiles.length;
+  msgEl.textContent = `📂 ストレージ: ${storageFiles.length}件 → DB使用中URLを取得中...`;
+
+  // ② DBのimage_urlを全件取得
+  let dbUrls = new Set();
+  let dbOffset = 0;
+  while(true) {
+    const { data } = await sb.from('pedals').select('image_url')
+      .not('image_url','is',null)
+      .like('image_url','%supabase.co/storage%')
+      .range(dbOffset, dbOffset + 999);
+    if(!data || !data.length) break;
+    data.forEach(p => {
+      // URLからファイル名を抽出
+      const match = p.image_url.match(/pedal-images\/(.+)$/);
+      if(match) dbUrls.add(match[1]);
+    });
+    if(data.length < 1000) break;
+    dbOffset += 1000;
+  }
+  document.getElementById('cu-stat-used').textContent = dbUrls.size;
+
+  // ③ 孤立ファイルを特定
+  const orphans = storageFiles.filter(f => !dbUrls.has(f.name));
+  document.getElementById('cu-stat-orphan').textContent = orphans.length;
+  msgEl.textContent = `完了: 総${storageFiles.length}件 / 使用中${dbUrls.size}件 / 孤立${orphans.length}件`;
+
+  if(!orphans.length) {
+    orphanEl.innerHTML = '<div class="empty-msg" style="color:#4ade80">✅ 孤立ファイルはありません</div>';
+    scanBtn.disabled = false;
+    return;
+  }
+
+  // ④ 削除実行 or 一覧表示
+  if(doDelete) {
+    msgEl.textContent = '🗑 削除中...';
+    const names = orphans.map(f => f.name);
+    // 一度に最大100件ずつ削除
+    let deleted = 0;
+    for(let i=0; i<names.length; i+=100) {
+      const batch = names.slice(i, i+100);
+      const { error } = await sb.storage.from('pedal-images').remove(batch);
+      if(error) { msgEl.textContent = '❌ 削除失敗: ' + error.message; break; }
+      deleted += batch.length;
+      msgEl.textContent = `🗑 削除中... ${deleted}/${names.length}件`;
+    }
+    document.getElementById('cu-stat-orphan').textContent = 0;
+    msgEl.textContent = `✅ ${deleted}件の孤立ファイルを削除しました`;
+    orphanEl.innerHTML = '<div class="empty-msg" style="color:#4ade80">🗑 削除完了</div>';
+    if(deleteBtn) deleteBtn.style.display = 'none';
+  } else {
+    // 一覧表示
+    orphanEl.innerHTML = '<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#e05050;margin-bottom:8px">🗑 孤立ファイル一覧（' + orphans.length + '件）</div>'
+      + '<div class="table-wrap"><table><thead><tr><th>ファイル名</th><th>サイズ</th><th>作成日</th></tr></thead><tbody>'
+      + orphans.map(f => `<tr>
+          <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${escHtml(f.name)}</td>
+          <td style="font-size:11px;color:var(--td)">${f.metadata?.size ? Math.round(f.metadata.size/1024)+'KB' : '-'}</td>
+          <td style="font-size:11px;color:var(--td)">${f.created_at ? new Date(f.created_at).toLocaleDateString('ja-JP') : '-'}</td>
+        </tr>`).join('')
+      + '</tbody></table></div>';
+    if(deleteBtn) deleteBtn.style.display = 'inline-block';
+  }
+
+  scanBtn.disabled = false;
+}
+
 
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';}
