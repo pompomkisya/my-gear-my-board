@@ -570,6 +570,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <div class="tab" id="rb-tab-results" onclick="rbSwitchTab('results')" style="margin-bottom:-1px">📋 結果確認</div>
       <div class="tab" id="rb-tab-manage" onclick="rbSwitchTab('manage')" style="margin-bottom:-1px">🖼 画像管理</div>
       <div class="tab" id="rb-tab-linkcheck" onclick="rbSwitchTab('linkcheck')" style="margin-bottom:-1px">🔗 リンク切れチェック</div>
+      <div class="tab" id="rb-tab-migrate" onclick="rbSwitchTab('migrate')" style="margin-bottom:-1px">🔄 一括ストレージ変換</div>
     </div>
 
     <!-- ① バッチ実行パネル -->
@@ -686,6 +687,46 @@ tr:hover td{background:rgba(255,255,255,.02)}
       </div>
       <div id="rb-lc-progress" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:12px"></div>
       <div id="rb-lc-results"><div class="empty-msg">チェックを実行すると結果が表示されます</div></div>
+    </div>
+
+    <!-- ④ 一括ストレージ変換パネル -->
+    <div id="rb-panel-migrate" style="display:none">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">
+        外部URL参照の画像をSupabaseストレージに一括保存し直します。<br>
+        圧縮（長辺600px・JPEG80%）後にストレージ保存するため、外部サーバーへの依存がなくなります。<br>
+        ⚠️ 件数が多いため時間がかかります。途中停止可能です。
+      </p>
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:16px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--ac);margin-bottom:10px">対象フィルター</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)">
+            <input type="checkbox" id="mg-skip-storage" checked style="accent-color:var(--ac)">
+            ストレージ保存済みはスキップ
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)">
+            <input type="checkbox" id="mg-skip-manual" checked style="accent-color:var(--ac)">
+            手動アップロード済み（manual）はスキップ
+          </label>
+        </div>
+      </div>
+      <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:16px;margin-bottom:16px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:12px">
+          <div class="stat-card"><div class="stat-num" id="mg-stat-total" style="font-size:24px">-</div><div class="stat-lbl">対象件数</div></div>
+          <div class="stat-card"><div class="stat-num" id="mg-stat-done" style="font-size:24px;color:#4ade80">0</div><div class="stat-lbl">✅ 変換済み</div></div>
+          <div class="stat-card"><div class="stat-num" id="mg-stat-fail" style="font-size:24px;color:#e05050">0</div><div class="stat-lbl">❌ 失敗</div></div>
+          <div class="stat-card"><div class="stat-num" id="mg-stat-skip" style="font-size:24px;color:var(--td)">0</div><div class="stat-lbl">⏭ スキップ</div></div>
+        </div>
+        <div style="background:var(--sf2);border:1px solid var(--bd);border-radius:4px;height:8px;overflow:hidden;margin-bottom:8px">
+          <div id="mg-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#4ade80,var(--ac));border-radius:4px;transition:width .3s"></div>
+        </div>
+        <div id="mg-progress-msg" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">待機中</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="fetch-btn" onclick="mgPreviewCount()">対象件数を確認</button>
+        <button class="submit-btn" id="mg-start-btn" onclick="mgStartMigrate()">▶ 一括変換開始</button>
+        <button class="fetch-btn" id="mg-stop-btn" onclick="mgStopMigrate()" style="display:none">⏹ 停止</button>
+      </div>
+      <div id="mg-fail-list" style="margin-top:16px"></div>
     </div>
   </div>
 </div><!-- /admin-wrap -->
@@ -1485,6 +1526,64 @@ async function handlePedalImageFile(input){
   try{const compressed=await compressPedalImage(file);const preview=document.getElementById('pedal-img-preview');preview.src=compressed;preview.classList.add('show');document.getElementById('edit-image-url').value='__pending__';window._pendingPedalImageB64=compressed;msg.textContent='✅ 変換完了。「保存」を押すとアップロードします。';document.getElementById('edit-image-file').dataset.uploaded='1';}
   catch(e){msg.textContent='❌ 変換に失敗しました';}
 }
+
+// ★★ 共通：外部URLをプロキシ経由でフェッチ → 圧縮 → ストレージ保存
+// 戻り値: Supabaseストレージの公開URL（失敗時はnull）
+async function fetchCompressAndUpload(externalUrl, pedalId, progressMsg) {
+  const msgEl = progressMsg ? document.getElementById(progressMsg) : null;
+  const setMsg = (t) => { if(msgEl) msgEl.textContent = t; };
+
+  // 既にストレージ保存済みならスキップ
+  if(externalUrl && externalUrl.includes('supabase.co/storage')) {
+    return externalUrl;
+  }
+
+  setMsg('🔍 画像を取得中...');
+  try {
+    // Netlify Functionでフェッチ（CORSを回避）
+    const res = await fetch('/.netlify/functions/image-proxy?url=' + encodeURIComponent(externalUrl));
+    if(!res.ok) throw new Error('プロキシエラー HTTP ' + res.status);
+    const data = await res.json();
+    if(!data.base64) throw new Error('画像データが空です');
+
+    setMsg('🗜 圧縮中...');
+    // Base64→DataURL→圧縮（長辺600px・JPEG80%）
+    const dataUrl = 'data:' + (data.contentType || 'image/jpeg') + ';base64,' + data.base64;
+    const compressed = await compressFromDataUrl(dataUrl);
+
+    setMsg('📤 ストレージに保存中...');
+    const storageUrl = await uploadPedalImage(compressed, pedalId);
+    setMsg('✅ ストレージ保存完了');
+    return storageUrl;
+  } catch(e) {
+    setMsg('❌ ' + e.message);
+    console.error('fetchCompressAndUpload error:', e);
+    return null;
+  }
+}
+
+// DataURL（Base64）を圧縮してJPEG DataURLを返す
+function compressFromDataUrl(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 600;
+      let { width, height } = img;
+      if(width > MAX || height > MAX) {
+        const ratio = Math.min(MAX/width, MAX/height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.80));
+    };
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
 function compressPedalImage(file){
   return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=ev=>{const img=new Image();img.onload=()=>{const MAX=600;let{width,height}=img;if(width>MAX||height>MAX){const ratio=Math.min(MAX/width,MAX/height);width=Math.round(width*ratio);height=Math.round(height*ratio);}const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;canvas.getContext('2d').drawImage(img,0,0,width,height);resolve(canvas.toDataURL('image/jpeg',0.80));};img.onerror=reject;img.src=ev.target.result;};reader.onerror=reject;reader.readAsDataURL(file);});
 }
@@ -1510,6 +1609,11 @@ async function savePedalEdit(){
   if(image_url==='__pending__'){
     if(window._pendingPedalImageB64){msg.textContent='📤 アップロード中...';try{image_url=await uploadPedalImage(window._pendingPedalImageB64,editingPedalId);window._pendingPedalImageB64=null;msg.textContent='✅ アップロード完了';}catch(e){msg.textContent='❌ '+(e?.message||'不明なエラー');return;}}
     else{image_url=null;}
+  } else if(image_url && !image_url.includes('supabase.co/storage')) {
+    // ★ 外部URLはストレージに保存し直す
+    const storageUrl = await fetchCompressAndUpload(image_url, editingPedalId, 'upload-progress-msg');
+    if(storageUrl) { image_url = storageUrl; }
+    // 失敗時は外部URLのまま保存（完全な失敗より優先）
   }
   // ★ 写真アップロード時はimage_sourceを'manual'に自動セット
   let image_source=document.getElementById('edit-image-source').value.trim()||null;
@@ -1976,7 +2080,7 @@ let rbLcRunning = false;
 let rbLcStopFlag = false;
 
 function rbSwitchTab(name) {
-  ['batch','results','manage','linkcheck'].forEach(t => {
+  ['batch','results','manage','linkcheck','migrate'].forEach(t => {
     document.getElementById('rb-panel-'+t).style.display = t===name ? 'block' : 'none';
     const tab = document.getElementById('rb-tab-'+t);
     if(tab) { tab.classList.toggle('on', t===name); }
@@ -2110,7 +2214,9 @@ async function rbStartBatch() {
           // ★ 手動アップロード済み(manual)は上書きしない。それ以外は上書きOK
           const isManual = pedal.image_source === 'manual';
           if(imageUrl && !isManual) {
-            updates.image_url = imageUrl;
+            // ★ ストレージに保存し直す
+            const storageUrl = await fetchCompressAndUpload(imageUrl, pedal.id, null);
+            updates.image_url = storageUrl || imageUrl;
             updates.image_source = 'rakuten';
           }
           if(itemUrl) updates.rakuten_item_url = itemUrl;
@@ -2609,8 +2715,11 @@ async function rbManageApplyUrl(pedalId) {
       const sourceInputR = document.getElementById('rb-manage-source-' + pedalId);
       const imageSourceR = sourceInputR ? sourceInputR.value.trim() || 'manual' : 'manual';
       if(imageSourceR && imageSourceR !== 'manual' && imageSourceR !== 'rakuten') rbSourceAcSave(imageSourceR);
+      // ★ ストレージに保存し直す
+      const storageUrlR = await fetchCompressAndUpload(item.imageUrl, pedalId, null);
+      const finalUrlR = storageUrlR || item.imageUrl;
       const { error } = await sb.from('pedals').update({
-        image_url: item.imageUrl,
+        image_url: finalUrlR,
         image_source: imageSourceR,
         rakuten_item_url: inputUrl,
         rakuten_searched: true
@@ -2618,11 +2727,11 @@ async function rbManageApplyUrl(pedalId) {
       if(error) { showToast('❌ 保存失敗: ' + error.message); return; }
       const idx = rbManageItems.findIndex(p => p.id === pedalId);
       if(idx >= 0) {
-        rbManageItems[idx].image_url = item.imageUrl;
+        rbManageItems[idx].image_url = finalUrlR;
         rbManageItems[idx].image_source = imageSourceR;
         rbManageItems[idx].rakuten_item_url = inputUrl;
       }
-      showToast('✅ 画像・商品URLを保存しました（出典: ' + imageSourceR + '）');
+      showToast('✅ 画像をストレージに保存しました（出典: ' + imageSourceR + '）');
     } catch(e) {
       showToast('❌ エラー: ' + e.message);
       return;
@@ -2632,16 +2741,123 @@ async function rbManageApplyUrl(pedalId) {
     const sourceInputD = document.getElementById('rb-manage-source-' + pedalId);
     const imageSourceD = sourceInputD ? sourceInputD.value.trim() || 'manual' : 'manual';
     if(imageSourceD && imageSourceD !== 'manual' && imageSourceD !== 'rakuten') rbSourceAcSave(imageSourceD);
+    // ★ 外部URLはストレージに保存し直す
+    const storageUrlD = await fetchCompressAndUpload(inputUrl, pedalId, null);
+    const finalUrlD = storageUrlD || inputUrl;
     const { error } = await sb.from('pedals').update({
-      image_url: inputUrl,
+      image_url: finalUrlD,
       image_source: imageSourceD
     }).eq('id', pedalId);
     if(error) { showToast('❌ 保存失敗: ' + error.message); return; }
     const idx = rbManageItems.findIndex(p => p.id === pedalId);
-    if(idx >= 0) { rbManageItems[idx].image_url = inputUrl; rbManageItems[idx].image_source = imageSourceD; }
-    showToast('✅ 画像URLを保存しました（出典: ' + imageSourceD + '）');
+    if(idx >= 0) { rbManageItems[idx].image_url = finalUrlD; rbManageItems[idx].image_source = imageSourceD; }
+    showToast('✅ 画像をストレージに保存しました（出典: ' + imageSourceD + '）');
   }
   rbManageRender();
+}
+
+// ★★ 一括ストレージ変換バッチ
+let mgStopFlag = false;
+
+async function mgPreviewCount() {
+  const skipStorage = document.getElementById('mg-skip-storage').checked;
+  const skipManual = document.getElementById('mg-skip-manual').checked;
+  let query = sb.from('pedals').select('id', {count:'exact', head:true}).not('image_url','is',null);
+  if(skipStorage) query = query.not('image_url','like','%supabase.co/storage%');
+  if(skipManual) query = query.neq('image_source','manual');
+  const { count } = await query;
+  document.getElementById('mg-stat-total').textContent = count || 0;
+  showToast('対象: ' + (count||0) + '件');
+}
+
+async function mgStartMigrate() {
+  const skipStorage = document.getElementById('mg-skip-storage').checked;
+  const skipManual = document.getElementById('mg-skip-manual').checked;
+  mgStopFlag = false;
+  document.getElementById('mg-start-btn').style.display = 'none';
+  document.getElementById('mg-stop-btn').style.display = 'inline-block';
+  ['mg-stat-done','mg-stat-fail','mg-stat-skip'].forEach(id => {
+    document.getElementById(id).textContent = '0';
+  });
+  document.getElementById('mg-fail-list').innerHTML = '';
+
+  // 対象を全件取得
+  let all = [];
+  let offset = 0;
+  while(true) {
+    let query = sb.from('pedals')
+      .select('id,full_name,brand,model,image_url,image_source')
+      .not('image_url','is',null)
+      .order('brand').order('model')
+      .range(offset, offset + 999);
+    if(skipStorage) query = query.not('image_url','like','%supabase.co/storage%');
+    if(skipManual) query = query.neq('image_source','manual');
+    const { data: batch } = await query;
+    if(!batch || !batch.length) break;
+    all = all.concat(batch);
+    if(batch.length < 1000) break;
+    offset += 1000;
+  }
+
+  document.getElementById('mg-stat-total').textContent = all.length;
+  let done=0, fail=0, skip=0;
+  const failList = [];
+
+  for(let i=0; i<all.length; i++) {
+    if(mgStopFlag) { showToast('⏹ 停止しました'); break; }
+    const pedal = all[i];
+    const progress = Math.round((i+1)/all.length*100);
+    document.getElementById('mg-progress-bar').style.width = progress + '%';
+    document.getElementById('mg-progress-msg').textContent =
+      `[${i+1}/${all.length}] ${pedal.full_name}`;
+
+    try {
+      const storageUrl = await fetchCompressAndUpload(pedal.image_url, pedal.id, null);
+      if(storageUrl && storageUrl !== pedal.image_url) {
+        await sb.from('pedals').update({ image_url: storageUrl }).eq('id', pedal.id);
+        done++;
+        document.getElementById('mg-stat-done').textContent = done;
+      } else if(storageUrl === pedal.image_url) {
+        // 既にストレージURL（スキップ）
+        skip++;
+        document.getElementById('mg-stat-skip').textContent = skip;
+      } else {
+        throw new Error('ストレージURL取得失敗');
+      }
+    } catch(e) {
+      fail++;
+      document.getElementById('mg-stat-fail').textContent = fail;
+      failList.push({ name: pedal.full_name, url: pedal.image_url, err: e.message });
+    }
+
+    // 負荷分散のため少し待機
+    await new Promise(r => setTimeout(r, 200));
+  }
+
+  mgStopFlag = false;
+  document.getElementById('mg-start-btn').style.display = 'inline-block';
+  document.getElementById('mg-stop-btn').style.display = 'none';
+  document.getElementById('mg-progress-msg').textContent =
+    `完了: 変換済み${done} スキップ${skip} 失敗${fail}`;
+  showToast(`✅ 完了: ${done}件変換 / ${fail}件失敗`);
+
+  // 失敗リスト表示
+  if(failList.length) {
+    const failEl = document.getElementById('mg-fail-list');
+    failEl.innerHTML = '<div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#e05050;margin-bottom:8px">❌ 失敗リスト（' + failList.length + '件）</div>'
+      + '<div class="table-wrap"><table><thead><tr><th>ペダル名</th><th>元URL</th><th>エラー</th></tr></thead><tbody>'
+      + failList.map(f => `<tr>
+          <td style="font-size:12px">${escHtml(f.name)}</td>
+          <td style="font-size:10px;color:var(--td);max-width:160px;word-break:break-all">${escHtml(f.url||'')}</td>
+          <td style="font-size:10px;color:#e05050">${escHtml(f.err||'')}</td>
+        </tr>`).join('')
+      + '</tbody></table></div>';
+  }
+}
+
+function mgStopMigrate() {
+  mgStopFlag = true;
+  showToast('停止中...');
 }
 
 function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
