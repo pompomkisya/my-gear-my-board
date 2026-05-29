@@ -1528,7 +1528,7 @@ async function handlePedalImageFile(input){
 }
 
 // ★★ 共通：外部URLをプロキシ経由でフェッチ → 圧縮 → ストレージ保存
-// 戻り値: Supabaseストレージの公開URL（失敗時はnull）
+// 戻り値: Supabaseストレージの公開URL（失敗時はthrow）
 async function fetchCompressAndUpload(externalUrl, pedalId, progressMsg) {
   const msgEl = progressMsg ? document.getElementById(progressMsg) : null;
   const setMsg = (t) => { if(msgEl) msgEl.textContent = t; };
@@ -1538,30 +1538,59 @@ async function fetchCompressAndUpload(externalUrl, pedalId, progressMsg) {
     return externalUrl;
   }
 
+  let compressed = null;
+
+  // ① image-proxy経由（メイン）
   setMsg('🔍 画像を取得中...');
   try {
-    // Netlify Functionでフェッチ（CORSを回避）
     const res = await fetch('/.netlify/functions/image-proxy?url=' + encodeURIComponent(externalUrl));
-    if(!res.ok) throw new Error('プロキシエラー HTTP ' + res.status);
+    if(!res.ok) {
+      let errDetail = 'HTTP ' + res.status;
+      try { const errData = await res.json(); errDetail = errData.error || errDetail; } catch(e2){}
+      throw new Error('プロキシエラー: ' + errDetail);
+    }
     const data = await res.json();
     if(!data.base64) throw new Error('画像データが空です');
-
     setMsg('🗜 圧縮中...');
-    // Base64→DataURL→圧縮（長辺600px・JPEG80%）
     const dataUrl = 'data:' + (data.contentType || 'image/jpeg') + ';base64,' + data.base64;
-    const compressed = await compressFromDataUrl(dataUrl);
+    compressed = await compressFromDataUrl(dataUrl);
+  } catch(e1) {
+    console.warn('① proxy失敗:', e1.message, '→ ② ブラウザ直接fetchを試みます');
+    setMsg('⚠️ プロキシ失敗、直接取得を試みます...');
 
-    setMsg('📤 ストレージに保存中...');
-    const storageUrl = await uploadPedalImage(compressed, pedalId);
-    if(!storageUrl) throw new Error('uploadPedalImage returned null');
-    setMsg('✅ ストレージ保存完了');
-    return storageUrl;
-  } catch(e) {
-    const detail = e?.message || e?.error_description || JSON.stringify(e) || '不明';
-    setMsg('❌ ' + detail);
-    console.error('fetchCompressAndUpload error:', externalUrl, detail, e);
-    throw new Error(detail); // 呼び出し元にも伝播させる
+    // ② ブラウザ直接fetch（CORSが許可されているサイト向け）
+    try {
+      const res2 = await fetch(externalUrl, { mode: 'cors' });
+      if(!res2.ok) throw new Error('HTTP ' + res2.status);
+      const blob2 = await res2.blob();
+      const dataUrl2 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob2);
+      });
+      setMsg('🗜 圧縮中...');
+      compressed = await compressFromDataUrl(dataUrl2);
+    } catch(e2) {
+      console.warn('② 直接fetch失敗:', e2.message, '→ ③ imgタグ描画を試みます');
+      setMsg('⚠️ 直接取得失敗、別方式を試みます...');
+
+      // ③ imgタグ描画（CORSを完全回避、crossOrigin未設定）
+      try {
+        compressed = await compressFromImageTag(externalUrl);
+        setMsg('🗜 圧縮中...');
+      } catch(e3) {
+        console.error('③ imgタグ失敗:', e3.message);
+        throw new Error('全取得方法失敗: ' + e1.message + ' / ' + e2.message + ' / ' + e3.message);
+      }
+    }
   }
+
+  setMsg('📤 ストレージに保存中...');
+  const storageUrl = await uploadPedalImage(compressed, pedalId);
+  if(!storageUrl) throw new Error('uploadPedalImage returned null');
+  setMsg('✅ ストレージ保存完了');
+  return storageUrl;
 }
 
 // DataURL（Base64）を圧縮してJPEG DataURLを返す
@@ -1583,6 +1612,34 @@ function compressFromDataUrl(dataUrl) {
     };
     img.onerror = reject;
     img.src = dataUrl;
+  });
+}
+
+// imgタグ経由でCanvasに描画（CORS回避・ただしtaintedCanvasになる場合あり）
+function compressFromImageTag(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 600;
+      let { width, height } = img;
+      if(width > MAX || height > MAX) {
+        const ratio = Math.min(MAX/width, MAX/height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      try {
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.80);
+        resolve(dataUrl);
+      } catch(e) {
+        reject(new Error('Canvas汚染エラー（CORS制限）: ' + e.message));
+      }
+    };
+    img.onerror = () => reject(new Error('imgタグ読み込み失敗'));
+    // crossOriginを設定しない（taintedになるが描画は可能なことが多い）
+    img.src = url + (url.includes('?') ? '&' : '?') + '_t=' + Date.now();
   });
 }
 
