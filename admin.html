@@ -1553,12 +1553,14 @@ async function fetchCompressAndUpload(externalUrl, pedalId, progressMsg) {
 
     setMsg('📤 ストレージに保存中...');
     const storageUrl = await uploadPedalImage(compressed, pedalId);
+    if(!storageUrl) throw new Error('uploadPedalImage returned null');
     setMsg('✅ ストレージ保存完了');
     return storageUrl;
   } catch(e) {
-    setMsg('❌ ' + e.message);
-    console.error('fetchCompressAndUpload error:', e);
-    return null;
+    const detail = e?.message || e?.error_description || JSON.stringify(e) || '不明';
+    setMsg('❌ ' + detail);
+    console.error('fetchCompressAndUpload error:', externalUrl, detail, e);
+    throw new Error(detail); // 呼び出し元にも伝播させる
   }
 }
 
@@ -2818,16 +2820,17 @@ async function mgStartMigrate() {
         done++;
         document.getElementById('mg-stat-done').textContent = done;
       } else if(storageUrl === pedal.image_url) {
-        // 既にストレージURL（スキップ）
         skip++;
         document.getElementById('mg-stat-skip').textContent = skip;
       } else {
-        throw new Error('ストレージURL取得失敗');
+        throw new Error('storageUrl null（プロキシまたはストレージ失敗）');
       }
     } catch(e) {
       fail++;
       document.getElementById('mg-stat-fail').textContent = fail;
-      failList.push({ name: pedal.full_name, url: pedal.image_url, err: e.message });
+      // エラー詳細をコンソールに出力
+      console.error('migrate failed:', pedal.full_name, pedal.image_url, e);
+      failList.push({ name: pedal.full_name, url: pedal.image_url, err: e.message || String(e) });
     }
 
     // 負荷分散のため少し待機
