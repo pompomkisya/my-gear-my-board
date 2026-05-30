@@ -379,6 +379,10 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 .feature-item-count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);flex-shrink:0}
 @keyframes encyclopediaGlow{0%,100%{box-shadow:0 0 8px rgba(232,85,45,.3),inset 0 0 8px rgba(232,85,45,.05)}50%{box-shadow:0 0 18px rgba(232,85,45,.6),inset 0 0 12px rgba(232,85,45,.1)}}
 @keyframes skeletonPulse{0%,100%{opacity:.4}50%{opacity:.8}}
+@keyframes gShake{0%,100%{transform:translateX(0)}10%{transform:translateX(-6px) rotate(-1deg)}20%{transform:translateX(6px) rotate(1deg)}30%{transform:translateX(-5px)}40%{transform:translateX(5px)}50%{transform:translateX(-3px)}60%{transform:translateX(3px)}70%{transform:translateX(-2px)}80%{transform:translateX(2px)}}
+@keyframes gFlash{0%,100%{opacity:0}15%{opacity:1}35%{opacity:0}55%{opacity:.6}75%{opacity:0}}
+@keyframes gBeam{0%{transform:translateY(100%) scaleX(0);opacity:0}30%{opacity:1;transform:translateY(0) scaleX(1)}70%{opacity:.8}100%{transform:translateY(-100%) scaleX(0);opacity:0}}
+@keyframes gPulseRing{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.5);opacity:0}}
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PRZL59FSGZ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-PRZL59FSGZ');</script>
@@ -1009,6 +1013,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <span class="g-db" style="animation-delay:.5s"></span>
     </div>
     <button onclick="closeGacha()" style="margin-top:12px;padding:7px 24px;background:transparent;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;letter-spacing:1px" id="g-close-txt">✕ 閉じる</button>
+    <button id="g-mute-btn" onclick="gToggleMute()" style="margin-top:8px;padding:5px 16px;background:transparent;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6e6c68;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:5px">
+      <span id="g-mute-icon">🔊</span><span id="g-mute-txt">SOUND ON</span>
+    </button>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1229,9 +1236,13 @@ function gStartRoll(){
   const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
   gSetShare(false);gRenderRolling();
   const gh=document.getElementById('g-hint');if(gh)gh.style.display='none';
+  // ★ 開始音
+  gSoundStart();
   let tick=0;
   gSlotT=setInterval(()=>{
     tick++;
+    // ★ ドラムロール（一定間隔で）
+    if(tick%4===0)gSoundRoll();
     const s=[SL[Math.floor(Math.random()*SL.length)],tick%2===0?'◆◆◆◆◆◆◆':'●●●●●●●',tick%3===0?'★★★★★':tick%3===1?'▓▓▓▓▓▓':'▒▒▒▒▒▒'];
     document.querySelectorAll('.g-sr').forEach((el,i)=>{if(s[i])el.textContent=s[i];});
   },55);
@@ -1250,6 +1261,8 @@ function gStartRoll(){
     gResult=p;gPhase='result';gCnt++;
     gHist.unshift(p);if(gHist.length>5)gHist.pop();
     gRenderResult(p);gSpawnPts(p);gSetShare(true);
+    // ★ 排出音
+    gSoundResult(p._rk);
     const gh=document.getElementById('g-hint');if(gh)gh.style.display='flex';
     const isEn=gLang==='en';
     const ht=document.getElementById('g-ht');if(ht)ht.textContent=isEn?'Tap again to re-roll':'再タップでもう一度';
@@ -1257,9 +1270,59 @@ function gStartRoll(){
 }
 function gSpawnPts(p){
   const rk=RR[p._rk];const el=document.getElementById('g-pts');if(!el)return;el.innerHTML='';
-  for(let i=0;i<rk.pc;i++){const d=document.createElement('div');d.className='g-fp';d.style.cssText=`left:${10+Math.random()*80}%;top:${15+Math.random()*70}%;width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;background:${rk.c};animation-delay:${Math.random()*.35}s;`;el.appendChild(d);}
-  if(['SSR','SR','Std'].includes(p._rk)){const n=p._rk==='SSR'?14:8;for(let i=0;i<n;i++){const d=document.createElement('div');d.className='g-sp';d.style.cssText=`left:${8+Math.random()*84}%;top:${8+Math.random()*84}%;width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;background:${rk.c};animation-delay:${Math.random()*.45}s;`;el.appendChild(d);}}
-  setTimeout(()=>{if(el)el.innerHTML='';},1500);
+  const card=document.getElementById('g-card');
+
+  // パーティクル色：Stdは金色に変更
+  const ptColor=p._rk==='Std'?'#f0c040':rk.c;
+
+  // ① 全レアリティ：浮遊パーティクル
+  const ptCount={SSR:32,SR:22,Sp:12,Std:6}[p._rk]||6;
+  for(let i=0;i<ptCount;i++){
+    const d=document.createElement('div');d.className='g-fp';
+    d.style.cssText=`left:${5+Math.random()*90}%;top:${10+Math.random()*80}%;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;background:${ptColor};animation-delay:${Math.random()*.5}s;`;
+    el.appendChild(d);
+  }
+
+  // ② Sp以上：星型スパーク
+  const spCount={SSR:20,SR:14,Sp:8,Std:0}[p._rk]||0;
+  for(let i=0;i<spCount;i++){
+    const d=document.createElement('div');d.className='g-sp';
+    d.style.cssText=`left:${5+Math.random()*90}%;top:${5+Math.random()*90}%;width:${6+Math.random()*10}px;height:${6+Math.random()*10}px;background:${ptColor};animation-delay:${Math.random()*.5}s;`;
+    el.appendChild(d);
+  }
+
+  // ③ SR以上：フラッシュ
+  if(p._rk==='SR'||p._rk==='SSR'){
+    const flash=document.createElement('div');
+    const flashColor=p._rk==='SSR'?'rgba(255,215,0,.45)':'rgba(168,85,247,.35)';
+    flash.style.cssText=`position:absolute;inset:0;background:${flashColor};pointer-events:none;z-index:25;animation:gFlash .7s ease-out forwards;border-radius:8px;`;
+    el.appendChild(flash);
+  }
+
+  // ④ SR：縦ビーム2本
+  if(p._rk==='SR'){
+    for(let i=0;i<2;i++){
+      const beam=document.createElement('div');
+      beam.style.cssText=`position:absolute;top:0;left:${30+i*40}%;width:2px;height:100%;background:linear-gradient(180deg,transparent,#a855f7,transparent);pointer-events:none;z-index:24;animation:gBeam .8s ease-out ${i*.15}s forwards;`;
+      el.appendChild(beam);
+    }
+  }
+
+  // ⑤ SSR：画面シェイク＋多数ビーム＋パルスリング
+  if(p._rk==='SSR'){
+    if(card)card.style.animation=rk.ga+',gShake .5s ease-out .1s';
+    for(let i=0;i<4;i++){
+      const beam=document.createElement('div');
+      beam.style.cssText=`position:absolute;top:0;left:${10+i*25}%;width:3px;height:100%;background:linear-gradient(180deg,transparent,${['#ffd700','#ff6b35','#a855f7','#06b6d4'][i]},transparent);pointer-events:none;z-index:24;animation:gBeam .9s ease-out ${i*.1}s forwards;`;
+      el.appendChild(beam);
+    }
+    // パルスリング
+    const ring=document.createElement('div');
+    ring.style.cssText=`position:absolute;top:50%;left:50%;width:80px;height:80px;margin:-40px 0 0 -40px;border-radius:50%;border:3px solid #ffd700;pointer-events:none;z-index:24;animation:gPulseRing .8s ease-out forwards;`;
+    el.appendChild(ring);
+  }
+
+  setTimeout(()=>{if(el)el.innerHTML='';if(card&&p._rk==='SSR'){card.style.animation=rk.ga;}},1600);
 }
 function gPedalImgSrc(p){if(p.image_url)return p.image_url;const t=(p.types&&p.types[0])||'other';return TYPE_ICON_BASE+t+'.png';}
 function gRenderIdle(){
@@ -1276,7 +1339,7 @@ function gRenderResult(p){
   const bs=`display:inline-flex;align-items:center;padding:2px 10px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;font-weight:bold;color:${rk.l==='Std'?'#9a9890':'#fff'};background:${rk.gr};background-size:200% 100%;${rk.rb?'animation:gShimmer 1.8s linear infinite;':''}`;
   const isEn=gLang==='en';const imgSrc=gPedalImgSrc(p);
   const panel=document.getElementById('g-panel');if(!panel)return;
-  panel.innerHTML=`<div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column;height:100%"><div style="position:relative;flex:0 0 54%;background:#1c1c1f;display:flex;align-items:center;justify-content:center;overflow:hidden"><div style="position:absolute;inset:0;background:radial-gradient(ellipse at center,${rk.gw.replace(/,[^,)]+\)$/,',0.22)')} 0%,transparent 65%);pointer-events:none"></div>${rk.rb?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>':''}<img src="${imgSrc}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px ${rk.gw});position:relative;z-index:2" onerror="this.src='${GACHA_IMG}'"><div style="position:absolute;top:8px;left:8px;z-index:5"><span style="${bs}">${rk.l}</span></div>${gCnt>0?`<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}</div><div style="flex:1;padding:10px 13px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517;min-height:0"><div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:3px">${p.brand}</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:4px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.model}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c}">${isEn?rk.nEn:rk.n}</div></div><div style="display:flex;gap:5px;margin-top:8px;flex-shrink:0"><button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="flex:1;padding:7px 0;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.3);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#e8552d;cursor:pointer">${isEn?'Pedal Detail Page →':'ペダル詳細ページへ'}</button><button onclick="event.stopPropagation();window.gSetIdle()" style="padding:7px 10px;background:#1c1c1f;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;white-space:nowrap;flex-shrink:0">🎰 AGAIN</button></div></div></div>`;
+  panel.innerHTML=`<div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column;height:100%"><div style="position:relative;flex:0 0 54%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden">${rk.rb?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>':''}<img src="${imgSrc}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px ${rk.gw});position:relative;z-index:2" onerror="this.src='${GACHA_IMG}'"><div style="position:absolute;top:8px;left:8px;z-index:5"><span style="${bs}">${rk.l}</span></div>${gCnt>0?`<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}</div><div style="flex:1;padding:10px 13px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517;min-height:0"><div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:3px">${p.brand}</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:4px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.model}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c}">${isEn?rk.nEn:rk.n}</div></div><div style="display:flex;gap:5px;margin-top:8px;flex-shrink:0"><button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="flex:1;padding:7px 0;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.3);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#e8552d;cursor:pointer">${isEn?'Pedal Detail Page →':'ペダル詳細ページへ'}</button><button onclick="event.stopPropagation();window.gSetIdle()" style="padding:7px 10px;background:#1c1c1f;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;white-space:nowrap;flex-shrink:0">🎰 AGAIN</button></div></div></div>`;
   gRenderHist();
 }
 function gRenderHist(){
@@ -1285,7 +1348,94 @@ function gRenderHist(){
   const hl=document.getElementById('g-hl');if(!hl)return;
   hl.innerHTML=gHist.map((p,i)=>{const r=RR[p._rk];return `<div class="g-hr" onclick="location.href='/pedal?slug=${p.slug}'" style="opacity:${1-i*.16}"><span style="padding:1px 7px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:bold;color:${r.l==='Std'?'#9a9890':'#fff'};background:${r.gr};background-size:200% 100%;flex-shrink:0;${r.rb?'animation:gShimmer 2s linear infinite;':''}">${r.l}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#9a9890;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${p.model}</span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;flex-shrink:0;margin-left:2px">→</span></div>`;}).join('');
 }
-window.gSetIdle=gSetIdle;
+// ★ 音エンジン（Web Audio API）
+let _audioCtx=null;
+let _gMuted=false;
+function _getAudioCtx(){if(!_audioCtx)try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}return _audioCtx;}
+function _playTone(freq,type,vol,attack,decay,delay=0){
+  const ctx=_getAudioCtx();if(!ctx||_gMuted)return;
+  try{
+    const osc=ctx.createOscillator();const gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.type=type;osc.frequency.setValueAtTime(freq,ctx.currentTime+delay);
+    gain.gain.setValueAtTime(0,ctx.currentTime+delay);
+    gain.gain.linearRampToValueAtTime(vol,ctx.currentTime+delay+attack);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+attack+decay);
+    osc.start(ctx.currentTime+delay);
+    osc.stop(ctx.currentTime+delay+attack+decay+0.01);
+  }catch(e){}
+}
+function _playNoise(vol,dur,delay=0){
+  const ctx=_getAudioCtx();if(!ctx||_gMuted)return;
+  try{
+    const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+    const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+    const src=ctx.createBufferSource();src.buffer=buf;
+    const gain=ctx.createGain();const filter=ctx.createBiquadFilter();
+    filter.type='bandpass';filter.frequency.value=800;
+    src.connect(filter);filter.connect(gain);gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(vol,ctx.currentTime+delay);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+dur);
+    src.start(ctx.currentTime+delay);src.stop(ctx.currentTime+delay+dur+0.01);
+  }catch(e){}
+}
+
+function gSoundStart(){
+  // コイン投入：短い上昇音
+  _playTone(440,'square',.15,.01,.08);
+  _playTone(880,'square',.08,.01,.06,.05);
+}
+function gSoundRoll(){
+  // ドラムロール：ノイズのスネア連打
+  for(let i=0;i<8;i++){_playNoise(.12,.04,i*.08);_playTone(120,'sine',.1,.01,.05,i*.08);}
+}
+function gSoundResult(rk){
+  // レアリティ別排出音
+  if(rk==='Std'){
+    _playTone(523,'triangle',.2,.01,.15);
+    _playTone(659,'triangle',.15,.01,.12,.08);
+  }else if(rk==='Sp'){
+    _playTone(523,'square',.18,.01,.1);
+    _playTone(659,'square',.18,.01,.1,.07);
+    _playTone(784,'square',.2,.01,.2,.14);
+    _playNoise(.08,.1,.05);
+  }else if(rk==='SR'){
+    // ジャジャーン系：上昇アルペジオ
+    [392,494,587,740].forEach((f,i)=>{_playTone(f,'sawtooth',.18,.01,.25,i*.06);});
+    _playNoise(.12,.15,.1);
+    _playTone(988,'sine',.25,.02,.6,.25);
+  }else if(rk==='SSR'){
+    // ファンファーレ：迫力の和音＋ロール
+    _playNoise(.2,.05);
+    [261,329,392,523].forEach((f,i)=>{_playTone(f,'sawtooth',.2,.02,.5,i*.04);});
+    _playTone(1046,'sine',.3,.03,.8,.2);
+    _playTone(1318,'sine',.25,.03,.7,.35);
+    _playNoise(.15,.2,.15);
+    // 余韻の高音
+    _playTone(1568,'sine',.15,.01,.5,.5);
+    _playTone(2093,'sine',.1,.01,.4,.6);
+  }
+}
+
+function gToggleMute(){
+  _gMuted=!_gMuted;
+  localStorage.setItem('mgmb_gacha_muted',_gMuted?'1':'0');
+  _updateMuteBtn();
+}
+function _updateMuteBtn(){
+  const icon=document.getElementById('g-mute-icon');
+  const txt=document.getElementById('g-mute-txt');
+  const btn=document.getElementById('g-mute-btn');
+  if(icon)icon.textContent=_gMuted?'🔇':'🔊';
+  if(txt)txt.textContent=_gMuted?'MUTED':'SOUND ON';
+  if(btn)btn.style.borderColor=_gMuted?'rgba(232,85,45,.4)':'#272729';
+}
+function _initMuteState(){
+  _gMuted=localStorage.getItem('mgmb_gacha_muted')==='1';
+  _updateMuteBtn();
+}
+window.gToggleMute=gToggleMute;
+
 async function gDoShare(){
   if(!gResult)return;const rk=RR[gResult._rk];const isEn=gLang==='en';
   const text=isEn?`GACHA Result [${rk.l}] Met "${gResult.model}"!\n#MGMB #guitarpedals\nhttps://mygearmyboard.com`:`GACHA結果【${rk.l}】「${gResult.model}」と出会った！\n#MGMB #エフェクター\nhttps://mygearmyboard.com`;
@@ -1343,7 +1493,7 @@ function applyGachaI18n(){
   Object.entries(I18N_GACHA).forEach(([id,t])=>{const el=document.getElementById(id);if(el)el.textContent=isEn?t.en:t.ja;});
 }
 window.openGacha=openGacha;window.closeGacha=closeGacha;window.gDoShare=gDoShare;window.gDoSave=gDoSave;
-window.addEventListener('DOMContentLoaded',()=>{gLang=getGLang();applyGachaLang();applyGachaI18n();});
+window.addEventListener('DOMContentLoaded',()=>{gLang=getGLang();applyGachaLang();applyGachaI18n();_initMuteState();});
 })();
 </script>
 <!-- 機材報告モーダル -->
