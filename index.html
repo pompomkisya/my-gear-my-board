@@ -312,7 +312,7 @@ footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:cent
 .g-sp{animation:gSpark .65s ease-out forwards;position:absolute;pointer-events:none;z-index:22;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
 .g-hr{display:flex;align-items:center;gap:6px;padding:4px 6px;border-bottom:1px solid #272729;cursor:pointer;transition:background .12s;border-radius:3px}
 .g-hr:hover{background:rgba(255,255,255,.05)}
-.gacha-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);z-index:800;display:flex;align-items:center;justify-content:center;padding:12px;opacity:0;pointer-events:none;transition:opacity .25s;overflow-y:auto}
+.gacha-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);z-index:800;display:flex;align-items:flex-start;justify-content:center;padding:12px;opacity:0;pointer-events:none;transition:opacity .25s;overflow-y:auto}
 .gacha-modal-overlay.open{opacity:1;pointer-events:all}
 .gacha-modal-inner{display:flex;flex-direction:column;align-items:center;font-family:'JetBrains Mono',monospace;color:#eae8e2;position:relative;width:100%;max-width:360px}
 .g-card{width:100%;max-width:340px;height:260px;background:#151517;border:1.5px solid #272729;border-radius:8px;overflow:hidden;cursor:pointer;position:relative;display:flex;flex-direction:column;user-select:none;transition:border-color .25s,box-shadow .25s}
@@ -383,6 +383,11 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 @keyframes gFlash{0%,100%{opacity:0}15%{opacity:1}35%{opacity:0}55%{opacity:.6}75%{opacity:0}}
 @keyframes gBeam{0%{transform:translateY(100%) scaleX(0);opacity:0}30%{opacity:1;transform:translateY(0) scaleX(1)}70%{opacity:.8}100%{transform:translateY(-100%) scaleX(0);opacity:0}}
 @keyframes gPulseRing{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.5);opacity:0}}
+@keyframes gCapsuleBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+@keyframes gCapsuleSplit{0%{transform:translateY(0)}100%{transform:translateY(-60px);opacity:0}}
+@keyframes gCapsuleBottom{0%{transform:translateY(0)}100%{transform:translateY(40px);opacity:0}}
+@keyframes gSlotScroll{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
+@keyframes gPedalAppear{0%{opacity:0;transform:scale(.5)}60%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PRZL59FSGZ"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-PRZL59FSGZ');</script>
@@ -975,6 +980,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:5px;color:#e8552d;margin-bottom:4px">GEAR GACHA</div>
       <div id="g-sub1" style="font-family:Noto Sans JP,sans-serif;font-size:12px;color:#9a9890;letter-spacing:1px">次の相棒に出会おう</div>
       <div id="g-sub2" style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:#6e6c68;letter-spacing:1px">ペダル図鑑から厳選紹介</div>
+      <button id="g-mute-btn" onclick="gToggleMute()" style="margin-top:8px;padding:4px 14px;background:transparent;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;letter-spacing:1px;display:inline-flex;align-items:center;gap:5px">
+        <span id="g-mute-icon">🔊</span><span id="g-mute-txt">SOUND ON</span>
+      </button>
     </div>
     <div class="g-card" id="g-card" onclick="gHandleTap()">
       <div style="position:absolute;inset:0;pointer-events:none;z-index:28;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.08) 2px,rgba(0,0,0,.08) 4px)"></div>
@@ -1013,9 +1021,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <span class="g-db" style="animation-delay:.5s"></span>
     </div>
     <button onclick="closeGacha()" style="margin-top:12px;padding:7px 24px;background:transparent;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;letter-spacing:1px" id="g-close-txt">✕ 閉じる</button>
-    <button id="g-mute-btn" onclick="gToggleMute()" style="margin-top:8px;padding:5px 16px;background:transparent;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#6e6c68;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:5px">
-      <span id="g-mute-icon">🔊</span><span id="g-mute-txt">SOUND ON</span>
-    </button>
   </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1219,7 +1224,7 @@ function applyGachaLang(){
   });
 }
 window.gHandleTap=function(){
-  if(gPhase==='rolling')return;
+  if(gPhase==='rolling'||gPhase==='capsule')return;
   if(gPhase==='result'){gSetIdle();return;}
   gStartRoll();
 };
@@ -1236,16 +1241,13 @@ function gStartRoll(){
   const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
   gSetShare(false);gRenderRolling();
   const gh=document.getElementById('g-hint');if(gh)gh.style.display='none';
+  // ★ AudioContext resume（タブ切替後のずれ防止）
+  if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();
   // ★ 開始音
   gSoundStart();
+  // ★ ドラムロール：CSSスクロールと同期した間隔（テキスト書き換え不要）
   let tick=0;
-  gSlotT=setInterval(()=>{
-    tick++;
-    // ★ ドラムロール（一定間隔で）
-    if(tick%4===0)gSoundRoll();
-    const s=[SL[Math.floor(Math.random()*SL.length)],tick%2===0?'◆◆◆◆◆◆◆':'●●●●●●●',tick%3===0?'★★★★★':tick%3===1?'▓▓▓▓▓▓':'▒▒▒▒▒▒'];
-    document.querySelectorAll('.g-sr').forEach((el,i)=>{if(s[i])el.textContent=s[i];});
-  },55);
+  gSlotT=setInterval(()=>{tick++;if(tick%4===0)gSoundRoll();},55);
   const p=gPick();
   if(!p){
     clearInterval(gSlotT);gPhase='idle';
@@ -1258,16 +1260,76 @@ function gStartRoll(){
   const dur={SSR:2800,SR:2000,Sp:1500,Std:1200}[p._rk]||1200;
   gRollT=setTimeout(()=>{
     clearInterval(gSlotT);
-    gResult=p;gPhase='result';gCnt++;
+    // ★ AudioContext再確認（タブ切替対策）
+    if(_audioCtx&&_audioCtx.state==='suspended'){
+      _audioCtx.resume().then(()=>gRenderCapsule(p));
+    }else{
+      gRenderCapsule(p);
+    }
+    gResult=p;gPhase='capsule';gCnt++;
     gHist.unshift(p);if(gHist.length>5)gHist.pop();
+    gSetShare(false);
+    const gh2=document.getElementById('g-hint');if(gh2)gh2.style.display='none';
+  },dur);
+}
+function gRenderCapsule(p){
+  const rk=RR[p._rk];
+  const panel=document.getElementById('g-panel');if(!panel)return;
+  const card=document.getElementById('g-card');
+  if(card){card.style.borderColor=rk.bd;card.style.animation=rk.ga;}
+
+  // カプセルSVG（上半球・下半球）
+  const capColor=rk.c;
+  const capTop=`<svg viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg" style="width:80px;display:block"><ellipse cx="40" cy="40" rx="39" ry="38" fill="${capColor}" opacity=".85"/><ellipse cx="40" cy="20" rx="28" ry="18" fill="rgba(255,255,255,.25)"/></svg>`;
+  const capBot=`<svg viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg" style="width:80px;display:block"><ellipse cx="40" cy="0" rx="39" ry="38" fill="${capColor}" opacity=".7"/></svg>`;
+
+  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1c1c1f;position:relative;overflow:hidden">
+    <div id="g-cap-wrap" style="display:flex;flex-direction:column;align-items:center;animation:gCapsuleBob 0.7s ease-in-out infinite">
+      <div id="g-cap-top">${capTop}</div>
+      <div id="g-cap-bot">${capBot}</div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${capColor};margin-top:10px;letter-spacing:2px;opacity:.8">● ● ●</div>
+  </div>`;
+
+  // ★ カプセル出現音（第1段）
+  gSoundCapsule();
+
+  // 画像をプリロード
+  const imgSrc=gPedalImgSrc(p);
+  const img=new Image();
+  img.onload=()=>gBreakCapsule(p,imgSrc);
+  img.onerror=()=>gBreakCapsule(p,imgSrc);
+  img.src=imgSrc;
+  // 最低0.8秒はカプセル表示（読み込みが早くても）
+  setTimeout(()=>{if(gPhase==='capsule')gBreakCapsule(p,imgSrc);},800);
+}
+
+function gBreakCapsule(p,imgSrc){
+  if(gPhase!=='capsule')return;
+  gPhase='result';
+  const rk=RR[p._rk];
+  const capTop=document.getElementById('g-cap-top');
+  const capBot=document.getElementById('g-cap-bot');
+  const capWrap=document.getElementById('g-cap-wrap');
+
+  // カプセル割れアニメーション
+  if(capTop)capTop.style.animation='gCapsuleSplit .4s ease-out forwards';
+  if(capBot)capBot.style.animation='gCapsuleBottom .4s ease-out forwards';
+  if(capWrap)capWrap.style.animation='none';
+
+  // ★ 割れ音（第2段）+ 排出音
+  gSoundCrack();
+  setTimeout(()=>gSoundResult(p._rk),200);
+
+  // 300ms後に結果表示
+  setTimeout(()=>{
     gRenderResult(p);gSpawnPts(p);gSetShare(true);
-    // ★ 排出音
-    gSoundResult(p._rk);
     const gh=document.getElementById('g-hint');if(gh)gh.style.display='flex';
     const isEn=gLang==='en';
     const ht=document.getElementById('g-ht');if(ht)ht.textContent=isEn?'Tap again to re-roll':'再タップでもう一度';
-  },dur);
+  },300);
 }
+
 function gSpawnPts(p){
   const rk=RR[p._rk];const el=document.getElementById('g-pts');if(!el)return;el.innerHTML='';
   const card=document.getElementById('g-card');
@@ -1331,7 +1393,25 @@ function gRenderIdle(){
 }
 function gRenderRolling(){
   const panel=document.getElementById('g-panel');if(!panel)return;
-  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:16px 14px;gap:10px"><div style="width:100%;background:#0d0d0e;border:1px solid rgba(240,165,0,.3);border-radius:4px;overflow:hidden"><div class="g-sr" style="padding:6px 12px;border-bottom:1px solid #272729;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:#f0a500;text-align:center;letter-spacing:2px;white-space:nowrap;overflow:hidden">BOSS</div><div class="g-sr" style="padding:6px 12px;border-bottom:1px solid #272729;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#6e6c68;text-align:center;white-space:nowrap;overflow:hidden">◆◆◆◆◆◆◆</div><div class="g-sr" style="padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#6e6c68;text-align:center;white-space:nowrap;overflow:hidden">★★★★★</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:5px;font-weight:bold">ROLLING<span class="g-db" style="background:#f0a500;width:4px;height:4px"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span></div><div style="width:75%;height:3px;background:#272729;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div></div></div>`;
+  const items1=[...SL,...SL];
+  const items2=['◆◆◆◆◆◆','●●●●●●','▓▓▓▓▓▓','▒▒▒▒▒▒','◆◆◆◆◆◆','●●●●●●','▓▓▓▓▓▓','▒▒▒▒▒▒'];
+  const items3=['★★★★★','✦✦✦✦✦','⬟⬟⬟⬟⬟','★★★★★','✦✦✦✦✦','⬟⬟⬟⬟⬟'];
+  const mkTrack=(arr,color,speed)=>{
+    const h=36;
+    const rows=arr.map(t=>`<div style="height:${h}px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px">${t}</div>`).join('');
+    return `<div style="height:${h}px;overflow:hidden;position:relative;border-bottom:1px solid #272729">
+      <div class="g-slot-track" style="animation:gSlotScroll ${speed}s linear infinite">${rows}${rows}</div>
+    </div>`;
+  };
+  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:16px 14px;gap:10px">
+    <div style="width:100%;background:#0d0d0e;border:1px solid rgba(240,165,0,.3);border-radius:4px;overflow:hidden">
+      ${mkTrack(items1,'#f0a500',1.2)}
+      ${mkTrack(items2,'#6e6c68',.9)}
+      ${mkTrack(items3,'#6e6c68',.7)}
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:5px;font-weight:bold">ROLLING<span class="g-db" style="background:#f0a500;width:4px;height:4px"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span></div>
+    <div style="width:75%;height:3px;background:#272729;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div></div>
+  </div>`;
 }
 function gRenderResult(p){
   const rk=RR[p._rk];
@@ -1415,6 +1495,19 @@ function gSoundResult(rk){
     _playTone(1568,'sine',.15,.01,.5,.5);
     _playTone(2093,'sine',.1,.01,.4,.6);
   }
+}
+
+function gSoundCapsule(){
+  // カプセル出現：コロン系の短い上昇音
+  _playTone(330,'triangle',.18,.01,.12);
+  _playTone(440,'triangle',.15,.01,.1,.06);
+  _playTone(550,'triangle',.12,.01,.1,.12);
+}
+function gSoundCrack(){
+  // カプセル割れ：パキッという打撃音
+  _playNoise(.3,.03);
+  _playTone(200,'square',.2,.001,.08,.02);
+  _playTone(100,'sine',.15,.001,.12,.04);
 }
 
 function gToggleMute(){
