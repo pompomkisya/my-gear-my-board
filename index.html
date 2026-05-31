@@ -1158,7 +1158,7 @@ const RR={
 const SL=['BOSS','MXR','EHX','STRYMON','KLON','TC ELEC','WALRUS','JHS','WAMPLER','KEELEY','FULLTONE','CAROLINE','EVENTIDE','CHASE BLISS'];
 let gPedals={SSR:[],SR:[],Sp:[],Std:[]};
 let gLoaded=false;
-let gPhase='idle',gResult=null,gSlotT=null,gRollT=null,gCnt=0,gHist=[];
+let gPhase='idle',gResult=null,gSlotT=null,gRollT=null,gCnt=0,gHist=[],gGlitchT=null;
 let gLang='ja';
 function getGLang(){try{return localStorage.getItem('mgmb_lang')||((navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en');}catch(e){return 'ja';}}
 async function loadGachaPedals(){
@@ -1202,6 +1202,7 @@ function closeGacha(){
   document.getElementById('gacha-overlay').classList.remove('open');
   document.body.style.overflow='';
   if(gSlotT)clearInterval(gSlotT);if(gRollT)clearTimeout(gRollT);
+  if(gGlitchT){clearInterval(gGlitchT);gGlitchT=null;}
   gPhase='idle';gResult=null;
   gSetShare(false);
   const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
@@ -1238,7 +1239,9 @@ function gSetIdle(){
 }
 function gStartRoll(){
   gPhase='rolling';
-  const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';}
+  // ★ 前回状態の完全リセット（パーティクル・カードスタイル・パネル）
+  const pts=document.getElementById('g-pts');if(pts)pts.innerHTML='';
+  const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';c.style.transform='';}
   gSetShare(false);gRenderRolling();
   const gh=document.getElementById('g-hint');if(gh)gh.style.display='none';
   // ★ AudioContext resume（タブ切替後のずれ防止）
@@ -1257,9 +1260,9 @@ function gStartRoll(){
     setTimeout(()=>{if(gPhase==='idle')loadGachaPedals();},800);
     return;
   }
-  const dur={SSR:2800,SR:2000,Sp:1500,Std:1200}[p._rk]||1200;
+  const dur={SSR:4300,SR:3500,Sp:3000,Std:2700}[p._rk]||2700;
   gRollT=setTimeout(()=>{
-    clearInterval(gSlotT);
+    clearInterval(gSlotT);gSlotT=null;
     // ★ AudioContext再確認（タブ切替対策）
     if(_audioCtx&&_audioCtx.state==='suspended'){
       _audioCtx.resume().then(()=>gRenderCapsule(p));
@@ -1278,32 +1281,49 @@ function gRenderCapsule(p){
   const card=document.getElementById('g-card');
   if(card){card.style.borderColor=rk.bd;card.style.animation=rk.ga;}
 
-  // カプセルSVG（上半球・下半球）
-  const capColor=rk.c;
-  const capTop=`<svg viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg" style="width:80px;display:block"><ellipse cx="40" cy="40" rx="39" ry="38" fill="${capColor}" opacity=".85"/><ellipse cx="40" cy="20" rx="28" ry="18" fill="rgba(255,255,255,.25)"/></svg>`;
-  const capBot=`<svg viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg" style="width:80px;display:block"><ellipse cx="40" cy="0" rx="39" ry="38" fill="${capColor}" opacity=".7"/></svg>`;
+  // SSRは虹色グラデーション、それ以外はレアリティ色
+  const isSSR=p._rk==='SSR';
+  const capColorTop=isSSR?'url(#capRainbow)':rk.c;
+  const capColorBot=isSSR?'url(#capRainbow)':rk.c;
+  const capDefs=isSSR?`<defs><linearGradient id="capRainbow" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ff6b6b"/><stop offset="25%" stop-color="#ffd93d"/><stop offset="50%" stop-color="#6bcb77"/><stop offset="75%" stop-color="#a855f7"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>`:'';
+  const capTop=`<svg viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg" style="width:80px;display:block">${capDefs}<ellipse cx="40" cy="40" rx="39" ry="38" fill="${isSSR?'url(#capRainbow)':rk.c}" opacity=".9"/><ellipse cx="40" cy="18" rx="26" ry="16" fill="rgba(255,255,255,.3)"/></svg>`;
+  const capBot=`<svg viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg" style="width:80px;display:block">${capDefs}<ellipse cx="40" cy="0" rx="39" ry="38" fill="${isSSR?'url(#capRainbow)':rk.c}" opacity=".75"/></svg>`;
+  const glowStyle=isSSR?`box-shadow:0 0 24px 8px rgba(255,215,0,.5),0 0 48px 16px rgba(168,85,247,.3);border-radius:50%;`:'';
 
   panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1c1c1f;position:relative;overflow:hidden">
     <div id="g-cap-wrap" style="display:flex;flex-direction:column;align-items:center;animation:gCapsuleBob 0.7s ease-in-out infinite">
-      <div id="g-cap-top">${capTop}</div>
+      <div id="g-cap-top" style="${glowStyle}">${capTop}</div>
       <div id="g-cap-bot">${capBot}</div>
     </div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${capColor};margin-top:10px;letter-spacing:2px;opacity:.8">● ● ●</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c};margin-top:10px;letter-spacing:2px;opacity:.8">● ● ●</div>
   </div>`;
 
-  // ★ カプセル出現音（第1段）
   gSoundCapsule();
 
-  // 画像をプリロード
+  // SSR: 後半グリッジ演出（ロール終了直後＝カプセル表示中に発火）
+  if(isSSR){
+    let glitchCount=0;
+    gGlitchT=setInterval(()=>{
+      glitchCount++;
+      const wrap=document.getElementById('g-cap-wrap');
+      if(!wrap){clearInterval(gGlitchT);gGlitchT=null;return;}
+      const tx=[-6,8,-10,5,-4,7,-3][glitchCount%7];
+      const sc=[1.05,.95,1.08,.97,1.03][glitchCount%5];
+      const hue=['hue-rotate(0deg)','hue-rotate(90deg)','hue-rotate(180deg)','hue-rotate(270deg)'][glitchCount%4];
+      wrap.style.transform=`translateX(${tx}px) scale(${sc})`;
+      wrap.style.filter=hue;
+      if(glitchCount>=10){clearInterval(gGlitchT);gGlitchT=null;wrap.style.transform='';wrap.style.filter='';}
+    },60);
+  }
+
   const imgSrc=gPedalImgSrc(p);
   const img=new Image();
-  img.onload=()=>gBreakCapsule(p,imgSrc);
-  img.onerror=()=>gBreakCapsule(p,imgSrc);
+  let broken=false;
+  const doBreak=()=>{if(!broken){broken=true;gBreakCapsule(p,imgSrc);}};
+  img.onload=doBreak;img.onerror=doBreak;
   img.src=imgSrc;
-  // 最低0.8秒はカプセル表示（読み込みが早くても）
-  setTimeout(()=>{if(gPhase==='capsule')gBreakCapsule(p,imgSrc);},800);
+  setTimeout(doBreak, isSSR?1200:800);
 }
-
 function gBreakCapsule(p,imgSrc){
   if(gPhase!=='capsule')return;
   gPhase='result';
@@ -1391,27 +1411,16 @@ function gRenderIdle(){
   const panel=document.getElementById('g-panel');if(!panel)return;
   panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 14px;background:radial-gradient(ellipse at 50% 55%,rgba(232,85,45,.08) 0%,transparent 68%);position:relative"><div class="g-idle-icon" style="width:96px;height:96px;margin-bottom:8px"><img src="${GACHA_IMG}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 14px rgba(232,85,45,.6))" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div style="display:none;font-size:56px;text-align:center;line-height:1">🎰</div></div><div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:#e8552d;margin-bottom:2px">GEAR GACHA</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#9a9890;letter-spacing:1.5px;margin-bottom:12px">GET YOUR NEXT PEDAL</div><div style="display:flex;align-items:center;gap:5px;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.4);border-radius:4px;padding:6px 16px"><span style="font-size:15px;line-height:1">🎰</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#e8552d;font-weight:bold">TAP TO ROLL</span><span class="g-db"></span></div>${gCnt>0?`<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}</div>`;
 }
-function gRenderRolling(){
+function gRenderRolling(rk){
   const panel=document.getElementById('g-panel');if(!panel)return;
-  const items1=[...SL,...SL];
-  const items2=['◆◆◆◆◆◆','●●●●●●','▓▓▓▓▓▓','▒▒▒▒▒▒','◆◆◆◆◆◆','●●●●●●','▓▓▓▓▓▓','▒▒▒▒▒▒'];
-  const items3=['★★★★★','✦✦✦✦✦','⬟⬟⬟⬟⬟','★★★★★','✦✦✦✦✦','⬟⬟⬟⬟⬟'];
-  const mkTrack=(arr,color,speed)=>{
+  // 3枠全部ブランド名（黄色）で統一
+  const brands=[...SL,...SL,...SL];
+  const mkTrack=(arr,speed,offset)=>{
     const h=36;
-    const rows=arr.map(t=>`<div style="height:${h}px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${color};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px">${t}</div>`).join('');
-    return `<div style="height:${h}px;overflow:hidden;position:relative;border-bottom:1px solid #272729">
-      <div class="g-slot-track" style="animation:gSlotScroll ${speed}s linear infinite">${rows}${rows}</div>
-    </div>`;
+    const rows=arr.map(t=>`<div style="height:${h}px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#f0a500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px">${t}</div>`).join('');
+    return `<div style="height:${h}px;overflow:hidden;position:relative;border-bottom:1px solid #272729"><div class="g-slot-track" style="animation:gSlotScroll ${speed}s linear infinite;animation-delay:-${offset}s">${rows}${rows}</div></div>`;
   };
-  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:16px 14px;gap:10px">
-    <div style="width:100%;background:#0d0d0e;border:1px solid rgba(240,165,0,.3);border-radius:4px;overflow:hidden">
-      ${mkTrack(items1,'#f0a500',1.2)}
-      ${mkTrack(items2,'#6e6c68',.9)}
-      ${mkTrack(items3,'#6e6c68',.7)}
-    </div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:5px;font-weight:bold">ROLLING<span class="g-db" style="background:#f0a500;width:4px;height:4px"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span></div>
-    <div style="width:75%;height:3px;background:#272729;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div></div>
-  </div>`;
+  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:16px 14px;gap:10px"><div id="g-slot-box" style="width:100%;background:#0d0d0e;border:1px solid rgba(240,165,0,.3);border-radius:4px;overflow:hidden">${mkTrack(brands,1.1,0)}${mkTrack(brands,.85,.3)}${mkTrack(brands,.65,.6)}</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:5px;font-weight:bold">ROLLING<span class="g-db" style="background:#f0a500;width:4px;height:4px"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span></div><div style="width:75%;height:3px;background:#272729;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div></div></div>`;
 }
 function gRenderResult(p){
   const rk=RR[p._rk];
@@ -1419,7 +1428,16 @@ function gRenderResult(p){
   const bs=`display:inline-flex;align-items:center;padding:2px 10px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;font-weight:bold;color:${rk.l==='Std'?'#9a9890':'#fff'};background:${rk.gr};background-size:200% 100%;${rk.rb?'animation:gShimmer 1.8s linear infinite;':''}`;
   const isEn=gLang==='en';const imgSrc=gPedalImgSrc(p);
   const panel=document.getElementById('g-panel');if(!panel)return;
-  panel.innerHTML=`<div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column;height:100%"><div style="position:relative;flex:0 0 54%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden">${rk.rb?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>':''}<img src="${imgSrc}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px ${rk.gw});position:relative;z-index:2" onerror="this.src='${GACHA_IMG}'"><div style="position:absolute;top:8px;left:8px;z-index:5"><span style="${bs}">${rk.l}</span></div>${gCnt>0?`<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}</div><div style="flex:1;padding:10px 13px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517;min-height:0"><div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:3px">${p.brand}</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:4px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.model}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c}">${isEn?rk.nEn:rk.n}</div></div><div style="display:flex;gap:5px;margin-top:8px;flex-shrink:0"><button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="flex:1;padding:7px 0;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.3);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#e8552d;cursor:pointer">${isEn?'Pedal Detail Page →':'ペダル詳細ページへ'}</button><button onclick="event.stopPropagation();window.gSetIdle()" style="padding:7px 10px;background:#1c1c1f;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;white-space:nowrap;flex-shrink:0">🎰 AGAIN</button></div></div></div>`;
+
+  // タイプタグ
+  const types=p.types||[];
+  const typeTagsHtml=types.slice(0,3).map(t=>`<span style="display:inline-block;padding:1px 6px;background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.3);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#f0a500;letter-spacing:.5px">${t}</span>`).join(' ');
+
+  // 詳細ページボタン（ぼんやり光る・👉強調）
+  const detailBtnStyle=`flex:1;padding:8px 0;background:rgba(232,85,45,.15);border:1px solid rgba(232,85,45,.5);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#e8552d;cursor:pointer;animation:gBlink 1.2s ease-in-out infinite;`;
+  const detailBtnLabel=isEn?'👉 Pedal Detail →':'👉 ペダル詳細ページへ';
+
+  panel.innerHTML=`<div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column;height:100%"><div style="position:relative;flex:0 0 54%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden">${rk.rb?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>':''}<img src="${imgSrc}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px ${rk.gw});position:relative;z-index:2" onerror="this.src='${GACHA_IMG}'"><div style="position:absolute;top:8px;left:8px;z-index:5"><span style="${bs}">${rk.l}</span></div>${gCnt>0?`<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}</div><div style="flex:1;padding:10px 13px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517;min-height:0"><div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:3px">${p.brand}</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:4px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.model}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c};margin-bottom:4px">${isEn?rk.nEn:rk.n}</div>${typeTagsHtml?`<div style="display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-top:3px">${typeTagsHtml}</div>`:''}</div><div style="display:flex;gap:5px;margin-top:8px;flex-shrink:0"><button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="${detailBtnStyle}">${detailBtnLabel}</button><button onclick="event.stopPropagation();window.gSetIdle()" style="padding:7px 10px;background:#1c1c1f;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;white-space:nowrap;flex-shrink:0">🎰 AGAIN</button></div></div></div>`;
   gRenderHist();
 }
 function gRenderHist(){
@@ -1466,8 +1484,8 @@ function gSoundStart(){
   _playTone(880,'square',.08,.01,.06,.05);
 }
 function gSoundRoll(){
-  // ドラムロール：ノイズのスネア連打
-  for(let i=0;i<8;i++){_playNoise(.12,.04,i*.08);_playTone(120,'sine',.1,.01,.05,i*.08);}
+  // ドラムロール：短めのスネア（約0.5秒）→ 次のロールタイミングまでに消える
+  for(let i=0;i<4;i++){_playNoise(.1,.03,i*.1);_playTone(120,'sine',.08,.01,.04,i*.1);}
 }
 function gSoundResult(rk){
   // レアリティ別排出音
