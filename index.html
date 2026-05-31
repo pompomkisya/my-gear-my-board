@@ -1239,42 +1239,170 @@ function gSetIdle(){
 }
 function gStartRoll(){
   gPhase='rolling';
-  // ★ 前回状態の完全リセット（パーティクル・カードスタイル・パネル）
   const pts=document.getElementById('g-pts');if(pts)pts.innerHTML='';
   const c=document.getElementById('g-card');if(c){c.style.animation='none';c.style.borderColor='#272729';c.style.boxShadow='';c.style.transform='';}
-  gSetShare(false);gRenderRolling();
+  gSetShare(false);
   const gh=document.getElementById('g-hint');if(gh)gh.style.display='none';
-  // ★ AudioContext resume（タブ切替後のずれ防止）
   if(_audioCtx&&_audioCtx.state==='suspended')_audioCtx.resume();
-  // ★ 開始音
-  gSoundStart();
-  // ★ ドラムロール：CSSスクロールと同期した間隔（テキスト書き換え不要）
-  let tick=0;
-  gSlotT=setInterval(()=>{tick++;if(tick%4===0)gSoundRoll();},55);
+
   const p=gPick();
   if(!p){
-    clearInterval(gSlotT);gPhase='idle';
-    const isEn=gLang==='en';
-    const panel=document.getElementById('g-panel');
-    if(panel)panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px"><div style="font-size:28px;animation:gPulse 1.2s ease-in-out infinite">⏳</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#f0a500;letter-spacing:1px;text-align:center;line-height:1.6">${isEn?'Loading pedal data...':'ペダルデータを読み込み中...'}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;letter-spacing:1px;text-align:center">${isEn?'Tap again to roll':'再タップしてください'}</div></div>`;
-    setTimeout(()=>{if(gPhase==='idle')loadGachaPedals();},800);
-    return;
+    gPhase='idle';
+    const isEn=gLang==='en';const panel=document.getElementById('g-panel');
+    if(panel)panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px"><div style="font-size:28px;animation:gPulse 1.2s ease-in-out infinite">⏳</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#f0a500;letter-spacing:1px;text-align:center;line-height:1.6">${isEn?'Loading pedal data...':'ペダルデータを読み込み中...'}</div></div>`;
+    setTimeout(()=>{if(gPhase==='idle')loadGachaPedals();},800);return;
   }
+
+  // ロール時間定義（ms）
   const dur={SSR:4300,SR:3500,Sp:3000,Std:2700}[p._rk]||2700;
-  gRollT=setTimeout(()=>{
-    clearInterval(gSlotT);gSlotT=null;
-    // ★ AudioContext再確認（タブ切替対策）
-    if(_audioCtx&&_audioCtx.state==='suspended'){
-      _audioCtx.resume().then(()=>gRenderCapsule(p));
-    }else{
-      gRenderCapsule(p);
+  // 各列が止まるタイミング（durから逆算）
+  const stop1=dur-1200, stop2=dur-700, stop3=dur-200;
+  const rk=p._rk;
+
+  // パネル描画
+  gRenderRolling(rk);
+
+  // 開始音
+  gSoundStart();
+
+  // ★ AudioContextの絶対時間でタイマーを管理（音ズレ防止）
+  const ctx=_getAudioCtx();
+  const t0=ctx?ctx.currentTime:0;
+  // ドラムロール音を絶対時間指定で並べる（重い端末でもズレない）
+  if(ctx&&!_gMuted){
+    for(let i=0;i<Math.floor(dur/220);i++){
+      const t=t0+i*0.22;
+      _playNoisAt(0.08,0.04,t);
+      _playToneAt(120,'sine',0.06,0.01,0.04,t+0.01);
     }
-    gResult=p;gPhase='capsule';gCnt++;
-    gHist.unshift(p);if(gHist.length>5)gHist.pop();
-    gSetShare(false);
-    const gh2=document.getElementById('g-hint');if(gh2)gh2.style.display='none';
+  }
+
+  // 列を止めるsetTimeoutを実際の演出タイミングで発火
+  gSlotT=setTimeout(()=>gStopCol(0,rk,p),stop1);
+  const t2=setTimeout(()=>gStopCol(1,rk,p),stop2);
+  const t3=setTimeout(()=>gStopCol(2,rk,p),stop3);
+  // 全停止後カプセルへ
+  gRollT=setTimeout(()=>{
+    clearTimeout(gSlotT);clearTimeout(t2);clearTimeout(t3);
+    gSlotT=null;
+    if(_audioCtx&&_audioCtx.state==='suspended'){
+      _audioCtx.resume().then(()=>gLaunchCapsule(p));
+    }else{
+      gLaunchCapsule(p);
+    }
   },dur);
 }
+
+// 列を止める処理
+function gStopCol(col,rk,p){
+  if(gPhase!=='rolling')return;
+  const box=document.getElementById('g-slot-box');if(!box)return;
+  const tracks=box.querySelectorAll('.g-slot-track-wrap');
+  if(!tracks[col])return;
+  const track=tracks[col];
+  const rkColor={SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#9a9890'}[rk]||'#9a9890';
+
+  // スクロール停止 → レアリティ色のセルを表示
+  track.style.animation='none';
+  track.innerHTML=`<div style="height:36px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${rkColor};letter-spacing:2px;background:${rkColor}18">${['SSR','SR','Sp','Std'].includes(rk)?rk:'●●●'}</div>`;
+
+  // カチッ音（絶対時間指定）
+  const ctx=_getAudioCtx();
+  if(ctx&&!_gMuted){
+    const t=ctx.currentTime;
+    _playToneAt(col===2?800:600,'square',0.18,0.002,0.06,t);
+    _playNoisAt(0.15,0.04,t+0.005);
+    if(col===2){
+      // 最後の列：レアリティ演出音
+      gSoundStopFinal(rk,t);
+    }
+  }
+
+  // Sp以上：最後の列が止まった瞬間に演出
+  if(col===2){
+    gSlotFinalEffect(rk,p);
+  }
+}
+
+// 最後の列が止まった瞬間の演出エフェクト
+function gSlotFinalEffect(rk,p){
+  const box=document.getElementById('g-slot-box');if(!box)return;
+  const rkColor={SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#9a9890'}[rk];
+
+  if(rk==='Std'){
+    // 小さいパルス
+    box.style.transition='box-shadow .2s';
+    box.style.boxShadow=`0 0 8px 2px ${rkColor}44`;
+    setTimeout(()=>{if(box)box.style.boxShadow='';},400);
+
+  }else if(rk==='Sp'){
+    // オレンジフラッシュ + パーティクル
+    box.style.boxShadow=`0 0 20px 6px ${rkColor}88`;
+    setTimeout(()=>{if(box)box.style.boxShadow='';},500);
+    _spawnSlotPts(6,rkColor);
+
+  }else if(rk==='SR'){
+    // 紫フラッシュ + ビーム + パーティクル
+    box.style.boxShadow=`0 0 28px 10px ${rkColor}99`;
+    setTimeout(()=>{if(box)box.style.boxShadow='';},700);
+    _spawnSlotPts(12,rkColor);
+    _spawnBeam(rkColor,1);
+
+  }else if(rk==='SSR'){
+    // 虹フラッシュ + グリッジ + シェイク + 大量パーティクル
+    const card=document.getElementById('g-card');
+    if(card)card.style.animation=(RR.SSR.ga||'')+',gShake .4s ease-out';
+    box.style.boxShadow='0 0 40px 16px #ffd70099';
+    // 短いグリッジ
+    let gc=0;
+    const gt=setInterval(()=>{
+      gc++;
+      if(box){box.style.filter=['hue-rotate(0deg)','hue-rotate(120deg)','hue-rotate(240deg)'][gc%3];}
+      if(gc>=6){clearInterval(gt);if(box)box.style.filter='';}
+    },50);
+    setTimeout(()=>{if(box)box.style.boxShadow='';},800);
+    _spawnSlotPts(28,rkColor);
+    _spawnBeam(rkColor,4);
+  }
+}
+
+// スロット用パーティクル
+function _spawnSlotPts(n,color){
+  const el=document.getElementById('g-pts');if(!el)return;
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');d.className='g-fp';
+    d.style.cssText=`left:${5+Math.random()*90}%;top:${10+Math.random()*80}%;width:${4+Math.random()*8}px;height:${4+Math.random()*8}px;background:${color};animation-delay:${Math.random()*.4}s;`;
+    el.appendChild(d);
+  }
+  if(n>=12){
+    for(let i=0;i<Math.floor(n/2);i++){
+      const d=document.createElement('div');d.className='g-sp';
+      d.style.cssText=`left:${5+Math.random()*90}%;top:${5+Math.random()*90}%;width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;background:${color};animation-delay:${Math.random()*.4}s;`;
+      el.appendChild(d);
+    }
+  }
+  setTimeout(()=>{if(el)el.innerHTML='';},1500);
+}
+
+// スロット用ビーム
+function _spawnBeam(color,count){
+  const el=document.getElementById('g-pts');if(!el)return;
+  for(let i=0;i<count;i++){
+    const b=document.createElement('div');
+    b.style.cssText=`position:absolute;top:0;left:${10+i*(80/Math.max(count,1))}%;width:2px;height:100%;background:linear-gradient(180deg,transparent,${color},transparent);pointer-events:none;z-index:24;animation:gBeam .8s ease-out ${i*.12}s forwards;`;
+    el.appendChild(b);
+  }
+}
+
+// カプセル起動（演出完了後に呼ばれる）
+function gLaunchCapsule(p){
+  gResult=p;gPhase='capsule';gCnt++;
+  gHist.unshift(p);if(gHist.length>5)gHist.pop();
+  gSetShare(false);
+  const gh=document.getElementById('g-hint');if(gh)gh.style.display='none';
+  gRenderCapsule(p);
+}
+
 function gRenderCapsule(p){
   const rk=RR[p._rk];
   const panel=document.getElementById('g-panel');if(!panel)return;
@@ -1339,7 +1467,7 @@ function gBreakCapsule(p,imgSrc){
 
   // ★ 割れ音（第2段）+ 排出音
   gSoundCrack();
-  setTimeout(()=>gSoundResult(p._rk),200);
+  setTimeout(()=>gSoundStopFinal(p._rk),200);
 
   // 300ms後に結果表示
   setTimeout(()=>{
@@ -1413,14 +1541,19 @@ function gRenderIdle(){
 }
 function gRenderRolling(rk){
   const panel=document.getElementById('g-panel');if(!panel)return;
-  // 3枠全部ブランド名（黄色）で統一
-  const brands=[...SL,...SL,...SL];
-  const mkTrack=(arr,speed,offset)=>{
-    const h=36;
-    const rows=arr.map(t=>`<div style="height:${h}px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:#f0a500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px">${t}</div>`).join('');
-    return `<div style="height:${h}px;overflow:hidden;position:relative;border-bottom:1px solid #272729"><div class="g-slot-track" style="animation:gSlotScroll ${speed}s linear infinite;animation-delay:-${offset}s">${rows}${rows}</div></div>`;
+  // レアリティ色の光の帯をスロット風に流す
+  const COLORS=['#ffd700','#a855f7','#f97316','#9a9890'];
+  const mkColTrack=(speed,offset)=>{
+    // 各色ブロックを交互に並べてスクロール
+    const blocks=[];
+    for(let i=0;i<12;i++){
+      const c=COLORS[i%4];
+      blocks.push(`<div style="height:36px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;color:${c};background:${c}18;border-bottom:1px solid ${c}44">●●●</div>`);
+    }
+    const rows=blocks.join('');
+    return `<div class="g-slot-track-wrap" style="height:36px;overflow:hidden;position:relative;border-bottom:1px solid #272729"><div class="g-slot-track" style="animation:gSlotScroll ${speed}s linear infinite;animation-delay:-${offset}s">${rows}${rows}</div></div>`;
   };
-  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:16px 14px;gap:10px"><div id="g-slot-box" style="width:100%;background:#0d0d0e;border:1px solid rgba(240,165,0,.3);border-radius:4px;overflow:hidden">${mkTrack(brands,1.1,0)}${mkTrack(brands,.85,.3)}${mkTrack(brands,.65,.6)}</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:5px;font-weight:bold">ROLLING<span class="g-db" style="background:#f0a500;width:4px;height:4px"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span></div><div style="width:75%;height:3px;background:#272729;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div></div></div>`;
+  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:16px 14px;gap:10px"><div id="g-slot-box" style="width:100%;background:#0d0d0e;border:1px solid rgba(240,165,0,.3);border-radius:4px;overflow:hidden">${mkColTrack(1.0,0)}${mkColTrack(.78,.25)}${mkColTrack(.58,.5)}</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:5px;font-weight:bold">ROLLING<span class="g-db" style="background:#f0a500;width:4px;height:4px"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span></div><div style="width:75%;height:3px;background:#272729;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div></div></div>`;
 }
 function gRenderResult(p){
   const rk=RR[p._rk];
@@ -1478,14 +1611,66 @@ function _playNoise(vol,dur,delay=0){
   }catch(e){}
 }
 
+
+// ★ 絶対時間指定版（音ズレ防止）- AudioContext時間を直接指定
+function _playToneAt(freq,type,vol,attack,decay,absTime){
+  const ctx=_getAudioCtx();if(!ctx||_gMuted)return;
+  try{
+    const t=Math.max(absTime,ctx.currentTime);
+    const osc=ctx.createOscillator();const gain=ctx.createGain();
+    osc.connect(gain);gain.connect(ctx.destination);
+    osc.type=type;osc.frequency.setValueAtTime(freq,t);
+    gain.gain.setValueAtTime(0,t);
+    gain.gain.linearRampToValueAtTime(vol,t+attack);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+attack+decay);
+    osc.start(t);osc.stop(t+attack+decay+0.01);
+  }catch(e){}
+}
+function _playNoisAt(vol,dur,absTime){
+  const ctx=_getAudioCtx();if(!ctx||_gMuted)return;
+  try{
+    const t=Math.max(absTime,ctx.currentTime);
+    const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+    const d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+    const src=ctx.createBufferSource();src.buffer=buf;
+    const gain=ctx.createGain();const filter=ctx.createBiquadFilter();
+    filter.type='bandpass';filter.frequency.value=800;
+    src.connect(filter);filter.connect(gain);gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(vol,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    src.start(t);src.stop(t+dur+0.01);
+  }catch(e){}
+}
+
+// 列が止まる最後の演出音（レアリティ別）
+function gSoundStopFinal(rk,absTime){
+  const t=absTime||(_getAudioCtx()?_getAudioCtx().currentTime:0);
+  if(rk==='Std'){
+    _playToneAt(440,'triangle',.18,.01,.2,t);
+  }else if(rk==='Sp'){
+    _playToneAt(523,'square',.2,.01,.15,t);
+    _playToneAt(659,'square',.18,.01,.15,t+.06);
+    _playToneAt(784,'square',.22,.01,.25,t+.12);
+    _playNoisAt(.1,.1,t+.05);
+  }else if(rk==='SR'){
+    [392,494,587,740].forEach((f,i)=>{_playToneAt(f,'sawtooth',.18,.01,.3,t+i*.07);});
+    _playNoisAt(.12,.15,t+.1);
+    _playToneAt(988,'sine',.25,.02,.6,t+.28);
+  }else if(rk==='SSR'){
+    _playNoisAt(.2,.05,t);
+    [261,329,392,523].forEach((f,i)=>{_playToneAt(f,'sawtooth',.2,.02,.5,t+i*.04);});
+    _playToneAt(1046,'sine',.3,.03,.8,t+.18);
+    _playToneAt(1318,'sine',.25,.03,.7,t+.32);
+    _playNoisAt(.15,.2,t+.14);
+    _playToneAt(1568,'sine',.15,.01,.5,t+.48);
+    _playToneAt(2093,'sine',.1,.01,.4,t+.58);
+  }
+}
+
 function gSoundStart(){
   // コイン投入：短い上昇音
   _playTone(440,'square',.15,.01,.08);
   _playTone(880,'square',.08,.01,.06,.05);
-}
-function gSoundRoll(){
-  // ドラムロール：短めのスネア（約0.5秒）→ 次のロールタイミングまでに消える
-  for(let i=0;i<4;i++){_playNoise(.1,.03,i*.1);_playTone(120,'sine',.08,.01,.04,i*.1);}
 }
 function gSoundResult(rk){
   // レアリティ別排出音
