@@ -1705,7 +1705,9 @@ async function savePedalEdit(){
   const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
   const ytUrlInput=document.getElementById('edit-youtube-url').value.trim();
   const resetYt=document.getElementById('reset-youtube').checked;
-  const updates={full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity};
+  const updates={full_name,brand,model,slug,types,description,description_en,rarity};
+  // ★ image_urlがnull/空の場合は既存値を保持（上書きしない）
+  if(image_url){updates.image_url=image_url;updates.image_source=image_source;}
   if(description||description_en)updates.updated_at=new Date().toISOString();
   if(ytUrlInput){const ytId=getYouTubeIdFromUrl(ytUrlInput);if(ytId){updates.youtube_video_id=ytId;}else{showToast('⚠️ YouTubeのURLが正しくありません');return;}}
   else if(resetYt){updates.youtube_video_id=null;}
@@ -1713,7 +1715,11 @@ async function savePedalEdit(){
   if(error){showToast('❌ 保存に失敗しました: '+error.message);return;}
   showToast('✅ 保存しました');
   const idx=allPedals.findIndex(p=>p.id==editingPedalId);
-  if(idx>=0){allPedals[idx]={...allPedals[idx],...updates,full_name,brand,model,slug,types,image_url,image_source,description,description_en,rarity};}
+  if(idx>=0){
+    allPedals[idx]={...allPedals[idx],...updates};
+    // image_urlがある場合のみローカルキャッシュも更新
+    if(image_url){allPedals[idx].image_url=image_url;allPedals[idx].image_source=image_source;}
+  }
   closePedalEdit();
   const searchVal=document.getElementById('pedal-search').value||'';
   if(searchVal.trim().length>=2){await searchPedalsFromDB(searchVal.trim());}else{renderPedals();}
