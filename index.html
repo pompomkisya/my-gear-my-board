@@ -384,9 +384,11 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 @keyframes gBeam{0%{transform:translateY(100%) scaleX(0);opacity:0}30%{opacity:1;transform:translateY(0) scaleX(1)}70%{opacity:.8}100%{transform:translateY(-100%) scaleX(0);opacity:0}}
 @keyframes gPulseRing{0%{transform:scale(.8);opacity:1}100%{transform:scale(2.5);opacity:0}}
 @keyframes gCapsuleBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+@keyframes gCapsuleShake{0%,100%{transform:translateX(0) rotate(0)}10%{transform:translateX(-8px) rotate(-4deg)}20%{transform:translateX(8px) rotate(4deg)}30%{transform:translateX(-10px) rotate(-5deg)}40%{transform:translateX(10px) rotate(5deg)}50%{transform:translateX(-8px) rotate(-3deg)}60%{transform:translateX(8px) rotate(3deg)}70%{transform:translateX(-5px) rotate(-2deg)}80%{transform:translateX(5px) rotate(2deg)}}
 @keyframes gCapsuleSplit{0%{transform:translateY(0)}100%{transform:translateY(-60px);opacity:0}}
 @keyframes gCapsuleBottom{0%{transform:translateY(0)}100%{transform:translateY(40px);opacity:0}}
 @keyframes gSlotScroll{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
+@keyframes gSlotScrollRev{0%{transform:translateY(-50%)}100%{transform:translateY(0)}}
 @keyframes gPedalAppear{0%{opacity:0;transform:scale(.5)}60%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PRZL59FSGZ"></script>
@@ -560,7 +562,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
                 <img id="gacha-img-mob" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:112px;height:112px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(232,85,45,.7));animation:gPulse 2.8s ease-in-out infinite" onerror="this.style.display='none';document.getElementById('gacha-fb-mob').style.display='block'">
                 <div id="gacha-fb-mob" style="display:none;font-size:54px;line-height:1;text-align:center">🎰</div>
                 <div style="display:flex;align-items:center;gap:3px;background:rgba(232,85,45,.12);border:1px solid rgba(232,85,45,.4);border-radius:3px;padding:3px 7px;margin-bottom:2px">
-                  <span style="font-size:9px">🎰</span>
                   <span style="font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:1.5px;color:#e8552d;font-weight:bold">TAP TO ROLL</span>
                   <span class="g-db" style="width:3px;height:3px"></span>
                 </div>
@@ -713,7 +714,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <img id="gacha-img-pc" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:160px;height:160px;object-fit:contain;filter:drop-shadow(0 0 22px rgba(232,85,45,.75));animation:gPulse 2.8s ease-in-out infinite" onerror="this.style.display='none';document.getElementById('gacha-fb-pc').style.display='block'">
         <div id="gacha-fb-pc" style="display:none;font-size:80px;line-height:1;text-align:center">🎰</div>
         <div style="display:flex;align-items:center;gap:5px;background:rgba(232,85,45,.14);border:1px solid rgba(232,85,45,.5);border-radius:4px;padding:6px 14px">
-          <span style="font-size:14px">🎰</span>
           <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2.5px;color:#e8552d;font-weight:bold">TAP TO ROLL</span>
           <span class="g-db" style="width:4px;height:4px"></span>
         </div>
@@ -1253,58 +1253,112 @@ function gStartRoll(){
     setTimeout(()=>{if(gPhase==='idle')loadGachaPedals();},800);return;
   }
 
-  // ロール時間定義（ms）
   const dur={SSR:4300,SR:3500,Sp:3000,Std:2700}[p._rk]||2700;
-  // 各列が止まるタイミング（durから逆算）
   const stop1=dur-1200, stop2=dur-700, stop3=dur-200;
   const rk=p._rk;
 
-  // パネル描画
+  // SSRのパターン抽選（A:通常 B:フェイク）
+  const ssrPatternB = rk==='SSR' && Math.random()<0.5;
   gRenderRolling(rk);
-
-  // 開始音
   gSoundStart();
 
-  // ★ AudioContextの絶対時間でタイマーを管理（音ズレ防止）
+  // ドラムロール（130ms間隔・絶対時間指定）
   const ctx=_getAudioCtx();
   const t0=ctx?ctx.currentTime:0;
-  // ドラムロール音を絶対時間指定で並べる（重い端末でもズレない）
   if(ctx&&!_gMuted){
-    for(let i=0;i<Math.floor(dur/220);i++){
-      const t=t0+i*0.22;
-      _playNoisAt(0.08,0.04,t);
-      _playToneAt(120,'sine',0.06,0.01,0.04,t+0.01);
+    const rollCount=Math.floor(dur/130);
+    for(let i=0;i<rollCount;i++){
+      const t=t0+i*0.13;
+      _playNoisAt(0.07,0.03,t);
+      _playToneAt(100,'sine',0.05,0.005,0.03,t+0.005);
     }
   }
 
-  // 列を止めるsetTimeoutを実際の演出タイミングで発火
+  // 列停止タイマー
   gSlotT=setTimeout(()=>gStopCol(0,rk,p),stop1);
   const t2=setTimeout(()=>gStopCol(1,rk,p),stop2);
-  const t3=setTimeout(()=>gStopCol(2,rk,p),stop3);
-  // 全停止後カプセルへ
+  const t3=setTimeout(()=>{
+    if(ssrPatternB){
+      gStopColFake(p); // Std仮止め
+    }else{
+      gStopCol(2,rk,p);
+    }
+  },stop3);
+
   gRollT=setTimeout(()=>{
     clearTimeout(gSlotT);clearTimeout(t2);clearTimeout(t3);
     gSlotT=null;
-    if(_audioCtx&&_audioCtx.state==='suspended'){
-      _audioCtx.resume().then(()=>gLaunchCapsule(p));
+    if(ssrPatternB){
+      // Bパターン：逆回転フェイク演出（この時点でStdが3列揃った状態）
+      gSSRFakeReversal(p);
     }else{
-      gLaunchCapsule(p);
+      if(_audioCtx&&_audioCtx.state==='suspended'){
+        _audioCtx.resume().then(()=>gLaunchCapsule(p));
+      }else{
+        gLaunchCapsule(p);
+      }
     }
   },dur);
 }
 
-// 列を止める処理
+// SSR Bパターン：Stdで仮止め後に逆回転してSSR揃い
+function gSSRFakeReversal(p){
+  if(gPhase!=='rolling')return;
+  const ctx=_getAudioCtx();
+  const t0=ctx?ctx.currentTime:0;
+
+  // 400ms後に逆回転開始
+  setTimeout(()=>{
+    if(gPhase!=='rolling')return;
+    gReverseRoll(); // 全列逆回転開始
+
+    // 右→中→左の順に停止（各300ms間隔）
+    const colOrder=[2,1,0];
+    colOrder.forEach((col,i)=>{
+      setTimeout(()=>{
+        if(gPhase!=='rolling')return;
+        gStopColReverse(col,'SSR',p);
+        // カチッ音（絶対時間）
+        const ctx2=_getAudioCtx();
+        if(ctx2&&!_gMuted){
+          const t=ctx2.currentTime;
+          _playToneAt(col===0?900:700,'square',0.2,0.002,0.06,t);
+          _playNoisAt(0.18,0.04,t+0.005);
+          if(col===0){
+            // 最後の列：SSRファンファーレ
+            setTimeout(()=>gSoundStopFinal('SSR'),50);
+          }
+        }
+      },300+i*300);
+    });
+
+    // 全停止後カプセルへ
+    setTimeout(()=>{
+      gResult=p;gPhase='capsule';gCnt++;
+      gHist.unshift(p);if(gHist.length>5)gHist.pop();
+      gSetShare(false);
+      gRenderCapsule(p);
+    },300+colOrder.length*300+200);
+  },400);
+}
+
 function gStopCol(col,rk,p){
   if(gPhase!=='rolling')return;
-  const box=document.getElementById('g-slot-box');if(!box)return;
-  const tracks=box.querySelectorAll('.g-slot-track-wrap');
-  if(!tracks[col])return;
-  const track=tracks[col];
+  const col_el=document.getElementById('g-vcol-'+col);
+  const track=document.getElementById('g-vtrack-'+col);
+  if(!col_el||!track)return;
   const rkColor={SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#9a9890'}[rk]||'#9a9890';
+  const rkSym={SSR:'★',SR:'★',Sp:'◆',Std:'●'}[rk];
+  const isSSR=rk==='SSR';
 
-  // スクロール停止 → レアリティ色のセルを表示
+  // スクロール停止 → レアリティシンボルを表示
   track.style.animation='none';
-  track.innerHTML=`<div style="height:36px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:${rkColor};letter-spacing:2px;background:${rkColor}18">${['SSR','SR','Sp','Std'].includes(rk)?rk:'●●●'}</div>`;
+  const symStyle=isSSR
+    ?`font-size:24px;font-weight:bold;background:linear-gradient(135deg,#ffd700,#ff6b35,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 6px #ffd700);animation:gShimmer 1.5s linear infinite`
+    :`font-size:22px;font-weight:bold;color:${rkColor};text-shadow:0 0 8px ${rkColor}88`;
+  track.innerHTML=`<div style="height:52px;display:flex;align-items:center;justify-content:center;${symStyle}">${rkSym}</div>`;
+  col_el.style.boxShadow=`0 0 10px 3px ${rkColor}66`;
+  col_el.style.borderColor=rkColor;
 
   // カチッ音（絶対時間指定）
   const ctx=_getAudioCtx();
@@ -1313,8 +1367,7 @@ function gStopCol(col,rk,p){
     _playToneAt(col===2?800:600,'square',0.18,0.002,0.06,t);
     _playNoisAt(0.15,0.04,t+0.005);
     if(col===2){
-      // 最後の列：レアリティ演出音
-      gSoundStopFinal(rk,t);
+      gSoundStopFinal(rk,t+0.08);
     }
   }
 
@@ -1324,7 +1377,6 @@ function gStopCol(col,rk,p){
   }
 }
 
-// 最後の列が止まった瞬間の演出エフェクト
 function gSlotFinalEffect(rk,p){
   const box=document.getElementById('g-slot-box');if(!box)return;
   const rkColor={SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#9a9890'}[rk];
@@ -1419,8 +1471,8 @@ function gRenderCapsule(p){
   const glowStyle=isSSR?`box-shadow:0 0 24px 8px rgba(255,215,0,.5),0 0 48px 16px rgba(168,85,247,.3);border-radius:50%;`:'';
 
   panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1c1c1f;position:relative;overflow:hidden">
-    <div id="g-cap-wrap" style="display:flex;flex-direction:column;align-items:center;animation:gCapsuleBob 0.7s ease-in-out infinite">
-      <div id="g-cap-top" style="${glowStyle}">${capTop}</div>
+    <div id="g-cap-wrap" style="display:flex;flex-direction:column;align-items:center;animation:gCapsuleBob 0.7s ease-in-out infinite;${glowStyle}">
+      <div id="g-cap-top">${capTop}</div>
       <div id="g-cap-bot">${capBot}</div>
     </div>
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c};margin-top:10px;letter-spacing:2px;opacity:.8">● ● ●</div>
@@ -1446,11 +1498,29 @@ function gRenderCapsule(p){
 
   const imgSrc=gPedalImgSrc(p);
   const img=new Image();
+  // レアリティ別最低表示時間（揺れ演出込み）
+  const minWait={SSR:2000,SR:1800,Sp:1500,Std:1300}[p._rk]||1300;
   let broken=false;
-  const doBreak=()=>{if(!broken){broken=true;gBreakCapsule(p,imgSrc);}};
-  img.onload=doBreak;img.onerror=doBreak;
+  let imgLoaded=false;
+  let timerDone=false;
+  const tryBreak=()=>{if(imgLoaded&&timerDone&&!broken){broken=true;gBreakCapsule(p,imgSrc);}};
+  img.onload=()=>{imgLoaded=true;tryBreak();};
+  img.onerror=()=>{imgLoaded=true;tryBreak();};
   img.src=imgSrc;
-  setTimeout(doBreak, isSSR?1200:800);
+
+  // 揺れ演出：表示後300msからふわふわ→激しく揺れる
+  setTimeout(()=>{
+    const wrap=document.getElementById('g-cap-wrap');
+    if(wrap)wrap.style.animation='gCapsuleBob 0.5s ease-in-out infinite';
+  },300);
+  // 最低表示時間の900ms前から激しく揺れる
+  setTimeout(()=>{
+    const wrap=document.getElementById('g-cap-wrap');
+    if(wrap)wrap.style.animation='gCapsuleShake 0.15s ease-in-out infinite';
+  },Math.max(300,minWait-900));
+
+  // 最低時間経過後に割れOK
+  setTimeout(()=>{timerDone=true;tryBreak();},minWait);
 }
 function gBreakCapsule(p,imgSrc){
   if(gPhase!=='capsule')return;
@@ -1472,9 +1542,7 @@ function gBreakCapsule(p,imgSrc){
   // 300ms後に結果表示
   setTimeout(()=>{
     gRenderResult(p);gSpawnPts(p);gSetShare(true);
-    const gh=document.getElementById('g-hint');if(gh)gh.style.display='flex';
-    const isEn=gLang==='en';
-    const ht=document.getElementById('g-ht');if(ht)ht.textContent=isEn?'Tap again to re-roll':'再タップでもう一度';
+    const gh=document.getElementById('g-hint');if(gh)gh.style.display='none';
   },300);
 }
 
@@ -1537,24 +1605,91 @@ function gSpawnPts(p){
 function gPedalImgSrc(p){if(p.image_url)return p.image_url;const t=(p.types&&p.types[0])||'other';return TYPE_ICON_BASE+t+'.png';}
 function gRenderIdle(){
   const panel=document.getElementById('g-panel');if(!panel)return;
-  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 14px;background:radial-gradient(ellipse at 50% 55%,rgba(232,85,45,.08) 0%,transparent 68%);position:relative"><div class="g-idle-icon" style="width:96px;height:96px;margin-bottom:8px"><img src="${GACHA_IMG}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 14px rgba(232,85,45,.6))" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div style="display:none;font-size:56px;text-align:center;line-height:1">🎰</div></div><div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:#e8552d;margin-bottom:2px">GEAR GACHA</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#9a9890;letter-spacing:1.5px;margin-bottom:12px">GET YOUR NEXT PEDAL</div><div style="display:flex;align-items:center;gap:5px;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.4);border-radius:4px;padding:6px 16px"><span style="font-size:15px;line-height:1">🎰</span><span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#e8552d;font-weight:bold">TAP TO ROLL</span><span class="g-db"></span></div>${gCnt>0?`<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}</div>`;
+  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 14px;background:radial-gradient(ellipse at 50% 55%,rgba(232,85,45,.08) 0%,transparent 68%);position:relative"><div class="g-idle-icon" style="width:96px;height:96px;margin-bottom:8px"><img src="${GACHA_IMG}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 14px rgba(232,85,45,.6))" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><div style="display:none;font-size:56px;text-align:center;line-height:1">🎰</div></div><div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:#e8552d;margin-bottom:2px">GEAR GACHA</div><div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#9a9890;letter-spacing:1.5px;margin-bottom:12px">GET YOUR NEXT PEDAL</div><div style="display:flex;align-items:center;gap:5px;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.4);border-radius:4px;padding:6px 16px"><span style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:#e8552d;font-weight:bold">TAP TO ROLL</span><span class="g-db"></span></div></div>`;
 }
 function gRenderRolling(rk){
   const panel=document.getElementById('g-panel');if(!panel)return;
-  // レアリティ色の光の帯をスロット風に流す
-  const COLORS=['#ffd700','#a855f7','#f97316','#9a9890'];
-  const mkColTrack=(speed,offset)=>{
-    // 各色ブロックを交互に並べてスクロール
-    const blocks=[];
-    for(let i=0;i<12;i++){
-      const c=COLORS[i%4];
-      blocks.push(`<div style="height:36px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1.5px;color:${c};background:${c}18;border-bottom:1px solid ${c}44">●●●</div>`);
+  // シンボル定義（全OS安全な記号＋CSS色付け）
+  const SYMS=[
+    {sym:'●',color:'#9a9890',rk:'Std'},  // グレー丸
+    {sym:'◆',color:'#f97316',rk:'Sp'},   // オレンジひし形
+    {sym:'★',color:'#a855f7',rk:'SR'},   // 紫星
+    {sym:'★',color:'#ffd700',rk:'SSR'},  // 金星（SSR）
+  ];
+  // 1列分のシンボルトラック生成
+  const mkVTrack=(id,speed,offset)=>{
+    // 12個のシンボルをランダムに並べる
+    const items=[];
+    for(let i=0;i<16;i++){
+      const s=SYMS[i%4];
+      items.push(`<div class="g-vsym" style="height:52px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:${s.color};text-shadow:0 0 8px ${s.color}88">${s.sym}</div>`);
     }
-    const rows=blocks.join('');
-    return `<div class="g-slot-track-wrap" style="height:36px;overflow:hidden;position:relative;border-bottom:1px solid #272729"><div class="g-slot-track" style="animation:gSlotScroll ${speed}s linear infinite;animation-delay:-${offset}s">${rows}${rows}</div></div>`;
+    const rows=items.join('');
+    return `<div style="width:80px;height:52px;overflow:hidden;position:relative;background:#0d0d0e;border:1px solid #272729;border-radius:4px" id="g-vcol-${id}">
+      <div class="g-slot-track" id="g-vtrack-${id}" style="animation:gSlotScroll ${speed}s linear infinite;animation-delay:-${offset}s">${rows}${rows}</div>
+    </div>`;
   };
-  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:16px 14px;gap:10px"><div id="g-slot-box" style="width:100%;background:#0d0d0e;border:1px solid rgba(240,165,0,.3);border-radius:4px;overflow:hidden">${mkColTrack(1.0,0)}${mkColTrack(.78,.25)}${mkColTrack(.58,.5)}</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:5px;font-weight:bold">ROLLING<span class="g-db" style="background:#f0a500;width:4px;height:4px"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span></div><div style="width:75%;height:3px;background:#272729;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div></div></div>`;
+  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(240,165,0,.08) 0%,transparent 65%);padding:16px 14px;gap:12px">
+    <div id="g-slot-box" style="display:flex;gap:10px;align-items:center;justify-content:center">
+      ${mkVTrack(0,0.55,0)}
+      ${mkVTrack(1,0.48,0.18)}
+      ${mkVTrack(2,0.40,0.35)}
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:4px;color:#f0a500;display:flex;align-items:center;gap:5px;font-weight:bold">ROLLING<span class="g-db" style="background:#f0a500;width:4px;height:4px"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.22s"></span><span class="g-db" style="background:#f0a500;width:4px;height:4px;animation-delay:.44s"></span></div>
+    <div style="width:60%;height:3px;background:#272729;border-radius:2px;overflow:hidden"><div style="height:100%;border-radius:2px;width:55%;background:linear-gradient(90deg,#e8552d,#f0a500,#e8552d);background-size:200% 100%;animation:gShimmer .7s linear infinite"></div></div>
+  </div>`;
 }
+
+// 列を逆回転させる（SSR Bパターン用）
+function gReverseRoll(){
+  for(let i=0;i<3;i++){
+    const track=document.getElementById('g-vtrack-'+i);
+    if(track){
+      // 逆方向スクロール（負のspeed）
+      const speeds=[0.55,0.48,0.40];
+      track.style.animation=`gSlotScrollRev ${speeds[i]}s linear infinite`;
+    }
+  }
+}
+
+// 逆回転停止（SSR Bパターン用）
+function gStopColReverse(col,rk,p){
+  const col_el=document.getElementById('g-vcol-'+col);
+  const track=document.getElementById('g-vtrack-'+col);
+  if(!col_el||!track)return;
+  const rkColor={SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#9a9890'}[rk];
+  const rkSym={SSR:'★',SR:'★',Sp:'◆',Std:'●'}[rk];
+  const isSSR=rk==='SSR';
+  const symStyle=isSSR
+    ?`font-size:24px;font-weight:bold;background:linear-gradient(135deg,#ffd700,#ff6b35,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 6px #ffd700);animation:gShimmer 1.5s linear infinite`
+    :`font-size:22px;font-weight:bold;color:${rkColor};text-shadow:0 0 12px ${rkColor}`;
+  track.style.animation='none';
+  track.innerHTML=`<div style="height:52px;display:flex;align-items:center;justify-content:center;${symStyle}">${rkSym}</div>`;
+  col_el.style.boxShadow=`0 0 14px 4px ${rkColor}88`;
+  col_el.style.borderColor=rkColor;
+  if(isSSR){
+    _spawnSlotPts(8,rkColor);
+  }
+}
+
+// Stdで仮止め（SSR Bパターン用）
+function gStopColFake(p){
+  for(let col=0;col<3;col++){
+    const col_el=document.getElementById('g-vcol-'+col);
+    const track=document.getElementById('g-vtrack-'+col);
+    if(!col_el||!track)return;
+    track.style.animation='none';
+    track.innerHTML=`<div style="height:52px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:#9a9890">●</div>`;
+    col_el.style.borderColor='#9a9890';
+  }
+  // 騙し音（Std確定っぽい音）
+  const ctx=_getAudioCtx();
+  if(ctx&&!_gMuted){
+    const t=ctx.currentTime;
+    _playToneAt(440,'triangle',0.15,0.01,0.2,t);
+  }
+}
+
 function gRenderResult(p){
   const rk=RR[p._rk];
   const c=document.getElementById('g-card');if(c){c.style.borderColor=rk.bd;c.style.animation=rk.ga;}
@@ -1567,10 +1702,13 @@ function gRenderResult(p){
   const typeTagsHtml=types.slice(0,3).map(t=>`<span style="display:inline-block;padding:1px 6px;background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.3);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:9px;color:#f0a500;letter-spacing:.5px">${t}</span>`).join(' ');
 
   // 詳細ページボタン（ぼんやり光る・👉強調）
-  const detailBtnStyle=`flex:1;padding:8px 0;background:rgba(232,85,45,.15);border:1px solid rgba(232,85,45,.5);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#e8552d;cursor:pointer;animation:gBlink 1.2s ease-in-out infinite;`;
+  const detailBtnStyle=`flex:1;padding:7px 0;background:rgba(232,85,45,.15);border:1px solid rgba(232,85,45,.5);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:#e8552d;cursor:pointer;animation:gBlink 1.2s ease-in-out infinite;`;
   const detailBtnLabel=isEn?'👉 Pedal Detail →':'👉 ペダル詳細ページへ';
 
-  panel.innerHTML=`<div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column;height:100%"><div style="position:relative;flex:0 0 54%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden">${rk.rb?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>':''}<img src="${imgSrc}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px ${rk.gw});position:relative;z-index:2" onerror="this.src='${GACHA_IMG}'"><div style="position:absolute;top:8px;left:8px;z-index:5"><span style="${bs}">${rk.l}</span></div>${gCnt>0?`<div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,.72);border:1px solid #272729;border-radius:3px;padding:1px 7px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68">x${gCnt}</div>`:''}</div><div style="flex:1;padding:10px 13px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517;min-height:0"><div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:3px">${p.brand}</div><div style="font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:4px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.model}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c};margin-bottom:4px">${isEn?rk.nEn:rk.n}</div>${typeTagsHtml?`<div style="display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-top:3px">${typeTagsHtml}</div>`:''}</div><div style="display:flex;gap:5px;margin-top:8px;flex-shrink:0"><button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="${detailBtnStyle}">${detailBtnLabel}</button><button onclick="event.stopPropagation();window.gSetIdle()" style="padding:7px 10px;background:#1c1c1f;border:1px solid #272729;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;cursor:pointer;white-space:nowrap;flex-shrink:0">🎰 AGAIN</button></div></div></div>`;
+  const tapAgainLabel=isEn?'Tap to roll again':'タップでもう一度';
+  const tapAgainHtml=`<div style="position:absolute;top:8px;right:8px;z-index:5;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.65);border:1px solid rgba(232,85,45,.4);border-radius:3px;padding:2px 7px"><span class="g-db" style="width:5px;height:5px;background:#e8552d"></span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#e8552d;letter-spacing:.5px">${tapAgainLabel}</span><span class="g-db" style="width:5px;height:5px;background:#e8552d;animation-delay:.5s"></span></div>`;
+
+  panel.innerHTML=`<div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column;height:100%"><div style="position:relative;flex:0 0 50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden">${rk.rb?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>':''}<img src="${imgSrc}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px ${rk.gw});position:relative;z-index:2" onerror="this.src='${GACHA_IMG}'"><div style="position:absolute;top:8px;left:8px;z-index:5"><span style="${bs}">${rk.l}</span></div>${tapAgainHtml}</div><div style="flex:1;padding:8px 12px 10px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517;min-height:0;overflow:hidden"><div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:2px">${p.brand}</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:3px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.model}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c};margin-bottom:3px">${isEn?rk.nEn:rk.n}</div>${typeTagsHtml?`<div style="display:flex;gap:3px;justify-content:center;flex-wrap:wrap">${typeTagsHtml}</div>`:''}</div><div style="display:flex;gap:5px;margin-top:6px;flex-shrink:0"><button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="${detailBtnStyle}">${detailBtnLabel}</button></div></div></div>`;
   gRenderHist();
 }
 function gRenderHist(){
