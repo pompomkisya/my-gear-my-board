@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ユーザーページ — My Gear My Board</title>
-<meta name="robots" content="index, follow">
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/favicon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="My Gear My Board">
+<meta property="og:title" content="ユーザーページ — My Gear My Board">
+<meta property="og:description" content="ペダルボード・機材を投稿・共有するSNS">
+<meta property="og:image" content="https://mygearmyboard.com/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MGMBpedalboard">
+<meta name="twitter:image" content="https://mygearmyboard.com/ogp.png">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -26,7 +25,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .page{max-width:680px;margin:0 auto;padding:24px 20px 60px}
 .loading{text-align:center;padding:60px;color:var(--td)}
 .error-box{text-align:center;padding:60px;color:var(--td)}
-/* プロフィール */
 .profile-hero{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:24px;margin-bottom:16px;display:flex;gap:16px;align-items:flex-start}
 .profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;border:2px solid var(--bd);overflow:hidden}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
@@ -37,10 +35,8 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .profile-links{display:flex;gap:8px;flex-wrap:wrap}
 .profile-link{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:11px;font-weight:600;color:var(--tm);text-decoration:none;transition:all .15s}
 .profile-link:hover{border-color:var(--ac);color:var(--ac)}
-/* セクション */
 .section-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:20px;margin-bottom:16px}
 .section-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;margin-bottom:14px;color:var(--tx)}
-/* 投稿一覧 */
 .posts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .post-card{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;overflow:hidden;text-decoration:none;color:var(--tx);display:block;transition:border-color .2s}
 .post-card:hover{border-color:var(--ac)}
@@ -49,7 +45,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .post-card-body{padding:8px}
 .post-card-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
 .post-card-meta{font-size:10px;color:var(--td)}
-/* 機材リスト */
 .gear-item{padding:12px 0;border-bottom:1px solid var(--bd)}
 .gear-item:last-child{border-bottom:none}
 .gear-item-row1{display:flex;align-items:center;gap:8px;margin-bottom:3px}
@@ -67,6 +62,12 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .gear-total-label{color:var(--tm)}
 .gear-total-value{color:var(--ac);font-weight:700}
 .private-note{text-align:center;padding:24px;font-size:13px;color:var(--td)}
+.share-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none}
+.share-btn:hover{border-color:var(--ac);color:var(--ac)}
+.share-btn-x{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;background:#000;border:1px solid #333;border-radius:4px;font-size:11px;font-weight:600;color:#fff;cursor:pointer;transition:all .15s}
+.share-btn-x:hover{border-color:var(--ac)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(max-width:480px){.posts-grid{grid-template-columns:1fr}.profile-hero{flex-direction:column;align-items:center;text-align:center}.profile-links{justify-content:center}}
 </style>
 </head>
@@ -87,6 +88,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 <div class="page">
   <div id="content"><div class="loading">読み込み中...</div></div>
 </div>
+<div class="toast" id="toast"></div>
 <script>
 const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
@@ -108,7 +110,8 @@ const I18N={
     gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',
     gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',
     ampLabel:'使用アンプ：',
-    untitled:'無題のボード',anon:'匿名'},
+    untitled:'無題のボード',anon:'匿名',
+    shareBtn:'🔗 シェア',shareBtnX:'𝕏 Xに投稿'},
   en:{logoSub:'Pedalboard SNS',backBtn:'← Home',langLabel:'JA',
     notFound:'User not found',backHome:'← Back to Home',
     sectionPosts:'Posts',sectionGear:'Gear List',
@@ -121,7 +124,8 @@ const I18N={
     gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',
     gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',
     ampLabel:'Amp: ',
-    untitled:'Untitled Board',anon:'Anonymous'}
+    untitled:'Untitled Board',anon:'Anonymous',
+    shareBtn:'🔗 Share',shareBtnX:'𝕏 Post to X'}
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
 
@@ -134,13 +138,24 @@ function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang
 
 function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+
+// ★ シェア関数
+function copyUserUrl(url){
+  navigator.clipboard.writeText(url)
+    .then(()=>showToast('🔗 '+(lang==='en'?'Copied!':'コピーしました')))
+    .catch(()=>prompt('URLをコピーしてください:',url));
+}
+function shareUserToX(url,username){
+  const text=encodeURIComponent((username||'')+(lang==='en'?' pedalboard — My Gear My Board #MGMB':'のペダルボード — My Gear My Board #MGMB #エフェクター'));
+  window.open('https://twitter.com/intent/tweet?text='+text+'&url='+encodeURIComponent(url),'_blank','width=550,height=420');
+}
 
 async function loadUser(){
   const params=new URLSearchParams(window.location.search);
   const username=params.get('username');
   if(!username){showError(tr('notFound'));return;}
 
-  // ユーザー情報取得（メールアドレス・password_hashは取得しない）
   const{data:user}=await sb.from('users')
     .select('id,username,bio,amp,x_url,instagram_url,avatar_url,gear_list_public,created_at')
     .eq('username',username).maybeSingle();
@@ -149,7 +164,13 @@ async function loadUser(){
 
   document.title=`${user.username} — My Gear My Board`;
 
-  // 投稿・機材を並列取得
+  // ★ OGP動的書き換え
+  const pageUrlOgp=`https://mygearmyboard.com/user?username=${encodeURIComponent(user.username)}`;
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content',`${user.username} — My Gear My Board`);
+  document.querySelector('meta[property="og:url"]')?.setAttribute('content',pageUrlOgp);
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content',
+    lang==='en'?`${user.username}'s pedalboard — My Gear My Board`:`${user.username}のペダルボード — My Gear My Board`);
+
   const[postsRes,gearRes]=await Promise.all([
     sb.from('posts').select('id,title,image_urls,likes,created_at,post_type').eq('user_id',user.id).order('created_at',{ascending:false}).limit(12),
     user.gear_list_public
@@ -174,7 +195,13 @@ function renderUser(user,posts,gear){
     user.instagram_url?`<a class="profile-link" href="${escHtml(user.instagram_url)}" target="_blank" rel="noopener">📸 Instagram</a>`:''
   ].filter(Boolean).join('');
 
-  // 投稿セクション
+  // ★ シェアボタン
+  const pageUrl=`https://mygearmyboard.com/user?username=${encodeURIComponent(user.username)}`;
+  const shareBtns=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+    <button class="share-btn" onclick="copyUserUrl('${pageUrl.replace(/'/g,"\\'")}')">${tr('shareBtn')}</button>
+    <button class="share-btn-x" onclick="shareUserToX('${pageUrl.replace(/'/g,"\\'")}','${escHtml(user.username||'').replace(/'/g,"\\'")}')">𝕏 ${lang==='en'?'Post to X':'Xに投稿'}</button>
+  </div>`;
+
   let postsHtml='';
   if(!posts.length){
     postsHtml=`<div class="private-note">${tr('noPosts')}</div>`;
@@ -193,7 +220,6 @@ function renderUser(user,posts,gear){
     }).join('')}</div>`;
   }
 
-  // 機材セクション
   let gearHtml='';
   if(!user.gear_list_public){
     gearHtml=`<div class="private-note">🔒 ${tr('gearPrivate')}</div>`;
@@ -201,7 +227,6 @@ function renderUser(user,posts,gear){
     gearHtml=`<div class="private-note">${tr('gearEmpty')}</div>`;
   }else{
     let totalJpy=0,totalUsd=0,hasJpy=false,hasUsd=false;
-    // 並べ替えセレクト
     const sortSelectHtml=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
       <span style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">${tr('gearSortLabel')}</span>
       <select id="user-gear-sort" onchange="applyUserGearSort()"
@@ -216,7 +241,6 @@ function renderUser(user,posts,gear){
       </select>
     </div>`;
     window._userGearData=gear;
-    // ペダルDBとの照合（slugを取得）
     let userPedalSlugMap={};
     if(gear&&gear.length){
       const names=gear.map(g=>g.name).filter(Boolean);
@@ -259,6 +283,7 @@ function renderUser(user,posts,gear){
         ${user.bio?`<div class="profile-bio">${escHtml(user.bio)}</div>`:''}
         ${user.amp?`<div class="profile-amp">🎸 ${tr('ampLabel')}${escHtml(user.amp)}</div>`:''}
         ${linksHtml?`<div class="profile-links">${linksHtml}</div>`:''}
+        ${shareBtns}
       </div>
     </div>
     <div class="section-card">
@@ -284,7 +309,8 @@ function applyUserGearSort(){
   else if(val==='name_asc')sorted.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
   else if(val==='name_desc')sorted.sort((a,b)=>(b.name||'').localeCompare(a.name||''));
   else sorted=[...window._userGearData];
-  wrap.innerHTML=sorted.map(g=>{
+  const wrap2=document.getElementById('user-gear-items');if(!wrap2)return;
+  wrap2.innerHTML=sorted.map(g=>{
     const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
     const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
     const sSlug=window._userPedalSlugMap&&window._userPedalSlugMap[g.name]||null;
