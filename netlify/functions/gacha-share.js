@@ -35,24 +35,20 @@ function fetchImage(url) {
 async function makeOgpImage(imageUrl) {
   const OGP_W = 1200;
   const OGP_H = 630;
-  const PADDING = 80; // 上下左右の余白
+  // Xは中央2:1クロップ表示のため、縦方向に十分な余白を確保
+  // 画像エリアは中央500x500以内に収める
+  const MAX_IMG = 460;
 
   const buf = await fetchImage(imageUrl);
 
-  // ペダル画像をパディング内に収まるようリサイズ（中央配置）
-  const maxW = OGP_W - PADDING * 2;
-  const maxH = OGP_H - PADDING * 2;
-
   const resized = await sharp(buf)
-    .resize(maxW, maxH, { fit: 'inside', withoutEnlargement: false })
+    .resize(MAX_IMG, MAX_IMG, { fit: 'inside', withoutEnlargement: false })
     .toBuffer();
 
-  // メタデータ取得（リサイズ後のサイズ）
   const meta = await sharp(resized).metadata();
   const left = Math.round((OGP_W - meta.width) / 2);
   const top = Math.round((OGP_H - meta.height) / 2);
 
-  // 白背景に合成
   const result = await sharp({
     create: {
       width: OGP_W,
