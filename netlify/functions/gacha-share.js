@@ -1,16 +1,35 @@
 // gacha-share.js
-// GET /gacha-share?pedal_id=xxx&rk=SSR&slug=xxx
-// → ペダル画像をOGPに使った動的HTML返す → /pedal?slug=xxx にリダイレクト
+// GET /gacha-share?pedal_id=xxx&rk=SSR&slug=xxx → 動的OGP HTML → /pedal?slug=xxx にリダイレクト
+// GET /gacha-share?pedal_id=xxx&img=1 → 1200x630 OGP画像を返す
 
 const { createClient } = require('@supabase/supabase-js');
+const https = require('https');
+const http = require('http');
 
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const SITE_URL = 'https://mygearmyboard.com';
-const DEFAULT_OGP = `${SITE_URL}/images/ogp.jpg`;
+const DEFAULT_OGP = `${SITE_URL}/ogp.png`;
 
 const RK_LABEL = { SSR:'LEGENDARY', SR:'EXPERT', Sp:'SPECIALIST', Std:'STANDARD' };
+const RK_COLOR = { SSR:'#ffd700', SR:'#a855f7', Sp:'#f97316', Std:'#6e6c68' };
+
+function fetchImage(url) {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith('https') ? https : http;
+    client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        fetchImage(res.headers.location).then(resolve).catch(reject);
+        return;
+      }
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => resolve({ buf: Buffer.concat(chunks), contentType: res.headers['content-type'] || 'image/jpeg' }));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
 
 exports.handler = async (event) => {
   const p = event.queryStringParameters || {};
@@ -22,19 +41,40 @@ exports.handler = async (event) => {
     return { statusCode: 302, headers: { Location: SITE_URL }, body: '' };
   }
 
-  // リダイレクト先：ペダル詳細ページ
+  // ★ 画像プロキシモード（?img=1）
+  // og.jsと同様にペダル画像を取得して返す
+  if (p.img === '1') {
+    try {
+      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data } = await sb.from('pedals').select('image_url').eq('id', parseInt(pedalId)).maybeSingle();
+      if (data && data.image_url) {
+        const { buf, contentType } = await fetchImage(data.image_url);
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': contentType,
+            'Cache-Control': 'public, max-age=86400'
+          },
+          body: buf.toString('base64'),
+          isBase64Encoded: true,
+        };
+      }
+    } catch (e) {
+      console.error('img proxy error:', e);
+    }
+    // 失敗時はデフォルトOGPにリダイレクト
+    return { statusCode: 302, headers: { Location: DEFAULT_OGP }, body: '' };
+  }
+
+  // ★ OGPページモード
   const redirectTo = slug
     ? `${SITE_URL}/pedal?slug=${encodeURIComponent(slug)}`
-    : `${SITE_URL}`;
+    : SITE_URL;
 
   let pedal = null;
   try {
     const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-    const { data } = await sb
-      .from('pedals')
-      .select('id,brand,model,full_name,image_url,slug')
-      .eq('id', parseInt(pedalId))
-      .maybeSingle();
+    const { data } = await sb.from('pedals').select('id,brand,model,full_name,image_url,slug').eq('id', parseInt(pedalId)).maybeSingle();
     pedal = data;
   } catch (e) {
     console.error('gacha-share error:', e);
@@ -45,8 +85,10 @@ exports.handler = async (event) => {
   const brand = pedal ? (pedal.brand || '') : '';
   const model = pedal ? (pedal.model || '') : '';
 
-  // OGP画像：ペダルのimage_url優先、なければデフォルト
-  const ogImage = (pedal && pedal.image_url) ? pedal.image_url : DEFAULT_OGP;
+  // OGP画像：プロキシ経由（ペダル画像あり）orデフォルト
+  const ogImage = (pedal && pedal.image_url)
+    ? `${SITE_URL}/gacha-share?pedal_id=${pedalId}&rk=${rk}&img=1`
+    : DEFAULT_OGP;
 
   const title = `【${rk} / ${rkLabel}】${pedalName} | MGMB GEAR GACHA`;
   const description = `${brand} ${model} が出た！ ガチャでペダルと出会おう。 #MGMB #エフェクター`;
