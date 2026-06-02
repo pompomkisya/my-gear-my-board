@@ -141,6 +141,8 @@ exports.handler = async (event) => {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${esc(ogImage)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:site_name" content="My Gear My Board">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MGMBpedalboard">
