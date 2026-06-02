@@ -65,7 +65,8 @@ exports.handler = async (event) => {
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${esc(ogImage)}">
 <meta property="og:site_name" content="My Gear My Board">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@MGMBpedalboard">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
 <meta name="twitter:image" content="${esc(ogImage)}">
@@ -83,7 +84,7 @@ exports.handler = async (event) => {
     statusCode: 200,
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'public, max-age=300'
+      'Cache-Control': 'public, max-age=60'
     },
     body: html
   };
