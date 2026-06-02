@@ -1275,15 +1275,10 @@ function gStartRoll(){
   }
 
   // 列停止タイマー
-  gSlotT=setTimeout(()=>gStopCol(0,rk,p),stop1);
-  const t2=setTimeout(()=>gStopCol(1,rk,p),stop2);
-  const t3=setTimeout(()=>{
-    if(ssrPatternB){
-      gStopColFake(p); // Std仮止め
-    }else{
-      gStopCol(2,rk,p);
-    }
-  },stop3);
+  // 列停止タイマー（Bパターン時は全列Stdで止める→先バレ防止）
+  gSlotT=setTimeout(()=>gStopCol(0, ssrPatternB?'Std':rk, p),stop1);
+  const t2=setTimeout(()=>gStopCol(1, ssrPatternB?'Std':rk, p),stop2);
+  const t3=setTimeout(()=>gStopCol(2, ssrPatternB?'Std':rk, p, ssrPatternB),stop3);
 
   gRollT=setTimeout(()=>{
     clearTimeout(gSlotT);clearTimeout(t2);clearTimeout(t3);
@@ -1304,45 +1299,64 @@ function gStartRoll(){
 // SSR Bパターン：Stdで仮止め後に逆回転してSSR揃い
 function gSSRFakeReversal(p){
   if(gPhase!=='rolling')return;
-  const ctx=_getAudioCtx();
-  const t0=ctx?ctx.currentTime:0;
 
-  // 400ms後に逆回転開始
+  // ★ Std3列が揃った状態 → 500ms待機 → 全列フラッシュ → 逆回転
   setTimeout(()=>{
     if(gPhase!=='rolling')return;
-    gReverseRoll(); // 全列逆回転開始
 
-    // 右→中→左の順に停止（各300ms間隔）
-    const colOrder=[2,1,0];
-    colOrder.forEach((col,i)=>{
-      setTimeout(()=>{
-        if(gPhase!=='rolling')return;
-        gStopColReverse(col,'SSR',p);
-        // カチッ音（絶対時間）
-        const ctx2=_getAudioCtx();
-        if(ctx2&&!_gMuted){
-          const t=ctx2.currentTime;
-          _playToneAt(col===0?900:700,'square',0.2,0.002,0.06,t);
-          _playNoisAt(0.18,0.04,t+0.005);
-          if(col===0){
-            // 最後の列：SSRファンファーレ
-            setTimeout(()=>gSoundStopFinal('SSR'),50);
-          }
-        }
-      },300+i*300);
-    });
+    // 全列フラッシュ（「あ、これStdじゃない！」の演出）
+    const box=document.getElementById('g-slot-box');
+    if(box){
+      box.style.transition='box-shadow .1s';
+      box.style.boxShadow='0 0 30px 10px rgba(255,215,0,.7)';
+      // グリッジ
+      let gc=0;
+      const gt=setInterval(()=>{
+        gc++;
+        if(box)box.style.filter=['hue-rotate(0deg)','hue-rotate(120deg)','hue-rotate(240deg)'][gc%3];
+        if(gc>=6){clearInterval(gt);if(box){box.style.filter='';box.style.boxShadow='';}}
+      },50);
+    }
+    // フラッシュ音
+    const ctx=_getAudioCtx();
+    if(ctx&&!_gMuted){
+      const t=ctx.currentTime;
+      _playNoisAt(0.2,0.06,t);
+      _playToneAt(200,'square',0.15,0.002,0.1,t+0.02);
+    }
 
-    // 全停止後カプセルへ
+    // 400ms後に逆回転開始
     setTimeout(()=>{
-      gResult=p;gPhase='capsule';gCnt++;
-      gHist.unshift(p);if(gHist.length>5)gHist.pop();
-      gSetShare(false);
-      gRenderCapsule(p);
-    },300+colOrder.length*300+200);
-  },400);
-}
+      if(gPhase!=='rolling')return;
+      gReverseRoll();
 
-function gStopCol(col,rk,p){
+      // 右→中→左の順に停止（各300ms間隔）
+      const colOrder=[2,1,0];
+      colOrder.forEach((col,i)=>{
+        setTimeout(()=>{
+          if(gPhase!=='rolling')return;
+          gStopColReverse(col,'SSR',p);
+          const ctx2=_getAudioCtx();
+          if(ctx2&&!_gMuted){
+            const t=ctx2.currentTime;
+            _playToneAt(col===0?900:700,'square',0.2,0.002,0.06,t);
+            _playNoisAt(0.18,0.04,t+0.005);
+            if(col===0){setTimeout(()=>gSoundStopFinal('SSR'),50);}
+          }
+        },300+i*300);
+      });
+
+      // 全停止後カプセルへ
+      setTimeout(()=>{
+        gResult=p;gPhase='capsule';gCnt++;
+        gHist.unshift(p);if(gHist.length>5)gHist.pop();
+        gSetShare(false);
+        gRenderCapsule(p);
+      },300+colOrder.length*300+200);
+    },400);
+  },500);
+}
+function gStopCol(col,rk,p,isFakeB){
   if(gPhase!=='rolling')return;
   const col_el=document.getElementById('g-vcol-'+col);
   const track=document.getElementById('g-vtrack-'+col);
@@ -1351,7 +1365,6 @@ function gStopCol(col,rk,p){
   const rkSym={SSR:'★',SR:'★',Sp:'◆',Std:'●'}[rk];
   const isSSR=rk==='SSR';
 
-  // スクロール停止 → レアリティシンボルを表示
   track.style.animation='none';
   const symStyle=isSSR
     ?`font-size:24px;font-weight:bold;background:linear-gradient(135deg,#ffd700,#ff6b35,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 6px #ffd700);animation:gShimmer 1.5s linear infinite`
@@ -1360,23 +1373,35 @@ function gStopCol(col,rk,p){
   col_el.style.boxShadow=`0 0 10px 3px ${rkColor}66`;
   col_el.style.borderColor=rkColor;
 
-  // カチッ音（絶対時間指定）
+  // カチッ音
   const ctx=_getAudioCtx();
   if(ctx&&!_gMuted){
     const t=ctx.currentTime;
     _playToneAt(col===2?800:600,'square',0.18,0.002,0.06,t);
     _playNoisAt(0.15,0.04,t+0.005);
-    if(col===2){
+    // Bパターン時：3列目もStdの音（ファイナル音は出さない）
+    if(col===2&&!isFakeB){
       gSoundStopFinal(rk,t+0.08);
+    }else if(col===2&&isFakeB){
+      // Std騙し音（軽め）
+      _playToneAt(440,'triangle',0.15,0.01,0.2,t+0.08);
     }
   }
 
-  // Sp以上：最後の列が止まった瞬間に演出
+  // 最後の列が止まった瞬間の演出
   if(col===2){
-    gSlotFinalEffect(rk,p);
+    if(isFakeB){
+      // BパターンのStd全揃い演出（小さいパルスのみ）
+      const box=document.getElementById('g-slot-box');
+      if(box){
+        box.style.boxShadow='0 0 8px 2px #9a989044';
+        setTimeout(()=>{if(box)box.style.boxShadow='';},400);
+      }
+    }else{
+      gSlotFinalEffect(rk,p);
+    }
   }
 }
-
 function gSlotFinalEffect(rk,p){
   const box=document.getElementById('g-slot-box');if(!box)return;
   const rkColor={SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#9a9890'}[rk];
@@ -1708,7 +1733,7 @@ function gRenderResult(p){
   const tapAgainLabel=isEn?'Tap to roll again':'タップでもう一度';
   const tapAgainHtml=`<div style="position:absolute;bottom:0;left:0;right:0;z-index:5;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;gap:6px;padding:5px 0"><span class="g-db" style="width:5px;height:5px;background:#e8552d"></span><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#e8552d;letter-spacing:1px;font-weight:700">${tapAgainLabel}</span><span class="g-db" style="width:5px;height:5px;background:#e8552d;animation-delay:.5s"></span></div>`;
 
-  panel.innerHTML=`<div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column;height:100%"><div style="position:relative;flex:0 0 50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden">${rk.rb?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>':''}<img src="${imgSrc}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px ${rk.gw});position:relative;z-index:2" onerror="this.src='${GACHA_IMG}'"><div style="position:absolute;top:8px;left:8px;z-index:5"><span style="${bs}">${rk.l}</span></div>${tapAgainHtml}</div><div style="flex:1;padding:8px 12px 10px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517;min-height:0;overflow:hidden"><div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:2px">${p.brand}</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:3px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.model}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c};margin-bottom:3px">${isEn?rk.nEn:rk.n}</div>${typeTagsHtml?`<div style="display:flex;gap:3px;justify-content:center;flex-wrap:wrap">${typeTagsHtml}</div>`:''}</div><div style="display:flex;gap:5px;margin-top:6px;flex-shrink:0"><button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="${detailBtnStyle}">${detailBtnLabel}</button></div></div></div>`;
+  panel.innerHTML=`<div class="g-result-reveal" style="flex:1;display:flex;flex-direction:column;height:100%"><div style="position:relative;flex:0 0 50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden">${rk.rb?'<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(168,85,247,.06),rgba(6,182,212,.06));background-size:300% 100%;animation:gShimmer 3s linear infinite;pointer-events:none"></div>':''}<img src="${imgSrc}" style="width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px ${rk.gw});position:relative;z-index:2;margin-bottom:28px" onerror="this.src='${GACHA_IMG}'"><div style="position:absolute;top:8px;left:8px;z-index:5"><span style="${bs}">${rk.l}</span></div>${tapAgainHtml}</div><div style="flex:1;padding:8px 12px 10px;display:flex;flex-direction:column;justify-content:space-between;border-top:1px solid ${rk.rb?'rgba(255,215,0,.4)':rk.bd+'66'};background:#151517;min-height:0;overflow:hidden"><div style="text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#6e6c68;margin-bottom:2px">${p.brand}</div><div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:#eae8e2;line-height:1.2;margin-bottom:3px;font-weight:bold;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.model}</div><div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:${rk.c};margin-bottom:3px">${isEn?rk.nEn:rk.n}</div>${typeTagsHtml?`<div style="display:flex;gap:3px;justify-content:center;flex-wrap:wrap">${typeTagsHtml}</div>`:''}</div><div style="display:flex;gap:5px;margin-top:6px;flex-shrink:0"><button onclick="event.stopPropagation();location.href='/pedal?slug=${p.slug}'" style="${detailBtnStyle}">${detailBtnLabel}</button></div></div></div>`;
   gRenderHist();
 }
 function gRenderHist(){
@@ -1870,10 +1895,105 @@ function _initMuteState(){
 }
 window.gToggleMute=gToggleMute;
 
+// ★ ガチャカードCanvas生成
+async function gGenerateCard(p){
+  const rk=RR[p._rk];
+  const canvas=document.createElement('canvas');
+  canvas.width=300;canvas.height=300;
+  const ctx=canvas.getContext('2d');
+
+  // 背景
+  ctx.fillStyle='#151517';
+  ctx.fillRect(0,0,300,300);
+
+  // レアリティ帯（上部）
+  const rkColors={SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#6e6c68'};
+  ctx.fillStyle=rkColors[p._rk]||'#6e6c68';
+  ctx.fillRect(0,0,300,36);
+
+  // レアリティテキスト
+  ctx.fillStyle='#fff';
+  ctx.font='bold 14px "JetBrains Mono",monospace';
+  ctx.textAlign='center';
+  ctx.fillText(rk.l+' — '+(p._rk==='SSR'?'LEGENDARY':p._rk==='SR'?'EXPERT':p._rk==='Sp'?'SPECIALIST':'STANDARD'),150,24);
+
+  // ペダル画像（中央）
+  try{
+    const img=await new Promise((res,rej)=>{
+      const i=new Image();i.crossOrigin='anonymous';
+      i.onload=()=>res(i);i.onerror=rej;
+      i.src=gPedalImgSrc(p)+'?_t='+Date.now();
+    });
+    const iSize=160;const ix=(300-iSize)/2;const iy=50;
+    ctx.drawImage(img,ix,iy,iSize,iSize);
+  }catch(e){
+    // 画像取得失敗時はアイコン
+    ctx.fillStyle='#272729';ctx.fillRect(70,50,160,160);
+    ctx.fillStyle='#6e6c68';ctx.font='60px serif';ctx.textAlign='center';ctx.fillText('🎛',150,150);
+  }
+
+  // ブランド名
+  ctx.fillStyle='#9a9890';
+  ctx.font='13px "Noto Sans JP",sans-serif';
+  ctx.textAlign='center';
+  ctx.fillText(p.brand||'',150,228);
+
+  // 商品名（長い場合は省略）
+  ctx.fillStyle='#eae8e2';
+  ctx.font='bold 15px "Noto Sans JP",sans-serif';
+  ctx.textAlign='center';
+  const maxW=260;let modelText=p.model||'';
+  while(ctx.measureText(modelText).width>maxW&&modelText.length>0)modelText=modelText.slice(0,-1);
+  if(modelText!==p.model)modelText+='…';
+  ctx.fillText(modelText,150,250);
+
+  // MGMBロゴ
+  ctx.fillStyle='#e8552d';
+  ctx.font='bold 11px "JetBrains Mono",monospace';
+  ctx.textAlign='center';
+  ctx.fillText('MY GEAR MY BOARD',150,278);
+
+  // ボーダー
+  ctx.strokeStyle=rkColors[p._rk]||'#6e6c68';
+  ctx.lineWidth=2;ctx.strokeRect(1,1,298,298);
+
+  return canvas;
+}
+
+// ★ gacha-cardsバケットに保存してURLを返す
+async function gSaveCard(canvas,p){
+  try{
+    const b64=canvas.toDataURL('image/jpeg',0.85);
+    const byteStr=atob(b64.split(',')[1]);
+    const ab=new ArrayBuffer(byteStr.length);const ia=new Uint8Array(ab);
+    for(let i=0;i<byteStr.length;i++)ia[i]=byteStr.charCodeAt(i);
+    const blob=new Blob([ab],{type:'image/jpeg'});
+    const filename=`gacha_${p.id}_${p._rk}.jpg`;
+    const{error}=await sb.storage.from('gacha-cards').upload(filename,blob,{contentType:'image/jpeg',upsert:true});
+    if(error)throw error;
+    const{data}=sb.storage.from('gacha-cards').getPublicUrl(filename);
+    return data.publicUrl;
+  }catch(e){console.error('gSaveCard error:',e);return null;}
+}
+
 async function gDoShare(){
   if(!gResult)return;const rk=RR[gResult._rk];const isEn=gLang==='en';
-  const text=isEn?`GACHA Result [${rk.l}] Met "${gResult.model}"!\n#MGMB #guitarpedals\nhttps://mygearmyboard.com`:`GACHA結果【${rk.l}】「${gResult.model}」と出会った！\n#MGMB #エフェクター\nhttps://mygearmyboard.com`;
-  try{if(navigator.share)await navigator.share({title:'MGMB GEAR GACHA',text});else{await navigator.clipboard.writeText(text).catch(()=>{});alert(isEn?'Copied!':'コピーしました');}}catch(e){if(e.name!=='AbortError')navigator.clipboard.writeText(text).catch(()=>{});}
+  // Canvasカード生成 → 保存
+  let shareUrl='https://mygearmyboard.com';
+  try{
+    const canvas=await gGenerateCard(gResult);
+    const cardUrl=await gSaveCard(canvas,gResult);
+    if(cardUrl){
+      shareUrl=`https://mygearmyboard.com/gacha-share?pedal_id=${gResult.id}&rk=${gResult._rk}`;
+    }
+  }catch(e){console.error('share card error:',e);}
+  const text=isEn
+    ?`GACHA Result [${rk.l}] Met "${gResult.model}"!\n#MGMB #guitarpedals\n${shareUrl}`
+    :`GACHA結果【${rk.l}】「${gResult.model}」と出会った！\n#MGMB #エフェクター\n${shareUrl}`;
+  try{
+    if(navigator.share)await navigator.share({title:'MGMB GEAR GACHA',text,url:shareUrl});
+    else{await navigator.clipboard.writeText(text).catch(()=>{});alert(isEn?'Copied!':'コピーしました');}
+  }catch(e){if(e.name!=='AbortError')navigator.clipboard.writeText(text).catch(()=>{});}
 }
 async function gDoSave(){
   if(!gResult)return;const isEn=gLang==='en';
