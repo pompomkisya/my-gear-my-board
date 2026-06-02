@@ -5,6 +5,7 @@
 const { createClient } = require('@supabase/supabase-js');
 const https = require('https');
 const http = require('http');
+const sharp = require('sharp');
 
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ||
@@ -13,7 +14,6 @@ const SITE_URL = 'https://mygearmyboard.com';
 const DEFAULT_OGP = `${SITE_URL}/ogp.png`;
 
 const RK_LABEL = { SSR:'LEGENDARY', SR:'EXPERT', Sp:'SPECIALIST', Std:'STANDARD' };
-const RK_COLOR = { SSR:'#ffd700', SR:'#a855f7', Sp:'#f97316', Std:'#6e6c68' };
 
 function fetchImage(url) {
   return new Promise((resolve, reject) => {
@@ -25,10 +25,47 @@ function fetchImage(url) {
       }
       const chunks = [];
       res.on('data', c => chunks.push(c));
-      res.on('end', () => resolve({ buf: Buffer.concat(chunks), contentType: res.headers['content-type'] || 'image/jpeg' }));
+      res.on('end', () => resolve(Buffer.concat(chunks)));
       res.on('error', reject);
     }).on('error', reject);
   });
+}
+
+// ペダル画像を1200x630白背景中央配置のJPEGにして返す
+async function makeOgpImage(imageUrl) {
+  const OGP_W = 1200;
+  const OGP_H = 630;
+  const PADDING = 80; // 上下左右の余白
+
+  const buf = await fetchImage(imageUrl);
+
+  // ペダル画像をパディング内に収まるようリサイズ（中央配置）
+  const maxW = OGP_W - PADDING * 2;
+  const maxH = OGP_H - PADDING * 2;
+
+  const resized = await sharp(buf)
+    .resize(maxW, maxH, { fit: 'inside', withoutEnlargement: false })
+    .toBuffer();
+
+  // メタデータ取得（リサイズ後のサイズ）
+  const meta = await sharp(resized).metadata();
+  const left = Math.round((OGP_W - meta.width) / 2);
+  const top = Math.round((OGP_H - meta.height) / 2);
+
+  // 白背景に合成
+  const result = await sharp({
+    create: {
+      width: OGP_W,
+      height: OGP_H,
+      channels: 3,
+      background: { r: 255, g: 255, b: 255 }
+    }
+  })
+  .composite([{ input: resized, left, top }])
+  .jpeg({ quality: 90 })
+  .toBuffer();
+
+  return result;
 }
 
 exports.handler = async (event) => {
@@ -41,28 +78,26 @@ exports.handler = async (event) => {
     return { statusCode: 302, headers: { Location: SITE_URL }, body: '' };
   }
 
-  // ★ 画像プロキシモード（?img=1）
-  // og.jsと同様にペダル画像を取得して返す
+  // ★ 画像プロキシモード（?img=1）→ 1200x630白背景中央配置で返す
   if (p.img === '1') {
     try {
       const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
       const { data } = await sb.from('pedals').select('image_url').eq('id', parseInt(pedalId)).maybeSingle();
       if (data && data.image_url) {
-        const { buf, contentType } = await fetchImage(data.image_url);
+        const ogpBuf = await makeOgpImage(data.image_url);
         return {
           statusCode: 200,
           headers: {
-            'Content-Type': contentType,
+            'Content-Type': 'image/jpeg',
             'Cache-Control': 'public, max-age=86400'
           },
-          body: buf.toString('base64'),
+          body: ogpBuf.toString('base64'),
           isBase64Encoded: true,
         };
       }
     } catch (e) {
       console.error('img proxy error:', e);
     }
-    // 失敗時はデフォルトOGPにリダイレクト
     return { statusCode: 302, headers: { Location: DEFAULT_OGP }, body: '' };
   }
 
