@@ -1,5 +1,6 @@
-/og  /.netlify/functions/og  200
-/sitemap.xml  /.netlify/functions/sitemap  200
+/og /.netlify/functions/og 200
+/sitemap.xml /.netlify/functions/sitemap 200
+/gacha-share /.netlify/functions/gacha-share 200
 /mypage /mypage.html 200
 /pedal /pedal.html 200
 /brand /brand.html 200
