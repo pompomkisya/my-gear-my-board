@@ -1991,7 +1991,10 @@ async function gSaveCard(canvas, p) {
     const blob = new Blob([ab], {type:'image/jpeg'});
     const filename = `gacha_${p.id}_${p._rk}.jpg`;
     gDebugToast('🔄 uploading ' + filename);
-    const sbCard = supabase.createClient(SUPA_URL, SUPA_KEY);
+    const sbCard = supabase.createClient(
+      'https://yzqfockzgyfjmngygbhp.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g'
+    );
     const {error} = await sbCard.storage.from('gacha-cards').upload(filename, blob, {contentType:'image/jpeg', upsert:true});
     if (error) { gDebugToast('❌ upload: ' + error.message + ' code=' + error.statusCode); return null; }
     const {data} = sbCard.storage.from('gacha-cards').getPublicUrl(filename);
