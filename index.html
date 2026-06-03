@@ -1898,7 +1898,7 @@ window.gToggleMute=gToggleMute;
 // ★ ガチャカードCanvas生成
 // ★ Canvas でガチャカード生成（1200x630、レアリティ帯付き）
 async function gGenerateCard(p) {
-  const rk = RR[p._rk];
+  gDebugToast('🔄 generateCard start');
   const rkColors = {SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#6e6c68'};
   const color = rkColors[p._rk] || '#6e6c68';
   const label = {SSR:'LEGENDARY',SR:'EXPERT',Sp:'SPECIALIST',Std:'STANDARD'}[p._rk] || 'STANDARD';
@@ -2017,10 +2017,13 @@ async function gDoShare(){
   }catch(e){if(e.name!=='AbortError')navigator.clipboard.writeText(text).catch(()=>{});}
 
   // ★ Canvas生成・保存はバックグラウンドで（次回シェア時にOGP画像が使われる）
-  gGenerateCard(gResult).then(canvas=>gSaveCard(canvas,gResult)).then(url=>{
-    if(url)console.log('card saved:',url);
+  gGenerateCard(gResult).then(canvas=>{
+    gDebugToast('✅ canvas生成OK → saving...');
+    return gSaveCard(canvas,gResult);
+  }).then(url=>{
+    if(url)gDebugToast('✅ saved: '+url.slice(-30));
     else gDebugToast('⚠️ card save: null URL');
-  }).catch(e=>gDebugToast('❌ card error: '+e.message));
+  }).catch(e=>gDebugToast('❌ gGenerateCard catch: '+(e.message||String(e))));
 }
 
 function gDebugToast(msg){
