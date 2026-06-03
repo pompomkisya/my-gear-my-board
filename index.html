@@ -2019,13 +2019,22 @@ async function gDoShare(){
   }catch(e){if(e.name!=='AbortError')navigator.clipboard.writeText(text).catch(()=>{});}
 
   // ★ Canvas生成・保存はバックグラウンドで（次回シェア時にOGP画像が使われる）
-  gGenerateCard(gResult).then(canvas=>{
-    gDebugToast('✅ canvas生成OK → saving...');
-    return gSaveCard(canvas,gResult);
-  }).then(url=>{
-    if(url)gDebugToast('✅ saved: '+url.slice(-30));
-    else gDebugToast('⚠️ card save: null URL');
-  }).catch(e=>gDebugToast('❌ gGenerateCard catch: '+(e.message||String(e))));
+  // まず最小Canvas(1x1)でgSaveCardが動くか確認
+  try {
+    const testCanvas = document.createElement('canvas');
+    testCanvas.width = 10; testCanvas.height = 10;
+    const testCtx = testCanvas.getContext('2d');
+    testCtx.fillStyle = '#ff0000';
+    testCtx.fillRect(0,0,10,10);
+    gDebugToast('🔄 test canvas ok, saving...');
+    const url = await gSaveCard(testCanvas, gResult);
+    if(url) {
+      gDebugToast('✅ test save ok! now generating full card...');
+      gGenerateCard(gResult).then(c=>gSaveCard(c,gResult)).catch(e=>gDebugToast('❌ full card: '+e.message));
+    }
+  } catch(e) {
+    gDebugToast('❌ test canvas: '+(e.message||String(e)));
+  }
 }
 
 function gDebugToast(msg){
