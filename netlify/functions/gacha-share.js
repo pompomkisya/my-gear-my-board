@@ -1,11 +1,10 @@
 // gacha-share.js
 // GET /gacha-share?pedal_id=xxx&rk=SSR&slug=xxx → 動的OGP HTML → /pedal?slug=xxx にリダイレクト
-// GET /gacha-share?pedal_id=xxx&img=1 → 1200x630 OGP画像を返す
+// GET /gacha-share?pedal_id=xxx&img=1 → 1200x630 SVG OGP画像を返す（sharp不使用）
 
 const { createClient } = require('@supabase/supabase-js');
 const https = require('https');
 const http = require('http');
-const sharp = require('sharp');
 
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ||
@@ -14,52 +13,53 @@ const SITE_URL = 'https://mygearmyboard.com';
 const DEFAULT_OGP = `${SITE_URL}/ogp.png`;
 
 const RK_LABEL = { SSR:'LEGENDARY', SR:'EXPERT', Sp:'SPECIALIST', Std:'STANDARD' };
+const RK_COLOR = { SSR:'#ffd700', SR:'#a855f7', Sp:'#f97316', Std:'#6e6c68' };
 
-function fetchImage(url) {
+function fetchBuffer(url) {
   return new Promise((resolve, reject) => {
     const client = url.startsWith('https') ? https : http;
     client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        fetchImage(res.headers.location).then(resolve).catch(reject);
+        fetchBuffer(res.headers.location).then(resolve).catch(reject);
         return;
       }
       const chunks = [];
       res.on('data', c => chunks.push(c));
-      res.on('end', () => resolve(Buffer.concat(chunks)));
+      res.on('end', () => resolve({
+        buf: Buffer.concat(chunks),
+        contentType: res.headers['content-type'] || 'image/jpeg'
+      }));
       res.on('error', reject);
     }).on('error', reject);
   });
 }
 
-// ペダル画像を1200x630白背景にfit:containで配置
-async function makeOgpImage(imageUrl) {
-  const OGP_W = 1200;
-  const OGP_H = 630;
+// ペダル画像をBase64化して1200x630のSVGに埋め込む（sharp不使用）
+async function makeOgpSvg(imageUrl, rk) {
+  const W = 1200, H = 630;
+  const color = RK_COLOR[rk] || '#6e6c68';
+  const label = RK_LABEL[rk] || 'STANDARD';
 
-  const buf = await fetchImage(imageUrl);
+  let imgTag = '';
+  try {
+    const { buf, contentType } = await fetchBuffer(imageUrl);
+    const b64 = buf.toString('base64');
+    const dataUrl = `data:${contentType};base64,${b64}`;
+    // ペダル画像を中央500x500エリアに配置（preserveAspectRatioでcontain）
+    imgTag = `<image href="${dataUrl}" x="350" y="65" width="500" height="500" preserveAspectRatio="xMidYMid meet"/>`;
+  } catch(e) {
+    console.error('image fetch failed:', e.message);
+  }
 
-  // 高さ630に合わせてリサイズ（幅は比率維持、1200超えたら幅基準）
-  const resized = await sharp(buf)
-    .resize(OGP_W, OGP_H, { fit: 'inside', withoutEnlargement: false })
-    .toBuffer();
-
-  const meta = await sharp(resized).metadata();
-  const left = Math.round((OGP_W - meta.width) / 2);
-  const top = Math.round((OGP_H - meta.height) / 2);
-
-  const result = await sharp({
-    create: {
-      width: OGP_W,
-      height: OGP_H,
-      channels: 3,
-      background: { r: 255, g: 255, b: 255 }
-    }
-  })
-  .composite([{ input: resized, left, top }])
-  .jpeg({ quality: 90 })
-  .toBuffer();
-
-  return result;
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}">
+  <rect width="${W}" height="${H}" fill="white"/>
+  <rect width="${W}" height="50" fill="${color}"/>
+  <text x="600" y="34" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">${rk} / ${label}</text>
+  ${imgTag}
+  <rect y="580" width="${W}" height="50" fill="#151517"/>
+  <text x="600" y="612" font-family="Arial,sans-serif" font-size="18" fill="#e8552d" text-anchor="middle" font-weight="bold">MY GEAR MY BOARD</text>
+</svg>`;
 }
 
 exports.handler = async (event) => {
@@ -72,25 +72,24 @@ exports.handler = async (event) => {
     return { statusCode: 302, headers: { Location: SITE_URL }, body: '' };
   }
 
-  // ★ 画像プロキシモード（?img=1）→ 1200x630白背景中央配置で返す
+  // ★ 画像モード（?img=1）→ SVGを返す
   if (p.img === '1') {
     try {
       const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
       const { data } = await sb.from('pedals').select('image_url').eq('id', parseInt(pedalId)).maybeSingle();
       if (data && data.image_url) {
-        const ogpBuf = await makeOgpImage(data.image_url);
+        const svg = await makeOgpSvg(data.image_url, rk);
         return {
           statusCode: 200,
           headers: {
-            'Content-Type': 'image/jpeg',
+            'Content-Type': 'image/svg+xml',
             'Cache-Control': 'public, max-age=86400'
           },
-          body: ogpBuf.toString('base64'),
-          isBase64Encoded: true,
+          body: svg,
         };
       }
     } catch (e) {
-      console.error('img proxy error:', e);
+      console.error('img mode error:', e);
     }
     return { statusCode: 302, headers: { Location: DEFAULT_OGP }, body: '' };
   }
@@ -114,7 +113,6 @@ exports.handler = async (event) => {
   const brand = pedal ? (pedal.brand || '') : '';
   const model = pedal ? (pedal.model || '') : '';
 
-  // OGP画像：プロキシ経由（ペダル画像あり）orデフォルト
   const ogImage = (pedal && pedal.image_url)
     ? `${SITE_URL}/gacha-share?pedal_id=${pedalId}&rk=${rk}&img=1`
     : DEFAULT_OGP;
