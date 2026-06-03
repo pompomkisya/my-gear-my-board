@@ -1896,10 +1896,120 @@ function _initMuteState(){
 window.gToggleMute=gToggleMute;
 
 // ★ ガチャカードCanvas生成
+// ★ Canvas でガチャカード生成（1200x630、レアリティ帯付き）
+async function gGenerateCard(p) {
+  const rk = RR[p._rk];
+  const rkColors = {SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#6e6c68'};
+  const color = rkColors[p._rk] || '#6e6c68';
+  const label = {SSR:'LEGENDARY',SR:'EXPERT',Sp:'SPECIALIST',Std:'STANDARD'}[p._rk] || 'STANDARD';
+  const W = 1200, H = 630;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // 白背景
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, W, H);
+
+  // 上部レアリティ帯
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, W, 60);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 26px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${p._rk} / ${label}`, W/2, 42);
+
+  // ペダル画像（image-proxy経由でBase64取得）
+  const imgSrc = gPedalImgSrc(p);
+  try {
+    let dataUrl = null;
+    const res = await fetch('/.netlify/functions/image-proxy?url=' + encodeURIComponent(imgSrc));
+    if (res.ok) {
+      const data = await res.json();
+      if (data.base64) dataUrl = 'data:' + (data.contentType||'image/jpeg') + ';base64,' + data.base64;
+    }
+    if (dataUrl) {
+      const img = await new Promise((resolve, reject) => {
+        const i = new Image();
+        i.onload = () => resolve(i);
+        i.onerror = reject;
+        i.src = dataUrl;
+      });
+      // 中央エリア(500x500)にfitして描画
+      const maxW = 500, maxH = 500;
+      const scale = Math.min(maxW/img.width, maxH/img.height);
+      const dw = Math.round(img.width * scale);
+      const dh = Math.round(img.height * scale);
+      const dx = Math.round((W - dw) / 2);
+      const dy = Math.round(60 + (500 - dh) / 2 + 10);
+      ctx.drawImage(img, dx, dy, dw, dh);
+    }
+  } catch(e) {
+    console.warn('gGenerateCard image error:', e.message);
+  }
+
+  // 下部MGMBバー
+  ctx.fillStyle = '#151517';
+  ctx.fillRect(0, H - 60, W, 60);
+  ctx.fillStyle = '#e8552d';
+  ctx.font = 'bold 22px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('MY GEAR MY BOARD', W/2, H - 20);
+
+  // ブランド名・モデル名
+  ctx.fillStyle = '#333333';
+  ctx.font = '18px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(p.brand || '', W/2, H - 75);
+  ctx.font = 'bold 22px Arial, sans-serif';
+  ctx.fillStyle = '#111111';
+  let modelText = p.model || '';
+  while (ctx.measureText(modelText).width > 800 && modelText.length > 0) modelText = modelText.slice(0,-1);
+  if (modelText !== p.model) modelText += '…';
+  ctx.fillText(modelText, W/2, H - 50);
+
+  return canvas;
+}
+
+// ★ gacha-cardsバケットに保存してURLを返す
+async function gSaveCard(canvas, p) {
+  try {
+    const b64 = canvas.toDataURL('image/jpeg', 0.88);
+    const byteStr = atob(b64.split(',')[1]);
+    const ab = new ArrayBuffer(byteStr.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteStr.length; i++) ia[i] = byteStr.charCodeAt(i);
+    const blob = new Blob([ab], {type:'image/jpeg'});
+    const filename = `gacha_${p.id}_${p._rk}.jpg`;
+    // ★ ローカルでsupabaseクライアントを生成（グローバルsbに依存しない）
+    const sbCard = supabase.createClient(SUPA_URL, SUPA_KEY);
+    const {error} = await sbCard.storage.from('gacha-cards').upload(filename, blob, {contentType:'image/jpeg', upsert:true});
+    if (error) throw error;
+    const {data} = sbCard.storage.from('gacha-cards').getPublicUrl(filename);
+    return data.publicUrl;
+  } catch(e) {
+    console.error('gSaveCard error:', e);
+    return null;
+  }
+}
+
 async function gDoShare(){
   if(!gResult)return;
   const rk=RR[gResult._rk];const isEn=gLang==='en';
-  const shareUrl=`https://mygearmyboard.com/gacha-share?pedal_id=${gResult.id}&rk=${gResult._rk}&slug=${encodeURIComponent(gResult.slug||'')}`;
+
+  // Canvas生成 → ストレージ保存 → gacha-shareURLに反映
+  const baseShareUrl=`https://mygearmyboard.com/gacha-share?pedal_id=${gResult.id}&rk=${gResult._rk}&slug=${encodeURIComponent(gResult.slug||'')}`;
+  let shareUrl = baseShareUrl;
+  try {
+    const canvas = await gGenerateCard(gResult);
+    const cardUrl = await gSaveCard(canvas, gResult);
+    // cardUrlが取れた場合もbaseShareUrlのまま（gacha-share.jsがgacha-cardsから取得する）
+    // カード保存失敗時はそのままbaseShareUrl（og:imageはデフォルトOGPになる）
+  } catch(e) {
+    console.error('share card error:', e);
+  }
+
   const text=isEn
     ?`GACHA Result [${rk.l}] Met "${gResult.model}"!\n#MGMB #guitarpedals\n${shareUrl}`
     :`GACHA結果【${rk.l}】「${gResult.model}」と出会った！\n#MGMB #エフェクター\n${shareUrl}`;
