@@ -37,7 +37,7 @@ async function makeOgpImage(imageUrl) {
   const OGP_H = 630;
   // Xは中央2:1クロップ表示のため、縦方向に十分な余白を確保
   // 画像エリアは中央500x500以内に収める
-  const MAX_IMG = 460;
+  const MAX_IMG = 300;
 
   const buf = await fetchImage(imageUrl);
 
