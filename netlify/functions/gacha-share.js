@@ -1,66 +1,15 @@
 // gacha-share.js
-// GET /gacha-share?pedal_id=xxx&rk=SSR&slug=xxx → 動的OGP HTML → /pedal?slug=xxx にリダイレクト
-// GET /gacha-share?pedal_id=xxx&img=1 → 1200x630 SVG OGP画像を返す（sharp不使用）
+// GET /gacha-share?pedal_id=xxx&rk=SSR&slug=xxx
+// → ペダル画像をog:imageに使った動的OGP HTML → /pedal?slug=xxx にリダイレクト
 
 const { createClient } = require('@supabase/supabase-js');
-const https = require('https');
-const http = require('http');
 
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ||
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const SITE_URL = 'https://mygearmyboard.com';
 const DEFAULT_OGP = `${SITE_URL}/ogp.png`;
-
 const RK_LABEL = { SSR:'LEGENDARY', SR:'EXPERT', Sp:'SPECIALIST', Std:'STANDARD' };
-const RK_COLOR = { SSR:'#ffd700', SR:'#a855f7', Sp:'#f97316', Std:'#6e6c68' };
-
-function fetchBuffer(url) {
-  return new Promise((resolve, reject) => {
-    const client = url.startsWith('https') ? https : http;
-    client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        fetchBuffer(res.headers.location).then(resolve).catch(reject);
-        return;
-      }
-      const chunks = [];
-      res.on('data', c => chunks.push(c));
-      res.on('end', () => resolve({
-        buf: Buffer.concat(chunks),
-        contentType: res.headers['content-type'] || 'image/jpeg'
-      }));
-      res.on('error', reject);
-    }).on('error', reject);
-  });
-}
-
-// ペダル画像をBase64化して1200x630のSVGに埋め込む（sharp不使用）
-async function makeOgpSvg(imageUrl, rk) {
-  const W = 1200, H = 630;
-  const color = RK_COLOR[rk] || '#6e6c68';
-  const label = RK_LABEL[rk] || 'STANDARD';
-
-  let imgTag = '';
-  try {
-    const { buf, contentType } = await fetchBuffer(imageUrl);
-    const b64 = buf.toString('base64');
-    const dataUrl = `data:${contentType};base64,${b64}`;
-    // ペダル画像を中央500x500エリアに配置（preserveAspectRatioでcontain）
-    imgTag = `<image href="${dataUrl}" x="350" y="65" width="500" height="500" preserveAspectRatio="xMidYMid meet"/>`;
-  } catch(e) {
-    console.error('image fetch failed:', e.message);
-  }
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}">
-  <rect width="${W}" height="${H}" fill="white"/>
-  <rect width="${W}" height="50" fill="${color}"/>
-  <text x="600" y="34" font-family="Arial,sans-serif" font-size="22" font-weight="bold" fill="white" text-anchor="middle">${rk} / ${label}</text>
-  ${imgTag}
-  <rect y="580" width="${W}" height="50" fill="#151517"/>
-  <text x="600" y="612" font-family="Arial,sans-serif" font-size="18" fill="#e8552d" text-anchor="middle" font-weight="bold">MY GEAR MY BOARD</text>
-</svg>`;
-}
 
 exports.handler = async (event) => {
   const p = event.queryStringParameters || {};
@@ -72,29 +21,6 @@ exports.handler = async (event) => {
     return { statusCode: 302, headers: { Location: SITE_URL }, body: '' };
   }
 
-  // ★ 画像モード（?img=1）→ SVGを返す
-  if (p.img === '1') {
-    try {
-      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data } = await sb.from('pedals').select('image_url').eq('id', parseInt(pedalId)).maybeSingle();
-      if (data && data.image_url) {
-        const svg = await makeOgpSvg(data.image_url, rk);
-        return {
-          statusCode: 200,
-          headers: {
-            'Content-Type': 'image/svg+xml',
-            'Cache-Control': 'public, max-age=86400'
-          },
-          body: svg,
-        };
-      }
-    } catch (e) {
-      console.error('img mode error:', e);
-    }
-    return { statusCode: 302, headers: { Location: DEFAULT_OGP }, body: '' };
-  }
-
-  // ★ OGPページモード
   const redirectTo = slug
     ? `${SITE_URL}/pedal?slug=${encodeURIComponent(slug)}`
     : SITE_URL;
@@ -102,9 +28,12 @@ exports.handler = async (event) => {
   let pedal = null;
   try {
     const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-    const { data } = await sb.from('pedals').select('id,brand,model,full_name,image_url,slug').eq('id', parseInt(pedalId)).maybeSingle();
+    const { data } = await sb.from('pedals')
+      .select('id,brand,model,full_name,image_url,slug')
+      .eq('id', parseInt(pedalId))
+      .maybeSingle();
     pedal = data;
-  } catch (e) {
+  } catch(e) {
     console.error('gacha-share error:', e);
   }
 
@@ -112,13 +41,7 @@ exports.handler = async (event) => {
   const pedalName = pedal ? pedal.full_name : 'Unknown Pedal';
   const brand = pedal ? (pedal.brand || '') : '';
   const model = pedal ? (pedal.model || '') : '';
-
-  // OGP画像：gacha-cardsバケットに保存済みのカード画像を使用
-  // カードがない場合はペダル直URL→デフォルトOGPの順でフォールバック
-  const cardFilename = `gacha_${pedalId}_${rk}.jpg`;
-  const cardImageUrl = `${SUPABASE_URL}/storage/v1/object/public/gacha-cards/${cardFilename}`;
-  const pedalImageUrl = (pedal && pedal.image_url) ? pedal.image_url : null;
-  const ogImage = pedalImageUrl ? cardImageUrl : DEFAULT_OGP;
+  const ogImage = (pedal && pedal.image_url) ? pedal.image_url : DEFAULT_OGP;
 
   const title = `【${rk} / ${rkLabel}】${pedalName} | MGMB GEAR GACHA`;
   const description = `${brand} ${model} が出た！ ガチャでペダルと出会おう。 #MGMB #エフェクター`;
@@ -136,10 +59,8 @@ exports.handler = async (event) => {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${esc(ogImage)}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
 <meta property="og:site_name" content="My Gear My Board">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@MGMBpedalboard">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
@@ -158,7 +79,7 @@ exports.handler = async (event) => {
     statusCode: 200,
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'public, max-age=60'
+      'Cache-Control': 'public, max-age=300'
     },
     body: html
   };
