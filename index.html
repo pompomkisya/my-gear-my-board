@@ -1896,157 +1896,19 @@ function _initMuteState(){
 window.gToggleMute=gToggleMute;
 
 // ★ ガチャカードCanvas生成
-// ★ Canvas でガチャカード生成（1200x630、レアリティ帯付き）
-async function gGenerateCard(p) {
-  gDebugToast('🔄 generateCard start');
-  const rkColors = {SSR:'#ffd700',SR:'#a855f7',Sp:'#f97316',Std:'#6e6c68'};
-  const color = rkColors[p._rk] || '#6e6c68';
-  const label = {SSR:'LEGENDARY',SR:'EXPERT',Sp:'SPECIALIST',Std:'STANDARD'}[p._rk] || 'STANDARD';
-  const W = 630, H = 315;
-
-  try {
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  gDebugToast('🔄 canvas ok');
-
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, W, 60);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 26px Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText(`${p._rk} / ${label}`, W/2, 42);
-  gDebugToast('🔄 header ok, fetching image...');
-
-  const imgSrc = gPedalImgSrc(p);
-  try {
-    let dataUrl = null;
-    const res = await fetch('/.netlify/functions/image-proxy?url=' + encodeURIComponent(imgSrc));
-    if (res.ok) {
-      const data = await res.json();
-      if (data.base64) dataUrl = 'data:' + (data.contentType||'image/jpeg') + ';base64,' + data.base64;
-      else gDebugToast('⚠️ proxy: no base64');
-    } else {
-      gDebugToast('⚠️ proxy HTTP: ' + res.status);
-    }
-    if (dataUrl) {
-      gDebugToast('🔄 image dataUrl ok, drawing...');
-      const img = await new Promise((resolve, reject) => {
-        const i = new Image();
-        i.onload = () => resolve(i);
-        i.onerror = reject;
-        i.src = dataUrl;
-      });
-      const maxW = 500, maxH = 500;
-      const scale = Math.min(maxW/img.width, maxH/img.height);
-      const dw = Math.round(img.width * scale);
-      const dh = Math.round(img.height * scale);
-      const dx = Math.round((W - dw) / 2);
-      const dy = Math.round(60 + (500 - dh) / 2 + 10);
-      ctx.drawImage(img, dx, dy, dw, dh);
-      gDebugToast('🔄 image drawn ok');
-    }
-  } catch(e) {
-    gDebugToast('⚠️ image err: ' + e.message);
-  }
-
-  ctx.fillStyle = '#151517';
-  ctx.fillRect(0, H - 60, W, 60);
-  ctx.fillStyle = '#e8552d';
-  ctx.font = 'bold 22px Arial, sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('MY GEAR MY BOARD', W/2, H - 20);
-  ctx.fillStyle = '#333333';
-  ctx.font = '18px Arial, sans-serif';
-  ctx.fillText(p.brand || '', W/2, H - 75);
-  ctx.font = 'bold 22px Arial, sans-serif';
-  ctx.fillStyle = '#111111';
-  let modelText = p.model || '';
-  while (ctx.measureText(modelText).width > 800 && modelText.length > 0) modelText = modelText.slice(0,-1);
-  if (modelText !== p.model) modelText += '…';
-  ctx.fillText(modelText, W/2, H - 50);
-
-  gDebugToast('✅ generateCard complete');
-  return canvas;
-
-  } catch(e) {
-    gDebugToast('❌ generateCard error: ' + (e.message||String(e)));
-    throw e;
-  }
-}
-
-// ★ gacha-cardsバケットに保存してURLを返す
-async function gSaveCard(canvas, p) {
-  try {
-    gDebugToast('🔄 saving...');
-    const b64 = canvas.toDataURL('image/jpeg', 0.88);
-    if (!b64 || b64.length < 100) { gDebugToast('❌ toDataURL失敗'); return null; }
-    gDebugToast('🔄 b64 ok len=' + b64.length);
-    const byteStr = atob(b64.split(',')[1]);
-    const ab = new ArrayBuffer(byteStr.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteStr.length; i++) ia[i] = byteStr.charCodeAt(i);
-    const blob = new Blob([ab], {type:'image/jpeg'});
-    const filename = `gacha_${p.id}_${p._rk}.jpg`;
-    gDebugToast('🔄 uploading ' + filename);
-    const sbCard = supabase.createClient(
-      'https://yzqfockzgyfjmngygbhp.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g'
-    );
-    const {error} = await sbCard.storage.from('gacha-cards').upload(filename, blob, {contentType:'image/jpeg', upsert:true});
-    if (error) { gDebugToast('❌ upload: ' + error.message + ' code=' + error.statusCode); return null; }
-    const {data} = sbCard.storage.from('gacha-cards').getPublicUrl(filename);
-    gDebugToast('✅ saved: ' + filename);
-    return data.publicUrl;
-  } catch(e) {
-    gDebugToast('❌ catch: ' + (e.message||String(e)));
-    return null;
-  }
-}
-
 async function gDoShare(){
   if(!gResult)return;
   const rk=RR[gResult._rk];const isEn=gLang==='en';
-
   const shareUrl=`https://mygearmyboard.com/gacha-share?pedal_id=${gResult.id}&rk=${gResult._rk}&slug=${encodeURIComponent(gResult.slug||'')}`;
   const text=isEn
     ?`GACHA Result [${rk.l}] Met "${gResult.model}"!\n#MGMB #guitarpedals\n${shareUrl}`
     :`GACHA結果【${rk.l}】「${gResult.model}」と出会った！\n#MGMB #エフェクター\n${shareUrl}`;
-
-  // ★ シェアを先に実行（レスポンス優先）
   try{
     if(navigator.share)await navigator.share({title:'MGMB GEAR GACHA',text});
     else{await navigator.clipboard.writeText(text).catch(()=>{});alert(isEn?'Copied!':'コピーしました');}
   }catch(e){if(e.name!=='AbortError')navigator.clipboard.writeText(text).catch(()=>{});}
-
-  // ★ Canvas生成・保存はバックグラウンドで（次回シェア時にOGP画像が使われる）
-  // まず最小Canvas(1x1)でgSaveCardが動くか確認
-  try {
-    const testCanvas = document.createElement('canvas');
-    testCanvas.width = 10; testCanvas.height = 10;
-    const testCtx = testCanvas.getContext('2d');
-    testCtx.fillStyle = '#ff0000';
-    testCtx.fillRect(0,0,10,10);
-    gDebugToast('🔄 test canvas ok, saving...');
-    const url = await gSaveCard(testCanvas, gResult);
-    if(url) {
-      gDebugToast('✅ test save ok! now generating full card...');
-      gGenerateCard(gResult).then(c=>gSaveCard(c,gResult)).catch(e=>gDebugToast('❌ full card: '+e.message));
-    }
-  } catch(e) {
-    gDebugToast('❌ test canvas: '+(e.message||String(e)));
-  }
 }
 
-function gDebugToast(msg){
-  // 画面上部に赤いデバッグメッセージを表示
-  let el=document.getElementById('g-debug-toast');
-  if(!el){el=document.createElement('div');el.id='g-debug-toast';el.style.cssText='position:fixed;top:60px;left:10px;right:10px;background:rgba(200,0,0,.9);color:#fff;padding:10px 14px;border-radius:6px;font-size:12px;z-index:9999;word-break:break-all';document.body.appendChild(el);}
-  el.textContent=msg;el.style.display='block';
-  setTimeout(()=>{if(el)el.style.display='none';},8000);
-}
 
 async function gDoSave(){
   if(!gResult)return;const isEn=gLang==='en';
