@@ -1904,23 +1904,22 @@ async function gGenerateCard(p) {
   const label = {SSR:'LEGENDARY',SR:'EXPERT',Sp:'SPECIALIST',Std:'STANDARD'}[p._rk] || 'STANDARD';
   const W = 1200, H = 630;
 
+  try {
   const canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
+  gDebugToast('🔄 canvas ok');
 
-  // 白背景
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, W, H);
-
-  // 上部レアリティ帯
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, W, 60);
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 26px Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText(`${p._rk} / ${label}`, W/2, 42);
+  gDebugToast('🔄 header ok, fetching image...');
 
-  // ペダル画像（image-proxy経由でBase64取得）
   const imgSrc = gPedalImgSrc(p);
   try {
     let dataUrl = null;
@@ -1933,13 +1932,13 @@ async function gGenerateCard(p) {
       gDebugToast('⚠️ proxy HTTP: ' + res.status);
     }
     if (dataUrl) {
+      gDebugToast('🔄 image dataUrl ok, drawing...');
       const img = await new Promise((resolve, reject) => {
         const i = new Image();
         i.onload = () => resolve(i);
         i.onerror = reject;
         i.src = dataUrl;
       });
-      // 中央エリア(500x500)にfitして描画
       const maxW = 500, maxH = 500;
       const scale = Math.min(maxW/img.width, maxH/img.height);
       const dw = Math.round(img.width * scale);
@@ -1947,23 +1946,20 @@ async function gGenerateCard(p) {
       const dx = Math.round((W - dw) / 2);
       const dy = Math.round(60 + (500 - dh) / 2 + 10);
       ctx.drawImage(img, dx, dy, dw, dh);
+      gDebugToast('🔄 image drawn ok');
     }
   } catch(e) {
-    console.warn('gGenerateCard image error:', e.message);
+    gDebugToast('⚠️ image err: ' + e.message);
   }
 
-  // 下部MGMBバー
   ctx.fillStyle = '#151517';
   ctx.fillRect(0, H - 60, W, 60);
   ctx.fillStyle = '#e8552d';
   ctx.font = 'bold 22px Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('MY GEAR MY BOARD', W/2, H - 20);
-
-  // ブランド名・モデル名
   ctx.fillStyle = '#333333';
   ctx.font = '18px Arial, sans-serif';
-  ctx.textAlign = 'center';
   ctx.fillText(p.brand || '', W/2, H - 75);
   ctx.font = 'bold 22px Arial, sans-serif';
   ctx.fillStyle = '#111111';
@@ -1972,7 +1968,13 @@ async function gGenerateCard(p) {
   if (modelText !== p.model) modelText += '…';
   ctx.fillText(modelText, W/2, H - 50);
 
+  gDebugToast('✅ generateCard complete');
   return canvas;
+
+  } catch(e) {
+    gDebugToast('❌ generateCard error: ' + (e.message||String(e)));
+    throw e;
+  }
 }
 
 // ★ gacha-cardsバケットに保存してURLを返す
