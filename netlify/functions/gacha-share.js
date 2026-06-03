@@ -31,18 +31,16 @@ function fetchImage(url) {
   });
 }
 
-// ペダル画像を1200x630白背景中央配置のJPEGにして返す
+// ペダル画像を1200x630白背景にfit:containで配置
 async function makeOgpImage(imageUrl) {
   const OGP_W = 1200;
   const OGP_H = 630;
-  // Xは中央2:1クロップ表示のため、縦方向に十分な余白を確保
-  // 画像エリアは中央500x500以内に収める
-  const MAX_IMG = 300;
 
   const buf = await fetchImage(imageUrl);
 
+  // 高さ630に合わせてリサイズ（幅は比率維持、1200超えたら幅基準）
   const resized = await sharp(buf)
-    .resize(MAX_IMG, MAX_IMG, { fit: 'inside', withoutEnlargement: false })
+    .resize(OGP_W, OGP_H, { fit: 'inside', withoutEnlargement: false })
     .toBuffer();
 
   const meta = await sharp(resized).metadata();
