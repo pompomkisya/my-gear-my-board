@@ -113,9 +113,12 @@ exports.handler = async (event) => {
   const brand = pedal ? (pedal.brand || '') : '';
   const model = pedal ? (pedal.model || '') : '';
 
-  const ogImage = (pedal && pedal.image_url)
-    ? `${SITE_URL}/gacha-share?pedal_id=${pedalId}&rk=${rk}&img=1`
-    : DEFAULT_OGP;
+  // OGP画像：gacha-cardsバケットに保存済みのカード画像を使用
+  // カードがない場合はペダル直URL→デフォルトOGPの順でフォールバック
+  const cardFilename = `gacha_${pedalId}_${rk}.jpg`;
+  const cardImageUrl = `${SUPABASE_URL}/storage/v1/object/public/gacha-cards/${cardFilename}`;
+  const pedalImageUrl = (pedal && pedal.image_url) ? pedal.image_url : null;
+  const ogImage = pedalImageUrl ? cardImageUrl : DEFAULT_OGP;
 
   const title = `【${rk} / ${rkLabel}】${pedalName} | MGMB GEAR GACHA`;
   const description = `${brand} ${model} が出た！ ガチャでペダルと出会おう。 #MGMB #エフェクター`;
