@@ -41,7 +41,10 @@ exports.handler = async (event) => {
   const pedalName = pedal ? pedal.full_name : 'Unknown Pedal';
   const brand = pedal ? (pedal.brand || '') : '';
   const model = pedal ? (pedal.model || '') : '';
-  const ogImage = (pedal && pedal.image_url) ? pedal.image_url : DEFAULT_OGP;
+  // OGP画像：Netlify Image CDN経由で600x600正方形にリサイズ
+  const ogImage = (pedal && pedal.image_url)
+    ? `${SITE_URL}/.netlify/images?url=${encodeURIComponent(pedal.image_url)}&w=600&h=600&fit=contain`
+    : DEFAULT_OGP;
 
   const title = `【${rk} / ${rkLabel}】${pedalName} | MGMB GEAR GACHA`;
   const description = `${brand} ${model} が出た！ ガチャでペダルと出会おう。 #MGMB #エフェクター`;
@@ -59,6 +62,8 @@ exports.handler = async (event) => {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${esc(ogImage)}">
+<meta property="og:image:width" content="600">
+<meta property="og:image:height" content="600">
 <meta property="og:site_name" content="My Gear My Board">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@MGMBpedalboard">
