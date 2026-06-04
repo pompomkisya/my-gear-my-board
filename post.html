@@ -211,7 +211,7 @@ textarea.form-input{resize:vertical;min-height:80px}
     <img class="logo-img" src="IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
     <div class="logo-text">
       <div class="logo-main">My Gear My Board</div>
-      <div class="logo-sub">ペダルボードSNS</div>
+      <div class="logo-sub">ペダルボード投稿&データベース</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
@@ -375,7 +375,7 @@ function toggleLang(){
   const backBtn=document.getElementById('back-btn');
   if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧';
   const logosub=document.querySelector('.logo-sub');
-  if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
+  if(logosub)logosub.textContent=lang==='en'?'Pedalboard Posts & Database':'ペダルボード投稿&データベース';
   if(currentPost)renderPost(currentPost);
 }
 function goBack(){location.href='/';}
@@ -836,7 +836,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   },500);
   const label=document.getElementById('post-lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
   const backBtn=document.getElementById('back-btn');if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧';
-  const logosub=document.querySelector('.logo-sub');if(logosub)logosub.textContent=lang==='en'?'Pedalboard SNS':'ペダルボードSNS';
+  const logosub=document.querySelector('.logo-sub');if(logosub)logosub.textContent=lang==='en'?'Pedalboard Posts & Database':'ペダルボード投稿&データベース';
   loadPost();
 });
 </script>
