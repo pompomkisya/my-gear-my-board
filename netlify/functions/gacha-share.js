@@ -1,8 +1,11 @@
 // gacha-share.js
-// GET /gacha-share?pedal_id=xxx&rk=SSR&slug=xxx
-// → ペダル画像をog:imageに使った動的OGP HTML → /pedal?slug=xxx にリダイレクト
+// GET /gacha-share?pedal_id=xxx&rk=SSR&slug=xxx → 動的OGP HTML
+// GET /gacha-share?pedal_id=xxx&rk=xxx&img=1 → 1200x630 JPEG画像
 
 const { createClient } = require('@supabase/supabase-js');
+const https = require('https');
+const http = require('http');
+const Jimp = require('jimp');
 
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ||
@@ -10,6 +13,46 @@ const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY ||
 const SITE_URL = 'https://mygearmyboard.com';
 const DEFAULT_OGP = `${SITE_URL}/ogp.png`;
 const RK_LABEL = { SSR:'LEGENDARY', SR:'EXPERT', Sp:'SPECIALIST', Std:'STANDARD' };
+
+function fetchBuffer(url) {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith('https') ? https : http;
+    client.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        fetchBuffer(res.headers.location).then(resolve).catch(reject);
+        return;
+      }
+      const chunks = [];
+      res.on('data', c => chunks.push(c));
+      res.on('end', () => resolve(Buffer.concat(chunks)));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+async function makeOgpJpeg(imageUrl) {
+  const W = 1200, H = 630;
+
+  // 白背景キャンバス作成
+  const canvas = new Jimp(W, H, 0xffffffff);
+
+  // ペダル画像取得・リサイズ
+  const buf = await fetchBuffer(imageUrl);
+  const pedal = await Jimp.read(buf);
+
+  // 上下80pxの余白を確保してfit
+  const maxW = W - 160;
+  const maxH = H - 160;
+  pedal.scaleToFit(maxW, maxH);
+
+  // 中央配置
+  const x = Math.round((W - pedal.getWidth()) / 2);
+  const y = Math.round((H - pedal.getHeight()) / 2);
+  canvas.composite(pedal, x, y);
+
+  // JPEGバッファとして返す
+  return canvas.getBufferAsync(Jimp.MIME_JPEG);
+}
 
 exports.handler = async (event) => {
   const p = event.queryStringParameters || {};
@@ -21,6 +64,30 @@ exports.handler = async (event) => {
     return { statusCode: 302, headers: { Location: SITE_URL }, body: '' };
   }
 
+  // ★ 画像モード（?img=1）→ 1200x630 JPEGを返す
+  if (p.img === '1') {
+    try {
+      const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data } = await sb.from('pedals').select('image_url').eq('id', parseInt(pedalId)).maybeSingle();
+      if (data && data.image_url) {
+        const jpegBuf = await makeOgpJpeg(data.image_url);
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'image/jpeg',
+            'Cache-Control': 'public, max-age=86400'
+          },
+          body: jpegBuf.toString('base64'),
+          isBase64Encoded: true
+        };
+      }
+    } catch(e) {
+      console.error('img mode error:', e.message);
+    }
+    return { statusCode: 302, headers: { Location: DEFAULT_OGP }, body: '' };
+  }
+
+  // ★ OGPページモード
   const redirectTo = slug
     ? `${SITE_URL}/pedal?slug=${encodeURIComponent(slug)}`
     : SITE_URL;
@@ -41,9 +108,8 @@ exports.handler = async (event) => {
   const pedalName = pedal ? pedal.full_name : 'Unknown Pedal';
   const brand = pedal ? (pedal.brand || '') : '';
   const model = pedal ? (pedal.model || '') : '';
-  // OGP画像：Netlify Image CDN経由で600x600正方形にリサイズ
   const ogImage = (pedal && pedal.image_url)
-    ? `${SITE_URL}/.netlify/images?url=${encodeURIComponent(pedal.image_url)}&w=600&h=600&fit=contain`
+    ? `${SITE_URL}/gacha-share?pedal_id=${pedalId}&rk=${rk}&img=1`
     : DEFAULT_OGP;
 
   const title = `【${rk} / ${rkLabel}】${pedalName} | MGMB GEAR GACHA`;
@@ -62,10 +128,10 @@ exports.handler = async (event) => {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:image" content="${esc(ogImage)}">
-<meta property="og:image:width" content="600">
-<meta property="og:image:height" content="600">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:site_name" content="My Gear My Board">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@MGMBpedalboard">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(description)}">
@@ -84,7 +150,7 @@ exports.handler = async (event) => {
     statusCode: 200,
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'public, max-age=300'
+      'Cache-Control': 'public, max-age=60'
     },
     body: html
   };
