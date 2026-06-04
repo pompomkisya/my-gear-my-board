@@ -1,2 +1,5 @@
 [[plugins]]
 package = "@netlify/plugin-functions-install-core"
+
+[[images]]
+  remote_images = ["https://yzqfockzgyfjmngygbhp\.supabase\.co/.*"]
