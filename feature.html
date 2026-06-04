@@ -78,7 +78,7 @@ header{position:sticky;top:0;z-index:300;display:flex;flex-direction:column;back
       <img src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
       <div>
         <div class="header-title">MY GEAR MY BOARD</div>
-        <div class="header-sub" id="header-sub">ペダルボードSNS</div>
+        <div class="header-sub" id="header-sub">ペダルボード投稿&データベース</div>
       </div>
     </a>
     <div class="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
@@ -106,12 +106,12 @@ function detectLang(){const s=localStorage.getItem('mgmb_lang');if(s)return s;co
 let lang=detectLang();
 
 const I18N={
-  ja:{headerSub:'ペダルボードSNS',home:'ホーム',gacha:'🎲 ペダルガチャ',langLabel:'EN',
+  ja:{headerSub:'ペダルボード投稿&データベース',home:'ホーム',gacha:'🎲 ペダルガチャ',langLabel:'EN',
       bcHome:'ホーム',featureTag:'✨ 特集',pedalSection:'🎛 収録ペダル',
       pedalCount:'ペダル',pedalCountUnit:'件',
       notFound:'特集が見つかりませんでした',backHome:'← ホームに戻る',
       empty:'ペダルが登録されていません'},
-  en:{headerSub:'Pedalboard SNS',home:'Home',gacha:'🎲 Pedal Gacha',langLabel:'JA',
+  en:{headerSub:'Pedalboard Posts & Database',home:'Home',gacha:'🎲 Pedal Gacha',langLabel:'JA',
       bcHome:'Home',featureTag:'✨ Feature',pedalSection:'🎛 Pedals in this feature',
       pedalCount:'',pedalCountUnit:' pedals',
       notFound:'Feature not found',backHome:'← Back to Home',
