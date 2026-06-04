@@ -507,9 +507,9 @@ async function handleYouTube(pedal){
 }
 
 const RECOMMEND_LIMIT=4;
-let recommendOffset=0,recommendPedalId=null,recommendTypes=[];
+let recommendOffset=0,recommendPedalId=null,recommendTypes=[],recommendSeenIds=new Set();
 async function loadRecommendedPedals(pedal){
-  recommendOffset=0;recommendPedalId=pedal.id;recommendTypes=pedal.types||[];
+  recommendOffset=0;recommendPedalId=pedal.id;recommendTypes=pedal.types||[];recommendSeenIds=new Set();
   const detailEl=document.getElementById('content');if(!detailEl)return;
   const recSection=document.createElement('div');
   recSection.id='recommend-section';recSection.style.cssText='margin-top:16px';
@@ -519,12 +519,26 @@ async function loadRecommendedPedals(pedal){
 }
 async function fetchRecommended(){
   if(!recommendTypes.length)return;
+  const STORAGE='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/';
   const{data,count}=await db.from('pedals').select('id,brand,model,slug,types,image_url,description,view_count',{count:'exact'}).contains('types',[recommendTypes[0]]).not('id','eq',recommendPedalId).not('description','is',null).not('youtube_video_id','is',null).order('view_count',{ascending:false,nullsFirst:false}).range(recommendOffset,recommendOffset+RECOMMEND_LIMIT-1);
   const grid=document.getElementById('recommend-grid');if(!grid)return;
-  if(!data||!data.length){if(recommendOffset===0)grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:24px;font-size:13px;color:var(--td)">${tr('recommendEmpty')}</div>`;return;}
-  const STORAGE='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/';
-  data.forEach(p=>{
-    let imgHtml=p.image_url?`<img src="${p.image_url}" alt="${p.model}" loading="lazy" style="width:100%;height:100%;object-fit:contain">`:(p.types&&p.types[0]?`<img src="${STORAGE}type_${p.types[0]}.png" alt="" loading="lazy" style="width:60%;height:60%;object-fit:contain;opacity:.4">`:`<span style="font-size:28px;opacity:.2">🎛</span>`);
+  const newData=(data||[]).filter(p=>!recommendSeenIds.has(p.id));
+  if(!newData.length){if(recommendOffset===0)grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:24px;font-size:13px;color:var(--td)">${tr('recommendEmpty')}</div>`;return;}
+  newData.forEach(p=>{
+    recommendSeenIds.add(p.id);
+    const typeIcon=p.types&&p.types[0]?`${STORAGE}type_${p.types[0]}.png`:'';
+    // image_url があれば試みる。失敗時はタイプアイコン→🎛の順でフォールバック
+    let imgHtml;
+    if(p.image_url){
+      const fallback=typeIcon
+        ?`this.onerror=function(){this.style.display='none';this.nextElementSibling.style.display='flex'};this.src='${typeIcon}'`
+        :`this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'`;
+      imgHtml=`<img src="${p.image_url}" alt="${p.model}" loading="lazy" style="width:100%;height:100%;object-fit:contain" onerror="${fallback}"><span style="display:none;font-size:28px;opacity:.2;width:100%;height:100%;align-items:center;justify-content:center">🎛</span>`;
+    }else if(typeIcon){
+      imgHtml=`<img src="${typeIcon}" alt="" loading="lazy" style="width:60%;height:60%;object-fit:contain;opacity:.4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none;font-size:28px;opacity:.2;width:100%;height:100%;align-items:center;justify-content:center">🎛</span>`;
+    }else{
+      imgHtml=`<span style="font-size:28px;opacity:.2">🎛</span>`;
+    }
     const card=document.createElement('a');
     card.href=`/pedal?slug=${p.slug}`;
     card.style.cssText='background:var(--sf2);border:1px solid var(--bd);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--tx);display:block;transition:border-color .2s';
