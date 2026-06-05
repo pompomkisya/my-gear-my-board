@@ -879,8 +879,8 @@ async function loadPedal() {
   document.getElementById('bc-pedal').textContent=pedal.model;
   document.title=`${pedal.full_name} | My Gear My Board`;
 
-  const pedalDesc=pedal.description?pedal.description.replace(/<[^>]+>/g,'').slice(0,120)+'...':
-    `${pedal.full_name}のペダル詳細ページ。使用ボードや購入リンクをチェック。`;
+  const pedalDesc=pedal.description?pedal.description.replace(/<[^>]+>/g,'').slice(0,120)+'...  | Also available in English':
+    `${pedal.full_name}のペダル詳細ページ。使用ボードや購入リンクをチェック。 | Also available in English`;
   const pedalDescEn=pedal.description_en?pedal.description_en.replace(/<[^>]+>/g,'').slice(0,120)+'...':
     `${pedal.full_name} pedal details. Check boards and purchase links.`;
   const finalDesc=lang==='en'?pedalDescEn:pedalDesc;
