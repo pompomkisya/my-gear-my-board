@@ -582,10 +582,18 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
       <div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:20px;margin-bottom:16px">
         <div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--ac);margin-bottom:14px">⚙️ 実行オプション</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+          <input class="form-input" id="rb-brand-filter" type="text" placeholder="🏷 ブランドで絞る（空欄=全件）" style="max-width:280px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td)">例: Effects Bakery</span>
+        </div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)">
             <input type="checkbox" id="rb-opt-skip-existing" checked style="accent-color:var(--ac)">
-            画像あり（手動入力済み）はスキップ
+            画像あり（すべてのソース）はスキップ
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)">
+            <input type="checkbox" id="rb-opt-skip-manual" checked style="accent-color:var(--ac)">
+            手動入力済みのみスキップ（楽天取得済みは上書き可）
           </label>
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tm)">
             <input type="checkbox" id="rb-opt-skip-searched" checked style="accent-color:var(--ac)">
@@ -828,6 +836,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
     <div class="pedal-edit-actions">
       <button class="submit-btn" onclick="savePedalEdit()">💾 保存</button>
+      <button class="fetch-btn" id="modal-rakuten-btn" onclick="fetchRakutenImageForEdit()" style="background:var(--sf2);border-color:rgba(232,85,45,.4);color:var(--ac)">🛒 楽天から画像取得</button>
       <button class="del-btn" onclick="deletePedalFromEdit()">🗑 このペダルを削除</button>
       <button class="fetch-btn" onclick="closePedalEdit()">キャンセル</button>
     </div>
@@ -1492,6 +1501,68 @@ function richCmd(editorId,tag){
   else{const selectedText=range.toString();const el=document.createElement(tag);if(selectedText){range.deleteContents();el.textContent=selectedText;}else{el.textContent=tag==='h2'?'見出し':tag==='h3'?'小見出し':'テキスト';}range.insertNode(el);range.setStartAfter(el);range.setEndAfter(el);sel.removeAllRanges();sel.addRange(range);}
 }
 
+// ★ ひらがな・カタカナ→ローマ字変換
+function toRomaji(str){
+  const m={
+    'キャ':'kya','キュ':'kyu','キョ':'kyo','シャ':'sha','シュ':'shu','ショ':'sho',
+    'チャ':'cha','チュ':'chu','チョ':'cho','ニャ':'nya','ニュ':'nyu','ニョ':'nyo',
+    'ヒャ':'hya','ヒュ':'hyu','ヒョ':'hyo','ミャ':'mya','ミュ':'myu','ミョ':'myo',
+    'リャ':'rya','リュ':'ryu','リョ':'ryo','ギャ':'gya','ギュ':'gyu','ギョ':'gyo',
+    'ジャ':'ja','ジュ':'ju','ジョ':'jo','ビャ':'bya','ビュ':'byu','ビョ':'byo',
+    'ピャ':'pya','ピュ':'pyu','ピョ':'pyo',
+    'きゃ':'kya','きゅ':'kyu','きょ':'kyo','しゃ':'sha','しゅ':'shu','しょ':'sho',
+    'ちゃ':'cha','ちゅ':'chu','ちょ':'cho','にゃ':'nya','にゅ':'nyu','にょ':'nyo',
+    'ひゃ':'hya','ひゅ':'hyu','ひょ':'hyo','みゃ':'mya','みゅ':'myu','みょ':'myo',
+    'りゃ':'rya','りゅ':'ryu','りょ':'ryo','ぎゃ':'gya','ぎゅ':'gyu','ぎょ':'gyo',
+    'じゃ':'ja','じゅ':'ju','じょ':'jo','びゃ':'bya','びゅ':'byu','びょ':'byo',
+    'ぴゃ':'pya','ぴゅ':'pyu','ぴょ':'pyo',
+    'ア':'a','イ':'i','ウ':'u','エ':'e','オ':'o',
+    'カ':'ka','キ':'ki','ク':'ku','ケ':'ke','コ':'ko',
+    'サ':'sa','シ':'shi','ス':'su','セ':'se','ソ':'so',
+    'タ':'ta','チ':'chi','ツ':'tsu','テ':'te','ト':'to',
+    'ナ':'na','ニ':'ni','ヌ':'nu','ネ':'ne','ノ':'no',
+    'ハ':'ha','ヒ':'hi','フ':'fu','ヘ':'he','ホ':'ho',
+    'マ':'ma','ミ':'mi','ム':'mu','メ':'me','モ':'mo',
+    'ヤ':'ya','ユ':'yu','ヨ':'yo',
+    'ラ':'ra','リ':'ri','ル':'ru','レ':'re','ロ':'ro',
+    'ワ':'wa','ヲ':'wo','ン':'n',
+    'ガ':'ga','ギ':'gi','グ':'gu','ゲ':'ge','ゴ':'go',
+    'ザ':'za','ジ':'ji','ズ':'zu','ゼ':'ze','ゾ':'zo',
+    'ダ':'da','ヂ':'ji','ヅ':'zu','デ':'de','ド':'do',
+    'バ':'ba','ビ':'bi','ブ':'bu','ベ':'be','ボ':'bo',
+    'パ':'pa','ピ':'pi','プ':'pu','ペ':'pe','ポ':'po',
+    'ァ':'a','ィ':'i','ゥ':'u','ェ':'e','ォ':'o','ッ':'','ー':'-',
+    'あ':'a','い':'i','う':'u','え':'e','お':'o',
+    'か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko',
+    'さ':'sa','し':'shi','す':'su','せ':'se','そ':'so',
+    'た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to',
+    'な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no',
+    'は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho',
+    'ま':'ma','み':'mi','む':'mu','め':'me','も':'mo',
+    'や':'ya','ゆ':'yu','よ':'yo',
+    'ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro',
+    'わ':'wa','を':'wo','ん':'n',
+    'が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go',
+    'ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo',
+    'だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do',
+    'ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo',
+    'ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po','っ':''
+  };
+  let result='';let i=0;
+  while(i<str.length){
+    const two=str.slice(i,i+2);
+    if(m[two]){result+=m[two];i+=2;}
+    else{const one=str[i];result+=(m[one]||one);i++;}
+  }
+  return result;
+}
+
+function generateSlug(full_name){
+  const romanized=toRomaji(full_name);
+  const slug=romanized.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  return slug||'pedal-'+Date.now();
+}
+
 async function addPedal(){
   const brand=document.getElementById('new-brand').value.trim();
   const model=document.getElementById('new-model').value.trim();
@@ -1499,15 +1570,23 @@ async function addPedal(){
   if(!brand||!model){showToast('❌ ブランド名とモデル名は必須です');return;}
   const types=typesRaw?typesRaw.split(',').map(t=>t.trim()).filter(Boolean):[];
   const full_name=brand+' '+model;
-  const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  let slug=generateSlug(full_name);
+  const{data:existing}=await sb.from('pedals').select('slug').ilike('slug',slug+'%');
+  if(existing&&existing.length>0){
+    const used=new Set(existing.map(r=>r.slug));
+    if(used.has(slug)){
+      let n=2;while(used.has(slug+'-'+n))n++;slug=slug+'-'+n;
+    }
+  }
   const{error}=await sb.from('pedals').insert({brand,model,full_name,slug,types});
   if(error){showToast('❌ 追加に失敗しました: '+error.message);return;}
-  showToast('✅ ペダルを追加しました');
+  showToast('✅ ペダルを追加しました（slug: '+slug+'）');
   document.getElementById('new-brand').value='';document.getElementById('new-model').value='';document.getElementById('new-types').value='';
-  const{data:newPedal}=await sb.from('pedals').select('*').eq('full_name',full_name).maybeSingle();
+  const{data:newPedal}=await sb.from('pedals').select('*').eq('slug',slug).maybeSingle();
   if(newPedal){allPedals.unshift(newPedal);allPedalsTotal+=1;document.getElementById('pedals-count').textContent=allPedalsTotal;}
   renderPedals();updateLoadAllBtn();
 }
+
 
 function getYouTubeIdFromUrl(url){
   if(!url)return null;
@@ -2183,12 +2262,15 @@ function initRakutenTab() {
 async function rbPreviewCount() {
   const skipExisting = document.getElementById('rb-opt-skip-existing').checked;
   const skipSearched = document.getElementById('rb-opt-skip-searched').checked;
+  const brandFilter = document.getElementById('rb-brand-filter').value.trim();
   let query = sb.from('pedals').select('id', {count:'exact', head:true});
+  if(brandFilter) query = query.ilike('brand', brandFilter);
   if(skipExisting) query = query.is('image_url', null);
   if(skipSearched) query = query.eq('rakuten_searched', false);
   const { count } = await query;
   document.getElementById('rb-stat-total').textContent = count || 0;
-  showToast('対象: ' + (count||0) + '件（全件取得して処理します）');
+  const brandMsg = brandFilter ? ' (ブランド: '+brandFilter+')' : '';
+  showToast('対象: ' + (count||0) + '件' + brandMsg);
 }
 
 // Netlify Function経由で楽天APIを呼ぶ（CORSのため）
@@ -2214,7 +2296,9 @@ function rbJudgeResult(pedalName, item) {
 
 async function rbStartBatch() {
   const skipExisting = document.getElementById('rb-opt-skip-existing').checked;
+  const skipManualOnly = document.getElementById('rb-opt-skip-manual').checked;
   const skipSearched = document.getElementById('rb-opt-skip-searched').checked;
+  const brandFilter = document.getElementById('rb-brand-filter').value.trim();
   const delay = parseInt(document.getElementById('rb-delay').value) || 1200;
 
   // 対象ペダルを全件取得（ページネーション対応）
@@ -2222,6 +2306,7 @@ async function rbStartBatch() {
   let offset = 0;
   while(true) {
     let query = sb.from('pedals').select('id,brand,model,full_name,image_url,image_source,rakuten_searched');
+    if(brandFilter) query = query.ilike('brand', brandFilter);
     if(skipExisting) query = query.is('image_url', null);
     if(skipSearched) query = query.eq('rakuten_searched', false);
     query = query.order('brand').order('model').range(offset, offset + 999);
@@ -2256,19 +2341,23 @@ async function rbStartBatch() {
     document.getElementById('rb-progress-msg').textContent =
       `[${i+1}/${pedals.length}] 検索中: ${pedal.full_name}`;
 
-    // 画像あり かつ 手動入力済みはスキップ（skipExistingがONの場合のみ）
-    if(skipExisting && pedal.image_url && pedal.image_source === 'manual') {
-      skip++;
-      document.getElementById('rb-stat-skip').textContent = skip;
-      rbResults.push({pedal, status:'skip', reason:'画像あり（手動・保護）'});
-      continue;
-    }
-    // 楽天取得済み画像はスキップ（skipExistingがONの場合のみ）
-    if(skipExisting && pedal.image_url && pedal.image_source === 'rakuten') {
-      skip++;
-      document.getElementById('rb-stat-skip').textContent = skip;
-      rbResults.push({pedal, status:'skip', reason:'画像あり（楽天取得済）'});
-      continue;
+    // 画像ありスキップ判定
+    if(pedal.image_url) {
+      const isManual = pedal.image_source === 'manual';
+      // 全画像スキップ（skipExistingがON）
+      if(skipExisting) {
+        skip++;
+        document.getElementById('rb-stat-skip').textContent = skip;
+        rbResults.push({pedal, status:'skip', reason:'画像あり（'+(isManual?'手動':'楽天取得済')+'・スキップ）'});
+        continue;
+      }
+      // 手動のみスキップ（skipManualOnlyがON）
+      if(skipManualOnly && isManual) {
+        skip++;
+        document.getElementById('rb-stat-skip').textContent = skip;
+        rbResults.push({pedal, status:'skip', reason:'画像あり（手動・保護）'});
+        continue;
+      }
     }
 
     try {
@@ -2355,6 +2444,33 @@ async function rbStartBatch() {
 function rbStopBatch() {
   rbStopFlag = true;
   showToast('停止中...');
+}
+
+// ★ 単体ペダルの楽天画像取得（編集モーダルから）
+async function fetchRakutenImageForEdit() {
+  const fullName = document.getElementById('edit-full-name').value.trim();
+  if(!fullName) { showToast('❌ 機材名を入力してください'); return; }
+  const btn = document.getElementById('modal-rakuten-btn');
+  btn.textContent = '🔍 検索中...'; btn.disabled = true;
+  try {
+    const data = await rbSearchRakuten(fullName);
+    const items = data.items || [];
+    if(!items.length) { showToast('❌ 楽天で見つかりませんでした'); return; }
+    const item = items[0];
+    const imageUrl = item.imageUrl || null;
+    const itemName = item.itemName || '';
+    const status = rbJudgeResult(fullName, item);
+    if(!imageUrl) { showToast('❌ 画像URLが取得できませんでした'); return; }
+    const statusEmoji = status==='success'?'✅':status==='warn'?'⚠️':'❌';
+    document.getElementById('edit-image-url').value = imageUrl;
+    document.getElementById('edit-image-source').value = 'rakuten';
+    previewPedalImg(imageUrl);
+    showToast(statusEmoji + ' 取得: ' + itemName.slice(0,30) + '...');
+  } catch(e) {
+    showToast('❌ エラー: ' + e.message);
+  } finally {
+    btn.textContent = '🛒 楽天から画像取得'; btn.disabled = false;
+  }
 }
 
 function rbRenderResults() {
