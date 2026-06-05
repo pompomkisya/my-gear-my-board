@@ -295,7 +295,7 @@ async function loadBrand() {
   const brandCanEl = document.getElementById('canonical');
   const brandDescText = lang==='en'
     ? `${currentBrand} effect pedals — ${totalPedals} pedals. Browse lineup and boards.`
-    : `${currentBrand}のエフェクターペダル一覧。${totalPedals}件のペダルと使用ボードをチェック。`;
+    : `${currentBrand}のエフェクターペダル一覧。${totalPedals}件のペダルと使用ボードをチェック。 | Also available in English`;
   if(brandDescEl) brandDescEl.setAttribute('content', brandDescText);
   if(brandOgEl) brandOgEl.setAttribute('content', brandDescText);
   if(brandCanEl) brandCanEl.setAttribute('href', brandUrl);
