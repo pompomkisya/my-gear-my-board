@@ -83,7 +83,13 @@ exports.handler = async function(event) {
   const customKeyword = event.queryStringParameters?.kw || null;
 
   try {
-    const searchQuery = customKeyword ? customKeyword : query + ' エフェクター';
+    // ★ クエリのサニタイズ（改行・特殊文字除去、100文字以内に制限）
+    const sanitizedQuery = query
+      .replace(/[\r\n\t]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 100);
+    const searchQuery = customKeyword ? customKeyword : sanitizedQuery + ' エフェクター';
 
     const url = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601' +
       '?applicationId=' + applicationId +
