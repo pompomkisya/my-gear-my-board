@@ -2453,7 +2453,9 @@ async function fetchRakutenImageForEdit() {
   const btn = document.getElementById('modal-rakuten-btn');
   btn.textContent = '🔍 検索中...'; btn.disabled = true;
   try {
-    const data = await rbSearchRakuten(fullName);
+    // サニタイズしてからAPI呼び出し
+    const sanitized = fullName.replace(/[\r\n\t]+/g,' ').replace(/\s+/g,' ').trim().slice(0,100);
+    const data = await rbSearchRakuten(sanitized);
     const items = data.items || [];
     if(!items.length) { showToast('❌ 楽天で見つかりませんでした'); return; }
     const item = items[0];
@@ -2906,7 +2908,8 @@ async function rbManageApplyUrl(pedalId) {
     // ★ 楽天APIで画像・商品URLを取得
     showToast('🔍 楽天から画像を取得中...');
     try {
-      const res = await fetch('/.netlify/functions/rakuten?q=' + encodeURIComponent(pedal.full_name) + '&item_url=' + encodeURIComponent(inputUrl));
+      const sanitizedName = pedal.full_name.replace(/[\r\n\t]+/g,' ').replace(/\s+/g,' ').trim().slice(0,100);
+      const res = await fetch('/.netlify/functions/rakuten?q=' + encodeURIComponent(sanitizedName) + '&item_url=' + encodeURIComponent(inputUrl));
       if(!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       const items = data.items || [];
