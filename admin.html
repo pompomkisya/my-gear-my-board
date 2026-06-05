@@ -1764,7 +1764,7 @@ async function savePedalEdit(){
   const rarity=document.getElementById('edit-rarity').value||null;
   if(!full_name||!brand){showToast('❌ 機材名とブランド名は必須です');return;}
   const model=full_name.startsWith(brand+' ')?full_name.slice(brand.length+1).trim():full_name;
-  const slug=full_name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  // ★ 編集保存時はslugを再生成しない（既存URLを保持するため）
   let image_url=document.getElementById('edit-image-url').value.trim()||null;
   if(image_url==='__pending__'){
     if(window._pendingPedalImageB64){msg.textContent='📤 アップロード中...';try{image_url=await uploadPedalImage(window._pendingPedalImageB64,editingPedalId);window._pendingPedalImageB64=null;msg.textContent='✅ アップロード完了';}catch(e){msg.textContent='❌ '+(e?.message||'不明なエラー');return;}}
@@ -1784,7 +1784,7 @@ async function savePedalEdit(){
   const description_en=document.getElementById('edit-desc-en').innerHTML.trim()||null;
   const ytUrlInput=document.getElementById('edit-youtube-url').value.trim();
   const resetYt=document.getElementById('reset-youtube').checked;
-  const updates={full_name,brand,model,slug,types,description,description_en,rarity};
+  const updates={full_name,brand,model,types,description,description_en,rarity};
   // ★ image_urlがnull/空の場合は既存値を保持（上書きしない）
   if(image_url){updates.image_url=image_url;updates.image_source=image_source;}
   if(description||description_en)updates.updated_at=new Date().toISOString();
