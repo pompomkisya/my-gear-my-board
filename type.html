@@ -299,7 +299,7 @@ async function loadType() {
   const typeCanEl = document.getElementById('canonical');
   const typeDescText = lang==='en'
     ? `${displayName} pedals — ${total} pedals in this category. Browse lineup and boards.`
-    : `${displayName}のエフェクターペダル一覧。${total}件のペダルと使用ボードをチェック。`;
+    : `${displayName}のエフェクターペダル一覧。${total}件のペダルと使用ボードをチェック。 | Also available in English`;
   if(typeDescEl) typeDescEl.setAttribute('content', typeDescText);
   if(typeOgEl) typeOgEl.setAttribute('content', typeDescText);
   if(typeCanEl) typeCanEl.setAttribute('href', typeUrl);
