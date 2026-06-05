@@ -86,6 +86,8 @@ exports.handler = async function(event) {
     // ★ クエリのサニタイズ（改行・特殊文字除去、100文字以内に制限）
     const sanitizedQuery = query
       .replace(/[\r\n\t]+/g, ' ')
+      .replace(/&/g, 'and')
+      .replace(/[^\w\s\u3000-\u9fff\uff00-\uffef\u3040-\u309f\u30a0-\u30ff-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
       .slice(0, 100);
