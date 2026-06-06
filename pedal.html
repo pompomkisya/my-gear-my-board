@@ -818,7 +818,7 @@ async function renderReviewPanel(wrapEl, pedal, session){
     reviews.forEach(r=>{
       const isOwn=session&&r.user_id===session.user.id;
       const liked=myLikedIds.has(r.id);
-      const userLink=r.username?`<a href="/user?id=${r.user_id}" class="review-user">@${r.username}</a>`:`<span class="review-user">${tr('reviewAnon')}</span>`;
+      const userLink=r.username?`<a href="/user?username=${encodeURIComponent(r.username)}" class="review-user">@${r.username}</a>`:`<span class="review-user">${tr('reviewAnon')}</span>`;
       const starDisp=r.rating_score?`<span style="margin-left:4px">${starHTML(r.rating_score,'small')}</span>`:'';
       html+=`<div class="review-item">
         <div class="review-header">
