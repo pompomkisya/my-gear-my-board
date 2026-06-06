@@ -362,8 +362,10 @@ async function fetchPedals(reset = false) {
     .range(offset, offset + LIMIT - 1);
   if (currentSearch) {
     const searchNorm = currentSearch.replace(/\s+/g, '');
-    if (searchNorm !== currentSearch) {
-      query = query.or(`full_name.ilike.%${currentSearch}%,full_name.ilike.%${searchNorm}%`);
+    // 3文字以上かつスペースなし入力の場合は文字間に%を挿入してワイルドカード検索
+    if (searchNorm.length >= 3 && searchNorm === currentSearch) {
+      const wildcard = '%' + searchNorm.split('').join('%') + '%';
+      query = query.or(`full_name.ilike.%${currentSearch}%,full_name.ilike.${wildcard}`);
     } else {
       query = query.ilike('full_name', `%${currentSearch}%`);
     }
