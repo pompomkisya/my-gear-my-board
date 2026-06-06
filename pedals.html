@@ -360,7 +360,14 @@ async function fetchPedals(reset = false) {
     .select('id, brand, model, slug, types, image_url', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + LIMIT - 1);
-  if (currentSearch) query = query.ilike('full_name', `%${currentSearch}%`);
+  if (currentSearch) {
+    const searchNorm = currentSearch.replace(/\s+/g, '');
+    if (searchNorm !== currentSearch) {
+      query = query.or(`full_name.ilike.%${currentSearch}%,full_name.ilike.%${searchNorm}%`);
+    } else {
+      query = query.ilike('full_name', `%${currentSearch}%`);
+    }
+  }
   if (currentBrand) query = query.eq('brand', currentBrand);
   if (currentType) query = query.contains('types', [currentType]);
   const { data, count, error } = await query;
