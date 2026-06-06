@@ -377,6 +377,10 @@ function applyLangUI(){
 
   updateStepUI();
   if(allDBPosts.length){renderGearWidget(allDBPosts);renderGearWidgetMob(allDBPosts);renderRankingWidget(allDBPosts);renderRankingWidgetMob(allDBPosts);}
+  // ★ さらに読み込む / 最新に戻る ボタンテキスト更新
+  ['back-to-top-btn','back-to-top-btn-pc'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=lang==='en'?'↑ Back to top':'↑ 最新に戻る';});
+  const lmBtn=document.getElementById('load-more-btn');if(lmBtn&&!lmBtn.disabled)lmBtn.textContent=lang==='en'?'Load more':'さらに読み込む';
+  const lmBtnPc=document.getElementById('load-more-btn-pc');if(lmBtnPc&&!lmBtnPc.disabled)lmBtnPc.textContent=lang==='en'?'Load more':'さらに読み込む';
 }
 function togglePostDropdown(e){e.stopPropagation();document.getElementById('post-dropdown').classList.toggle('open');}
 function closeDropdownAndPost(type){document.getElementById('post-dropdown').classList.remove('open');openPost(type);}
@@ -428,12 +432,16 @@ function showSkeletonCards(count){
 }
 
 // ★ 修正: 先行8件表示 → バックグラウンドで全件取得
+let _postsOffset=0;const _postsPerPage=8;const _postsMax=40;
 async function loadPostsFromDB(){
+  _postsOffset=0;
   showSkeletonCards(6);
   const{data:firstBatch,error:firstError}=await sb.from('posts')
-    .select('*').order('created_at',{ascending:false}).limit(8);
+    .select('*').order('created_at',{ascending:false}).limit(_postsPerPage+1);
   if(firstError){console.error(firstError);return;}
-  allDBPosts=(firstBatch||[]).map(p=>({
+  const hasMore=(firstBatch||[]).length>_postsPerPage;
+  const batch=(firstBatch||[]).slice(0,_postsPerPage);
+  allDBPosts=batch.map(p=>({
     ...p,
     comment_count:0,
     gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
@@ -441,9 +449,45 @@ async function loadPostsFromDB(){
       types:pedalTypesMap[g.name]||[]
     }))
   }));
+  _postsOffset=allDBPosts.length;
   applyFilter();
   buildTicker(allDBPosts);
+  updateLoadMoreBtn(hasMore);
   loadAllPostsBackground();
+}
+
+async function loadMorePosts(){
+  const btn=document.getElementById('load-more-btn');if(btn){btn.disabled=true;btn.textContent=lang==='en'?'Loading...':'読み込み中...';}
+  const{data:batch}=await sb.from('posts').select('*').order('created_at',{ascending:false}).range(_postsOffset,_postsOffset+_postsPerPage);
+  if(!batch||!batch.length){updateLoadMoreBtn(false);return;}
+  const newPosts=batch.map(p=>({
+    ...p,
+    comment_count:0,
+    gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
+      ...g,
+      types:pedalTypesMap[g.name]||[]
+    }))
+  }));
+  allDBPosts=[...allDBPosts,...newPosts];
+  _postsOffset=allDBPosts.length;
+  applyFilter();
+  const hasMore=batch.length>=_postsPerPage&&allDBPosts.length<_postsMax;
+  updateLoadMoreBtn(hasMore,allDBPosts.length>=_postsMax);
+}
+
+function updateLoadMoreBtn(hasMore,isMax=false){
+  const ids=['load-more-btn','load-more-btn-pc'];
+  const backIds=['back-to-top-btn','back-to-top-btn-pc'];
+  if(isMax){
+    ids.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    backIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='block';});
+  }else if(hasMore){
+    ids.forEach(id=>{const el=document.getElementById(id);if(el){el.style.display='block';el.disabled=false;el.textContent=lang==='en'?'Load more':'さらに読み込む';}});
+    backIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  }else{
+    ids.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+    backIds.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  }
 }
 
 async function loadAllPostsBackground(){
@@ -505,6 +549,8 @@ async function loadPedalDataBackground(posts,cm){
     renderGearWidget(allDBPosts);
     renderGearWidgetMob(allDBPosts);
     pedalDataLoaded=true;
+    // ★ ガチャカードクリック待ち状態なら自動でガチャ開始
+    if(window._gachaPendingAutoStart){window._gachaPendingAutoStart=false;openGacha();}
   }catch(e){
     console.error('pedal data load error',e);
   }finally{
