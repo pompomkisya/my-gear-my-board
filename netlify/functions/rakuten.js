@@ -25,15 +25,11 @@ exports.handler = async function(event) {
       const shopCode = match[1];
       const itemCode = shopCode + ':' + match[2];
 
-      const url = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Get/20220601' +
-        '?applicationId=' + applicationId +
-        '&accessKey=' + accessKey +
-        '&itemCode=' + encodeURIComponent(itemCode) +
-        '&imageFlag=1' +
-        '&format=json' +
-        '&formatVersion=2';
+      const params1 = new URLSearchParams({ applicationId, accessKey, itemCode, imageFlag: '1', format: 'json', formatVersion: '2' });
+      const url = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Get/20220601?' + params1;
 
-      const res = await fetch(url, { headers });
+      console.log('Rakuten query URL:', url);
+    const res = await fetch(url, { headers });
 
       if (!res.ok) {
         const errorText = await res.text();
@@ -93,14 +89,8 @@ exports.handler = async function(event) {
       .slice(0, 100);
     const searchQuery = customKeyword ? customKeyword : sanitizedQuery + ' エフェクター';
 
-    const url = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601' +
-      '?applicationId=' + applicationId +
-      '&accessKey=' + accessKey +
-      '&keyword=' + encodeURIComponent(searchQuery) +
-      '&hits=5' +
-      '&imageFlag=1' +
-      '&format=json' +
-      '&formatVersion=2';
+    const params2 = new URLSearchParams({ applicationId, accessKey, keyword: searchQuery, hits: '5', imageFlag: '1', format: 'json', formatVersion: '2' });
+    const url = 'https://openapi.rakuten.co.jp/ichibams/api/IchibaItem/Search/20220601?' + params2;
 
     const res = await fetch(url, { headers });
 
