@@ -476,7 +476,11 @@ function renderPost(p){
   }else{html+='<div class="no-img">'+(isGear?'🎸':'🎛')+'</div>';}
   html+='<div class="type-badge '+(isGear?'gear':'board')+'">'+(isGear?(lang==='en'?'Gear':'機材'):(lang==='en'?'Pedalboard':'エフェクターボード'))+'</div>';
   html+='<div class="post-title">'+p.title+'</div>';
-  html+='<div class="meta"><div class="av">'+init+'</div><div class="meta-info"><div class="meta-name">'+(p.username||'匿名ユーザー')+'</div><div class="meta-time">'+timeAgo(p.created_at)+'</div></div></div>';
+  const userHref=p.username?`/user?username=${encodeURIComponent(p.username)}`:null;
+  const userNameHtml=userHref
+    ?`<a href="${userHref}" class="meta-name-link" style="color:inherit;text-decoration:none;transition:color .15s" onmouseover="this.style.color='var(--ac)'" onmouseout="this.style.color='inherit'">${p.username}</a>`
+    :(p.username||'匿名ユーザー');
+  html+='<div class="meta"><div class="av"'+(p.username?` style="cursor:pointer" onclick="location.href=\'/user?username='+encodeURIComponent(p.username)+'\'"`:'')+'>'+init+'</div><div class="meta-info"><div class="meta-name">'+userNameHtml+'</div><div class="meta-time">'+timeAgo(p.created_at)+'</div></div></div>';
   html+='<div class="actions">'
     +'<div class="act-btn'+(liked?' liked':'')+'" id="like-btn" onclick="toggleLike()">'+(liked?'❤️':'🤍')+(lang==='en'?' Like ':' いいね ')+'<span id="like-count">'+(p.likes||0)+'</span></div>'
     +'<div class="act-btn" onclick="copyUrl()">🔗 '+(lang==='en'?'Copy URL':'URLをコピー')+'</div>'
