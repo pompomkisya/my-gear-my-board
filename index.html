@@ -580,6 +580,11 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
             </div>
             <div id="card-grid-mob" style="display:contents"></div>
           </div>
+          <!-- ★ さらに読み込む / 最新に戻る -->
+          <div style="padding:0 0 12px;display:flex;gap:8px;justify-content:center">
+            <button id="load-more-btn" onclick="loadMorePosts()" style="display:none;flex:1;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">さらに読み込む</button>
+            <button id="back-to-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;flex:1;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">↑ 最新に戻る</button>
+          </div>
         </div>
       </div>
     </div>
@@ -733,6 +738,11 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div id="card-grid" style="display:contents">
       <div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)">読み込み中...</div>
     </div>
+  </div>
+  <!-- ★ さらに読み込む / 最新に戻る（PC） -->
+  <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
+    <button id="load-more-btn-pc" onclick="loadMorePosts()" style="display:none;padding:11px 32px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">さらに読み込む</button>
+    <button id="back-to-top-btn-pc" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;padding:11px 32px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">↑ 最新に戻る</button>
   </div>
 </main>
 <aside class="sr">
@@ -1193,10 +1203,21 @@ function gSetShare(v){
   else{el.style.opacity='0';el.style.pointerEvents='none';setTimeout(()=>{if(el.style.opacity==='0')el.style.visibility='hidden';},300);}
 }
 function openGacha(){
+  // ペダルデータ未ロード時は待機フラグを立てて読み込み完了後に自動開始
+  if(!pedalDataLoaded){
+    window._gachaPendingAutoStart=true;
+    gLang=getGLang();applyGachaLang();
+    document.getElementById('gacha-overlay').classList.add('open');
+    document.body.style.overflow='hidden';
+    loadGachaPedals();gSetIdle();
+    return;
+  }
   gLang=getGLang();applyGachaLang();
   document.getElementById('gacha-overlay').classList.add('open');
   document.body.style.overflow='hidden';
-  loadGachaPedals();gSetIdle();
+  loadGachaPedals();
+  // ★ ロード済みなら即座にロール開始
+  setTimeout(()=>{if(gPhase==='idle')gStartRoll();},300);
 }
 function closeGacha(){
   document.getElementById('gacha-overlay').classList.remove('open');
@@ -1961,7 +1982,7 @@ function applyGachaI18n(){
   if(mobSub)mobSub.textContent=isEn?enSubMob:jaSubMob;if(pcSub)pcSub.textContent=isEn?enSubPc:jaSubPc;
   Object.entries(I18N_GACHA).forEach(([id,t])=>{const el=document.getElementById(id);if(el)el.textContent=isEn?t.en:t.ja;});
 }
-window.openGacha=openGacha;window.closeGacha=closeGacha;window.gDoShare=gDoShare;window.gDoSave=gDoSave;
+window.openGacha=openGacha;window.closeGacha=closeGacha;window.gDoShare=gDoShare;window.gDoSave=gDoSave;window.loadMorePosts=loadMorePosts;
 window.addEventListener('DOMContentLoaded',()=>{gLang=getGLang();applyGachaLang();applyGachaI18n();_initMuteState();});
 })();
 </script>
