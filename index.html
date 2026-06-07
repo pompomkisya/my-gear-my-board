@@ -579,11 +579,24 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
               </div>
             </div>
             <div id="card-grid-mob" style="display:contents"></div>
+            <!-- ★ さらに読み込む / 最新に戻る（グリッド内・全幅） -->
+            <button id="load-more-btn" onclick="loadMorePosts()" style="display:none;grid-column:1/-1;margin-top:4px;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">さらに読み込む</button>
+            <button id="back-to-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;grid-column:1/-1;margin-top:4px;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">↑ 最新に戻る</button>
           </div>
-          <!-- ★ さらに読み込む / 最新に戻る -->
-          <div style="padding:0 0 12px;display:flex;gap:8px;justify-content:center">
-            <button id="load-more-btn" onclick="loadMorePosts()" style="display:none;flex:1;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">さらに読み込む</button>
-            <button id="back-to-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;flex:1;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">↑ 最新に戻る</button>
+
+        </div>
+        <!-- ★ ペダル図鑑CTAカード（グリッド外・常時表示） -->
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:13px">
+          <a href="/pedals" id="pedal-db-cta-mob" style="display:block;background:linear-gradient(135deg,rgba(232,85,45,.18) 0%,rgba(232,85,45,.06) 60%,rgba(13,13,14,.9) 100%);border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center">
+              <div style="font-size:28px;opacity:.7">🎛</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--ac)" id="pedal-db-cta-title-mob">ペダル図鑑</div>
+              <div style="font-family:'Noto Sans JP',sans-serif;font-size:9px;color:var(--tm);letter-spacing:.5px" id="pedal-db-cta-sub-mob">エフェクター2,300件以上</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ac);opacity:.7;letter-spacing:1px">BROWSE →</div>
+            </div>
+          </a>
+          <div id="pedal-db-cta-right-mob" style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center">
+            <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);text-align:center;padding:8px" id="pedal-db-cta-placeholder-mob">特集・広告<br>準備中</div>
           </div>
         </div>
       </div>
@@ -738,11 +751,23 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div id="card-grid" style="display:contents">
       <div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--td)">読み込み中...</div>
     </div>
+    <!-- ★ さらに読み込む / 最新に戻る（グリッド内・全幅） -->
+    <button id="load-more-btn-pc" onclick="loadMorePosts()" style="display:none;grid-column:1/-1;margin-top:4px;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">さらに読み込む</button>
+    <button id="back-to-top-btn-pc" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;grid-column:1/-1;margin-top:4px;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">↑ 最新に戻る</button>
   </div>
-  <!-- ★ さらに読み込む / 最新に戻る（PC） -->
-  <div style="margin-top:12px;display:flex;gap:8px;justify-content:center">
-    <button id="load-more-btn-pc" onclick="loadMorePosts()" style="display:none;padding:11px 32px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">さらに読み込む</button>
-    <button id="back-to-top-btn-pc" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;padding:11px 32px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">↑ 最新に戻る</button>
+  <!-- ★ ペダル図鑑CTAカード（グリッド外・常時表示） -->
+  <div style="margin-top:13px;display:grid;grid-template-columns:1fr 1fr;gap:13px">
+    <a href="/pedals" id="pedal-db-cta-pc" style="display:block;background:linear-gradient(135deg,rgba(232,85,45,.18) 0%,rgba(232,85,45,.06) 60%,rgba(13,13,14,.9) 100%);border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;text-align:center">
+        <div style="font-size:36px;opacity:.7">🎛</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--ac)" id="pedal-db-cta-title-pc">ペダル図鑑</div>
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm);letter-spacing:.5px" id="pedal-db-cta-sub-pc">エフェクター2,300件以上</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);opacity:.7;letter-spacing:1px">BROWSE →</div>
+      </div>
+    </a>
+    <div id="pedal-db-cta-right-pc" style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;aspect-ratio:1;display:flex;align-items:center;justify-content:center">
+      <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);text-align:center;padding:12px" id="pedal-db-cta-placeholder-pc">特集・広告<br>準備中</div>
+    </div>
   </div>
 </main>
 <aside class="sr">
@@ -1202,22 +1227,14 @@ function gSetShare(v){
   if(v){el.style.visibility='visible';el.style.opacity='1';el.style.pointerEvents='auto';}
   else{el.style.opacity='0';el.style.pointerEvents='none';setTimeout(()=>{if(el.style.opacity==='0')el.style.visibility='hidden';},300);}
 }
-function openGacha(){
-  // ペダルデータ未ロード時は待機フラグを立てて読み込み完了後に自動開始
-  if(!pedalDataLoaded){
-    window._gachaPendingAutoStart=true;
-    gLang=getGLang();applyGachaLang();
-    document.getElementById('gacha-overlay').classList.add('open');
-    document.body.style.overflow='hidden';
-    loadGachaPedals();gSetIdle();
-    return;
-  }
+async function openGacha(){
   gLang=getGLang();applyGachaLang();
   document.getElementById('gacha-overlay').classList.add('open');
   document.body.style.overflow='hidden';
-  loadGachaPedals();
-  // ★ ロード済みなら即座にロール開始
-  setTimeout(()=>{if(gPhase==='idle')gStartRoll();},300);
+  // ★ loadGachaPedalsの完了を待ってから自動ロール開始
+  await loadGachaPedals();
+  gSetIdle();
+  setTimeout(()=>{if(gPhase==='idle'&&gLoaded)gStartRoll();},300);
 }
 function closeGacha(){
   document.getElementById('gacha-overlay').classList.remove('open');
