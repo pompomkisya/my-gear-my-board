@@ -517,8 +517,9 @@ function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(
 function expandDesc(){const el=document.getElementById('desc-text');if(el&&window._fullDesc)el.innerHTML=escHtml(window._fullDesc);const toggle=document.querySelector('.desc-toggle');if(toggle)toggle.style.display='none';}
 function timeAgo(ts){
   const d=Math.floor((Date.now()-new Date(ts))/1000);
-  if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}
-  if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';
+  if(d>=86400){const dt=new Date(ts);return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');}
+  if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';return Math.floor(d/3600)+'h ago';}
+  if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';return Math.floor(d/3600)+'時間前';
 }
 let slideIdx=0;
 function initSlider(count){slideIdx=0;}
