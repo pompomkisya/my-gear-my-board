@@ -55,11 +55,12 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 
 /* ── Tab Grid ── */
 .tab-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
-.tab-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 6px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;cursor:pointer;transition:all .18s;touch-action:manipulation;min-height:56px}
-.tab-btn:hover{border-color:rgba(232,85,45,.4);background:rgba(232,85,45,.04)}
-.tab-btn.on{background:rgba(232,85,45,.1);border-color:var(--ac)}
-.tab-btn-icon{font-size:16px;line-height:1}
-.tab-btn-label{font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);white-space:nowrap}
+.tab-btn{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;padding:0;background:var(--sf);border:1px solid var(--bd);border-radius:12px;cursor:pointer;transition:all .18s;touch-action:manipulation;position:relative;aspect-ratio:1;overflow:hidden;background-size:cover;background-position:center}
+.tab-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 35%,rgba(13,13,14,.85) 100%);pointer-events:none}
+.tab-btn:hover{border-color:rgba(232,85,45,.5);transform:translateY(-1px)}
+.tab-btn.on{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac) inset}
+.tab-btn-icon{display:none}
+.tab-btn-label{position:relative;z-index:1;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;color:var(--tx);white-space:nowrap;padding-bottom:8px}
 .tab-btn.on .tab-btn-label{color:var(--ac)}
 
 /* ── Posts Grid ── */
@@ -170,7 +171,7 @@ function applyLang(){
 }
 function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();loadUser();}
 function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';if(d<86400)return Math.floor(d/3600)+'h ago';return Math.floor(d/86400)+'d ago';}if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';if(d<86400)return Math.floor(d/3600)+'時間前';return Math.floor(d/86400)+'日前';}
+function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(d>=86400){const dt=new Date(ts);return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');}if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';return Math.floor(d/3600)+'h ago';}if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';return Math.floor(d/3600)+'時間前';}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 function copyUserUrl(url){navigator.clipboard.writeText(url).then(()=>showToast('🔗 '+(lang==='en'?'Copied!':'コピーしました'))).catch(()=>prompt('URLをコピーしてください:',url));}
 function shareUserToX(url,username){
@@ -252,16 +253,13 @@ function renderUser(user,posts,gear,reviews,pageUrl){
     </div>
 
     <div class="tab-grid">
-      <div class="tab-btn on" id="utab-posts" onclick="switchTab('posts')">
-        <span class="tab-btn-icon">📋</span>
+      <div class="tab-btn on" id="utab-posts" style="background-image:url(/icons/icon_posts.png)" onclick="switchTab('posts')">
         <span class="tab-btn-label">${tr('sectionPosts')}</span>
       </div>
-      <div class="tab-btn" id="utab-gear" onclick="switchTab('gear')">
-        <span class="tab-btn-icon">🎸</span>
+      <div class="tab-btn" id="utab-gear" style="background-image:url(/icons/icon_gear.png)" onclick="switchTab('gear')">
         <span class="tab-btn-label">${tr('sectionGear')}</span>
       </div>
-      <div class="tab-btn" id="utab-reviews" onclick="switchTab('reviews')">
-        <span class="tab-btn-icon">⭐</span>
+      <div class="tab-btn" id="utab-reviews" style="background-image:url(/icons/icon_reviews.png)" onclick="switchTab('reviews')">
         <span class="tab-btn-label">${tr('sectionReviews')}</span>
       </div>
     </div>
