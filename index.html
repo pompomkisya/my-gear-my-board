@@ -19,6 +19,8 @@
 <meta name="robots" content="index, follow">
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--ac2:#f0a500;--tx:#eae8e2;--tm:#9a9890;--td:#6e6c68}
@@ -590,7 +592,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           <a href="/pedals" id="pedal-db-cta-mob" style="display:block;background:url(/icons/icon_pedaldb.png);background-size:cover;background-position:center;border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
             <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 30%,rgba(13,13,14,.95) 100%)"></div>
             <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:12px;text-align:center">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)" id="pedal-db-cta-title-mob">ペダル図鑑</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6);white-space:nowrap" id="pedal-db-cta-title-mob">エフェクター図鑑</div>
               <div style="font-family:'Noto Sans JP',sans-serif;font-size:9px;color:var(--tm);letter-spacing:.5px" id="pedal-db-cta-sub-mob">エフェクター2,300件以上</div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ac);opacity:.85;letter-spacing:1px;padding-bottom:2px">BROWSE →</div>
             </div>
@@ -760,7 +762,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <a href="/pedals" id="pedal-db-cta-pc" style="display:block;background:url(/icons/icon_pedaldb.png);background-size:cover;background-position:center;border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
       <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 30%,rgba(13,13,14,.95) 100%)"></div>
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;padding:16px;text-align:center">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)" id="pedal-db-cta-title-pc">ペダル図鑑</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6);white-space:nowrap" id="pedal-db-cta-title-pc">エフェクター図鑑</div>
         <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm);letter-spacing:.5px" id="pedal-db-cta-sub-pc">エフェクター2,300件以上</div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);opacity:.85;letter-spacing:1px;padding-bottom:2px">BROWSE →</div>
       </div>
@@ -1227,11 +1229,18 @@ function gSetShare(v){
   if(v){el.style.visibility='visible';el.style.opacity='1';el.style.pointerEvents='auto';}
   else{el.style.opacity='0';el.style.pointerEvents='none';setTimeout(()=>{if(el.style.opacity==='0')el.style.visibility='hidden';},300);}
 }
+function gRenderLoading(){
+  const panel=document.getElementById('g-panel');if(!panel)return;
+  const isEn=gLang==='en';
+  panel.innerHTML=`<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:10px"><div style="font-size:28px;animation:gPulse 1.2s ease-in-out infinite">⏳</div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#f0a500;letter-spacing:1px;text-align:center;line-height:1.6">${isEn?'Loading...':'読み込み中...'}</div></div>`;
+}
 async function openGacha(){
   gLang=getGLang();applyGachaLang();
   document.getElementById('gacha-overlay').classList.add('open');
   document.body.style.overflow='hidden';
-  // ★ loadGachaPedalsの完了を待って待機画面（idle）を表示。自動ロールはしない
+  // ★ 読み込み中表示→完了したら自動で待機画面（idle）に切り替え
+  gPhase='loading';
+  gRenderLoading();
   await loadGachaPedals();
   gSetIdle();
 }
@@ -1262,7 +1271,7 @@ function applyGachaLang(){
   });
 }
 window.gHandleTap=function(){
-  if(gPhase==='rolling'||gPhase==='capsule')return;
+  if(gPhase==='rolling'||gPhase==='capsule'||gPhase==='loading')return;
   if(gPhase==='result'){gSetIdle();return;}
   gStartRoll();
 };
