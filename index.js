@@ -85,7 +85,7 @@ const I18N={
     widgetRankingMob:'Top Boards This Month',widgetGearMob:'Popular Gear',widgetNewsMob:'Gear News',adMob:'Ad',
     posts:' posts',noData:'No data',noPost:'No posts yet',noPostGeneral:'No posts',
     footerPrivacy:'Privacy Policy',footerContact:'Contact',footerCopy:'© 2026 My Gear My Board. All rights reserved.',
-    postDropBoard:'🎛 &nbsp;Post Pedalboard',postDropGear:'🎸 &nbsp;Post Gear',headerPost:'＋ &nbsp;POST ▾',
+    postDropBoard:'🎛 &nbsp;Post Pedalboard',postDropGear:'🎸 &nbsp;Post Gear',headerPost:'＋ &nbsp;POST&nbsp;▾',
     uploadAreaText:'Click here to upload photos',
     uploadAreaSub:'Up to 3 photos · First photo is thumbnail',
     uploadAreaHint:'Adding numbers makes it easier to understand',
@@ -553,8 +553,6 @@ async function loadPedalDataBackground(posts,cm){
     renderGearWidget(allDBPosts);
     renderGearWidgetMob(allDBPosts);
     pedalDataLoaded=true;
-    // ★ ガチャカードクリック待ち状態なら自動でガチャ開始
-    if(window._gachaPendingAutoStart){window._gachaPendingAutoStart=false;openGacha();}
   }catch(e){
     console.error('pedal data load error',e);
   }finally{
