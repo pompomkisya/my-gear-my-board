@@ -418,7 +418,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       🌐 <span id="lang-label">EN</span>
     </div>
     <div style="position:relative">
-      <button class="h-btn" onclick="togglePostDropdown(event)">＋ &nbsp;投稿する ▾</button>
+      <button class="h-btn" onclick="togglePostDropdown(event)">＋ &nbsp;投稿する&nbsp;▾</button>
       <div class="post-dropdown" id="post-dropdown">
         <div class="post-dropdown-item" onclick="closeDropdownAndPost('board')">🎛 &nbsp;ボードを投稿</div>
         <div class="post-dropdown-item" onclick="closeDropdownAndPost('gear')">🎸 &nbsp;機材を投稿</div>
@@ -588,9 +588,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <!-- ★ ペダル図鑑CTAカード（グリッド外・常時表示） -->
         <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:13px">
           <a href="/pedals" id="pedal-db-cta-mob" style="display:block;background:url(/icons/icon_pedaldb.png);background-size:cover;background-position:center;border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
-            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 40%,rgba(13,13,14,.85) 100%)"></div>
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 30%,rgba(13,13,14,.95) 100%)"></div>
             <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:12px;text-align:center">
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--ac)" id="pedal-db-cta-title-mob">ペダル図鑑</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)" id="pedal-db-cta-title-mob">ペダル図鑑</div>
               <div style="font-family:'Noto Sans JP',sans-serif;font-size:9px;color:var(--tm);letter-spacing:.5px" id="pedal-db-cta-sub-mob">エフェクター2,300件以上</div>
               <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ac);opacity:.85;letter-spacing:1px;padding-bottom:2px">BROWSE →</div>
             </div>
@@ -758,9 +758,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   <!-- ★ ペダル図鑑CTAカード（グリッド外・常時表示） -->
   <div style="margin-top:13px;display:grid;grid-template-columns:1fr 1fr;gap:13px">
     <a href="/pedals" id="pedal-db-cta-pc" style="display:block;background:url(/icons/icon_pedaldb.png);background-size:cover;background-position:center;border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
-      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 40%,rgba(13,13,14,.85) 100%)"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 30%,rgba(13,13,14,.95) 100%)"></div>
       <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;padding:16px;text-align:center">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--ac)" id="pedal-db-cta-title-pc">ペダル図鑑</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)" id="pedal-db-cta-title-pc">ペダル図鑑</div>
         <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm);letter-spacing:.5px" id="pedal-db-cta-sub-pc">エフェクター2,300件以上</div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);opacity:.85;letter-spacing:1px;padding-bottom:2px">BROWSE →</div>
       </div>
@@ -1231,10 +1231,9 @@ async function openGacha(){
   gLang=getGLang();applyGachaLang();
   document.getElementById('gacha-overlay').classList.add('open');
   document.body.style.overflow='hidden';
-  // ★ loadGachaPedalsの完了を待ってから自動ロール開始
+  // ★ loadGachaPedalsの完了を待って待機画面（idle）を表示。自動ロールはしない
   await loadGachaPedals();
   gSetIdle();
-  setTimeout(()=>{if(gPhase==='idle'&&gLoaded)gStartRoll();},300);
 }
 function closeGacha(){
   document.getElementById('gacha-overlay').classList.remove('open');
