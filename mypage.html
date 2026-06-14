@@ -634,18 +634,21 @@ async function saveProfile(){
 // ── Tab counts ──
 async function loadCounts(){
   if(!currentUser)return;
-  const[postsRes,gearRes,reviewsRes,gachaRes,notifRes]=await Promise.all([
+  const sid=localStorage.getItem('mgmb_sid');
+  const[postsRes,gearRes,reviewsRes,gachaRes,notifRes,likesRes]=await Promise.all([
     sb.from('posts').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
     sb.from('user_gear').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
     sb.from('pedal_reviews').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
     sb.from('gacha_saves').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
     sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id).eq('is_read',false),
+    sid?sb.from('likes').select('id',{count:'exact',head:true}).eq('session_id',sid):Promise.resolve({count:0}),
   ]);
   const setCount=(id,n)=>{const el=document.getElementById(id);if(el)el.textContent=n!=null?n:'0';};
   setCount('my-count-posts',postsRes.count||0);
   setCount('my-count-gear',gearRes.count||0);
   setCount('my-count-reviews',reviewsRes.count||0);
   setCount('my-count-gacha',gachaRes.count||0);
+  setCount('my-count-likes',likesRes.count||0);
   const notifCount=notifRes.count||0;
   setCount('my-count-notif',notifCount);
   const dot=document.getElementById('notif-dot');
