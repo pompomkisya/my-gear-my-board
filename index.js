@@ -44,7 +44,7 @@ const I18N={
     confirmType:'タイプ',confirmUser:'ユーザー名',confirmTitle:'タイトル',confirmGear:'機材',
     confirmGenre:'ジャンル',confirmDesc:'説明',confirmYt:'YouTube',confirmPhoto:'写真',
     typeBoard:'エフェクターボード',typeGear:'MY GEAR',
-    doneTitle:'投稿完了！',doneSub:'あなたのボードが公開されました！',doneSubGear:'あなたの機材が公開されました！',doneClose:'閉じる',doneMypage:'マイページを作る →',doneMypageNote:'※ 投稿と同じブラウザ・端末でマイページを作成してください。別のブラウザやシークレットモードでは、登録前の投稿は紐付けされません。',
+    doneTitle:'投稿完了！',doneSub:'あなたのボードが公開されました！',doneSubGear:'あなたの機材が公開されました！',doneClose:'閉じる',doneMypage:'マイページを作る',doneMypageLead:'マイページで投稿を一覧管理できます。マイページ作成を推奨します。',doneMypageNote:'※ 投稿と同じブラウザ・端末でマイページを作成してください。別のブラウザやシークレットモードでは、登録前の投稿は紐付けされません。',
     gearRemindTitle:'機材を追加しませんか？',gearRemindSub:'機材を追加すると、より多くの人に見てもらえます',
     gearRemindAdd:'機材を追加する',gearRemindSkip:'そのまま投稿',
     filterClear:'← フィルターを解除',emptyFxPromo:'このエフェクタータイプを使った投稿がまだありません',
@@ -104,7 +104,7 @@ const I18N={
     confirmType:'Type',confirmUser:'Username',confirmTitle:'Title',confirmGear:'Gear',
     confirmGenre:'Genre',confirmDesc:'Description',confirmYt:'YouTube',confirmPhoto:'Photos',
     typeBoard:'Pedalboard',typeGear:'MY GEAR',
-    doneTitle:'Posted!',doneSub:'Your board is now public!',doneSubGear:'Your gear is now public!',doneClose:'Close',doneMypage:'Create My Page →',doneMypageNote:'※ Please create your account using the same browser and device you used to post. Posts made before registration cannot be linked if you switch browsers or use private mode.',
+    doneTitle:'Posted!',doneSub:'Your board is now public!',doneSubGear:'Your gear is now public!',doneClose:'Close',doneMypage:'Create My Page',doneMypageLead:'Manage your posts on My Page. We recommend creating an account.',doneMypageNote:'※ Please create your account using the same browser and device you used to post. Posts made before registration cannot be linked if you switch browsers or use private mode.',
     gearRemindTitle:'Add your gear?',gearRemindSub:'Adding gear helps more people find your post.',
     gearRemindAdd:'Add gear',gearRemindSkip:'Post anyway',
     filterClear:'← Clear Filter',emptyFxPromo:'No posts with this effect type yet',
@@ -981,8 +981,10 @@ async function submitPostToDB(){
     const isLoggedIn=!!postUserId;
     mypageWrap.style.display=isLoggedIn?'none':'block';
     if(!isLoggedIn){
+      const leadEl=document.getElementById('done-mypage-lead');
       const noteEl=document.getElementById('done-mypage-note');
       const btnEl=document.getElementById('done-mypage-btn');
+      if(leadEl)leadEl.textContent=tr('doneMypageLead');
       if(noteEl)noteEl.textContent=tr('doneMypageNote');
       if(btnEl)btnEl.textContent=tr('doneMypage');
     }
