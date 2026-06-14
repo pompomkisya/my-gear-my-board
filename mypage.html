@@ -476,6 +476,22 @@ function showMyPage(){
   document.getElementById('auth-wrap').style.display='none';
   document.getElementById('mypage-wrap').classList.add('show');
   loadProfile();loadMyPosts();loadNotifCount();loadCounts();
+  // ★ session_idの匿名投稿を自分のアカウントに自動紐付け
+  linkSessionPosts();
+}
+async function linkSessionPosts(){
+  if(!currentUser)return;
+  const sid=localStorage.getItem('mgmb_sid');
+  if(!sid)return;
+  // session_idが一致しuser_idがnullの投稿を自分のアカウントに紐付け
+  const{data:posts}=await sb.from('posts').select('id').eq('session_id',sid).is('user_id',null);
+  if(!posts||!posts.length)return;
+  const{data:userData}=await sb.from('users').select('username').eq('id',currentUser.id).single();
+  const username=userData?.username||currentUser.user_metadata?.username||'';
+  const{error}=await sb.from('posts').update({user_id:currentUser.id,username}).eq('session_id',sid).is('user_id',null);
+  if(!error&&posts.length>0){
+    showToast(lang==='en'?`✅ ${posts.length} post(s) linked to your account`:`✅ ${posts.length}件の投稿をアカウントに紐付けました`);
+  }
 }
 function switchAuthTab(tab){
   document.getElementById('tab-login').classList.toggle('on',tab==='login');
