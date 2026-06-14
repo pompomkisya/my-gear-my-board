@@ -2253,7 +2253,7 @@ function renderRegionPosts(){
 let _allUsers=[];
 async function loadUsersAdmin(){
   document.getElementById('users-table-wrap').innerHTML='<div style="padding:20px;color:var(--td)">読み込み中...</div>';
-  const{data,error}=await sbAdmin.from('users').select('id,username,email,created_at,bio').order('created_at',{ascending:false}).limit(500);
+  const{data,error}=await sb.from('users').select('id,username,email,created_at,bio').order('created_at',{ascending:false}).limit(500);
   if(error){document.getElementById('users-table-wrap').innerHTML='<div style="padding:20px;color:#e05050">エラー: '+error.message+'</div>';return;}
   _allUsers=data||[];
   const statsEl=document.getElementById('users-stats');
