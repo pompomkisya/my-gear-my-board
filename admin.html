@@ -181,6 +181,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-regions')">🌍 言語圏別</div>
     <div class="tab" onclick="switchTab(this,'tab-maintenance')">🔧 メンテナンス</div>
     <div class="tab" onclick="switchTab(this,'tab-rakuten')">🛒 楽天画像バッチ</div>
+    <div class="tab" onclick="switchTab(this,'tab-users')">👤 ユーザー管理</div>
   </div>
 
   <div class="panel on" id="tab-dashboard">
@@ -559,6 +560,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
     </div>
   </div>
 
+
+  <!-- ★ ユーザー管理タブ -->
+  <div class="panel" id="tab-users" style="display:none">
+    <div class="section-title">👤 ユーザー管理</div>
+    <div id="users-stats" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap"></div>
+    <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
+      <input id="user-search" type="text" placeholder="ユーザー名・メール検索..." style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--tx);outline:none" oninput="filterUsersAdmin()">
+    </div>
+    <div id="users-table-wrap"></div>
+  </div>
 
   <!-- ★ 楽天画像バッチタブ -->
   <div class="panel" id="tab-rakuten">
@@ -990,6 +1001,7 @@ function switchTab(el,tabId){
   if(tabId==='tab-features')loadFeatures();
   if(tabId==='tab-maintenance')loadMaintenance();
   if(tabId==='tab-rakuten')initRakutenTab();
+  if(tabId==='tab-users')loadUsersAdmin();
 }
 
 let allPosts=[],allPedals=[],allComments=[];
@@ -2236,6 +2248,34 @@ function renderRegionPosts(){
     +'</tbody></table></div>';
 }
 
+
+// ★ ユーザー管理
+let _allUsers=[];
+async function loadUsersAdmin(){
+  document.getElementById('users-table-wrap').innerHTML='<div style="padding:20px;color:var(--td)">読み込み中...</div>';
+  const{data,error}=await sbAdmin.from('users').select('id,username,email,created_at,bio').order('created_at',{ascending:false}).limit(500);
+  if(error){document.getElementById('users-table-wrap').innerHTML='<div style="padding:20px;color:#e05050">エラー: '+error.message+'</div>';return;}
+  _allUsers=data||[];
+  const statsEl=document.getElementById('users-stats');
+  if(statsEl){statsEl.innerHTML=`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 20px;text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--ac)">${_allUsers.length}</div><div style="font-size:11px;color:var(--td);margin-top:2px">登録ユーザー数</div></div>`;}
+  renderUsersAdmin(_allUsers);
+}
+function filterUsersAdmin(){
+  const q=(document.getElementById('user-search')?.value||'').toLowerCase();
+  const filtered=q?_allUsers.filter(u=>(u.username||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)):_allUsers;
+  renderUsersAdmin(filtered);
+}
+function renderUsersAdmin(users){
+  const wrap=document.getElementById('users-table-wrap');
+  if(!users.length){wrap.innerHTML='<div style="padding:20px;color:var(--td)">ユーザーが見つかりません</div>';return;}
+  wrap.innerHTML='<div class="table-wrap"><table><thead><tr><th>ユーザー名</th><th>メール</th><th>登録日</th><th>自己紹介</th></tr></thead><tbody>'
+    +users.map(u=>`<tr>
+      <td><a href="/user?username=${encodeURIComponent(u.username||'')}" target="_blank" style="color:var(--ac);text-decoration:none;font-weight:600">${u.username||'(未設定)'}</a></td>
+      <td style="font-size:11px;color:var(--td)">${u.email||''}</td>
+      <td style="font-size:11px;color:var(--td);white-space:nowrap">${u.created_at?u.created_at.slice(0,10):''}</td>
+      <td style="font-size:11px;color:var(--td);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.bio||''}</td>
+    </tr>`).join('')+'</tbody></table></div>';
+}
 
 // ★ 楽天画像バッチ
 
