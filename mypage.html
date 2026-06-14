@@ -290,9 +290,11 @@ textarea.edit-input{resize:vertical;min-height:70px}
           <div class="profile-name" id="profile-name">USER</div>
           <div class="profile-email" id="profile-email"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span id="profile-edit-hint" style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td)">プロフィール編集</span>
-          <span class="profile-chevron" id="profile-chevron">▼</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <div style="display:flex;align-items:center;gap:4px;padding:4px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);white-space:nowrap;pointer-events:none">
+            <span id="profile-edit-hint">プロフィール編集</span>
+            <span class="profile-chevron" id="profile-chevron" style="font-size:9px">▼</span>
+          </div>
           <button onclick="event.stopPropagation();doLogout()" id="mp-logout-header-btn" style="padding:4px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='rgba(224,80,80,.1)'" onmouseout="this.style.background='transparent'">ログアウト</button>
         </div>
       </div>
@@ -319,7 +321,6 @@ textarea.edit-input{resize:vertical;min-height:70px}
           <input class="edit-input" id="edit-instagram-url" type="url" placeholder="https://instagram.com/yourname">
         </div>
         <button class="save-btn" id="mp-save-btn" onclick="saveProfile()">プロフィールを保存</button>
-        <button class="logout-btn" id="mp-logout-btn" onclick="doLogout()">ログアウト</button>
       </div>
     </div>
 
@@ -441,7 +442,7 @@ function applyLang(){
   const ampEl=document.getElementById('edit-amp');if(ampEl)ampEl.placeholder=tr('ampPh');
   const loginPwEl=document.getElementById('login-password');if(loginPwEl)loginPwEl.placeholder=tr('pwPh');
   const regPwEl=document.getElementById('reg-password');if(regPwEl)regPwEl.placeholder=tr('regPwPh');
-  setTxt('mp-save-btn',tr('saveBtn'));setTxt('mp-logout-btn',tr('logoutBtn'));const lhBtn=document.getElementById('mp-logout-header-btn');if(lhBtn)lhBtn.textContent=tr('logoutBtn');
+  setTxt('mp-save-btn',tr('saveBtn'));const lhBtn=document.getElementById('mp-logout-header-btn');if(lhBtn)lhBtn.textContent=tr('logoutBtn');
   setTxt('my-tab-posts-lbl',tr('tabPosts'));setTxt('my-tab-gear-lbl',tr('tabGear'));
   setTxt('my-tab-reviews-lbl',tr('tabReviews'));setTxt('my-tab-likes-lbl',tr('tabLikes'));
   setTxt('my-tab-gacha-lbl',tr('tabGacha'));setTxt('my-tab-notif-lbl',tr('tabNotif'));
