@@ -44,7 +44,7 @@ const I18N={
     confirmType:'タイプ',confirmUser:'ユーザー名',confirmTitle:'タイトル',confirmGear:'機材',
     confirmGenre:'ジャンル',confirmDesc:'説明',confirmYt:'YouTube',confirmPhoto:'写真',
     typeBoard:'エフェクターボード',typeGear:'MY GEAR',
-    doneTitle:'投稿完了！',doneSub:'あなたのボードが公開されました！',doneSubGear:'あなたの機材が公開されました！',doneClose:'閉じる',
+    doneTitle:'投稿完了！',doneSub:'あなたのボードが公開されました！',doneSubGear:'あなたの機材が公開されました！',doneClose:'閉じる',doneMypage:'マイページを作る →',doneMypageNote:'※ 投稿と同じブラウザ・端末でマイページを作成してください。別のブラウザやシークレットモードでは、登録前の投稿は紐付けされません。',
     gearRemindTitle:'機材を追加しませんか？',gearRemindSub:'機材を追加すると、より多くの人に見てもらえます',
     gearRemindAdd:'機材を追加する',gearRemindSkip:'そのまま投稿',
     filterClear:'← フィルターを解除',emptyFxPromo:'このエフェクタータイプを使った投稿がまだありません',
@@ -104,7 +104,7 @@ const I18N={
     confirmType:'Type',confirmUser:'Username',confirmTitle:'Title',confirmGear:'Gear',
     confirmGenre:'Genre',confirmDesc:'Description',confirmYt:'YouTube',confirmPhoto:'Photos',
     typeBoard:'Pedalboard',typeGear:'MY GEAR',
-    doneTitle:'Posted!',doneSub:'Your board is now public!',doneSubGear:'Your gear is now public!',doneClose:'Close',
+    doneTitle:'Posted!',doneSub:'Your board is now public!',doneSubGear:'Your gear is now public!',doneClose:'Close',doneMypage:'Create My Page →',doneMypageNote:'※ Please create your account using the same browser and device you used to post. Posts made before registration cannot be linked if you switch browsers or use private mode.',
     gearRemindTitle:'Add your gear?',gearRemindSub:'Adding gear helps more people find your post.',
     gearRemindAdd:'Add gear',gearRemindSkip:'Post anyway',
     filterClear:'← Clear Filter',emptyFxPromo:'No posts with this effect type yet',
@@ -962,7 +962,8 @@ async function submitPostToDB(){
     username:postUsername,
     title,description:desc,genre:genres,
     gear_list:selectedGears.map(g=>({name:g.name,brand:g.brand||'',search_query:g.search_query||null})),
-    image_urls,pin_hash:pin,likes:0,post_type:currentPostType,youtube_url
+    image_urls,pin_hash:pin,likes:0,post_type:currentPostType,youtube_url,
+    session_id:getSessionId()
   };
   if(postUserId)insertData.user_id=postUserId;
   const{error}=await sb.from('posts').insert(insertData);
@@ -974,6 +975,20 @@ async function submitPostToDB(){
   ['pd1','pd2','pd3','pd4'].forEach(id=>{document.getElementById(id).value='';});
   document.querySelectorAll('#post-genre-select .gs.on').forEach(el=>el.classList.remove('on'));
   document.getElementById('done-sub').textContent=currentPostType==='gear'?tr('doneSubGear'):tr('doneSub');
+  // ★ 未ログイン時のみマイページ案内を表示
+  const mypageWrap=document.getElementById('done-mypage-wrap');
+  if(mypageWrap){
+    const isLoggedIn=!!postUserId;
+    mypageWrap.style.display=isLoggedIn?'none':'block';
+    if(!isLoggedIn){
+      const noteEl=document.getElementById('done-mypage-note');
+      const btnEl=document.getElementById('done-mypage-btn');
+      if(noteEl)noteEl.textContent=tr('doneMypageNote');
+      if(btnEl)btnEl.textContent=tr('doneMypage');
+    }
+  }
+  const doneCloseBtn=document.getElementById('done-close-btn');
+  if(doneCloseBtn)doneCloseBtn.textContent=tr('doneClose');
   document.getElementById('done-bd').classList.add('open');
   await loadPostsFromDB();
 }
