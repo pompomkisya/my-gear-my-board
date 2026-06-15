@@ -291,9 +291,10 @@ textarea.edit-input{resize:vertical;min-height:70px}
           <div class="profile-email" id="profile-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-          <div style="display:flex;align-items:center;gap:5px;padding:5px 11px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);white-space:nowrap;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
+          <div style="position:relative;display:flex;align-items:center;gap:5px;padding:5px 11px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);white-space:nowrap;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
             <span id="profile-edit-hint">編集</span>
             <span class="profile-chevron" id="profile-chevron" style="font-size:9px;margin-left:1px">▼</span>
+            <span class="notif-dot" id="notif-header-dot" style="position:absolute;top:-3px;right:-3px;display:none"></span>
           </div>
           <button onclick="event.stopPropagation();doLogout()" id="mp-logout-header-btn" style="padding:5px 11px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='rgba(224,80,80,.1)'" onmouseout="this.style.background='transparent'">ログアウト</button>
         </div>
@@ -346,10 +347,10 @@ textarea.edit-input{resize:vertical;min-height:70px}
         <span class="tab-btn-label" id="my-tab-gacha-lbl">ガチャ保存</span>
         <span class="tab-btn-count" id="my-count-gacha">—</span>
       </div>
-      <div class="tab-btn" id="my-tab-notif" style="background-image:url(/icons/icon_notif.png)" onclick="switchMyTab('notif')">
-        <span class="tab-btn-label" id="my-tab-notif-lbl">通知</span>
-        <span class="tab-btn-count" id="my-count-notif">—</span>
-        <span class="notif-dot" id="notif-dot"></span>
+      <div class="tab-btn" style="background-image:url(/icons/icon_wishlist.png);position:relative" id="my-tab-wishlist" onclick="switchMyTab('wishlist')">
+        <span class="tab-btn-label" id="my-tab-wishlist-lbl">欲しいリスト</span>
+        <span class="tab-btn-count" id="my-count-wishlist">—</span>
+        <span class="notif-dot" id="notif-dot" style="position:absolute;top:6px;right:6px;z-index:2"></span>
       </div>
     </div>
 
@@ -359,7 +360,7 @@ textarea.edit-input{resize:vertical;min-height:70px}
     <div id="my-panel-reviews" style="display:none"></div>
     <div id="my-panel-likes" class="post-list" style="display:none"></div>
     <div id="my-panel-gacha" class="gacha-save-list" style="display:none"></div>
-    <div id="my-panel-notif" style="display:none"></div>
+    <div id="my-panel-wishlist" style="display:none"></div>
   </div>
 </div>
 
@@ -418,8 +419,8 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 function detectLang(){const saved=localStorage.getItem('mgmb_lang');if(saved)return saved;const bl=navigator.language||navigator.userLanguage||'ja';return bl.toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
 const MP_I18N={
-  ja:{logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとマイページを持てます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'自分の投稿',tabGear:'機材リスト',tabReviews:'レビュー',tabLikes:'いいね',tabGacha:'ガチャ保存',tabNotif:'通知',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyGacha:'ガチャ保存がまだありません',emptyReviews:'まだレビューがありません',gachaDeleteConfirm:'このガチャ保存を削除しますか？',gachaDeleted:'削除しました',emptyNotif:'通知はありません',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました',profileToggleOpen:'プロフィールを編集',profileToggleClose:'閉じる',avEditLbl:'変更',profileEditHint:'✏️ 編集',gearTotalTitle:'TOTAL GEAR VALUE',gearTotalJpy:'JPY 合計',gearTotalUsd:'USD 合計',gearPublicLabel:'機材リストを公開する',gearPublicOn:'公開中',gearPublicOff:'非公開',gearShareBtn:'🔗 シェア',gearPrivateNote:'機材リストは非公開です',gearSortLabel:'並べ替え：',gearSortDefault:'登録順',gearSortDateAsc:'購入日（古い順）',gearSortDateDesc:'購入日（新しい順）',gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',gearAddBtn:'＋ 機材を追加',gearModalAddTitle:'機材を追加',gearModalEditTitle:'機材を編集',gearLblName:'機材名 *',gearLblBrand:'ブランド',gearLblPrice:'購入金額',gearLblDate:'購入日',gearLblMemo:'メモ',gearSaveBtn:'保存',gearCancelBtn:'キャンセル',gearNameRequired:'機材名を入力してください',gearSaved:'✅ 保存しました',gearDeleted:'✅ 削除しました',gearDeleteConfirm:'この機材を削除しますか？',gearCopied:'🔗 URLをコピーしました'},
-  en:{logoSub:'Pedalboard Posts & Database',backBtn:'← Home',tabLogin:'Login',tabRegister:'Register',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Register',rfSub:'Post without signing up, or register for your own profile',rfLblName:'Username',rfLblEmail:'Email',rfLblPw:'Password (6+ chars)',registerBtn:'Register',registerBtnLoading:'Registering...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:'We will send a reset link to your registered email',rstLblEmail:'Email',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Amp, music genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Logout',confirmLogout:'Are you sure you want to logout?',tabPosts:'My Posts',tabGear:'Gear List',tabReviews:'Reviews',tabLikes:'Liked',tabGacha:'Gacha Saves',tabNotif:'Notifications',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyGacha:'No gacha saves yet',emptyReviews:'No reviews yet',gachaDeleteConfirm:'Delete this gacha save?',gachaDeleted:'Deleted',emptyNotif:'No notifications',loading:'Loading...',errEmailPw:'Please enter email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email is already registered',errResetEmail:'Please enter your email',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New Password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',profileToggleOpen:'Edit Profile',profileToggleClose:'Close',avEditLbl:'Edit',profileEditHint:'✏️ Edit',gearTotalTitle:'TOTAL GEAR VALUE',gearTotalJpy:'JPY Total',gearTotalUsd:'USD Total',gearPublicLabel:'Make gear list public',gearPublicOn:'Public',gearPublicOff:'Private',gearShareBtn:'🔗 Share',gearPrivateNote:'Gear list is private',gearSortLabel:'Sort: ',gearSortDefault:'Default',gearSortDateAsc:'Date (oldest)',gearSortDateDesc:'Date (newest)',gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',gearAddBtn:'＋ Add Gear',gearModalAddTitle:'Add Gear',gearModalEditTitle:'Edit Gear',gearLblName:'Gear Name *',gearLblBrand:'Brand',gearLblPrice:'Purchase Price',gearLblDate:'Purchase Date',gearLblMemo:'Memo',gearSaveBtn:'Save',gearCancelBtn:'Cancel',gearNameRequired:'Please enter a gear name',gearSaved:'✅ Saved',gearDeleted:'✅ Deleted',gearDeleteConfirm:'Delete this gear item?',gearCopied:'🔗 URL copied'}
+  ja:{logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとマイページを持てます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'自分の投稿',tabGear:'機材リスト',tabReviews:'レビュー',tabLikes:'いいね',tabGacha:'ガチャ保存',tabWishlist:'欲しいリスト',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyGacha:'ガチャ保存がまだありません',emptyReviews:'まだレビューがありません',gachaDeleteConfirm:'このガチャ保存を削除しますか？',gachaDeleted:'削除しました',emptyWishlist:'欲しいリストはまだ空です',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました',profileToggleOpen:'プロフィールを編集',profileToggleClose:'閉じる',avEditLbl:'変更',profileEditHint:'✏️ 編集',gearTotalTitle:'TOTAL GEAR VALUE',gearTotalJpy:'JPY 合計',gearTotalUsd:'USD 合計',gearPublicLabel:'機材リストを公開する',gearPublicOn:'公開中',gearPublicOff:'非公開',gearShareBtn:'🔗 シェア',gearPrivateNote:'機材リストは非公開です',gearSortLabel:'並べ替え：',gearSortDefault:'登録順',gearSortDateAsc:'購入日（古い順）',gearSortDateDesc:'購入日（新しい順）',gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',gearAddBtn:'＋ 機材を追加',gearModalAddTitle:'機材を追加',gearModalEditTitle:'機材を編集',gearLblName:'機材名 *',gearLblBrand:'ブランド',gearLblPrice:'購入金額',gearLblDate:'購入日',gearLblMemo:'メモ',gearSaveBtn:'保存',gearCancelBtn:'キャンセル',gearNameRequired:'機材名を入力してください',gearSaved:'✅ 保存しました',gearDeleted:'✅ 削除しました',gearDeleteConfirm:'この機材を削除しますか？',gearCopied:'🔗 URLをコピーしました'},
+  en:{logoSub:'Pedalboard Posts & Database',backBtn:'← Home',tabLogin:'Login',tabRegister:'Register',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Register',rfSub:'Post without signing up, or register for your own profile',rfLblName:'Username',rfLblEmail:'Email',rfLblPw:'Password (6+ chars)',registerBtn:'Register',registerBtnLoading:'Registering...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:'We will send a reset link to your registered email',rstLblEmail:'Email',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Amp, music genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Logout',confirmLogout:'Are you sure you want to logout?',tabPosts:'My Posts',tabGear:'Gear List',tabReviews:'Reviews',tabLikes:'Liked',tabGacha:'Gacha Saves',tabWishlist:'Wish List',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyGacha:'No gacha saves yet',emptyReviews:'No reviews yet',gachaDeleteConfirm:'Delete this gacha save?',gachaDeleted:'Deleted',emptyWishlist:'Your wish list is empty',loading:'Loading...',errEmailPw:'Please enter email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email is already registered',errResetEmail:'Please enter your email',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New Password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',profileToggleOpen:'Edit Profile',profileToggleClose:'Close',avEditLbl:'Edit',profileEditHint:'✏️ Edit',gearTotalTitle:'TOTAL GEAR VALUE',gearTotalJpy:'JPY Total',gearTotalUsd:'USD Total',gearPublicLabel:'Make gear list public',gearPublicOn:'Public',gearPublicOff:'Private',gearShareBtn:'🔗 Share',gearPrivateNote:'Gear list is private',gearSortLabel:'Sort: ',gearSortDefault:'Default',gearSortDateAsc:'Date (oldest)',gearSortDateDesc:'Date (newest)',gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',gearAddBtn:'＋ Add Gear',gearModalAddTitle:'Add Gear',gearModalEditTitle:'Edit Gear',gearLblName:'Gear Name *',gearLblBrand:'Brand',gearLblPrice:'Purchase Price',gearLblDate:'Purchase Date',gearLblMemo:'Memo',gearSaveBtn:'Save',gearCancelBtn:'Cancel',gearNameRequired:'Please enter a gear name',gearSaved:'✅ Saved',gearDeleted:'✅ Deleted',gearDeleteConfirm:'Delete this gear item?',gearCopied:'🔗 URL copied'}
 };
 function tr(key){return(MP_I18N[lang]||MP_I18N.ja)[key]||MP_I18N.ja[key]||key;}
 function setTxt(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt;}
@@ -445,7 +446,7 @@ function applyLang(){
   setTxt('mp-save-btn',tr('saveBtn'));const lhBtn=document.getElementById('mp-logout-header-btn');if(lhBtn)lhBtn.textContent=tr('logoutBtn');
   setTxt('my-tab-posts-lbl',tr('tabPosts'));setTxt('my-tab-gear-lbl',tr('tabGear'));
   setTxt('my-tab-reviews-lbl',tr('tabReviews'));setTxt('my-tab-likes-lbl',tr('tabLikes'));
-  setTxt('my-tab-gacha-lbl',tr('tabGacha'));setTxt('my-tab-notif-lbl',tr('tabNotif'));
+  setTxt('my-tab-gacha-lbl',tr('tabGacha'));setTxt('my-tab-wishlist-lbl',tr('tabWishlist'));
   setTxt('av-edit-lbl',tr('avEditLbl'));setTxt('profile-edit-hint',tr('profileEditHint'));
   const acHint=document.getElementById('gear-ac-hint');
   if(acHint)acHint.textContent=lang==='en'?'Type to search and autocomplete. Click a suggestion to add!':'ローマ字入力で自動予測変換できます。候補をクリックで簡単追加！';
@@ -637,13 +638,14 @@ async function saveProfile(){
 async function loadCounts(){
   if(!currentUser)return;
   const sid=localStorage.getItem('mgmb_sid');
-  const[postsRes,gearRes,reviewsRes,gachaRes,notifRes,likesRes]=await Promise.all([
+  const[postsRes,gearRes,reviewsRes,gachaRes,notifRes,likesRes,wishlistRes]=await Promise.all([
     sb.from('posts').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
     sb.from('user_gear').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
     sb.from('pedal_reviews').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
     sb.from('gacha_saves').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
     sb.from('notifications').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id).eq('is_read',false),
     sid?sb.from('likes').select('id',{count:'exact',head:true}).eq('session_id',sid):Promise.resolve({count:0}),
+    sb.from('pedal_wishlists').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id),
   ]);
   const setCount=(id,n)=>{const el=document.getElementById(id);if(el)el.textContent=n!=null?n:'0';};
   setCount('my-count-posts',postsRes.count||0);
@@ -651,14 +653,17 @@ async function loadCounts(){
   setCount('my-count-reviews',reviewsRes.count||0);
   setCount('my-count-gacha',gachaRes.count||0);
   setCount('my-count-likes',likesRes.count||0);
+  setCount('my-count-wishlist',wishlistRes.count||0);
   const notifCount=notifRes.count||0;
-  setCount('my-count-notif',notifCount);
+  // 通知はタブではなくヘッダードットで表示
   const dot=document.getElementById('notif-dot');
   if(dot)dot.style.display=notifCount>0?'block':'none';
+  const headerDot=document.getElementById('notif-header-dot');
+  if(headerDot)headerDot.style.display=notifCount>0?'block':'none';
 }
 
 function switchMyTab(tab){
-  ['posts','gear','reviews','likes','gacha','notif'].forEach(t=>{
+  ['posts','gear','reviews','likes','gacha','wishlist'].forEach(t=>{
     const btn=document.getElementById('my-tab-'+t);
     const panel=document.getElementById('my-panel-'+t);
     if(btn)btn.classList.toggle('on',t===tab);
@@ -667,7 +672,7 @@ function switchMyTab(tab){
   if(tab==='gear')loadGearList();
   if(tab==='likes')loadLikedPosts();
   if(tab==='gacha')loadGachaSaves();
-  if(tab==='notif')loadNotifications();
+  if(tab==='wishlist')loadWishlistTab();
   if(tab==='reviews')loadMyReviews();
 }
 
@@ -684,6 +689,48 @@ async function loadLikedPosts(){
   const ids=likes.map(l=>l.post_id);const{data:posts}=await sb.from('posts').select('*').in('id',ids).order('created_at',{ascending:false});
   if(!posts||!posts.length){el.innerHTML=`<div class="empty-msg">${tr('emptyLikes')}</div>`;return;}
   el.innerHTML=posts.map(p=>postItemHTML(p)).join('');
+}
+async function loadWishlistTab(){
+  if(!currentUser)return;
+  const el=document.getElementById('my-panel-wishlist');
+  el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
+  const{data}=await sb.from('pedal_wishlists')
+    .select('id,created_at,pedals(id,brand,model,full_name,slug,image_url,types)')
+    .eq('user_id',currentUser.id)
+    .order('created_at',{ascending:false})
+    .limit(100);
+  if(!data||!data.length){el.innerHTML=`<div class="empty-msg">${tr('emptyWishlist')}</div>`;return;}
+  el.innerHTML=data.map(w=>{
+    const p=w.pedals;if(!p)return'';
+    const imgSrc=p.image_url||'';
+    const typeIcon=p.types&&p.types[0]?`https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_${p.types[0]}.png`:'';
+    const img=imgSrc?`<img class="gacha-save-img" src="${escHtml(imgSrc)}" loading="lazy" onerror="this.src='${escHtml(typeIcon)}'">`:typeIcon?`<img class="gacha-save-img" src="${escHtml(typeIcon)}" loading="lazy">`:`<div class="gacha-save-img-empty">🎛</div>`;
+    return`<div class="gacha-save-item" style="position:relative">
+      <div style="display:flex;align-items:center;gap:12px;flex:1;cursor:pointer" onclick="location.href='/pedal?slug=${escHtml(p.slug)}'">
+        ${img}
+        <div class="gacha-save-info">
+          <div class="gacha-save-brand">${escHtml(p.brand)}</div>
+          <div class="gacha-save-model">${escHtml(p.model)}</div>
+          <div class="gacha-save-date">${timeAgo(w.created_at)}</div>
+        </div>
+        <div class="gacha-save-arrow" style="font-family:'Noto Sans JP',sans-serif;font-size:10px;white-space:nowrap">${lang==='en'?'Detail →':'ペダル詳細 →'}</div>
+      </div>
+      <button onclick="removeWishlist('${w.id}',this)" style="flex-shrink:0;margin-left:8px;padding:6px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:6px;font-size:11px;color:#e05050;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='rgba(224,80,80,.1)'" onmouseout="this.style.background='transparent'">✕</button>
+    </div>`;
+  }).join('');
+}
+async function removeWishlist(id,btn){
+  if(!confirm(lang==='en'?'Remove from wish list?':'欲しいリストから外しますか？'))return;
+  btn.disabled=true;
+  const{error}=await sb.from('pedal_wishlists').delete().eq('id',id).eq('user_id',currentUser.id);
+  if(error){btn.disabled=false;return;}
+  const item=btn.closest('.gacha-save-item');if(item)item.remove();
+  const el=document.getElementById('my-panel-wishlist');
+  if(el&&el.children.length===0)el.innerHTML=`<div class="empty-msg">${tr('emptyWishlist')}</div>`;
+  showToast(lang==='en'?'Removed from wish list':'欲しいリストから外しました');
+  // カウント更新
+  const cEl=document.getElementById('my-count-wishlist');
+  if(cEl)cEl.textContent=Math.max(0,(parseInt(cEl.textContent)||1)-1);
 }
 async function loadGachaSaves(){
   if(!currentUser)return;const el=document.getElementById('my-panel-gacha');
