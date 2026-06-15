@@ -48,7 +48,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .profile-link:hover{border-color:var(--ac);color:var(--ac)}
 
 /* ── Stats Grid ── */
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:0}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:0}
 .stat-item{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 8px;text-align:center}
 .stat-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--ac);line-height:1}
 .stat-label{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);margin-top:4px}
@@ -143,7 +143,7 @@ const I18N={
     sectionPosts:'投稿一覧',sectionGear:'機材リスト',sectionReviews:'レビュー',
     gearPrivate:'このユーザーの機材リストは非公開です',
     gearEmpty:'機材が登録されていません',
-    noPosts:'まだ投稿がありません',noReviews:'まだレビューがありません',
+    noPosts:'まだ投稿がありません',noReviews:'まだレビューがありません',sectionWishlist:'欲しいリスト',noWishlist:'欲しいリストは非公開か空です',
     totalJpy:'円合計',totalUsd:'ドル合計',
     gearSortLabel:'並べ替え：',gearSortDefault:'登録順',gearSortDateAsc:'購入日（古い順）',gearSortDateDesc:'購入日（新しい順）',
     gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',
@@ -155,7 +155,7 @@ const I18N={
     sectionPosts:'Posts',sectionGear:'Gear List',sectionReviews:'Reviews',
     gearPrivate:'This user\'s gear list is private',
     gearEmpty:'No gear registered',
-    noPosts:'No posts yet',noReviews:'No reviews yet',
+    noPosts:'No posts yet',noReviews:'No reviews yet',sectionWishlist:'Wish List',noWishlist:'Wish list is private or empty',
     totalJpy:'JPY Total',totalUsd:'USD Total',
     gearSortLabel:'Sort: ',gearSortDefault:'Default',gearSortDateAsc:'Date (oldest)',gearSortDateDesc:'Date (newest)',
     gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',
@@ -180,11 +180,11 @@ function shareUserToX(url,username){
 }
 
 // ── Tab state ──
-let _userData=null,_posts=[],_gear=[],_reviews=[];
+let _userData=null,_posts=[],_gear=[],_reviews=[],_wishlist=[];
 let _currentTab='posts';
 function switchTab(tab){
   _currentTab=tab;
-  ['posts','gear','reviews'].forEach(t=>{
+  ['posts','gear','reviews','wishlist'].forEach(t=>{
     const btn=document.getElementById('utab-'+t);
     const panel=document.getElementById('upanel-'+t);
     if(btn)btn.classList.toggle('on',t===tab);
@@ -208,20 +208,22 @@ async function loadUser(){
   document.querySelector('meta[property="og:description"]')?.setAttribute('content',
     lang==='en'?`${user.username}'s pedalboard — My Gear My Board`:`${user.username}のペダルボード — My Gear My Board`);
 
-  const[postsRes,gearRes,reviewsRes]=await Promise.all([
+  const[postsRes,gearRes,reviewsRes,wishlistRes]=await Promise.all([
     sb.from('posts').select('id,title,image_urls,likes,created_at,post_type').eq('user_id',user.id).order('created_at',{ascending:false}).limit(12),
     user.gear_list_public
       ?sb.from('user_gear').select('*').eq('user_id',user.id).order('sort_order').order('created_at')
       :Promise.resolve({data:null}),
-    sb.from('pedal_reviews').select('id,body,rating_score,likes,created_at,pedal_id,pedals(full_name,slug)').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20)
+    sb.from('pedal_reviews').select('id,body,rating_score,likes,created_at,pedal_id,pedals(full_name,slug)').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20),
+    sb.from('pedal_wishlists').select('id,created_at,pedals(id,brand,model,full_name,slug,image_url,types)').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
   ]);
   _posts=postsRes.data||[];
   _gear=gearRes.data||[];
   _reviews=reviewsRes.data||[];
-  renderUser(user,_posts,_gear,_reviews,pageUrl);
+  _wishlist=wishlistRes.data||[];
+  renderUser(user,_posts,_gear,_reviews,_wishlist,pageUrl);
 }
 
-function renderUser(user,posts,gear,reviews,pageUrl){
+function renderUser(user,posts,gear,reviews,wishlist,pageUrl){
   const avatarHtml=user.avatar_url
     ?`<img src="${escHtml(user.avatar_url)}" alt="${escHtml(user.username)}">`
     :`<span style="font-size:28px;font-weight:700">${user.username[0].toUpperCase()}</span>`;
@@ -244,6 +246,7 @@ function renderUser(user,posts,gear,reviews,pageUrl){
         <div class="stat-item"><div class="stat-value">${posts.length}</div><div class="stat-label">${tr('statPosts')}</div></div>
         <div class="stat-item"><div class="stat-value">${gearCount}</div><div class="stat-label">${tr('statGear')}</div></div>
         <div class="stat-item"><div class="stat-value">${reviews.length}</div><div class="stat-label">${tr('statReviews')}</div></div>
+        <div class="stat-item"><div class="stat-value">${wishlist.length}</div><div class="stat-label">${tr('sectionWishlist')}</div></div>
       </div>
     </div>
 
@@ -252,7 +255,7 @@ function renderUser(user,posts,gear,reviews,pageUrl){
       <button class="share-btn-x" onclick="shareUserToX('${escHtml(pageUrl)}','${escHtml(user.username)}')">${tr('shareBtnX')}</button>
     </div>
 
-    <div class="tab-grid">
+    <div class="tab-grid" style="grid-template-columns:repeat(4,1fr)">
       <div class="tab-btn on" id="utab-posts" style="background-image:url(/icons/icon_posts.png)" onclick="switchTab('posts')">
         <span class="tab-btn-label">${tr('sectionPosts')}</span>
       </div>
@@ -262,11 +265,15 @@ function renderUser(user,posts,gear,reviews,pageUrl){
       <div class="tab-btn" id="utab-reviews" style="background-image:url(/icons/icon_reviews.png)" onclick="switchTab('reviews')">
         <span class="tab-btn-label">${tr('sectionReviews')}</span>
       </div>
+      <div class="tab-btn" style="background-image:url(/icons/icon_wishlist.png)" id="utab-wishlist" onclick="switchTab('wishlist')">
+        <span class="tab-btn-label">${tr('sectionWishlist')}</span>
+      </div>
     </div>
 
     <div id="upanel-posts">${renderPosts(posts)}</div>
     <div id="upanel-gear" style="display:none">${renderGear(gear,user.gear_list_public)}</div>
     <div id="upanel-reviews" style="display:none">${renderReviews(reviews)}</div>
+    <div id="upanel-wishlist" style="display:none">${renderWishlist(wishlist,user.wishlist_public)}</div>
   `;
   document.getElementById('content').innerHTML=html;
 }
@@ -351,6 +358,23 @@ function applyUserGearSort(){
   if(wrap)wrap.innerHTML=renderGearItems(sorted);
 }
 
+function renderWishlist(wishlist,isPublic){
+  if(!wishlist||!wishlist.length)return`<div class="section-card"><div class="empty-msg">${tr('noWishlist')}</div></div>`;
+  return`<div>${wishlist.map(w=>{
+    const p=w.pedals;if(!p)return'';
+    const imgSrc=p.image_url||'';
+    const typeIcon=p.types&&p.types[0]?`https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_${p.types[0]}.png`:'';
+    const imgEl=imgSrc?`<img src="${escHtml(imgSrc)}" loading="lazy" style="width:48px;height:48px;object-fit:contain;border-radius:6px;background:var(--sf2);border:1px solid var(--bd);flex-shrink:0" onerror="this.src='${escHtml(typeIcon)}'">`:typeIcon?`<img src="${escHtml(typeIcon)}" loading="lazy" style="width:48px;height:48px;object-fit:contain;border-radius:6px;background:var(--sf2);border:1px solid var(--bd);flex-shrink:0">`:`<div style="width:48px;height:48px;border-radius:6px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎛</div>`;
+    return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);cursor:pointer" onclick="location.href='/pedal?slug=${escHtml(p.slug)}'">
+      ${imgEl}
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--td);font-weight:600;letter-spacing:.5px">${escHtml(p.brand)}</div>
+        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.model)}</div>
+      </div>
+      <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ac);flex-shrink:0">${lang==='en'?'Detail →':'詳細 →'}</div>
+    </div>`;
+  }).join('')}</div>`;
+}
 function renderReviews(reviews){
   if(!reviews||!reviews.length)return`<div class="section-card"><div class="empty-msg">${tr('noReviews')}</div></div>`;
   return`<div>${reviews.map(r=>{
