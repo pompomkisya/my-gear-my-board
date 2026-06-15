@@ -382,8 +382,11 @@ function applyLangUI(){
   const lmBtnPc=document.getElementById('load-more-btn-pc');if(lmBtnPc&&!lmBtnPc.disabled)lmBtnPc.textContent=lang==='en'?'Load more':'さらに読み込む';
   // ★ ペダル図鑑CTAテキスト更新
   ['pedal-db-cta-title-mob','pedal-db-cta-title-pc'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=lang==='en'?'PEDAL ENCYCLOPEDIA':'エフェクター図鑑';});
-  ['pedal-db-cta-sub-mob','pedal-db-cta-sub-pc'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=lang==='en'?'2,300+ effects pedals':'エフェクター2,300件以上';});
+  ['pedal-db-cta-sub-mob','pedal-db-cta-sub-pc'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=lang==='en'?'2,000+ effects pedals':'エフェクター2,000件以上';});
   ['pedal-db-cta-placeholder-mob','pedal-db-cta-placeholder-pc'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=lang==='en'?'Featured &amp; Ads<br>Coming Soon':'特集・広告<br>準備中';});
+  // ★ ガイドボタン
+  const slGuide=document.getElementById('sl-guide-text');if(slGuide)slGuide.textContent=lang==='en'?'What you can do':'MGMBで出来ること';
+  const guideMob=document.getElementById('guide-cta-title-mob');if(guideMob)guideMob.textContent=lang==='en'?'WHAT YOU CAN DO':'MGMBで出来ること';
 }
 function togglePostDropdown(e){e.stopPropagation();document.getElementById('post-dropdown').classList.toggle('open');}
 function closeDropdownAndPost(type){document.getElementById('post-dropdown').classList.remove('open');openPost(type);}
