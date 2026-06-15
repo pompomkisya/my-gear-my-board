@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MGMBで出来ること — My Gear My Board</title>
+<meta name="description" content="My Gear My Board（MGMB）でできること。ペダルボード投稿・エフェクター図鑑・ペダルガチャ・マイページ機能を紹介。">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0e;--sf:#151517;--sf2:#1c1c1f;--bd:#272729;--ac:#e8552d;--tx:#eae8e2;--tm:#9a9890;--td:#6e6c68}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:'Noto Sans JP',sans-serif;font-weight:300;min-height:100vh}
+header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(13,13,14,.96);backdrop-filter:blur(14px);border-bottom:1px solid var(--bd)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;cursor:pointer}
+.logo-img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.logo-main{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.logo-sub{font-size:9px;letter-spacing:2px;color:var(--ac);text-transform:uppercase;margin-top:2px}
+.back-btn{padding:7px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;text-decoration:none;display:flex;align-items:center;white-space:nowrap}
+.back-btn:hover{border-color:var(--ac);color:var(--ac)}
+.lang-btn{display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;color:var(--tm);transition:all .15s}
+.lang-btn:hover{border-color:var(--ac);color:var(--ac)}
+.page{max-width:680px;margin:0 auto;padding:32px 16px 60px}
+
+/* Hero */
+.hero{text-align:center;margin-bottom:40px;padding:0 8px}
+.hero-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ac);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;margin-bottom:12px;line-height:1.1}
+.hero-sub{font-family:'Noto Sans JP',sans-serif;font-size:13px;color:var(--tm);line-height:1.8}
+
+/* Section */
+.section{margin-bottom:32px}
+.section-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;overflow:hidden}
+.section-header{display:flex;align-items:center;gap:14px;padding:20px 22px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .15s;user-select:none}
+.section-header:hover{background:rgba(255,255,255,.02)}
+.section-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--ac);line-height:1;flex-shrink:0;width:32px;text-align:center}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;flex:1}
+.section-chevron{font-size:12px;color:var(--td);transition:transform .25s;flex-shrink:0}
+.section-chevron.open{transform:rotate(180deg)}
+.section-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.4,0,.2,1)}
+.section-body.open{max-height:1200px}
+.section-inner{padding:20px 22px}
+
+/* Image placeholder */
+.img-placeholder{background:var(--sf2);border:1px dashed var(--bd);border-radius:10px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.img-placeholder-text{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);letter-spacing:1px}
+
+/* Outline */
+.outline{list-style:none}
+.outline-item{margin-bottom:12px}
+.outline-main{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px}
+.outline-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.outline-text{font-size:14px;font-weight:600;color:var(--tx);line-height:1.5}
+.outline-sub{list-style:none;margin-left:22px;margin-top:4px}
+.outline-sub li{font-size:12px;color:var(--tm);line-height:1.7;padding-left:12px;position:relative}
+.outline-sub li::before{content:'—';position:absolute;left:0;color:var(--td);font-size:10px}
+
+/* CTA */
+.cta-bar{background:rgba(232,85,45,.08);border:1px solid rgba(232,85,45,.25);border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;text-decoration:none;transition:all .18s}
+.cta-bar:hover{background:rgba(232,85,45,.14);border-color:var(--ac)}
+.cta-bar-text{font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:700;color:var(--ac)}
+.cta-bar-arrow{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ac);flex-shrink:0}
+
+/* Start CTA */
+.start-cta{text-align:center;padding:32px 20px;background:var(--sf);border:1px solid var(--bd);border-radius:16px;margin-top:8px}
+.start-cta-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;margin-bottom:8px}
+.start-cta-sub{font-size:12px;color:var(--tm);margin-bottom:20px;line-height:1.7}
+.start-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:var(--ac);border:none;border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer;text-decoration:none;transition:all .18s}
+.start-btn:hover{background:#cf4c26;transform:translateY(-1px)}
+
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px}
+@media(max-width:600px){.page{padding:24px 12px 48px}.hero-title{font-size:28px}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/">
+    <img class="logo-img" src="/IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
+    <div>
+      <div class="logo-main">MY GEAR MY BOARD</div>
+      <div class="logo-sub" id="guide-logo-sub">ペダルボード投稿&データベース</div>
+    </div>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a class="back-btn" href="/" id="guide-back-btn">← ホーム</a>
+    <div class="lang-btn" onclick="toggleLang()">🌐 <span id="guide-lang-label">EN</span></div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-label" id="guide-hero-label">GUIDE</div>
+    <div class="hero-title" id="guide-hero-title">MGMBで出来ること</div>
+    <div class="hero-sub" id="guide-hero-sub">My Gear My Boardは、ギター・ベースプレイヤーのためのペダルボード投稿SNS＆エフェクターデータベースです。</div>
+  </div>
+
+  <!-- 1. 投稿 -->
+  <div class="section">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-num">1</div>
+        <div class="section-title" id="guide-s1-title">ペダルボードを投稿する</div>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="img-placeholder"><span class="img-placeholder-text">SCREENSHOT — 投稿フォーム</span></div>
+          <ul class="outline">
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">📸</span><span class="outline-text" id="guide-s1-p1">登録不要・匿名でOK</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s1-p1-1">アカウント登録なしで写真1枚から投稿できます</li>
+                <li id="guide-s1-p1-2">名前は任意。匿名での投稿もできます</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">🎛</span><span class="outline-text" id="guide-s1-p2">機材タグで整理</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s1-p2-1">使用しているエフェクターをタグとして追加できます</li>
+                <li id="guide-s1-p2-2">タグはエフェクター図鑑のデータと連携します</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">🔒</span><span class="outline-text" id="guide-s1-p3">投稿パスワードで管理</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s1-p3-1">4桁のパスワードを設定すると後から編集・削除できます</li>
+                <li id="guide-s1-p3-2">マイページを作れば投稿を一覧管理できます</li>
+              </ul>
+            </li>
+          </ul>
+          <a href="/" class="cta-bar">
+            <span class="cta-bar-text" id="guide-s1-cta">投稿してみる</span>
+            <span class="cta-bar-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 図鑑 -->
+  <div class="section">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-num">2</div>
+        <div class="section-title" id="guide-s2-title">エフェクター図鑑を使う</div>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="img-placeholder"><span class="img-placeholder-text">SCREENSHOT — エフェクター図鑑</span></div>
+          <ul class="outline">
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">📚</span><span class="outline-text" id="guide-s2-p1">2,000件以上のデータベース</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s2-p1-1">エフェクター・ペダルを随時追加・更新中</li>
+                <li id="guide-s2-p1-2">ブランド・タイプ別に絞り込み検索できます</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">🎯</span><span class="outline-text" id="guide-s2-p2">実際の使用例を確認</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s2-p2-1">各ペダルのページで実際に使っているボード投稿を見られます</li>
+                <li id="guide-s2-p2-2">購入前のリアルな使用感を確認できます</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">⭐</span><span class="outline-text" id="guide-s2-p3">レビューを書く・読む</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s2-p3-1">各ペダルにレビューと星評価を投稿できます</li>
+                <li id="guide-s2-p3-2">Amazonや楽天へのリンクも掲載</li>
+              </ul>
+            </li>
+          </ul>
+          <a href="/pedals" class="cta-bar">
+            <span class="cta-bar-text" id="guide-s2-cta">エフェクター図鑑を開く</span>
+            <span class="cta-bar-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ガチャ -->
+  <div class="section">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-num">3</div>
+        <div class="section-title" id="guide-s3-title">ペダルガチャを回す</div>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="img-placeholder"><span class="img-placeholder-text">SCREENSHOT — ガチャ画面</span></div>
+          <ul class="outline">
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">🎰</span><span class="outline-text" id="guide-s3-p1">次の1台との偶然の出会い</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s3-p1-1">図鑑の2,000件以上のペダルからランダムに1台が登場</li>
+                <li id="guide-s3-p1-2">SSR・SR・Sp・Stdのレアリティ設定あり</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">💾</span><span class="outline-text" id="guide-s3-p2">気になったら保存</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s3-p2-1">マイページでガチャ結果を保存・一覧管理できます</li>
+                <li id="guide-s3-p2-2">ペダル詳細ページに直接ジャンプも可能</li>
+              </ul>
+            </li>
+          </ul>
+          <a href="/" class="cta-bar">
+            <span class="cta-bar-text" id="guide-s3-cta">ガチャを回す</span>
+            <span class="cta-bar-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. マイページ -->
+  <div class="section">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-num">4</div>
+        <div class="section-title" id="guide-s4-title">マイページを持つ</div>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="img-placeholder"><span class="img-placeholder-text">SCREENSHOT — マイページ</span></div>
+          <ul class="outline">
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">📋</span><span class="outline-text" id="guide-s4-p1">投稿を一覧管理</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s4-p1-1">自分のすべての投稿をマイページで確認できます</li>
+                <li id="guide-s4-p1-2">匿名投稿もアカウントに引き継ぎできます</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">🎸</span><span class="outline-text" id="guide-s4-p2">機材リストを公開</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s4-p2-1">所有エフェクターと購入金額・購入日を登録できます</li>
+                <li id="guide-s4-p2-2">合計金額の自動計算・公開・シェア機能あり</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">⭐</span><span class="outline-text" id="guide-s4-p3">レビューを管理</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s4-p3-1">書いたレビューをマイページで一覧確認できます</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">🎰</span><span class="outline-text" id="guide-s4-p4">ガチャ結果を保存</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s4-p4-1">気になったガチャ結果をマイページに保存できます</li>
+              </ul>
+            </li>
+          </ul>
+          <a href="/mypage" class="cta-bar">
+            <span class="cta-bar-text" id="guide-s4-cta">マイページを作る</span>
+            <span class="cta-bar-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. コミュニティ -->
+  <div class="section">
+    <div class="section-card">
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="section-num">5</div>
+        <div class="section-title" id="guide-s5-title">コミュニティに参加する</div>
+        <span class="section-chevron">▼</span>
+      </div>
+      <div class="section-body">
+        <div class="section-inner">
+          <div class="img-placeholder"><span class="img-placeholder-text">SCREENSHOT — 投稿・コメント画面</span></div>
+          <ul class="outline">
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">❤️</span><span class="outline-text" id="guide-s5-p1">いいね・コメント</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s5-p1-1">気に入った投稿にいいねやコメントができます</li>
+                <li id="guide-s5-p1-2">いいねした投稿はマイページで確認できます</li>
+              </ul>
+            </li>
+            <li class="outline-item">
+              <div class="outline-main"><span class="outline-icon">👤</span><span class="outline-text" id="guide-s5-p2">ユーザーページで繋がる</span></div>
+              <ul class="outline-sub">
+                <li id="guide-s5-p2-1">ユーザーページで投稿・機材リストを公開できます</li>
+                <li id="guide-s5-p2-2">投稿者名をクリックでそのユーザーのページへジャンプ</li>
+              </ul>
+            </li>
+          </ul>
+          <a href="/" class="cta-bar">
+            <span class="cta-bar-text" id="guide-s5-cta">投稿を見る</span>
+            <span class="cta-bar-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Start CTA -->
+  <div class="start-cta">
+    <div class="start-cta-title" id="guide-start-title">さっそく使ってみよう</div>
+    <div class="start-cta-sub" id="guide-start-sub">登録不要。写真1枚からすぐに投稿できます。</div>
+    <a href="/" class="start-btn" id="guide-start-btn">ホームへ →</a>
+  </div>
+</div>
+
+<script>
+function detectLang(){const s=localStorage.getItem('mgmb_lang');if(s)return s;const b=navigator.language||'ja';return b.toLowerCase().startsWith('ja')?'ja':'en';}
+let lang=detectLang();
+const I18N={
+  ja:{logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',langLabel:'EN',
+    heroLabel:'GUIDE',heroTitle:'MGMBで出来ること',heroSub:'My Gear My Boardは、ギター・ベースプレイヤーのためのペダルボード投稿SNS＆エフェクターデータベースです。',
+    s1Title:'ペダルボードを投稿する',s1P1:'登録不要・匿名でOK',s1P1_1:'アカウント登録なしで写真1枚から投稿できます',s1P1_2:'名前は任意。匿名での投稿もできます',s1P2:'機材タグで整理',s1P2_1:'使用しているエフェクターをタグとして追加できます',s1P2_2:'タグはエフェクター図鑑のデータと連携します',s1P3:'投稿パスワードで管理',s1P3_1:'4桁のパスワードを設定すると後から編集・削除できます',s1P3_2:'マイページを作れば投稿を一覧管理できます',s1Cta:'投稿してみる',
+    s2Title:'エフェクター図鑑を使う',s2P1:'2,000件以上のデータベース',s2P1_1:'エフェクター・ペダルを随時追加・更新中',s2P1_2:'ブランド・タイプ別に絞り込み検索できます',s2P2:'実際の使用例を確認',s2P2_1:'各ペダルのページで実際に使っているボード投稿を見られます',s2P2_2:'購入前のリアルな使用感を確認できます',s2P3:'レビューを書く・読む',s2P3_1:'各ペダルにレビューと星評価を投稿できます',s2P3_2:'Amazonや楽天へのリンクも掲載',s2Cta:'エフェクター図鑑を開く',
+    s3Title:'ペダルガチャを回す',s3P1:'次の1台との偶然の出会い',s3P1_1:'図鑑の2,000件以上のペダルからランダムに1台が登場',s3P1_2:'SSR・SR・Sp・Stdのレアリティ設定あり',s3P2:'気になったら保存',s3P2_1:'マイページでガチャ結果を保存・一覧管理できます',s3P2_2:'ペダル詳細ページに直接ジャンプも可能',s3Cta:'ガチャを回す',
+    s4Title:'マイページを持つ',s4P1:'投稿を一覧管理',s4P1_1:'自分のすべての投稿をマイページで確認できます',s4P1_2:'匿名投稿もアカウントに引き継ぎできます',s4P2:'機材リストを公開',s4P2_1:'所有エフェクターと購入金額・購入日を登録できます',s4P2_2:'合計金額の自動計算・公開・シェア機能あり',s4P3:'レビューを管理',s4P3_1:'書いたレビューをマイページで一覧確認できます',s4P4:'ガチャ結果を保存',s4P4_1:'気になったガチャ結果をマイページに保存できます',s4Cta:'マイページを作る',
+    s5Title:'コミュニティに参加する',s5P1:'いいね・コメント',s5P1_1:'気に入った投稿にいいねやコメントができます',s5P1_2:'いいねした投稿はマイページで確認できます',s5P2:'ユーザーページで繋がる',s5P2_1:'ユーザーページで投稿・機材リストを公開できます',s5P2_2:'投稿者名をクリックでそのユーザーのページへジャンプ',s5Cta:'投稿を見る',
+    startTitle:'さっそく使ってみよう',startSub:'登録不要。写真1枚からすぐに投稿できます。',startBtn:'ホームへ →'},
+  en:{logoSub:'Pedalboard Posts & Database',backBtn:'← Home',langLabel:'JA',
+    heroLabel:'GUIDE',heroTitle:'What you can do on MGMB',heroSub:'My Gear My Board is a pedalboard sharing SNS and effects pedal database for guitar and bass players.',
+    s1Title:'Post Your Pedalboard',s1P1:'No sign-up needed',s1P1_1:'Post with just one photo — no account required',s1P1_2:'Your name is optional. Anonymous posts are welcome',s1P2:'Tag your gear',s1P2_1:'Add your effects pedals as tags on your post',s1P2_2:'Tags link to the Pedal Encyclopedia database',s1P3:'Manage with a password',s1P3_1:'Set a 4-digit password to edit or delete your post later',s1P3_2:'Create a My Page to manage all your posts in one place',s1Cta:'Post now',
+    s2Title:'Use the Pedal Encyclopedia',s2P1:'2,000+ pedals in the database',s2P1_1:'Effects pedals are added and updated regularly',s2P1_2:'Filter by brand or effect type',s2P2:'See real-world usage',s2P2_1:"See actual board posts featuring each pedal on its page",s2P2_2:'Get a real feel for how it sounds before you buy',s2P3:'Write and read reviews',s2P3_1:'Post a review and star rating for any pedal',s2P3_2:'Links to Amazon and Rakuten included',s2Cta:'Open the Pedal Encyclopedia',
+    s3Title:'Roll the Gear Gacha',s3P1:'A chance encounter with your next pedal',s3P1_1:'A random pedal from 2,000+ in the database appears each roll',s3P1_2:'Rarity tiers: SSR, SR, Sp, and Std',s3P2:'Save what catches your eye',s3P2_1:'Save gacha results to your My Page for later',s3P2_2:'Jump straight to the pedal detail page',s3Cta:'Roll the gacha',
+    s4Title:'Create Your My Page',s4P1:'Manage all your posts',s4P1_1:'View all your posts in one place on My Page',s4P1_2:'Claim anonymous posts and link them to your account',s4P2:'Share your gear list',s4P2_1:'Log your pedals with purchase price and date',s4P2_2:'Auto-calculate total value, share, and make it public',s4P3:'Manage your reviews',s4P3_1:'See all the reviews you have written in one place',s4P4:'Save gacha results',s4P4_1:'Save gacha results to browse and revisit later',s4Cta:'Create My Page',
+    s5Title:'Join the Community',s5P1:'Likes and comments',s5P1_1:'Like and comment on posts you enjoy',s5P1_2:'Liked posts are saved on your My Page',s5P2:'Connect via user pages',s5P2_1:'Share your posts and gear list publicly on your user page',s5P2_2:"Click a poster's name to visit their user page",s5Cta:'Browse posts',
+    startTitle:'Get started now',startSub:'No sign-up needed. Post with just one photo.',startBtn:'Go to Home →'}
+};
+function tr(k){return(I18N[lang]||I18N.ja)[k]||I18N.ja[k]||k;}
+function set(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt;}
+function applyLang(){
+  set('guide-logo-sub',tr('logoSub'));set('guide-back-btn',tr('backBtn'));set('guide-lang-label',tr('langLabel'));
+  set('guide-hero-label',tr('heroLabel'));set('guide-hero-title',tr('heroTitle'));set('guide-hero-sub',tr('heroSub'));
+  set('guide-s1-title',tr('s1Title'));set('guide-s1-p1',tr('s1P1'));set('guide-s1-p1-1',tr('s1P1_1'));set('guide-s1-p1-2',tr('s1P1_2'));
+  set('guide-s1-p2',tr('s1P2'));set('guide-s1-p2-1',tr('s1P2_1'));set('guide-s1-p2-2',tr('s1P2_2'));
+  set('guide-s1-p3',tr('s1P3'));set('guide-s1-p3-1',tr('s1P3_1'));set('guide-s1-p3-2',tr('s1P3_2'));set('guide-s1-cta',tr('s1Cta'));
+  set('guide-s2-title',tr('s2Title'));set('guide-s2-p1',tr('s2P1'));set('guide-s2-p1-1',tr('s2P1_1'));set('guide-s2-p1-2',tr('s2P1_2'));
+  set('guide-s2-p2',tr('s2P2'));set('guide-s2-p2-1',tr('s2P2_1'));set('guide-s2-p2-2',tr('s2P2_2'));
+  set('guide-s2-p3',tr('s2P3'));set('guide-s2-p3-1',tr('s2P3_1'));set('guide-s2-p3-2',tr('s2P3_2'));set('guide-s2-cta',tr('s2Cta'));
+  set('guide-s3-title',tr('s3Title'));set('guide-s3-p1',tr('s3P1'));set('guide-s3-p1-1',tr('s3P1_1'));set('guide-s3-p1-2',tr('s3P1_2'));
+  set('guide-s3-p2',tr('s3P2'));set('guide-s3-p2-1',tr('s3P2_1'));set('guide-s3-p2-2',tr('s3P2_2'));set('guide-s3-cta',tr('s3Cta'));
+  set('guide-s4-title',tr('s4Title'));set('guide-s4-p1',tr('s4P1'));set('guide-s4-p1-1',tr('s4P1_1'));set('guide-s4-p1-2',tr('s4P1_2'));
+  set('guide-s4-p2',tr('s4P2'));set('guide-s4-p2-1',tr('s4P2_1'));set('guide-s4-p2-2',tr('s4P2_2'));
+  set('guide-s4-p3',tr('s4P3'));set('guide-s4-p3-1',tr('s4P3_1'));set('guide-s4-p4',tr('s4P4'));set('guide-s4-p4-1',tr('s4P4_1'));set('guide-s4-cta',tr('s4Cta'));
+  set('guide-s5-title',tr('s5Title'));set('guide-s5-p1',tr('s5P1'));set('guide-s5-p1-1',tr('s5P1_1'));set('guide-s5-p1-2',tr('s5P1_2'));
+  set('guide-s5-p2',tr('s5P2'));set('guide-s5-p2-1',tr('s5P2_1'));set('guide-s5-p2-2',tr('s5P2_2'));set('guide-s5-cta',tr('s5Cta'));
+  set('guide-start-title',tr('startTitle'));set('guide-start-sub',tr('startSub'));set('guide-start-btn',tr('startBtn'));
+  document.documentElement.lang=lang==='ja'?'ja':'en';
+}
+function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();}
+function toggleSection(header){
+  const body=header.nextElementSibling;
+  const chevron=header.querySelector('.section-chevron');
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chevron.classList.toggle('open',!isOpen);
+}
+applyLang();
+</script>
+</body>
+</html>
