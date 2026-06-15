@@ -295,8 +295,16 @@ textarea.form-input{resize:vertical;min-height:80px}
       <button class="del-btn" onclick="confirmDelete()">🗑 この投稿を削除する</button>
       <div id="claim-post-wrap" style="display:none;margin-top:16px;padding:14px;background:rgba(232,85,45,.06);border:1px solid rgba(232,85,45,.2);border-radius:8px">
         <div style="font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tx);font-weight:600;margin-bottom:4px">📎 この投稿を自分のアカウントに引き継ぐ</div>
-        <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);line-height:1.6;margin-bottom:10px">マイページにログインしている状態でPINを入力すると、この投稿があなたのアカウントに紐付けられます。</div>
-        <button onclick="claimPost()" style="width:100%;padding:10px;background:var(--ac);border:none;border-radius:6px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s">引き継ぐ</button>
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);line-height:1.6;margin-bottom:12px">マイページにログインしている状態で投稿パスワードを入力すると、この投稿があなたのアカウントに紐付けられます。</div>
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm);margin-bottom:8px">投稿パスワード（4桁）</div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
+          <input class="pin-d" id="claim-p1" type="password" inputmode="numeric" maxlength="1">
+          <input class="pin-d" id="claim-p2" type="password" inputmode="numeric" maxlength="1">
+          <input class="pin-d" id="claim-p3" type="password" inputmode="numeric" maxlength="1">
+          <input class="pin-d" id="claim-p4" type="password" inputmode="numeric" maxlength="1">
+        </div>
+        <div id="claim-err" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:#e05050;min-height:16px;margin-bottom:8px;text-align:center"></div>
+        <button onclick="claimPost()" style="width:100%;padding:10px;background:var(--ac);border:none;border-radius:6px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s">この投稿を引き継ぐ</button>
       </div>
     </div>
   </div>
@@ -675,28 +683,30 @@ async function saveEdit(){
   closeModal('edit-bd');showToast('✅ 投稿を更新しました');await loadPost();
 }
 async function claimPost(){
+  const errEl=document.getElementById('claim-err');
+  if(errEl)errEl.textContent='';
   // Supabase Authのセッション確認
   const{data:{session}}=await sb.auth.getSession();
   if(!session){
-    showToast(lang==='en'?'❌ Please log in to My Page first':'❌ 先にマイページにログインしてください');
+    if(errEl)errEl.textContent='❌ 先にマイページにログインしてください';
     return;
   }
-  // PIN確認
-  const pin=prompt(lang==='en'?'Enter the PIN for this post:':'この投稿のPINを入力してください:');
-  if(!pin)return;
-  // PIN検証
-  const{data:post}=await sb.from('posts').select('pin_hash,user_id').eq('id',POST_ID).single();
-  if(!post){showToast('❌ 投稿が見つかりません');return;}
-  if(post.user_id){showToast(lang==='en'?'❌ This post is already linked to an account':'❌ この投稿は既にアカウントに紐付けられています');return;}
-  // pin_hashはbcryptハッシュのため、入力値をそのまま比較できないので別途確認
-  // 代替として投稿編集が既に開いている（PIN認証済み）ので現在のセッションPINと照合
-  if(String(pin).trim()!==String(currentPin).trim()){showToast(lang==='en'?'❌ Incorrect PIN':'❌ PINが違います');return;}
+  // 4桁入力から投稿パスワード取得
+  const pin=['claim-p1','claim-p2','claim-p3','claim-p4'].map(id=>document.getElementById(id)?.value||'').join('');
+  if(pin.length<4){if(errEl)errEl.textContent='❌ 投稿パスワード（4桁）を入力してください';return;}
+  // currentPinと照合（編集認証済みのPINと比較）
+  if(String(pin).trim()!==String(currentPin).trim()){
+    if(errEl)errEl.textContent='❌ 投稿パスワードが違います';
+    ['claim-p1','claim-p2','claim-p3','claim-p4'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('claim-p1')?.focus();
+    return;
+  }
   // ユーザー情報取得
   const{data:userData}=await sb.from('users').select('username').eq('id',session.user.id).single();
   const username=userData?.username||session.user.user_metadata?.username||'';
   // 紐付け
   const{error}=await sb.from('posts').update({user_id:session.user.id,username}).eq('id',POST_ID).is('user_id',null);
-  if(error){showToast('❌ '+error.message);return;}
+  if(error){if(errEl)errEl.textContent='❌ '+error.message;return;}
   showToast(lang==='en'?'✅ Post linked to your account!':'✅ 投稿をアカウントに引き継ぎました！');
   document.getElementById('claim-post-wrap').style.display='none';
   await loadPost();
@@ -865,6 +875,11 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 function openPostLightbox(src){const lb=document.getElementById('post-lightbox');const img=document.getElementById('post-lightbox-img');if(!lb||!img)return;img.src=src;lb.classList.add('open');document.body.style.overflow='hidden';}
 function closePostLightbox(){const lb=document.getElementById('post-lightbox');if(lb)lb.classList.remove('open');document.body.style.overflow='';}
 
+['claim-p1','claim-p2','claim-p3','claim-p4'].forEach((id,i,arr)=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',()=>{if(el.value.length===1&&i<arr.length-1)document.getElementById(arr[i+1]).focus();});
+  el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&i>0)document.getElementById(arr[i-1]).focus();});
+});
 ['pin1','pin2','pin3','pin4'].forEach((id,i,arr)=>{
   const el=document.getElementById(id);
   el.addEventListener('input',()=>{if(el.value&&i<arr.length-1)document.getElementById(arr[i+1]).focus();if(el.value&&i===arr.length-1)verifyPin();});
