@@ -353,7 +353,6 @@ function applyLangUI(){
   set('lbl-desc',tr('lblDesc'));
   set('pass-box-title',tr('passTitle'));
   const passWarnEl=document.getElementById('pass-warn');if(passWarnEl)passWarnEl.innerHTML=tr('passWarn');
-  set('anon-note',tr('anonNote'));
   const pusr=document.getElementById('post-username');if(pusr)pusr.placeholder=tr('phUsername');
   const ptitle=document.getElementById('post-title');if(ptitle)ptitle.placeholder=tr(currentPostType==='gear'?'phTitleGear':'phTitle');
   const pdesc=document.getElementById('post-desc');if(pdesc)pdesc.placeholder=tr('phDesc');
