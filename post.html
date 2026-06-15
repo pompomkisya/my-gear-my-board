@@ -293,6 +293,11 @@ textarea.form-input{resize:vertical;min-height:80px}
       </div>
       <button class="submit-btn" onclick="saveEdit()">変更を保存する</button>
       <button class="del-btn" onclick="confirmDelete()">🗑 この投稿を削除する</button>
+      <div id="claim-post-wrap" style="display:none;margin-top:16px;padding:14px;background:rgba(232,85,45,.06);border:1px solid rgba(232,85,45,.2);border-radius:8px">
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tx);font-weight:600;margin-bottom:4px">📎 この投稿を自分のアカウントに引き継ぐ</div>
+        <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);line-height:1.6;margin-bottom:10px">マイページにログインしている状態でPINを入力すると、この投稿があなたのアカウントに紐付けられます。</div>
+        <button onclick="claimPost()" style="width:100%;padding:10px;background:var(--ac);border:none;border-radius:6px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer;transition:all .15s">引き継ぐ</button>
+      </div>
     </div>
   </div>
 </div>
@@ -587,6 +592,7 @@ async function postComment(parentId,replyToName){
   await loadComments();
 }
 
+let currentPin='';
 function openEditModal(){
   ['pin1','pin2','pin3','pin4'].forEach(id=>{document.getElementById(id).value='';});
   document.getElementById('pin-err').textContent='';
@@ -602,7 +608,15 @@ function verifyPin(){
   const isMaster=entered.toUpperCase()===MASTER_KEY;
   if(currentPost&&(isMaster||entered===currentPost.pin_hash)){
     document.getElementById('pin-err').textContent='';
+    currentPin=entered;
     document.getElementById('edit-step1').style.display='none';
+    // 引き継ぎボタン：user_idがnullの場合のみ表示
+    const claimWrap=document.getElementById('claim-post-wrap');
+    if(claimWrap){
+      sb.auth.getSession().then(({data:{session}})=>{
+        claimWrap.style.display=(!currentPost.user_id&&session)?'block':'none';
+      });
+    }
     document.getElementById('edit-title').value=currentPost.title||'';
     document.getElementById('edit-title').placeholder=currentPost.post_type==='gear'?'例：My New Gear！':'例：ライブ用最強ボード';
     const gear=Array.isArray(currentPost.gear_list)?currentPost.gear_list:[];
@@ -659,6 +673,33 @@ async function saveEdit(){
   const{error}=await sb.from('posts').update({title,gear_list,description,youtube_url,image_urls}).eq('id',POST_ID);
   if(error){showToast('❌ 更新に失敗しました');return;}
   closeModal('edit-bd');showToast('✅ 投稿を更新しました');await loadPost();
+}
+async function claimPost(){
+  // Supabase Authのセッション確認
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){
+    showToast(lang==='en'?'❌ Please log in to My Page first':'❌ 先にマイページにログインしてください');
+    return;
+  }
+  // PIN確認
+  const pin=prompt(lang==='en'?'Enter the PIN for this post:':'この投稿のPINを入力してください:');
+  if(!pin)return;
+  // PIN検証
+  const{data:post}=await sb.from('posts').select('pin_hash,user_id').eq('id',POST_ID).single();
+  if(!post){showToast('❌ 投稿が見つかりません');return;}
+  if(post.user_id){showToast(lang==='en'?'❌ This post is already linked to an account':'❌ この投稿は既にアカウントに紐付けられています');return;}
+  // pin_hashはbcryptハッシュのため、入力値をそのまま比較できないので別途確認
+  // 代替として投稿編集が既に開いている（PIN認証済み）ので現在のセッションPINと照合
+  if(String(pin).trim()!==String(currentPin).trim()){showToast(lang==='en'?'❌ Incorrect PIN':'❌ PINが違います');return;}
+  // ユーザー情報取得
+  const{data:userData}=await sb.from('users').select('username').eq('id',session.user.id).single();
+  const username=userData?.username||session.user.user_metadata?.username||'';
+  // 紐付け
+  const{error}=await sb.from('posts').update({user_id:session.user.id,username}).eq('id',POST_ID).is('user_id',null);
+  if(error){showToast('❌ '+error.message);return;}
+  showToast(lang==='en'?'✅ Post linked to your account!':'✅ 投稿をアカウントに引き継ぎました！');
+  document.getElementById('claim-post-wrap').style.display='none';
+  await loadPost();
 }
 async function confirmDelete(){
   if(!confirm('本当にこの投稿を削除しますか？\nこの操作は取り消せません。'))return;
