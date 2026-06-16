@@ -533,9 +533,9 @@ let cachedPedal=null, cachedPosts=[], currentSession=null;
 // ★ 欲しいリスト
 let _wishlistId=null;
 async function loadWishlistState(pedalId){
-  const{data:{session}}=await sb.auth.getSession();
+  const{data:{session}}=await db.auth.getSession();
   if(!session){updateWishlistBtn(false);return;}
-  const{data}=await sb.from('pedal_wishlists').select('id').eq('user_id',session.user.id).eq('pedal_id',pedalId).maybeSingle();
+  const{data}=await db.from('pedal_wishlists').select('id').eq('user_id',session.user.id).eq('pedal_id',pedalId).maybeSingle();
   _wishlistId=data?.id||null;
   updateWishlistBtn(!!data);
 }
@@ -548,15 +548,15 @@ function updateWishlistBtn(isAdded){
   else{btn.classList.remove('added');if(icon)icon.textContent='🤍';if(txt)txt.textContent=tr('wishlistAdd');}
 }
 async function toggleWishlist(){
-  const{data:{session}}=await sb.auth.getSession();
+  const{data:{session}}=await db.auth.getSession();
   if(!session){openWishlistModal();return;}
   const pedalId=cachedPedal?.id;if(!pedalId)return;
   if(_wishlistId){
-    await sb.from('pedal_wishlists').delete().eq('id',_wishlistId);
+    await db.from('pedal_wishlists').delete().eq('id',_wishlistId);
     _wishlistId=null;updateWishlistBtn(false);
     showToast(lang==='en'?'Removed from wish list':'欲しいリストから外しました');
   }else{
-    const{data,error}=await sb.from('pedal_wishlists').insert({user_id:session.user.id,pedal_id:pedalId}).select('id').single();
+    const{data,error}=await db.from('pedal_wishlists').insert({user_id:session.user.id,pedal_id:pedalId}).select('id').single();
     if(error){showToast('❌ '+error.message);return;}
     _wishlistId=data.id;updateWishlistBtn(true);
     showToast(lang==='en'?'✅ Added to wish list!':'✅ 欲しいリストに追加しました！');
@@ -1039,7 +1039,6 @@ function renderPedal(pedal,posts){
       ${quickNavHtml}
       ${descHtml}
     </div>
-    <div id="yt-section"><div class="yt-card" id="section-video"><div class="yt-card-title">${tr('ytTitle')}</div><div class="yt-loading"><div class="yt-loading-icon">▶</div><div class="yt-loading-text">${tr('ytLoading')}</div></div></div></div>
     <!-- ★ 欲しいリストボタン -->
     <div style="margin-bottom:4px">
       <button class="wishlist-btn" id="wishlist-btn" onclick="toggleWishlist()">
@@ -1047,6 +1046,7 @@ function renderPedal(pedal,posts){
         <span id="wishlist-btn-text">欲しいリストに追加</span>
       </button>
     </div>
+    <div id="yt-section"><div class="yt-card" id="section-video"><div class="yt-card-title">${tr('ytTitle')}</div><div class="yt-loading"><div class="yt-loading-icon">▶</div><div class="yt-loading-text">${tr('ytLoading')}</div></div></div></div>
     <div class="buy-card" id="section-buy">
       <div class="buy-card-title">${tr('buyTitle')}</div>
       <div class="buy-buttons">
