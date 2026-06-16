@@ -194,6 +194,18 @@
     .review-like-btn { display: flex; align-items: center; gap: 4px; background: none; border: 1px solid var(--bd); border-radius: 20px; padding: 3px 10px; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--tm); cursor: pointer; transition: all .15s; touch-action: manipulation; }
     .review-like-btn:hover { border-color: var(--ac); color: var(--ac); }
     .review-like-btn.liked { border-color: var(--ac); color: var(--ac); }
+    .wishlist-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 10px; background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 600; color: var(--tm); cursor: pointer; transition: all .18s; margin-bottom: 10px; touch-action: manipulation; }
+    .wishlist-btn:hover { border-color: rgba(232,85,45,.5); color: var(--ac); }
+    .wishlist-btn.added { border-color: var(--ac); color: var(--ac); background: rgba(232,85,45,.08); }
+    .wishlist-modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(4px); z-index: 800; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .wishlist-modal.open { display: flex; }
+    .wishlist-modal-box { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 24px; max-width: 360px; width: 100%; text-align: center; }
+    .wishlist-modal-icon { font-size: 32px; margin-bottom: 12px; }
+    .wishlist-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; margin-bottom: 8px; }
+    .wishlist-modal-sub { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; color: var(--tm); line-height: 1.7; margin-bottom: 16px; }
+    .wishlist-modal-benefits { text-align: left; background: var(--sf2); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; }
+    .wishlist-modal-benefits li { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--tm); line-height: 1.8; list-style: none; padding-left: 14px; position: relative; }
+    .wishlist-modal-benefits li::before { content: '✓'; position: absolute; left: 0; color: var(--ac); font-size: 10px; }
     .review-edit-btn { background: none; border: none; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--td); cursor: pointer; padding: 3px 6px; }
     .review-edit-btn:hover { color: var(--tm); }
     .review-empty { text-align: center; padding: 28px 16px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--td); }
@@ -328,6 +340,10 @@ const I18N = {
     reviewLoginBtn:'マイページを作る →',
     reviewEmpty:'まだレビューがありません。最初のレビューを書きましょう！',
     reviewLiked:'❤️ いいね！', reviewAnon:'匿名ユーザー',
+    wishlistAdd:'欲しいリストに追加',wishlistAdded:'欲しいリスト入り ✓',wishlistRemove:'リストから外す',
+    wmTitle:'欲しいリストに追加',wmSub:'マイページへの登録が必要です。\n登録・ログインすると：',
+    wmB1:'欲しいリストを保存できます',wmB2:'投稿を一覧管理できます',wmB3:'機材リストを公開できます',
+    wmLoginBtn:'マイページを作る・ログイン →',wmCloseBtn:'閉じる',
     reviewOptionalStar:'評価（任意）',
   },
   en: {
@@ -354,6 +370,10 @@ const I18N = {
     reviewLoginBtn:'Create My Page →',
     reviewEmpty:'No reviews yet. Be the first to write one!',
     reviewLiked:'❤️ Liked!', reviewAnon:'Anonymous',
+    wishlistAdd:'Add to Wish List',wishlistAdded:'In Wish List ✓',wishlistRemove:'Remove from list',
+    wmTitle:'Add to Wish List',wmSub:'You need to create a My Page to use this feature.',
+    wmB1:'Save your wish list',wmB2:'Manage all your posts',wmB3:'Share your gear list',
+    wmLoginBtn:'Create My Page / Login →',wmCloseBtn:'Close',
     reviewOptionalStar:'Rating (optional)',
   }
 };
@@ -510,6 +530,52 @@ function toggleLang() {
 
 let cachedPedal=null, cachedPosts=[], currentSession=null;
 
+// ★ 欲しいリスト
+let _wishlistId=null;
+async function loadWishlistState(pedalId){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){updateWishlistBtn(false);return;}
+  const{data}=await sb.from('pedal_wishlists').select('id').eq('user_id',session.user.id).eq('pedal_id',pedalId).maybeSingle();
+  _wishlistId=data?.id||null;
+  updateWishlistBtn(!!data);
+}
+function updateWishlistBtn(isAdded){
+  const btn=document.getElementById('wishlist-btn');
+  const icon=document.getElementById('wishlist-btn-icon');
+  const txt=document.getElementById('wishlist-btn-text');
+  if(!btn)return;
+  if(isAdded){btn.classList.add('added');if(icon)icon.textContent='❤️';if(txt)txt.textContent=tr('wishlistAdded');}
+  else{btn.classList.remove('added');if(icon)icon.textContent='🤍';if(txt)txt.textContent=tr('wishlistAdd');}
+}
+async function toggleWishlist(){
+  const{data:{session}}=await sb.auth.getSession();
+  if(!session){openWishlistModal();return;}
+  const pedalId=cachedPedal?.id;if(!pedalId)return;
+  if(_wishlistId){
+    await sb.from('pedal_wishlists').delete().eq('id',_wishlistId);
+    _wishlistId=null;updateWishlistBtn(false);
+    showToast(lang==='en'?'Removed from wish list':'欲しいリストから外しました');
+  }else{
+    const{data,error}=await sb.from('pedal_wishlists').insert({user_id:session.user.id,pedal_id:pedalId}).select('id').single();
+    if(error){showToast('❌ '+error.message);return;}
+    _wishlistId=data.id;updateWishlistBtn(true);
+    showToast(lang==='en'?'✅ Added to wish list!':'✅ 欲しいリストに追加しました！');
+  }
+}
+function openWishlistModal(){
+  const m=document.getElementById('wishlist-login-modal');if(!m)return;
+  const setT=(id,t)=>{const el=document.getElementById(id);if(el)el.textContent=t;};
+  setT('wm-title',tr('wmTitle'));setT('wm-b1',tr('wmB1'));setT('wm-b2',tr('wmB2'));setT('wm-b3',tr('wmB3'));
+  setT('wm-login-btn',tr('wmLoginBtn'));setT('wm-close-btn',tr('wmCloseBtn'));
+  const sub=document.getElementById('wm-sub');
+  if(sub)sub.innerHTML=lang==='en'?'You need to create a My Page to use this feature.<br>After signing up you can:':'マイページへの登録が必要です。<br>登録・ログインすると：';
+  m.classList.add('open');document.body.style.overflow='hidden';
+}
+function closeWishlistModal(){
+  const m=document.getElementById('wishlist-login-modal');
+  if(m)m.classList.remove('open');
+  document.body.style.overflow='';
+}
 function initDescAccordion() {
   const desc=document.getElementById('desc-text');const btn=document.getElementById('desc-toggle-btn');
   if(!desc||!btn)return;
@@ -974,6 +1040,13 @@ function renderPedal(pedal,posts){
       ${descHtml}
     </div>
     <div id="yt-section"><div class="yt-card" id="section-video"><div class="yt-card-title">${tr('ytTitle')}</div><div class="yt-loading"><div class="yt-loading-icon">▶</div><div class="yt-loading-text">${tr('ytLoading')}</div></div></div></div>
+    <!-- ★ 欲しいリストボタン -->
+    <div style="margin-bottom:4px">
+      <button class="wishlist-btn" id="wishlist-btn" onclick="toggleWishlist()">
+        <span id="wishlist-btn-icon">🤍</span>
+        <span id="wishlist-btn-text">欲しいリストに追加</span>
+      </button>
+    </div>
     <div class="buy-card" id="section-buy">
       <div class="buy-card-title">${tr('buyTitle')}</div>
       <div class="buy-buttons">
@@ -991,6 +1064,7 @@ function renderPedal(pedal,posts){
     </div>
     <div class="boards-card" id="section-boards"><h3>🎛 ${tr('sectionBoards')}</h3><div class="boards-grid">${boardsHtml}</div></div>`;
   initDescAccordion();
+  loadWishlistState(pedal.id);
 }
 
 function showError(msg){
@@ -1001,5 +1075,20 @@ applyLang();
 loadPedal();
 document.addEventListener('DOMContentLoaded', initMobSwipe);
 </script>
+<!-- ★ 欲しいリスト未ログインモーダル -->
+<div class="wishlist-modal" id="wishlist-login-modal" onclick="if(event.target===this)closeWishlistModal()">
+  <div class="wishlist-modal-box">
+    <div class="wishlist-modal-icon">🤍</div>
+    <div class="wishlist-modal-title" id="wm-title">欲しいリストに追加</div>
+    <div class="wishlist-modal-sub" id="wm-sub">マイページへの登録が必要です。<br>登録・ログインすると：</div>
+    <ul class="wishlist-modal-benefits" id="wm-benefits">
+      <li id="wm-b1">欲しいリストを保存できます</li>
+      <li id="wm-b2">投稿を一覧管理できます</li>
+      <li id="wm-b3">機材リストを公開できます</li>
+    </ul>
+    <a href="/mypage" style="display:block;padding:11px;background:var(--ac);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;color:#fff;text-decoration:none;margin-bottom:8px" id="wm-login-btn">マイページを作る・ログイン →</a>
+    <button onclick="closeWishlistModal()" style="width:100%;padding:9px;background:transparent;border:1px solid var(--bd);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tm);cursor:pointer;transition:all .15s" id="wm-close-btn">閉じる</button>
+  </div>
+</div>
 </body>
 </html>
