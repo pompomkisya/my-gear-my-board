@@ -4,18 +4,8 @@
   <meta charset="UTF-8">
   <meta name="robots" content="index, follow">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ペダル詳細 | My Gear My Board</title>
-  <meta name="description" content="" id="meta-description">
-  <meta property="og:title" content="My Gear My Board" id="og-title">
-  <meta property="og:description" content="" id="og-description">
-  <meta property="og:image" content="" id="og-image">
-  <meta property="og:url" content="" id="og-url">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="" id="tw-title">
-  <meta name="twitter:description" content="" id="tw-description">
-  <meta name="twitter:image" content="" id="tw-image">
-  <link rel="canonical" href="" id="canonical">
-  <script type="application/ld+json" id="json-ld"></script>
+  <title>エフェクターペダル一覧 | My Gear My Board</title>
+  <meta name="description" content="エフェクターペダルをブランド・タイプ・キーワードで検索。実際のボードでの使用例も確認できます。 | Also available in English">
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="apple-touch-icon" href="/favicon.png">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -24,203 +14,123 @@
     :root {
       --bg: #0d0d0e; --sf: #151517; --sf2: #1c1c1f;
       --bd: #272729; --ac: #e8552d; --tx: #eae8e2; --tm: #9a9890; --td: #6e6c68;
-      --amazon: #f0a500; --sweetwater: #1a73e8; --soundhouse: #654874;
-      --rakuten: #bf0000; --reverb: #00a99d;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--tx); font-family: 'Noto Sans JP', sans-serif; font-weight: 300; min-height: 100vh; }
-    header { background: rgba(13,13,14,.96); backdrop-filter: blur(14px); border-bottom: 1px solid var(--bd); padding: 0; display: flex; flex-direction: column; position: sticky; top: 0; z-index: 100; }
-    .header-row1 { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 16px 4px; border-bottom: 1px solid rgba(39,39,41,.6); }
-    .header-row2 { display: flex; align-items: center; justify-content: flex-start; gap: 6px; padding: 4px 16px 6px; }
+    header {
+      background: rgba(13,13,14,.96); backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--bd); padding: 0;
+      display: flex; flex-direction: column; position: sticky; top: 0; z-index: 100;
+    }
+    .header-row1 {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 8px 16px 4px; border-bottom: 1px solid rgba(39,39,41,.6);
+    }
+    .header-row2 {
+      display: flex; align-items: center; justify-content: flex-start; gap: 6px;
+      padding: 4px 16px 6px;
+    }
     .header-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex: 1; min-width: 0; }
     .header-logo img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
     .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 3px; color: var(--tx); white-space: nowrap; }
     .header-sub { font-size: 9px; letter-spacing: 2px; color: var(--ac); text-transform: uppercase; margin-top: 1px; white-space: nowrap; }
-    .lang-btn { display: flex; align-items: center; gap: 4px; padding: 6px 10px; background: var(--sf); border: 1px solid var(--bd); border-radius: 4px; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600; color: var(--tm); cursor: pointer; transition: all .15s; touch-action: manipulation; }
+    .header-right { display: flex; align-items: center; gap: 6px; }
+    .lang-btn {
+      display: flex; align-items: center; gap: 4px; padding: 6px 10px;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600;
+      color: var(--tm); cursor: pointer; transition: all .15s; touch-action: manipulation;
+    }
     .lang-btn:hover { border-color: var(--ac); color: var(--ac); }
-    .home-btn { display: flex; align-items: center; gap: 4px; padding: 5px 10px; background: var(--sf); border: 1px solid var(--bd); border-radius: 4px; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 600; color: var(--tm); cursor: pointer; transition: all .15s; text-decoration: none; white-space: nowrap; }
+    .home-btn {
+      display: flex; align-items: center; gap: 4px; padding: 5px 10px;
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 4px;
+      font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 600;
+      color: var(--tm); cursor: pointer; transition: all .15s; text-decoration: none; white-space: nowrap;
+    }
     .home-btn:hover { border-color: var(--ac); color: var(--ac); }
-    .breadcrumb { background: var(--sf); border-bottom: 1px solid var(--bd); padding: 10px 16px; font-size: 12px; color: var(--tm); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .breadcrumb {
+      background: var(--sf); border-bottom: 1px solid var(--bd);
+      padding: 10px 16px; font-size: 12px; color: var(--tm);
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
     .breadcrumb a { color: var(--tm); text-decoration: none; }
     .breadcrumb a:hover { color: var(--tx); }
     .breadcrumb .sep { color: var(--bd); }
     .breadcrumb .current { color: var(--tx); }
-    /* ★ PCレイアウト：中央ペダル情報 + 右サイドレビュー */
-    .page-wrapper { padding: 20px 16px 60px; }
-    .page-layout { max-width: 760px; margin: 0 auto; }
-    .page-main { width: 100%; }
-    .page-side { display: none; }
-    @media(min-width: 900px) {
-      .page-wrapper { padding: 24px 24px 60px; }
-      .page-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; max-width: 1160px; margin: 0 auto; align-items: start; }
-      .page-side { display: block; position: sticky; top: 90px; max-height: calc(100vh - 110px); overflow-y: auto; }
+    .search-area {
+      background: var(--sf); border-bottom: 1px solid var(--bd);
+      padding: 16px; position: sticky; top: 58px; z-index: 90;
     }
-    /* ★ スマホタブUI */
-    .mob-tabs { display: none; position: sticky; top: 78px; z-index: 50; background: var(--bg); border-bottom: 1px solid var(--bd); }
-    .mob-tabs-inner { display: flex; }
-    .mob-tab { flex: 1; padding: 11px 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 600; color: var(--tm); text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; touch-action: manipulation; }
-    .mob-tab.on { color: var(--ac); border-bottom-color: var(--ac); }
-    .mob-panel { display: block; }
-    .mob-panel.hidden { display: none; }
-    @media(max-width: 899px) {
-      .mob-tabs { display: block; }
-      .page-main { padding-top: 0; }
+    .search-input-wrap { position: relative; margin-bottom: 10px; }
+    .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--tm); font-size: 16px; pointer-events: none; }
+    .search-input {
+      width: 100%; background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
+      padding: 12px 12px 12px 38px; color: var(--tx); font-size: 16px;
+      font-family: 'Noto Sans JP', sans-serif; outline: none; -webkit-appearance: none;
     }
-    /* 既存スタイル */
+    .search-input:focus { border-color: var(--ac); }
+    .search-input::placeholder { color: var(--td); }
+    .filter-row { display: flex; gap: 8px; width: 100%; }
+    .filter-select {
+      flex: 1; min-width: 0; width: 0;
+      background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px;
+      padding: 10px 32px 10px 12px; color: var(--tx); font-size: 14px;
+      font-family: 'Noto Sans JP', sans-serif; outline: none;
+      -webkit-appearance: none; appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236e6c68' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    .filter-select:focus { border-color: var(--ac); }
+    .filter-select option { background: var(--sf); color: var(--tx); }
     .container { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
-    .loading { text-align: center; padding: 60px 20px; color: var(--tm); }
-    .error-box { background: var(--sf); border: 1px solid #c0392b; border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--tm); }
-    .pedal-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
-    .pedal-top { display: flex; flex-direction: column; align-items: center; gap: 14px; margin-bottom: 20px; text-align: center; }
-    .pedal-image-block { width: 150px; flex-shrink: 0; }
-    .pedal-image { width: 150px; height: 150px; background: var(--sf2); border: 1px solid var(--bd); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: zoom-in; }
-    .pedal-info { width: 100%; }
-    .type-badges { justify-content: center; }
-    .pedal-image.no-source { border-radius: 12px; }
-    .pedal-image.no-img { cursor: default; }
-    .pedal-image img { width: 100%; height: 100%; object-fit: contain; }
-    .pedal-image-placeholder { font-size: 40px; opacity: .3; }
-    .image-source { background: var(--sf2); border: 1px solid var(--bd); border-top: none; border-radius: 0 0 12px 12px; padding: 3px 6px; text-align: center; font-size: 8px; color: #555; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 150px; }
-    @media(min-width: 900px) {
-      .pedal-card { padding: 32px; }
-      .pedal-top { flex-direction: row; align-items: flex-start; gap: 28px; text-align: left; }
-      .pedal-image-block { width: 200px; }
-      .pedal-image { width: 200px; height: 200px; }
-      .pedal-image.has-source { border-radius: 16px 16px 0 0; }
-      .pedal-image.no-source { border-radius: 16px; }
-      .image-source { width: 200px; }
-      .pedal-info { width: auto; }
-      .type-badges { justify-content: flex-start; }
-      .pedal-name { font-size: 32px; }
+    .result-count { font-size: 12px; color: var(--tm); margin-bottom: 14px; }
+    .result-count span { color: var(--ac); font-weight: 700; }
+    .pedal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    @media (max-width: 480px) { .pedal-grid { grid-template-columns: repeat(2, 1fr); } }
+    .pedal-card {
+      background: var(--sf); border: 1px solid var(--bd); border-radius: 12px;
+      overflow: hidden; text-decoration: none; color: var(--tx);
+      display: block; transition: border-color .2s;
     }
-    .pedal-info { flex: 1; min-width: 0; }
-    .pedal-brand { font-size: 12px; font-weight: 700; color: var(--ac); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; }
-    .pedal-name { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; line-height: 1.2; margin-bottom: 10px; word-break: break-word; }
-    .type-badges { display: flex; flex-wrap: wrap; gap: 6px; }
-    .type-badge { background: var(--sf2); border: 1px solid var(--bd); color: var(--tm); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
-    .quick-nav { display: flex; flex-direction: row; gap: 6px; padding: 14px 0 4px; border-top: 1px solid var(--bd); }
-    .quick-nav-chip { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 9px 4px; background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; font-weight: 500; color: var(--tm); cursor: pointer; text-decoration: none; transition: border-color .15s, color .15s, background .15s; touch-action: manipulation; text-align: center; min-width: 0; }
-    .quick-nav-chip:hover { border-color: var(--ac); color: var(--ac); background: rgba(232,85,45,.05); }
-    .quick-nav-chip-icon { font-size: 16px; line-height: 1; }
-    .quick-nav-chip-label { font-size: 10px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
-    .pedal-description-wrap { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--bd); position: relative; }
-    .pedal-description { font-size: 14px; color: var(--tm); line-height: 1.7; font-family: 'Noto Sans JP', sans-serif; max-height: 8.5em; overflow: hidden; transition: max-height .4s ease; }
-    .pedal-description.expanded { max-height: 9999px; }
-    .pedal-description.empty { font-style: italic; color: var(--td); max-height: none; }
-    .pedal-description h2 { font-size: 17px; font-weight: 700; color: var(--tx); margin: 14px 0 6px; }
-    .pedal-description h3 { font-size: 14px; font-weight: 600; color: var(--tm); margin: 10px 0 4px; }
-    .pedal-description b { font-weight: 700; color: var(--tx); }
-    .desc-toggle-btn { display: block; width: 100%; margin-top: 10px; padding: 9px; background: var(--sf2); border: 1px solid var(--bd); border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600; color: var(--ac); cursor: pointer; text-align: center; transition: border-color .15s, background .15s; touch-action: manipulation; }
-    .desc-toggle-btn:hover { border-color: var(--ac); background: rgba(232,85,45,.06); }
-    .desc-toggle-btn.hidden { display: none; }
-    .desc-updated { margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--td); text-align: right; }
-    .yt-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-    .yt-card-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 14px; }
-    .yt-embed-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; background: #000; }
-    .yt-embed-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 10px; }
-    .yt-loading { aspect-ratio: 16/9; background: var(--sf2); border-radius: 10px; border: 1px solid var(--bd); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
-    .yt-loading-icon { font-size: 32px; opacity: .3; animation: pulse 1.5s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:.6} }
-    .yt-loading-text { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; color: var(--td); }
-    .yt-fallback { aspect-ratio: 16/9; background: var(--sf2); border-radius: 10px; border: 1px solid var(--bd); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; }
-    .yt-fallback-icon { font-size: 36px; opacity: .25; }
-    .yt-fallback-text { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--td); text-align: center; line-height: 1.6; }
-    .yt-fallback-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #ff0000; border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 600; color: #fff; text-decoration: none; transition: opacity .15s; }
-    .yt-fallback-btn:hover { opacity: .85; }
-    .buy-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-    .buy-card-title { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--td); margin-bottom: 12px; text-align: center; letter-spacing: 1px; }
-    .buy-buttons { display: flex; flex-direction: column; gap: 10px; }
-    .buy-btn { display: block; width: 100%; padding: 14px; border-radius: 10px; text-align: center; font-size: 15px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; transition: opacity .2s; font-family: 'Noto Sans JP', sans-serif; }
-    .buy-btn:hover { opacity: .85; }
-    .buy-btn.soundhouse { background: var(--soundhouse); color: #fff; }
-    .buy-btn.sweetwater { background: var(--sweetwater); color: #fff; }
-    .buy-btn.amazon { background: var(--amazon); color: #111; }
-    .buy-btn.rakuten { background: var(--rakuten); color: #fff; }
-    .buy-btn.reverb { background: var(--reverb); color: #fff; }
-    .boards-card { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
-    .boards-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 2px; margin-bottom: 16px; }
-    .boards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .board-item { background: var(--sf2); border: 1px solid var(--bd); border-radius: 10px; overflow: hidden; text-decoration: none; color: var(--tx); display: block; transition: border-color .2s; }
-    .board-item:hover { border-color: var(--ac); }
-    .board-thumb { width: 100%; aspect-ratio: 4/3; background: var(--sf); overflow: hidden; }
-    .board-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .board-thumb-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--bd); }
-    .board-meta { padding: 10px; }
-    .board-title { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
-    .board-user { font-size: 11px; color: var(--tm); }
-    .empty-state { text-align: center; padding: 36px 20px; }
-    .empty-state-icon { font-size: 36px; margin-bottom: 12px; opacity: .4; }
-    .empty-state-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--tm); margin-bottom: 8px; }
-    .empty-state-text { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--td); line-height: 1.6; margin-bottom: 16px; }
-    .empty-state-btn { display: inline-block; padding: 10px 24px; background: var(--ac); border-radius: 4px; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600; color: #fff; text-decoration: none; transition: background .15s; }
-    .empty-state-btn:hover { background: #cf4c26; }
-    /* ★ 評価・レビューパネル */
-    .review-panel { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; overflow: hidden; }
-    .review-panel-tabs { display: flex; border-bottom: 1px solid var(--bd); }
-    .review-panel-tab { flex: 1; padding: 12px 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 600; color: var(--tm); text-align: center; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; touch-action: manipulation; }
-    .review-panel-tab.on { color: var(--ac); border-bottom-color: var(--ac); }
-    .review-panel-body { padding: 16px; }
-    /* 星評価 */
-    .rating-display { text-align: center; padding: 12px 0 16px; border-bottom: 1px solid var(--bd); margin-bottom: 16px; }
-    .rating-avg { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 2px; color: var(--tx); line-height: 1; }
-    .rating-stars-display { display: flex; justify-content: center; gap: 4px; margin: 6px 0; }
-    .rating-count { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--td); }
-    .rating-input-label { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--tm); margin-bottom: 8px; text-align: center; }
-    .rating-stars-input { display: flex; justify-content: center; gap: 6px; margin-bottom: 4px; }
-    .star-btn { font-size: 24px; cursor: pointer; background: none; border: none; padding: 2px; transition: transform .1s; line-height: 1; touch-action: manipulation; }
-    .star-btn:hover { transform: scale(1.2); }
-    .star-small { font-size: 16px; }
-    /* レビュー */
-    .review-form-wrap { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--bd); }
-    .review-form-title { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 700; color: var(--tm); margin-bottom: 10px; }
-    .review-textarea { width: 100%; background: var(--sf2); border: 1px solid var(--bd); border-radius: 8px; padding: 10px 12px; font-size: 16px; color: var(--tx); font-family: 'Noto Sans JP', sans-serif; outline: none; transition: border-color .15s; resize: vertical; min-height: 80px; }
-    .review-textarea:focus { border-color: var(--ac); }
-    .review-textarea::placeholder { color: var(--td); }
-    .review-form-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 8px; }
-    .review-star-row { display: flex; align-items: center; gap: 4px; }
-    .review-submit-btn { padding: 8px 18px; background: var(--ac); border: none; border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer; touch-action: manipulation; transition: background .15s; white-space: nowrap; }
-    .review-submit-btn:hover { background: #cf4c26; }
-    .review-login-prompt { background: rgba(232,85,45,.06); border: 1px solid rgba(232,85,45,.2); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; text-align: center; }
-    .review-login-prompt p { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; color: var(--tm); margin-bottom: 10px; line-height: 1.6; }
-    .review-login-btn { display: inline-block; padding: 8px 20px; background: var(--ac); border-radius: 6px; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 700; color: #fff; text-decoration: none; }
-    .review-item { padding: 12px 0; border-bottom: 1px solid var(--bd); }
-    .review-item:last-child { border-bottom: none; }
-    .review-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
-    .review-user { font-size: 12px; font-weight: 700; color: var(--tx); text-decoration: none; }
-    .review-user:hover { color: var(--ac); }
-    .review-date { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--td); margin-left: auto; }
-    .review-body { font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--tm); line-height: 1.7; margin-bottom: 8px; white-space: pre-wrap; }
-    .review-footer { display: flex; align-items: center; gap: 8px; }
-    .review-like-btn { display: flex; align-items: center; gap: 4px; background: none; border: 1px solid var(--bd); border-radius: 20px; padding: 3px 10px; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--tm); cursor: pointer; transition: all .15s; touch-action: manipulation; }
-    .review-like-btn:hover { border-color: var(--ac); color: var(--ac); }
-    .review-like-btn.liked { border-color: var(--ac); color: var(--ac); }
-    .wishlist-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 10px; background: var(--sf); border: 1px solid var(--bd); border-radius: 8px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; font-weight: 600; color: var(--tm); cursor: pointer; transition: all .18s; margin-bottom: 10px; touch-action: manipulation; }
-    .wishlist-btn:hover { border-color: rgba(232,85,45,.5); color: var(--ac); }
-    .wishlist-btn.added { border-color: var(--ac); color: var(--ac); background: rgba(232,85,45,.08); }
-    .wishlist-modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(4px); z-index: 800; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .wishlist-modal.open { display: flex; }
-    .wishlist-modal-box { background: var(--sf); border: 1px solid var(--bd); border-radius: 16px; padding: 24px; max-width: 360px; width: 100%; text-align: center; }
-    .wishlist-modal-icon { font-size: 32px; margin-bottom: 12px; }
-    .wishlist-modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; margin-bottom: 8px; }
-    .wishlist-modal-sub { font-family: 'Noto Sans JP', sans-serif; font-size: 12px; color: var(--tm); line-height: 1.7; margin-bottom: 16px; }
-    .wishlist-modal-benefits { text-align: left; background: var(--sf2); border-radius: 8px; padding: 12px 14px; margin-bottom: 18px; }
-    .wishlist-modal-benefits li { font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--tm); line-height: 1.8; list-style: none; padding-left: 14px; position: relative; }
-    .wishlist-modal-benefits li::before { content: '✓'; position: absolute; left: 0; color: var(--ac); font-size: 10px; }
-    .review-edit-btn { background: none; border: none; font-family: 'Noto Sans JP', sans-serif; font-size: 11px; color: var(--td); cursor: pointer; padding: 3px 6px; }
-    .review-edit-btn:hover { color: var(--tm); }
-    .review-empty { text-align: center; padding: 28px 16px; font-family: 'Noto Sans JP', sans-serif; font-size: 13px; color: var(--td); }
-    /* Lightbox */
-    .pedal-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.92); backdrop-filter: blur(6px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity .25s; cursor: zoom-out; }
-    .pedal-lightbox.open { opacity: 1; pointer-events: all; }
-    .pedal-lightbox img { max-width: 92vw; max-height: 86vh; object-fit: contain; border-radius: 8px; border: 1px solid var(--bd); transform: scale(.9); transition: transform .25s; }
-    .pedal-lightbox.open img { transform: scale(1); }
-    .pedal-lightbox-close { position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; background: rgba(255,255,255,.12); border: none; border-radius: 50%; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .15s; }
-    .pedal-lightbox-close:hover { background: rgba(232,85,45,.7); }
-    /* Toast */
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--sf); border: 1px solid var(--bd); border-radius: 4px; padding: 10px 18px; font-family: 'Noto Sans JP', sans-serif; font-size: 12px; color: var(--tx); z-index: 999; opacity: 0; transition: all .3s; pointer-events: none; white-space: nowrap; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .pedal-card:hover { border-color: var(--ac); }
+    .pedal-card-image {
+      width: 100%; aspect-ratio: 1; background: var(--sf2);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; border-bottom: 1px solid var(--bd);
+    }
+    .pedal-card-image img { width: 100%; height: 100%; object-fit: contain; }
+    /* ★ タイプアイコン（画像なし時） */
+    .pedal-card-image .type-icon-img {
+      width: 60%; height: 60%; object-fit: contain; opacity: .45;
+    }
+    .pedal-card-image-placeholder { font-size: 32px; opacity: .2; }
+    .pedal-card-body { padding: 10px; }
+    .pedal-card-brand {
+      font-size: 10px; color: var(--ac); font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+      margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .pedal-card-name {
+      font-size: 12px; font-weight: 600; line-height: 1.3; margin-bottom: 6px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .pedal-card-types { display: flex; flex-wrap: wrap; gap: 3px; }
+    .type-badge {
+      background: var(--sf2); border: 1px solid var(--bd); color: var(--tm);
+      font-size: 9px; padding: 2px 6px; border-radius: 20px; white-space: nowrap;
+    }
+    .loading { text-align: center; padding: 60px 20px; color: var(--tm); }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--tm); font-size: 14px; }
+    .load-more {
+      width: 100%; padding: 14px; background: var(--sf); border: 1px solid var(--bd); border-radius: 10px;
+      color: var(--tm); font-size: 14px; font-family: 'Noto Sans JP', sans-serif;
+      cursor: pointer; transition: color .2s, border-color .2s;
+    }
+    .load-more:hover { color: var(--tx); border-color: var(--ac); }
+    .load-more:disabled { opacity: .4; cursor: default; }
   </style>
-<script>var froglink=window.froglink||{};froglink.atkey='d56e28631e4762fa57fcaf582d73af0a';(function(d){var s=d.createElement('script');s.src='https://h.accesstrade.net/js/froglink/froglink_min.js';s.type="text/javascript";s.async=true;var e=d.getElementsByTagName('script')[0];e.parentNode.insertBefore(s,e);})(document);</script>
 </head>
 <body>
 <header>
@@ -239,68 +149,75 @@
     <a href="/#gacha" class="home-btn">🎲 <span id="gacha-text">ペダルガチャ</span></a>
   </div>
 </header>
-
-<!-- ★ スマホタブ -->
-<div class="mob-tabs" id="mob-tabs">
-  <div class="mob-tabs-inner">
-    <div class="mob-tab on" id="mob-tab-info" onclick="switchMobTab('info')" data-label-ja="ペダル情報" data-label-en="Pedal Info">ペダル情報</div>
-    <div class="mob-tab" id="mob-tab-review" onclick="switchMobTab('review')" data-label-ja="レビュー・評価" data-label-en="Reviews">レビュー・評価</div>
-  </div>
-</div>
-
 <div class="breadcrumb">
   <a href="/" id="bc-home">ホーム</a>
   <span class="sep">›</span>
-  <a href="#" id="bc-brand">...</a>
-  <span class="sep">›</span>
-  <span id="bc-pedal" class="current">読み込み中...</span>
+  <span class="current" id="bc-current">ペダル一覧</span>
 </div>
-
-<!-- ★ PCレイアウト -->
-<div class="page-wrapper">
-  <div class="page-layout">
-  <!-- 左：メインコンテンツ -->
-  <div class="page-main">
-    <!-- スマホ：パネル切り替え -->
-    <div id="mob-panel-info" class="mob-panel">
-      <div id="content"><div class="loading">読み込み中...</div></div>
-    </div>
-    <div id="mob-panel-review" class="mob-panel hidden">
-      <div id="mob-review-panel-wrap" style="padding:16px 0">
-        <!-- スマホ用レビューパネル（loadReviewPanel()で生成） -->
-        <div class="loading">読み込み中...</div>
-      </div>
-    </div>
+<div class="search-area">
+  <div class="search-input-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" id="search-input" placeholder="ペダルを検索...">
   </div>
-
-  <!-- 右：評価・レビュー（PC専用） -->
-  <div class="page-side" id="pc-side">
-    <div id="pc-review-panel-wrap">
-      <!-- PC用レビューパネル（loadReviewPanel()で生成） -->
-      <div class="review-panel">
-        <div style="padding:40px 16px;text-align:center;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--td)">読み込み中...</div>
-      </div>
-    </div>
+  <div class="filter-row">
+    <select class="filter-select" id="brand-select">
+      <option value="" id="brand-all">ブランド：すべて</option>
+    </select>
+    <select class="filter-select" id="type-select">
+      <option value="" id="type-all">タイプ：すべて</option>
+      <option value="overdrive" id="type-overdrive">OD（オーバードライブ）</option>
+      <option value="distortion" id="type-distortion">Dist（ディストーション）</option>
+      <option value="fuzz" id="type-fuzz">Fuzz（ファズ）</option>
+      <option value="boost" id="type-boost">Boost（ブースター）</option>
+      <option value="reverb" id="type-reverb">Reverb（リバーブ）</option>
+      <option value="delay" id="type-delay">Delay（ディレイ）</option>
+      <option value="chorus" id="type-chorus">Chorus（コーラス）</option>
+      <option value="flanger" id="type-flanger">Flanger（フランジャー）</option>
+      <option value="phaser" id="type-phaser">Phaser（フェイザー）</option>
+      <option value="tremolo" id="type-tremolo">Tremolo（トレモロ）</option>
+      <option value="vibrato" id="type-vibrato">Vibrato（ビブラート）</option>
+      <option value="pitch_octave" id="type-pitch_octave">Pitch / Octave（ピッチ/オクターブ）</option>
+      <option value="wah_filter" id="type-wah_filter">Wah / Filter（ワウ/フィルター）</option>
+      <option value="comp" id="type-comp">Comp（コンプレッサー）</option>
+      <option value="eq" id="type-eq">EQ（イコライザー）</option>
+      <option value="noise_gate" id="type-noise_gate">Noise Gate（ノイズゲート）</option>
+      <option value="looper" id="type-looper">Looper（ルーパー）</option>
+      <option value="volume" id="type-volume">Volume（ボリューム）</option>
+      <option value="tuner" id="type-tuner">Tuner（チューナー）</option>
+      <option value="multi" id="type-multi">Multi FX（マルチ）</option>
+      <option value="preamp" id="type-preamp">Preamp（プリアンプ）</option>
+      <option value="modulation" id="type-modulation">Modulation（モジュレーション）</option>
+      <option value="sequence_rhythm" id="type-sequence_rhythm">Sequence / Rhythm</option>
+      <option value="glitch" id="type-glitch">Glitch（グリッチ）</option>
+      <option value="acoustic" id="type-acoustic">Acoustic（アコースティック）</option>
+      <option value="vocal" id="type-vocal">Vocal（ボーカル）</option>
+      <option value="power_supply" id="type-power_supply">Power Supply（パワーサプライ）</option>
+      <option value="switcher" id="type-switcher">Switcher（スイッチャー）</option>
+      <option value="buffer" id="type-buffer">Buffer（バッファー）</option>
+      <option value="synth" id="type-synth">Synth（シンセ）</option>
+      <option value="junction_box" id="type-junction_box">Junction Box</option>
+      <option value="other" id="type-other">Other（その他）</option>
+    </select>
   </div>
-</div><!-- /page-layout -->
-</div><!-- /page-wrapper -->
-<div class="pedal-lightbox" id="pedal-lightbox" onclick="closePedalLightbox()">
-  <button class="pedal-lightbox-close" onclick="closePedalLightbox()">✕</button>
-  <img id="pedal-lightbox-img" src="" alt="">
-  <div id="pedal-lightbox-source" style="position:absolute;bottom:16px;right:16px;background:rgba(0,0,0,.7);color:#888;font-size:11px;font-family:'Noto Sans JP',sans-serif;padding:4px 10px;border-radius:4px;display:none;max-width:80vw;text-align:right;line-height:1.5"></div>
 </div>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
+<div class="container">
+  <div class="result-count" id="result-count"></div>
+  <div id="pedal-grid" class="pedal-grid"></div>
+  <div id="loading" class="loading">読み込み中...</div>
+  <button class="load-more" id="load-more" style="display:none" onclick="loadMore()">さらに読み込む</button>
+</div>
 <script>
 const SUPABASE_URL = 'https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+Math.random().toString(36).slice(2)+Date.now();localStorage.setItem('mgmb_sid',s);}return s;}
-const SESSION_ID = getSessionId();
+// ★ タイプアイコンURL生成
+const SUPABASE_STORAGE = 'https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/';
+function getTypeIconUrl(types) {
+  if (!types || !types.length) return null;
+  return SUPABASE_STORAGE + 'type_' + types[0] + '.png';
+}
 
 function detectLang() {
   const saved = localStorage.getItem('mgmb_lang');
@@ -312,783 +229,232 @@ let lang = detectLang();
 
 const I18N = {
   ja: {
-    headerSub:'ペダルボード投稿&データベース', home:'ホーム', gacha:'ペダルガチャ', langLabel:'EN', bcHome:'ホーム',
-    descEmpty:'説明文は準備中です。',
-    buyTitle:'🛒 購入・価格をチェック',
-    btnSoundhouse:'🎸 サウンドハウスで探す',
-    btnAmazon:'📦 Amazonで探す',
-    btnRakuten:'🛍 楽天で探す',
-    btnReverb:'🎵 Reverbで探す',
-    ytTitle:'▶ デモ動画', ytLoading:'動画を取得中...',
-    ytFallbackText:'動画を自動取得できませんでした。YouTubeで検索してみましょう。',
-    ytFallbackBtn:'YouTubeで探す',
-    sectionBoards:'このペダルを使ったボード',
-    emptyBoardTitle:'まだ投稿がありません',
-    emptyBoardText:'このペダルを使ったボードをあなたが最初に投稿しましょう！',
-    emptyBoardBtn:'ボードを投稿する →',
-    loading:'読み込み中...', notFound:'ペダルが見つかりませんでした。',
-    backHome:'← ホームに戻る', anonUser:'匿名', untitled:'無題のボード',
-    recommendTitle:'✨ おすすめペダル', recommendLoadMore:'さらに読み込む', recommendEmpty:'おすすめペダルはありません',
-    navVideo:'📺 デモ動画', navBuy:'🛒 在庫を調べる', navBoards:'🎸 投稿ボード',
-    readMore:'続きを読む ▼', readLess:'閉じる ▲', updatedAt:'紹介文最終更新日：',
-    // ★ レビュー
-    tabInfo:'ペダル情報', tabReview:'レビュー・評価',
-    ratingTitle:'評価', ratingYours:'ユーザー平均評価', ratingVotes:'件の評価', ratingMine:'あなたの評価', ratingReset:'評価をリセット',
-    reviewTitle:'レビュー', reviewPlaceholder:'このペダルの感想・レビューを書いてください...',
-    reviewSubmit:'投稿する', reviewEdit:'編集', reviewSave:'保存', reviewCancel:'キャンセル',
-    reviewLoginMsg:'レビューを投稿するにはマイページ登録が必要です',
-    reviewLoginBtn:'マイページを作る →',
-    reviewEmpty:'まだレビューがありません。最初のレビューを書きましょう！',
-    reviewLiked:'❤️ いいね！', reviewAnon:'匿名ユーザー',
-    wishlistAdd:'欲しいリストに追加',wishlistAdded:'欲しいリスト入り ✓',wishlistRemove:'リストから外す',
-    wmTitle:'欲しいリストに追加',wmSub:'マイページへの登録が必要です。\n登録・ログインすると：',
-    wmB1:'欲しいリストを保存できます',wmB2:'投稿を一覧管理できます',wmB3:'機材リストを公開できます',
-    wmLoginBtn:'マイページを作る・ログイン →',wmCloseBtn:'閉じる',
-    reviewOptionalStar:'評価（任意）',
+    headerSub:'ペダルボード投稿&データベース', home:'ホーム', gacha:'ペダルガチャ', langLabel:'EN',
+    bcHome:'ホーム', bcCurrent:'ペダル一覧',
+    pageTitle:'エフェクターペダル一覧 | My Gear My Board',
+    searchPlaceholder:'ペダルを検索...',
+    brandAll:'ブランド：すべて', typeAll:'タイプ：すべて',
+    resultCount:'件のペダルが見つかりました',
+    loading:'読み込み中...', empty:'ペダルが見つかりませんでした',
+    loadMore:'さらに読み込む', loadMoreCount:'残り',
+    typeOptions:{
+      overdrive:'OD（オーバードライブ）',distortion:'Dist（ディストーション）',
+      fuzz:'Fuzz（ファズ）',boost:'Boost（ブースター）',
+      reverb:'Reverb（リバーブ）',delay:'Delay（ディレイ）',
+      chorus:'Chorus（コーラス）',flanger:'Flanger（フランジャー）',
+      phaser:'Phaser（フェイザー）',tremolo:'Tremolo（トレモロ）',
+      vibrato:'Vibrato（ビブラート）',pitch_octave:'Pitch / Octave（ピッチ/オクターブ）',
+      wah_filter:'Wah / Filter（ワウ/フィルター）',comp:'Comp（コンプレッサー）',
+      eq:'EQ（イコライザー）',noise_gate:'Noise Gate（ノイズゲート）',
+      looper:'Looper（ルーパー）',volume:'Volume（ボリューム）',
+      tuner:'Tuner（チューナー）',multi:'Multi FX（マルチ）',
+      preamp:'Preamp（プリアンプ）',modulation:'Modulation（モジュレーション）',
+      sequence_rhythm:'Sequence / Rhythm（シークエンス/リズム）',glitch:'Glitch（グリッチ）',
+      acoustic:'Acoustic（アコースティック）',vocal:'Vocal（ボーカル）',
+      power_supply:'Power Supply（パワーサプライ）',switcher:'Switcher（スイッチャー）',
+      buffer:'Buffer（バッファー）',synth:'Synth（シンセ）',
+      junction_box:'Junction Box（ジャンクションボックス）',other:'Other（その他）'
+    }
   },
   en: {
-    headerSub:'Pedalboard Posts & Database', home:'Home', gacha:'Pedal Gacha', langLabel:'JA', bcHome:'Home',
-    descEmpty:'Description coming soon.',
-    buyTitle:'🛒 Check Prices',
-    btnAmazonUs:'📦 Find on Amazon', btnSweetwater:'🎵 Find on Sweetwater', btnReverb:'🎵 Find on Reverb',
-    ytTitle:'▶ Demo Video', ytLoading:'Fetching video...',
-    ytFallbackText:'Could not fetch a video automatically. Try searching on YouTube.',
-    ytFallbackBtn:'Search on YouTube',
-    sectionBoards:'Boards using this pedal',
-    emptyBoardTitle:'No boards yet', emptyBoardText:'Be the first to post a board featuring this pedal!',
-    emptyBoardBtn:'Post your board →',
-    loading:'Loading...', notFound:'Pedal not found.',
-    backHome:'← Back to Home', anonUser:'Anonymous', untitled:'Untitled Board',
-    navVideo:'📺 Demo Video', navBuy:'🛒 Check Prices', navBoards:'🎸 Boards',
-    readMore:'Read more ▼', readLess:'Close ▲', updatedAt:'Last updated: ',
-    // ★ レビュー
-    tabInfo:'Pedal Info', tabReview:'Reviews',
-    ratingTitle:'Rating', ratingYours:'User Average', ratingVotes:'ratings', ratingMine:'Your Rating', ratingReset:'Reset rating',
-    reviewTitle:'Reviews', reviewPlaceholder:'Write your review for this pedal...',
-    reviewSubmit:'Post', reviewEdit:'Edit', reviewSave:'Save', reviewCancel:'Cancel',
-    reviewLoginMsg:'Sign up for a My Page account to post reviews.',
-    reviewLoginBtn:'Create My Page →',
-    reviewEmpty:'No reviews yet. Be the first to write one!',
-    reviewLiked:'❤️ Liked!', reviewAnon:'Anonymous',
-    wishlistAdd:'Add to Wish List',wishlistAdded:'In Wish List ✓',wishlistRemove:'Remove from list',
-    wmTitle:'Add to Wish List',wmSub:'You need to create a My Page to use this feature.',
-    wmB1:'Save your wish list',wmB2:'Manage all your posts',wmB3:'Share your gear list',
-    wmLoginBtn:'Create My Page / Login →',wmCloseBtn:'Close',
-    reviewOptionalStar:'Rating (optional)',
+    headerSub:'Pedalboard Posts & Database', home:'Home', gacha:'Pedal Gacha', langLabel:'JA',
+    bcHome:'Home', bcCurrent:'Pedal List',
+    pageTitle:'Effect Pedals | My Gear My Board',
+    searchPlaceholder:'Search pedals...',
+    brandAll:'Brand: All', typeAll:'Type: All',
+    resultCount:' pedals found',
+    loading:'Loading...', empty:'No pedals found',
+    loadMore:'Load more', loadMoreCount:'remaining',
+    typeOptions:{
+      overdrive:'Overdrive (OD)',distortion:'Distortion',fuzz:'Fuzz',boost:'Boost',
+      reverb:'Reverb',delay:'Delay',chorus:'Chorus',flanger:'Flanger',
+      phaser:'Phaser',tremolo:'Tremolo',vibrato:'Vibrato',
+      pitch_octave:'Pitch / Octave',wah_filter:'Wah / Filter',
+      comp:'Compressor',eq:'EQ',noise_gate:'Noise Gate',
+      looper:'Looper',volume:'Volume',tuner:'Tuner',multi:'Multi FX',
+      preamp:'Preamp',modulation:'Modulation',sequence_rhythm:'Sequence / Rhythm',
+      glitch:'Glitch',acoustic:'Acoustic',vocal:'Vocal',power_supply:'Power Supply',
+      switcher:'Switcher',buffer:'Buffer',synth:'Synth',
+      junction_box:'Junction Box',other:'Other'
+    }
   }
 };
 function tr(key) { return (I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key; }
 
-function showToast(msg){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
-
-const TYPE_LABELS = {
-  'overdrive':'OD','od':'OD','distortion':'Dist','dist':'Dist','fuzz':'Fuzz',
-  'boost':'Boost','reverb':'Reverb','delay':'Delay','chorus':'Chorus',
-  'flanger':'Flanger','phaser':'Phaser','modulation':'Mod','mod':'Mod',
-  'tremolo':'Tremolo','vibrato':'Vibrato','pitch':'Pitch','wah':'Wah',
-  'compressor':'Comp','comp':'Comp','eq':'EQ','noise_gate':'Noise Gate',
-  'looper':'Looper','volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer','pre':'Preamp'
-};
-const TYPE_LABELS_JA = {
-  'overdrive':'オーバードライブ','od':'オーバードライブ','distortion':'ディストーション','dist':'ディストーション',
-  'fuzz':'ファズ','boost':'ブースター','reverb':'リバーブ','delay':'ディレイ','chorus':'コーラス',
-  'flanger':'フランジャー','phaser':'フェイザー','modulation':'モジュレーション','mod':'モジュレーション',
-  'tremolo':'トレモロ','vibrato':'ビブラート','pitch':'ピッチ','wah':'ワウ',
-  'compressor':'コンプレッサー','comp':'コンプレッサー','eq':'イコライザー','noise_gate':'ノイズゲート',
-  'looper':'ルーパー','volume':'ボリューム','tuner':'チューナー','multi':'マルチエフェクター',
-  'preamp':'プリアンプ','switcher':'スイッチャー','buffer':'バッファー','pre':'プリアンプ'
-};
-const TYPE_LABELS_EN = {
-  'overdrive':'Overdrive','od':'Overdrive','distortion':'Distortion','dist':'Distortion',
-  'fuzz':'Fuzz','boost':'Boost','reverb':'Reverb','delay':'Delay','chorus':'Chorus',
-  'flanger':'Flanger','phaser':'Phaser','modulation':'Modulation','mod':'Modulation',
-  'tremolo':'Tremolo','vibrato':'Vibrato','pitch':'Pitch Shifter','wah':'Wah',
-  'compressor':'Compressor','comp':'Compressor','eq':'EQ','noise_gate':'Noise Gate',
-  'looper':'Looper','volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer','pre':'Preamp'
-};
-function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()]||t; }
-function getRecommendTitle(type){
-  const t=(type||'').toLowerCase();
-  if(lang==='en'){const n=TYPE_LABELS_EN[t]||t;return`✨ Recommended ${n} Pedals`;}
-  const n=TYPE_LABELS_JA[t]||TYPE_LABELS_EN[t]||t;
-  return`✨ ${n}のおすすめペダル`;
-}
-function soundhouseUrl(n) { return 'https://www.soundhouse.co.jp/search/index?search_all='+encodeURIComponent(n); }
-function sweetwaterUrl(n) { return 'https://www.sweetwater.com/store/search.php?s='+encodeURIComponent(n); }
-function amazonJpUrl(n) { return 'https://www.amazon.co.jp/s?k='+encodeURIComponent(n)+'&tag=mgmb-22'; }
-function amazonUsUrl(n) { return 'https://www.amazon.com/s?k='+encodeURIComponent(n)+'&tag=mgmb-20'; }
-function rakutenUrl(n, itemUrl) {
-  if(itemUrl) return 'https://af.moshimo.com/af/c/click?a_id=5580518&p_id=54&pc_id=54&pl_id=616&url=' + encodeURIComponent(itemUrl);
-  return 'https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(n+' エフェクター')+'/';
-}
-function reverbUrl(n) { return 'https://reverb.com/marketplace?query='+encodeURIComponent(n); }
-function ytSearchUrl(n) { return 'https://www.youtube.com/results?search_query='+encodeURIComponent(n+' demo'); }
-
-function openPedalLightbox(src, source) {
-  const lb=document.getElementById('pedal-lightbox');const img=document.getElementById('pedal-lightbox-img');
-  const srcEl=document.getElementById('pedal-lightbox-source');
-  if(!lb||!img)return;
-  img.src=src;
-  if(srcEl){
-    if(source){srcEl.textContent='出典: '+source;srcEl.style.display='block';}
-    else{srcEl.style.display='none';}
-  }
-  lb.classList.add('open');document.body.style.overflow='hidden';
-}
-function closePedalLightbox() {
-  const lb=document.getElementById('pedal-lightbox');if(!lb)return;lb.classList.remove('open');document.body.style.overflow='';
-}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePedalLightbox();});
-
-// ★ スマホタブ切り替え
-function switchMobTab(tab){
-  document.getElementById('mob-tab-info').classList.toggle('on', tab==='info');
-  document.getElementById('mob-tab-review').classList.toggle('on', tab==='review');
-  document.getElementById('mob-panel-info').classList.toggle('hidden', tab!=='info');
-  document.getElementById('mob-panel-review').classList.toggle('hidden', tab!=='review');
-  if(tab==='review' && cachedPedal && !_mobReviewLoaded){
-    _mobReviewLoaded=true;
-    const wrap=document.getElementById('mob-review-panel-wrap');
-    if(wrap) renderReviewPanel(wrap, cachedPedal, currentSession);
-  }
-}
-let _mobReviewLoaded=false;
-
-// ★ スワイプでタブ切り替え（スマホ）
-function initMobSwipe(){
-  const container=document.querySelector('.mob-tabs')?.closest('div')?.parentElement;
-  // body全体でスワイプ検出
-  let startX=0, startY=0, swipeDecided=false, isHoriz=false;
-  const THRESHOLD=60, ANGLE=0.5;
-  document.addEventListener('touchstart', e=>{
-    if(window.innerWidth>=900)return;
-    startX=e.touches[0].clientX;
-    startY=e.touches[0].clientY;
-    swipeDecided=false; isHoriz=false;
-  },{passive:true});
-  document.addEventListener('touchmove', e=>{
-    if(window.innerWidth>=900)return;
-    if(swipeDecided)return;
-    const dx=e.touches[0].clientX-startX;
-    const dy=e.touches[0].clientY-startY;
-    if(Math.abs(dx)>10||Math.abs(dy)>10){
-      swipeDecided=true;
-      isHoriz=Math.abs(dx)>Math.abs(dy)*(1/ANGLE);
-    }
-  },{passive:true});
-  document.addEventListener('touchend', e=>{
-    if(window.innerWidth>=900||!isHoriz)return;
-    const dx=e.changedTouches[0].clientX-startX;
-    const infoActive=document.getElementById('mob-tab-info').classList.contains('on');
-    if(dx < -THRESHOLD && infoActive) switchMobTab('review');
-    else if(dx > THRESHOLD && !infoActive) switchMobTab('info');
-  },{passive:true});
-}
-
 function applyLang() {
+  document.title = tr('pageTitle');
   document.getElementById('header-sub').textContent = tr('headerSub');
   document.getElementById('home-text').textContent = tr('home');
   const gt=document.getElementById('gacha-text');if(gt)gt.textContent=tr('gacha');
   document.getElementById('lang-label').textContent = tr('langLabel');
   document.getElementById('bc-home').textContent = tr('bcHome');
-  // タブ
-  const ti=document.getElementById('mob-tab-info');if(ti)ti.textContent=tr('tabInfo');
-  const tr2=document.getElementById('mob-tab-review');if(tr2)tr2.textContent=tr('tabReview');
-  // レビューカウント付きタブ更新
-  updateReviewTabCount();
+  document.getElementById('bc-current').textContent = tr('bcCurrent');
+  document.getElementById('search-input').placeholder = tr('searchPlaceholder');
+  document.getElementById('brand-all').textContent = tr('brandAll');
+  document.getElementById('type-all').textContent = tr('typeAll');
+  document.getElementById('loading').textContent = tr('loading');
+  const opts = tr('typeOptions');
+  Object.keys(opts).forEach(k => {
+    const el = document.getElementById('type-' + k);
+    if (el) el.textContent = opts[k];
+  });
+  const lmBtn = document.getElementById('load-more');
+  if (lmBtn && lmBtn.style.display !== 'none') {
+    const remaining = total - offset;
+    lmBtn.textContent = tr('loadMore') + (remaining > 0 ? `（${tr('loadMoreCount')} ${remaining} 件）` : '');
+  }
+  if (total > 0) {
+    document.getElementById('result-count').innerHTML = `<span>${total}</span> ${tr('resultCount')}`;
+  }
 }
-
-function updateReviewTabCount(){
-  const count=_reviewCount>0?` (${_reviewCount})`:'';
-  const mobTab=document.getElementById('mob-tab-review');
-  const pcTabEl=document.getElementById('pc-review-tab');
-  if(mobTab)mobTab.textContent=tr('tabReview')+count;
-  if(pcTabEl)pcTabEl.textContent=tr('tabReview')+count;
-}
-let _reviewCount=0;
 
 function toggleLang() {
-  lang=lang==='ja'?'en':'ja';
-  localStorage.setItem('mgmb_lang',lang);
+  lang = lang === 'ja' ? 'en' : 'ja';
+  localStorage.setItem('mgmb_lang', lang);
   applyLang();
-  if(cachedPedal) renderPedal(cachedPedal, cachedPosts);
-  // おすすめタイトル更新
-  const recTitle=document.getElementById('recommend-title');
-  if(recTitle&&recommendTypes.length)recTitle.textContent=getRecommendTitle(recommendTypes[0]);
-  // レビューパネル再レンダリング
-  if(cachedPedal){
-    const pcWrap=document.getElementById('pc-review-panel-wrap');
-    if(pcWrap) renderReviewPanel(pcWrap, cachedPedal, currentSession);
-    if(_mobReviewLoaded){
-      const mobWrap=document.getElementById('mob-review-panel-wrap');
-      if(mobWrap) renderReviewPanel(mobWrap, cachedPedal, currentSession);
+}
+
+const TYPE_LABELS = {
+  'overdrive':'OD','od':'OD','distortion':'Dist','dist':'Dist',
+  'fuzz':'Fuzz','boost':'Boost','reverb':'Reverb','delay':'Delay',
+  'chorus':'Chorus','flanger':'Flanger','phaser':'Phaser',
+  'modulation':'Mod','tremolo':'Tremolo','vibrato':'Vibrato',
+  'pitch_octave':'Pitch/Oct','wah_filter':'Wah/Filter',
+  'compressor':'Comp','comp':'Comp','eq':'EQ','noise_gate':'Noise Gate',
+  'looper':'Looper','volume':'Volume','tuner':'Tuner','multi':'Multi FX',
+  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer',
+  'sequence_rhythm':'Seq/Rhythm','glitch':'Glitch','acoustic':'Acoustic',
+  'vocal':'Vocal','power_supply':'Power Supply','synth':'Synth',
+  'junction_box':'Junction Box','other':'Other'
+};
+function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()] || t; }
+
+const LIMIT = 24;
+let offset = 0;
+let total = 0;
+let searchTimer = null;
+let currentSearch = '';
+let currentBrand = '';
+let currentType = '';
+
+async function loadBrands() {
+  const { data } = await db.from('pedals').select('brand').order('brand', { ascending: true });
+  if (!data) return;
+  const brands = [...new Set(data.map(d => d.brand))].filter(Boolean).sort();
+  const select = document.getElementById('brand-select');
+  brands.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b; opt.textContent = b;
+    select.appendChild(opt);
+  });
+}
+
+async function fetchPedals(reset = false) {
+  if (reset) {
+    offset = 0;
+    document.getElementById('pedal-grid').innerHTML = '';
+    document.getElementById('load-more').style.display = 'none';
+  }
+  document.getElementById('loading').style.display = 'block';
+  let query = db.from('pedals')
+    .select('id, brand, model, slug, types, image_url', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(offset, offset + LIMIT - 1);
+  if (currentSearch) {
+    const searchNorm = currentSearch.replace(/\s+/g, '');
+    // 3文字以上かつスペースなし入力の場合は3文字チャンクで%区切りワイルドカード検索
+    if (searchNorm.length >= 3 && searchNorm === currentSearch) {
+      const chunks = [];
+      for (let i = 0; i < searchNorm.length; i += 3) chunks.push(searchNorm.slice(i, i + 3));
+      const wildcard = '%' + chunks.join('%') + '%';
+      query = query.or(`full_name.ilike.%${currentSearch}%,full_name.ilike.${wildcard}`);
+    } else {
+      query = query.ilike('full_name', `%${currentSearch}%`);
     }
+  }
+  if (currentBrand) query = query.eq('brand', currentBrand);
+  if (currentType) query = query.contains('types', [currentType]);
+  const { data, count, error } = await query;
+  document.getElementById('loading').style.display = 'none';
+  if (error || !data) return;
+  if (reset) total = count || 0;
+  document.getElementById('result-count').innerHTML =
+    total > 0 ? `<span>${total}</span> ${tr('resultCount')}` : '';
+  if (data.length === 0 && offset === 0) {
+    document.getElementById('pedal-grid').innerHTML =
+      `<div class="empty-state" style="grid-column:1/-1">${tr('empty')}</div>`;
+    return;
+  }
+  renderPedals(data);
+  offset += LIMIT;
+  const btn = document.getElementById('load-more');
+  if (offset < total) {
+    btn.style.display = 'block';
+    btn.textContent = `${tr('loadMore')}（${tr('loadMoreCount')} ${total - offset} 件）`;
+  } else {
+    btn.style.display = 'none';
   }
 }
 
-let cachedPedal=null, cachedPosts=[], currentSession=null;
+function renderPedals(pedals) {
+  const grid = document.getElementById('pedal-grid');
+  pedals.forEach(p => {
+    const typesHtml = (p.types || []).slice(0, 2).map(t =>
+      `<span class="type-badge">${getTypeLabel(t)}</span>`
+    ).join('');
 
-// ★ 欲しいリスト
-let _wishlistId=null;
-async function loadWishlistState(pedalId){
-  const{data:{session}}=await sb.auth.getSession();
-  if(!session){updateWishlistBtn(false);return;}
-  const{data}=await sb.from('pedal_wishlists').select('id').eq('user_id',session.user.id).eq('pedal_id',pedalId).maybeSingle();
-  _wishlistId=data?.id||null;
-  updateWishlistBtn(!!data);
-}
-function updateWishlistBtn(isAdded){
-  const btn=document.getElementById('wishlist-btn');
-  const icon=document.getElementById('wishlist-btn-icon');
-  const txt=document.getElementById('wishlist-btn-text');
-  if(!btn)return;
-  if(isAdded){btn.classList.add('added');if(icon)icon.textContent='❤️';if(txt)txt.textContent=tr('wishlistAdded');}
-  else{btn.classList.remove('added');if(icon)icon.textContent='🤍';if(txt)txt.textContent=tr('wishlistAdd');}
-}
-async function toggleWishlist(){
-  const{data:{session}}=await sb.auth.getSession();
-  if(!session){openWishlistModal();return;}
-  const pedalId=cachedPedal?.id;if(!pedalId)return;
-  if(_wishlistId){
-    await sb.from('pedal_wishlists').delete().eq('id',_wishlistId);
-    _wishlistId=null;updateWishlistBtn(false);
-    showToast(lang==='en'?'Removed from wish list':'欲しいリストから外しました');
-  }else{
-    const{data,error}=await sb.from('pedal_wishlists').insert({user_id:session.user.id,pedal_id:pedalId}).select('id').single();
-    if(error){showToast('❌ '+error.message);return;}
-    _wishlistId=data.id;updateWishlistBtn(true);
-    showToast(lang==='en'?'✅ Added to wish list!':'✅ 欲しいリストに追加しました！');
-  }
-}
-function openWishlistModal(){
-  const m=document.getElementById('wishlist-login-modal');if(!m)return;
-  const setT=(id,t)=>{const el=document.getElementById(id);if(el)el.textContent=t;};
-  setT('wm-title',tr('wmTitle'));setT('wm-b1',tr('wmB1'));setT('wm-b2',tr('wmB2'));setT('wm-b3',tr('wmB3'));
-  setT('wm-login-btn',tr('wmLoginBtn'));setT('wm-close-btn',tr('wmCloseBtn'));
-  const sub=document.getElementById('wm-sub');
-  if(sub)sub.innerHTML=lang==='en'?'You need to create a My Page to use this feature.<br>After signing up you can:':'マイページへの登録が必要です。<br>登録・ログインすると：';
-  m.classList.add('open');document.body.style.overflow='hidden';
-}
-function closeWishlistModal(){
-  const m=document.getElementById('wishlist-login-modal');
-  if(m)m.classList.remove('open');
-  document.body.style.overflow='';
-}
-function initDescAccordion() {
-  const desc=document.getElementById('desc-text');const btn=document.getElementById('desc-toggle-btn');
-  if(!desc||!btn)return;
-  if(desc.scrollHeight<=desc.clientHeight+4){btn.classList.add('hidden');return;}
-  btn.onclick=function(){const expanded=desc.classList.toggle('expanded');btn.textContent=expanded?tr('readLess'):tr('readMore');};
-}
-
-async function fetchVideoId(pedalName) {
-  try{const res=await fetch(`/.netlify/functions/youtube?q=${encodeURIComponent(pedalName)}`);if(!res.ok)return null;const data=await res.json();return data.videoId||null;}catch(e){return null;}
-}
-async function cacheVideoId(pedalId,videoId){await db.from('pedals').update({youtube_video_id:videoId}).eq('id',pedalId);}
-
-function renderYouTube(pedalId,pedalName,videoId){
-  const el=document.getElementById('yt-section');if(!el)return;
-  if(videoId){el.innerHTML=`<div class="yt-card" id="section-video"><div class="yt-card-title">${tr('ytTitle')}</div><div class="yt-embed-wrap"><iframe src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" title="${pedalName} demo"></iframe></div></div>`;}
-  else{el.innerHTML=`<div class="yt-card" id="section-video"><div class="yt-card-title">${tr('ytTitle')}</div><div class="yt-fallback"><div class="yt-fallback-icon">▶</div><div class="yt-fallback-text">${tr('ytFallbackText')}</div><a href="${ytSearchUrl(pedalName)}" target="_blank" rel="noopener" class="yt-fallback-btn">▶ ${tr('ytFallbackBtn')}</a></div></div>`;}
-}
-async function handleYouTube(pedal){
-  if(pedal.youtube_video_id){renderYouTube(pedal.id,pedal.full_name,pedal.youtube_video_id);return;}
-  const videoId=await fetchVideoId(pedal.full_name);
-  if(videoId){cacheVideoId(pedal.id,videoId);cachedPedal.youtube_video_id=videoId;}
-  renderYouTube(pedal.id,pedal.full_name,videoId);
-}
-
-const RECOMMEND_LIMIT=6;
-let recommendOffset=0,recommendPedalId=null,recommendTypes=[],recommendSeenIds=new Set();
-async function loadRecommendedPedals(pedal){
-  recommendOffset=0;recommendPedalId=pedal.id;recommendTypes=pedal.types||[];recommendSeenIds=new Set();
-  const detailEl=document.getElementById('content');if(!detailEl)return;
-  const recSection=document.createElement('div');
-  recSection.id='recommend-section';recSection.style.cssText='margin-top:16px';
-  const title=getRecommendTitle(recommendTypes[0]);
-  recSection.innerHTML=`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:20px"><div id="recommend-title" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;margin-bottom:14px">${title}</div><div id="recommend-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div><button id="recommend-more-btn" onclick="loadMoreRecommended()" style="display:none;width:100%;margin-top:12px;padding:12px;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;color:var(--tm);font-size:13px;font-family:'Noto Sans JP',sans-serif;cursor:pointer">${tr('recommendLoadMore')}</button></div>`;
-  detailEl.appendChild(recSection);
-  await fetchRecommended();
-}
-async function fetchRecommended(){
-  if(!recommendTypes.length)return;
-  const STORAGE='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/';
-  const{data,count}=await db.from('pedals').select('id,brand,model,slug,types,image_url,description,view_count',{count:'exact'}).contains('types',[recommendTypes[0]]).not('id','eq',recommendPedalId).not('description','is',null).not('youtube_video_id','is',null).order('view_count',{ascending:false,nullsFirst:false}).range(recommendOffset,recommendOffset+RECOMMEND_LIMIT+1);
-  const grid=document.getElementById('recommend-grid');if(!grid)return;
-  let newData=(data||[]).filter(p=>!recommendSeenIds.has(p.id));
-  if(!newData.length){if(recommendOffset===0)grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:24px;font-size:13px;color:var(--td)">${tr('recommendEmpty')}</div>`;return;}
-  // グリッド全体の表示数が常に偶数になるよう調整
-  const currentTotal=grid.children.length;
-  const targetTotal=currentTotal+newData.length;
-  const evenTotal=targetTotal%2===0?targetTotal:targetTotal-1;
-  const toShow=Math.max(0,evenTotal-currentTotal);
-  if(toShow===0)return;
-  newData=newData.slice(0,toShow);
-  newData.forEach(p=>{
-    recommendSeenIds.add(p.id);
-    const typeIcon=p.types&&p.types[0]?`${STORAGE}type_${p.types[0]}.png`:'';
-    let imgHtml;
-    if(p.image_url){
-      const fallback=typeIcon
-        ?`this.onerror=function(){this.style.display='none';this.nextElementSibling.style.display='flex'};this.src='${typeIcon}'`
-        :`this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'`;
-      imgHtml=`<img src="${p.image_url}" alt="${p.model}" loading="lazy" style="width:100%;height:100%;object-fit:contain" onerror="${fallback}"><span style="display:none;font-size:28px;opacity:.2;width:100%;height:100%;align-items:center;justify-content:center">🎛</span>`;
-    }else if(typeIcon){
-      imgHtml=`<img src="${typeIcon}" alt="" loading="lazy" style="width:60%;height:60%;object-fit:contain;opacity:.4" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none;font-size:28px;opacity:.2;width:100%;height:100%;align-items:center;justify-content:center">🎛</span>`;
-    }else{
-      imgHtml=`<span style="font-size:28px;opacity:.2">🎛</span>`;
+    // ★ 画像なし→タイプアイコン表示
+    let imageHtml;
+    if (p.image_url) {
+      imageHtml = `<img src="${p.image_url}" alt="${p.model}" loading="lazy">`;
+    } else {
+      const iconUrl = getTypeIconUrl(p.types);
+      if (iconUrl) {
+        imageHtml = `<img class="type-icon-img" src="${iconUrl}" alt="${(p.types||[])[0]||''}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="pedal-card-image-placeholder" style="display:none">🎛</span>`;
+      } else {
+        imageHtml = `<span class="pedal-card-image-placeholder">🎛</span>`;
+      }
     }
-    const card=document.createElement('a');
-    card.href=`/pedal?slug=${p.slug}`;
-    card.style.cssText='background:var(--sf2);border:1px solid var(--bd);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--tx);display:block;transition:border-color .2s';
-    card.onmouseover=()=>card.style.borderColor='var(--ac)';card.onmouseout=()=>card.style.borderColor='var(--bd)';
-    card.innerHTML=`<div style="width:100%;aspect-ratio:1;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--bd)">${imgHtml}</div><div style="padding:8px"><div style="font-size:10px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.brand}</div><div style="font-size:12px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.model}</div></div>`;
+
+    const card = document.createElement('a');
+    card.href = `/pedal?slug=${p.slug}`;
+    card.className = 'pedal-card';
+    card.innerHTML = `
+      <div class="pedal-card-image">${imageHtml}</div>
+      <div class="pedal-card-body">
+        <div class="pedal-card-brand">${p.brand}</div>
+        <div class="pedal-card-name">${p.model}</div>
+        <div class="pedal-card-types">${typesHtml}</div>
+      </div>`;
     grid.appendChild(card);
   });
-  recommendOffset+=newData.length;
-  const btn=document.getElementById('recommend-more-btn');
-  if(btn)btn.style.display=(count&&recommendOffset<count)?'block':'none';
-}
-async function loadMoreRecommended(){await fetchRecommended();}
-
-async function fetchBoardsByPedal(pedalFullName){
-  const{data:aliases}=await db.from('pedal_aliases').select('alias').eq('pedal_full_name',pedalFullName);
-  const searchNames=[pedalFullName,...(aliases||[]).map(a=>a.alias)];
-  const{data:posts}=await db.from('posts').select('id,title,username,image_urls,gear_list,created_at').order('created_at',{ascending:false}).limit(200);
-  if(!posts)return[];
-  const lowerNames=searchNames.map(n=>n.replace(/\t/g,' ').replace(/ +/g,' ').toLowerCase().trim());
-  return posts.filter(post=>{const gear=Array.isArray(post.gear_list)?post.gear_list:[];return gear.some(g=>{const gName=(g.name||g||'').replace(/\t/g,' ').replace(/ +/g,' ').toLowerCase().trim();return lowerNames.includes(gName);});}).slice(0,6);
 }
 
-// ★ 評価・レビュー機能
-let _myRating=0, _hoverRating=0, _myReviewId=null, _myReviewScore=0, _editingReview=false;
+function loadMore() { fetchPedals(false); }
 
-function starHTML(score, size='normal'){
-  const cls=size==='small'?'star-small':'';
-  return [1,2,3,4,5].map(i=>`<span class="${cls}" style="color:${i<=score?'#f0a500':'var(--bd)'}">★</span>`).join('');
-}
+document.getElementById('search-input').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    currentSearch = e.target.value.trim();
+    fetchPedals(true);
+  }, 300);
+});
 
-function renderStarInput(current, onClickFn, idPrefix){
-  return `<div class="rating-stars-input" id="${idPrefix}-stars">
-    ${[1,2,3,4,5].map(i=>`<button class="star-btn" data-val="${i}"
-      onmouseover="hoverStar(${i},'${idPrefix}')"
-      onmouseout="hoverStar(0,'${idPrefix}')"
-      onclick="${onClickFn}(${i})"
-      style="color:${i<=current?'#f0a500':'var(--bd)'}">★</button>`).join('')}
-  </div>`;
-}
+document.getElementById('brand-select').addEventListener('change', e => {
+  const val = e.target.value;
+  if (val) { window.location.href = `/brand?name=${encodeURIComponent(val)}`; }
+  else { currentBrand = ''; fetchPedals(true); }
+});
 
-function hoverStar(val, prefix){
-  document.querySelectorAll(`#${prefix}-stars button`).forEach((btn,idx)=>{
-    btn.style.color=(idx+1)<=(val||_hoverRating||_myRating)?'#f0a500':'var(--bd)';
-  });
-  _hoverRating=val;
-}
-
-async function resetRating(){
-  if(!cachedPedal)return;
-  await db.from('pedal_ratings').delete().eq('pedal_id',cachedPedal.id).eq('session_id',SESSION_ID);
-  _myRating=0;
-  showToast(lang==='en'?'Rating removed':'評価をリセットしました');
-  const pcWrap=document.getElementById('pc-review-panel-wrap');
-  if(pcWrap)await renderReviewPanel(pcWrap,cachedPedal,currentSession);
-  if(_mobReviewLoaded){const mobWrap=document.getElementById('mob-review-panel-wrap');if(mobWrap)await renderReviewPanel(mobWrap,cachedPedal,currentSession);}
-}
-
-async function submitRating(score){
-  if(!cachedPedal)return;
-  _myRating=score;
-  const existing=await db.from('pedal_ratings').select('id').eq('pedal_id',cachedPedal.id).eq('session_id',SESSION_ID).maybeSingle();
-  if(existing.data){
-    await db.from('pedal_ratings').update({score,updated_at:new Date().toISOString()}).eq('id',existing.data.id);
-  }else{
-    await db.from('pedal_ratings').insert({pedal_id:cachedPedal.id,session_id:SESSION_ID,score});
-  }
-  showToast(lang==='en'?`⭐ Rated ${score}/5`:`⭐ ${score}点で評価しました`);
-  // 再レンダリング（PC・スマホ両方）
-  const pcWrap=document.getElementById('pc-review-panel-wrap');
-  if(pcWrap) renderReviewPanel(pcWrap,cachedPedal,currentSession);
-  if(_mobReviewLoaded){const mobWrap=document.getElementById('mob-review-panel-wrap');if(mobWrap)renderReviewPanel(mobWrap,cachedPedal,currentSession);}
-}
-
-function hoverReviewStar(val){
-  _myReviewScore=val;
-  document.querySelectorAll('.review-star-input button').forEach((btn,idx)=>{
-    btn.style.color=(idx+1)<=val?'#f0a500':'var(--bd)';
-  });
-}
-
-async function submitReview(){
-  if(!currentSession){showToast(tr('reviewLoginMsg'));return;}
-  const textarea=document.querySelector('.review-textarea');
-  if(!textarea)return;
-  const body=textarea.value.trim();
-  if(!body){showToast(lang==='en'?'Please write a review.':'レビュー本文を入力してください。');return;}
-  const username=currentSession._username||currentSession.user?.user_metadata?.username||null;
-  if(_myReviewId){
-    // 編集
-    await db.from('pedal_reviews').update({body,rating_score:_myReviewScore||null,updated_at:new Date().toISOString()}).eq('id',_myReviewId);
-    showToast(lang==='en'?'✅ Review updated':'✅ レビューを更新しました');
-  }else{
-    // 新規
-    await db.from('pedal_reviews').insert({pedal_id:cachedPedal.id,user_id:currentSession.user.id,username,body,rating_score:_myReviewScore||null});
-    showToast(lang==='en'?'✅ Review posted!':'✅ レビューを投稿しました！');
-  }
-  _editingReview=false;
-  const pcWrap=document.getElementById('pc-review-panel-wrap');
-  if(pcWrap)renderReviewPanel(pcWrap,cachedPedal,currentSession);
-  if(_mobReviewLoaded){const mobWrap=document.getElementById('mob-review-panel-wrap');if(mobWrap)renderReviewPanel(mobWrap,cachedPedal,currentSession);}
-}
-
-async function toggleReviewLike(reviewId, el){
-  const cnt=el.querySelector('.like-count');
-  const{data:ex}=await db.from('pedal_review_likes').select('id').eq('review_id',reviewId).eq('session_id',SESSION_ID).maybeSingle();
-  if(ex){
-    await db.from('pedal_review_likes').delete().eq('review_id',reviewId).eq('session_id',SESSION_ID);
-    const n=Math.max(0,(parseInt(cnt.textContent)||1)-1);
-    await db.from('pedal_reviews').update({likes:n}).eq('id',reviewId);
-    cnt.textContent=n;el.classList.remove('liked');
-  }else{
-    await db.from('pedal_review_likes').insert({review_id:reviewId,session_id:SESSION_ID});
-    const{data:rev}=await db.from('pedal_reviews').select('likes').eq('id',reviewId).single();
-    const n=(rev?.likes||0)+1;
-    await db.from('pedal_reviews').update({likes:n}).eq('id',reviewId);
-    cnt.textContent=n;el.classList.add('liked');showToast(tr('reviewLiked'));
-  }
-}
-
-function startEditReview(reviewId, body, score){
-  _myReviewId=reviewId;_myReviewScore=score||0;_editingReview=true;
-  const pcWrap=document.getElementById('pc-review-panel-wrap');
-  if(pcWrap)renderReviewPanel(pcWrap,cachedPedal,currentSession);
-  if(_mobReviewLoaded){const mobWrap=document.getElementById('mob-review-panel-wrap');if(mobWrap)renderReviewPanel(mobWrap,cachedPedal,currentSession);}
-  // フォームにテキストをセット
-  setTimeout(()=>{
-    document.querySelectorAll('.review-textarea').forEach(ta=>ta.value=body);
-    document.querySelectorAll('.review-star-input button').forEach((btn,idx)=>{
-      btn.style.color=(idx+1)<=(_myReviewScore)?'#f0a500':'var(--bd)';
-    });
-  },50);
-}
-
-function cancelEditReview(){
-  _editingReview=false;_myReviewId=null;_myReviewScore=0;
-  const pcWrap=document.getElementById('pc-review-panel-wrap');
-  if(pcWrap)renderReviewPanel(pcWrap,cachedPedal,currentSession);
-  if(_mobReviewLoaded){const mobWrap=document.getElementById('mob-review-panel-wrap');if(mobWrap)renderReviewPanel(mobWrap,cachedPedal,currentSession);}
-}
-
-function formatDate(isoStr){
-  if(!isoStr)return'';const d=new Date(isoStr);
-  if(lang==='en')return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
-  return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-}
-
-async function renderReviewPanel(wrapEl, pedal, session){
-  if(!wrapEl)return;
-
-  // データ取得
-  const[ratingsRes, reviewsRes, myRatingRes, myLikesRes]=await Promise.all([
-    db.from('pedal_ratings').select('score').eq('pedal_id',pedal.id),
-    db.from('pedal_reviews').select('*').eq('pedal_id',pedal.id).order('created_at',{ascending:false}),
-    db.from('pedal_ratings').select('score').eq('pedal_id',pedal.id).eq('session_id',SESSION_ID).maybeSingle(),
-    db.from('pedal_review_likes').select('review_id').eq('session_id',SESSION_ID),
-  ]);
-
-  const ratings=ratingsRes.data||[];
-  const reviews=reviewsRes.data||[];
-  const myRating=myRatingRes.data?.score||0;
-  const myLikedIds=new Set((myLikesRes.data||[]).map(l=>l.review_id));
-  // DBの最新値を常に反映（リセット・投票後も正しく表示）
-  _myRating=myRating;
-
-  // レビュー件数更新
-  _reviewCount=reviews.length;
-  updateReviewTabCount();
-
-  // 平均評価
-  const avgScore=ratings.length?Math.round((ratings.reduce((s,r)=>s+r.score,0)/ratings.length)*10)/10:0;
-
-  // 自分のレビュー確認
-  const myReview=session?reviews.find(r=>r.user_id===session.user.id):null;
-  if(myReview&&!_editingReview)_myReviewId=myReview.id;
-
-  // HTML生成
-  let html=`<div class="review-panel">
-    <div class="review-panel-tabs">
-      <div class="review-panel-tab on" id="pc-review-tab">${tr('tabReview')}${reviews.length>0?` (${reviews.length})`:''}</div>
-    </div>
-    <div class="review-panel-body">`;
-
-  // 星評価セクション
-  const ratingPrefix='rating-input-'+Math.random().toString(36).slice(2,7);
-  html+=`<div class="rating-display">
-    <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-bottom:4px">${tr('ratingYours')}</div>
-    <div class="rating-avg">${avgScore>0?avgScore:'—'}</div>
-    <div class="rating-stars-display">${starHTML(Math.round(avgScore))}</div>
-    <div class="rating-count">${ratings.length}${lang==='en'?' '+tr('ratingVotes'):tr('ratingVotes')}</div>
-  </div>
-  <div class="rating-input-label">${tr('ratingMine')}</div>
-  ${renderStarInput(_myRating,'submitRating',ratingPrefix)}
-  ${_myRating>0?`<div style="text-align:center;margin-top:4px"><button onclick="resetRating()" style="background:none;border:none;font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);cursor:pointer;text-decoration:underline">${tr('ratingReset')}</button></div>`:''}
-  <div style="height:16px"></div>`;
-
-  // レビューフォームセクション
-  if(session){
-    const isEdit=_editingReview&&myReview;
-    html+=`<div class="review-form-wrap">
-      <div class="review-form-title">${isEdit?tr('reviewEdit'):tr('reviewTitle')}</div>
-      <textarea class="review-textarea" placeholder="${tr('reviewPlaceholder')}">${isEdit&&myReview?myReview.body:''}</textarea>
-      <div class="review-form-actions">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td)">${tr('reviewOptionalStar')}</span>
-          <div class="review-star-input" style="display:flex;gap:2px">
-            ${[1,2,3,4,5].map(i=>`<button class="star-btn" style="font-size:18px;color:${i<=(_myReviewScore||myReview?.rating_score||0)?'#f0a500':'var(--bd)'}" onclick="hoverReviewStar(${i})">★</button>`).join('')}
-          </div>
-        </div>
-        <div style="display:flex;gap:6px">
-          ${isEdit?`<button class="review-edit-btn" onclick="cancelEditReview()">${tr('reviewCancel')}</button>`:''}
-          <button class="review-submit-btn" onclick="submitReview()">${isEdit?tr('reviewSave'):tr('reviewSubmit')}</button>
-        </div>
-      </div>
-    </div>`;
-  }else{
-    // 未ログイン：フォームは表示するが投稿ボタンで促す
-    html+=`<div class="review-form-wrap">
-      <div class="review-form-title">${tr('reviewTitle')}</div>
-      <textarea class="review-textarea" placeholder="${tr('reviewPlaceholder')}"></textarea>
-      <div class="review-form-actions">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-          <span style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td)">${tr('reviewOptionalStar')}</span>
-          <div style="display:flex;gap:2px">
-            ${[1,2,3,4,5].map(i=>`<span style="font-size:18px;color:var(--bd)">★</span>`).join('')}
-          </div>
-        </div>
-        <button class="review-submit-btn" onclick="promptLogin()">${tr('reviewSubmit')}</button>
-      </div>
-      <div id="login-prompt-msg" style="display:none;margin-top:10px">
-        <div class="review-login-prompt">
-          <p>${tr('reviewLoginMsg')}</p>
-          <a href="/mypage" class="review-login-btn">${tr('reviewLoginBtn')}</a>
-        </div>
-      </div>
-    </div>`;
-  }
-
-  // レビュー一覧
-  if(!reviews.length){
-    html+=`<div class="review-empty">${tr('reviewEmpty')}</div>`;
-  }else{
-    reviews.forEach(r=>{
-      const isOwn=session&&r.user_id===session.user.id;
-      const liked=myLikedIds.has(r.id);
-      const userLink=r.username?`<a href="/user?username=${encodeURIComponent(r.username)}" class="review-user">@${r.username}</a>`:`<span class="review-user">${tr('reviewAnon')}</span>`;
-      const starDisp=r.rating_score?`<span style="margin-left:4px">${starHTML(r.rating_score,'small')}</span>`:'';
-      html+=`<div class="review-item">
-        <div class="review-header">
-          ${userLink}${starDisp}
-          <span class="review-date">${formatDate(r.created_at)}</span>
-        </div>
-        <div class="review-body">${escHtml(r.body)}</div>
-        <div class="review-footer">
-          <button class="review-like-btn ${liked?'liked':''}" onclick="toggleReviewLike('${r.id}',this)">
-            ❤️ <span class="like-count">${r.likes||0}</span>
-          </button>
-          ${isOwn?`<button class="review-edit-btn" onclick="startEditReview('${r.id}',${JSON.stringify(r.body)},${r.rating_score||0})">${tr('reviewEdit')}</button>`:''}
-        </div>
-      </div>`;
-    });
-  }
-
-  html+=`</div></div>`;
-  wrapEl.innerHTML=html;
-  // 星入力の初期表示更新（クラスで全パネル対応）
-  document.querySelectorAll('.rating-stars-input button').forEach((btn,idx)=>{
-    btn.style.color=(idx+1)<=_myRating?'#f0a500':'var(--bd)';
-  });
-}
-
-function escHtml(str){return(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
-function promptLogin(){
-  document.querySelectorAll('#login-prompt-msg').forEach(el=>{
-    el.style.display=el.style.display==='none'?'block':'none';
-  });
-}
-
-async function loadPedal() {
-  const params=new URLSearchParams(window.location.search);
-  const slug=params.get('slug');
-  if(!slug){showError(tr('notFound'));return;}
-
-  // セッション取得
-  const{data:{session}}=await db.auth.getSession();
-  currentSession=session;
-  if(session){
-    // usernameをusersテーブルから取得してキャッシュ
-    const{data:userData}=await db.from('users').select('username').eq('id',session.user.id).single();
-    if(session)session._username=userData?.username||session.user.user_metadata?.username||null;
-  }
-
-  const{data:pedals}=await db.from('pedals')
-    .select('id,brand,model,full_name,slug,types,image_url,image_source,description,description_en,youtube_video_id,updated_at,rakuten_item_url')
-    .eq('slug',decodeURIComponent(slug)).limit(1);
-  if(!pedals?.length){showError(tr('notFound'));return;}
-  const pedal=pedals[0];
-  cachedPedal=pedal;
-  db.from('pedals').update({view_count:(pedal.view_count||0)+1}).eq('id',pedal.id).then(()=>{});
-
-  document.getElementById('bc-brand').textContent=pedal.brand;
-  document.getElementById('bc-brand').href=`/brand?name=${encodeURIComponent(pedal.brand)}`;
-  document.getElementById('bc-pedal').textContent=pedal.model;
-  document.title=`${pedal.full_name} | My Gear My Board`;
-
-  const pedalDesc=pedal.description?pedal.description.replace(/<[^>]+>/g,'').slice(0,120)+'...  | Also available in English':
-    `${pedal.full_name}のペダル詳細ページ。使用ボードや購入リンクをチェック。 | Also available in English`;
-  const pedalDescEn=pedal.description_en?pedal.description_en.replace(/<[^>]+>/g,'').slice(0,120)+'...':
-    `${pedal.full_name} pedal details. Check boards and purchase links.`;
-  const finalDesc=lang==='en'?pedalDescEn:pedalDesc;
-  const pedalUrl=`https://mygearmyboard.com/pedal?slug=${pedal.slug}`;
-  const pedalImg=pedal.image_url||'https://mygearmyboard.com/ogp.png';
-
-  const setMeta=(id,attr,val)=>{const el=document.getElementById(id);if(el)el.setAttribute(attr,val);};
-  setMeta('meta-description','content',finalDesc);setMeta('og-title','content',`${pedal.full_name} | My Gear My Board`);
-  setMeta('og-description','content',finalDesc);setMeta('og-image','content',pedalImg);
-  setMeta('og-url','content',pedalUrl);setMeta('tw-title','content',`${pedal.full_name} | My Gear My Board`);
-  setMeta('tw-description','content',finalDesc);setMeta('tw-image','content',pedalImg);
-  setMeta('canonical','href',pedalUrl);
-
-  // JSON-LD（aggregateRatingはレビュー読み込み後に更新）
-  updateJsonLd(pedal, finalDesc, pedalUrl, pedalImg, 0, 0);
-
-  const posts=await fetchBoardsByPedal(pedal.full_name);
-  cachedPosts=posts;
-  renderPedal(pedal,cachedPosts);
-  handleYouTube(pedal);
-  loadRecommendedPedals(pedal);
-
-  // ★ PC右カラム・スマホレビューパネルを並行レンダリング
-  const pcWrap=document.getElementById('pc-review-panel-wrap');
-  if(pcWrap) await renderReviewPanel(pcWrap,pedal,session);
-
-  // aggregateRating更新
-  const{data:ratings}=await db.from('pedal_ratings').select('score').eq('pedal_id',pedal.id);
-  if(ratings&&ratings.length){
-    const avg=Math.round((ratings.reduce((s,r)=>s+r.score,0)/ratings.length)*10)/10;
-    updateJsonLd(pedal,finalDesc,pedalUrl,pedalImg,avg,ratings.length);
-  }
-}
-
-function updateJsonLd(pedal, desc, url, img, avgScore, ratingCount){
-  const jsonLd={
-    "@context":"https://schema.org",
-    "@type":"Product",
-    "name":pedal.full_name,
-    "description":desc,
-    "image":img,
-    "url":url,
-    "brand":{"@type":"Brand","name":pedal.brand},
-    "category":(pedal.types||[]).join(', '),
-  };
-  if(avgScore>0&&ratingCount>0){
-    jsonLd.aggregateRating={
-      "@type":"AggregateRating",
-      "ratingValue":avgScore,
-      "reviewCount":ratingCount,
-      "bestRating":5,
-      "worstRating":1,
-    };
-  }
-  const ldEl=document.getElementById('json-ld');if(ldEl)ldEl.textContent=JSON.stringify(jsonLd);
-}
-
-function formatUpdatedAt(isoStr){
-  if(!isoStr)return'';const d=new Date(isoStr);
-  return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-}
-
-function renderPedal(pedal,posts){
-  const typesHtml=(pedal.types||[]).map(t=>`<span class="type-badge">${getTypeLabel(t)}</span>`).join('');
-  let imageBlockHtml='';
-  if(pedal.image_url){
-    const hasSource=!!pedal.image_source;
-    const safeUrl=pedal.image_url.replace(/'/g,"\\'");
-    const safeSource=(pedal.image_source||'').replace(/'/g,"\\'");
-    imageBlockHtml=`<div class="pedal-image-block"><div class="pedal-image ${hasSource?'has-source':'no-source'}" onclick="openPedalLightbox('${safeUrl}','${safeSource}')"><img src="${pedal.image_url}" alt="${pedal.model}" loading="lazy"></div>${hasSource?`<div class="image-source">出典: ${pedal.image_source}</div>`:''}</div>`;
-  }else{
-    const firstType=pedal.types&&pedal.types[0]?pedal.types[0]:null;
-    const typeIconUrl=firstType?'https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_'+firstType+'.png':null;
-    imageBlockHtml=`<div class="pedal-image-block"><div class="pedal-image no-source no-img">${typeIconUrl?`<img src="${typeIconUrl}" alt="${firstType}" loading="lazy" style="width:72px;height:72px;object-fit:contain;opacity:.5" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''}<span class="pedal-image-placeholder" ${typeIconUrl?'style="display:none"':''}>🎛</span></div></div>`;
-  }
-  const navItems=[
-    {href:'#section-video',icon:'📺',labelJa:'デモ動画',labelEn:'Demo'},
-    {href:'#section-buy',icon:'🛒',labelJa:'在庫を調べる',labelEn:'Buy'},
-    {href:'#section-boards',icon:'🎸',labelJa:'投稿ボード',labelEn:'Boards'},
-  ];
-  const quickNavHtml=`<nav class="quick-nav" aria-label="ページ内ナビ">${navItems.map(item=>`<a href="${item.href}" class="quick-nav-chip"><span class="quick-nav-chip-icon">${item.icon}</span><span class="quick-nav-chip-label">${lang==='en'?item.labelEn:item.labelJa}</span></a>`).join('')}</nav>`;
-  const desc=lang==='en'?(pedal.description_en||pedal.description):pedal.description;
-  const updatedStr=formatUpdatedAt(pedal.updated_at);
-  const descHtml=desc?`<div class="pedal-description-wrap"><div class="pedal-description" id="desc-text">${desc}</div><button class="desc-toggle-btn" id="desc-toggle-btn">${tr('readMore')}</button>${updatedStr?`<div class="desc-updated">${tr('updatedAt')}${updatedStr}</div>`:''}</div>`:`<div class="pedal-description-wrap"><div class="pedal-description empty">${tr('descEmpty')}</div></div>`;
-  const boardsHtml=posts.length>0?posts.map(post=>{const thumb=post.image_urls?.length>0?`<img src="${post.image_urls[0]}" alt="" loading="lazy">`:`<div class="board-thumb-placeholder">🎸</div>`;return`<a href="/post?id=${post.id}" class="board-item"><div class="board-thumb">${thumb}</div><div class="board-meta"><div class="board-title">${post.title||tr('untitled')}</div><div class="board-user">${post.username?'@'+post.username:tr('anonUser')}</div></div></a>`;}).join(''):`<div class="empty-state"><div class="empty-state-icon">🎸</div><div class="empty-state-title">${tr('emptyBoardTitle')}</div><div class="empty-state-text">${tr('emptyBoardText')}</div><a href="/" class="empty-state-btn">${tr('emptyBoardBtn')}</a></div>`;
-  const rakutenHref=rakutenUrl(pedal.full_name,pedal.rakuten_item_url);
-  document.getElementById('content').innerHTML=`
-    <div class="pedal-card">
-      <div class="pedal-top">${imageBlockHtml}<div class="pedal-info"><div class="pedal-brand">${pedal.brand}</div><div class="pedal-name">${pedal.model}</div><div class="type-badges">${typesHtml}</div></div></div>
-      ${quickNavHtml}
-      ${descHtml}
-    </div>
-    <div id="yt-section"><div class="yt-card" id="section-video"><div class="yt-card-title">${tr('ytTitle')}</div><div class="yt-loading"><div class="yt-loading-icon">▶</div><div class="yt-loading-text">${tr('ytLoading')}</div></div></div></div>
-    <!-- ★ 欲しいリストボタン -->
-    <div style="margin-bottom:4px">
-      <button class="wishlist-btn" id="wishlist-btn" onclick="toggleWishlist()">
-        <span id="wishlist-btn-icon">🤍</span>
-        <span id="wishlist-btn-text">欲しいリストに追加</span>
-      </button>
-    </div>
-    <div class="buy-card" id="section-buy">
-      <div class="buy-card-title">${tr('buyTitle')}</div>
-      <div class="buy-buttons">
-        ${lang==='ja'?`
-          <a href="${amazonJpUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazon')}</a>
-          <a href="${rakutenHref}" target="_blank" rel="noopener" class="buy-btn rakuten">${tr('btnRakuten')}</a>
-          <a href="${soundhouseUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn soundhouse">${tr('btnSoundhouse')}</a>
-          <a href="${reverbUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn reverb">${tr('btnReverb')}</a>
-        `:`
-          <a href="${amazonUsUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn amazon">${tr('btnAmazonUs')}</a>
-          <a href="${sweetwaterUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn sweetwater">${tr('btnSweetwater')}</a>
-          <a href="${reverbUrl(pedal.full_name)}" target="_blank" rel="noopener" class="buy-btn reverb">${tr('btnReverb')}</a>
-        `}
-      </div>
-    </div>
-    <div class="boards-card" id="section-boards"><h3>🎛 ${tr('sectionBoards')}</h3><div class="boards-grid">${boardsHtml}</div></div>`;
-  initDescAccordion();
-  loadWishlistState(pedal.id);
-}
-
-function showError(msg){
-  document.getElementById('content').innerHTML=`<div class="error-box"><p>${msg}</p><a href="/" style="color:var(--ac);margin-top:16px;display:block;">${tr('backHome')}</a></div>`;
-}
+document.getElementById('type-select').addEventListener('change', e => {
+  const val = e.target.value;
+  if (val) { window.location.href = `/type?name=${encodeURIComponent(val)}`; }
+  else { currentType = ''; fetchPedals(true); }
+});
 
 applyLang();
-loadPedal();
-document.addEventListener('DOMContentLoaded', initMobSwipe);
+loadBrands();
+fetchPedals(true);
 </script>
-<!-- ★ 欲しいリスト未ログインモーダル -->
-<div class="wishlist-modal" id="wishlist-login-modal" onclick="if(event.target===this)closeWishlistModal()">
-  <div class="wishlist-modal-box">
-    <div class="wishlist-modal-icon">🤍</div>
-    <div class="wishlist-modal-title" id="wm-title">欲しいリストに追加</div>
-    <div class="wishlist-modal-sub" id="wm-sub">マイページへの登録が必要です。<br>登録・ログインすると：</div>
-    <ul class="wishlist-modal-benefits" id="wm-benefits">
-      <li id="wm-b1">欲しいリストを保存できます</li>
-      <li id="wm-b2">投稿を一覧管理できます</li>
-      <li id="wm-b3">機材リストを公開できます</li>
-    </ul>
-    <a href="/mypage" style="display:block;padding:11px;background:var(--ac);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;color:#fff;text-decoration:none;margin-bottom:8px" id="wm-login-btn">マイページを作る・ログイン →</a>
-    <button onclick="closeWishlistModal()" style="width:100%;padding:9px;background:transparent;border:1px solid var(--bd);border-radius:8px;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tm);cursor:pointer;transition:all .15s" id="wm-close-btn">閉じる</button>
-  </div>
-</div>
 </body>
 </html>
