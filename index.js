@@ -1275,8 +1275,7 @@ function goPanel(n){
   currentPanel=Math.max(0,Math.min(2,n));const c=document.getElementById('swipe-container');if(!c)return;
   c.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';
   document.querySelectorAll('.swipe-dot').forEach((d,i)=>d.classList.toggle('on',i===currentPanel));
-  // ★ パネル切り替え時にスクロール位置をトップに戻す
-  if(prev!==currentPanel)window.scrollTo({top:0,behavior:'instant'});
+
 }
 function initSwipe(){
   const c=document.getElementById('swipe-container');if(!c)return;
