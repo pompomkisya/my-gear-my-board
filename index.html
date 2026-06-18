@@ -265,7 +265,7 @@ textarea.form-input{resize:vertical;min-height:90px}
 .done-close-btn{background:var(--ac);border:none;border-radius:4px;padding:10px 28px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:4px;padding:10px 18px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+footer{border-top:1px solid var(--bd);padding:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}@media(max-width:680px){footer{display:none!important}}
 .footer-logo{height:28px;object-fit:contain;opacity:.7}
 .footer-links{display:flex;gap:14px}
 .footer-link{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#eae8e2;cursor:pointer;transition:color .15s;letter-spacing:.5px;text-decoration:none;font-weight:600}
@@ -332,21 +332,21 @@ header{padding:0 14px;height:54px}
 .h-search-wrap{display:none}
 .h-btn{padding:7px 12px;font-size:11px;letter-spacing:.5px}
 .h-icon{width:32px;height:32px;font-size:13px}
-#swipe-ui{overflow:hidden;width:100%}
-.swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
+#swipe-ui{width:100%}
+.swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd);position:sticky;top:58px;z-index:200}
 .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block;touch-action:manipulation}
 .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
 .swipe-container{display:flex;width:300%;transition:transform .38s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start}
 .swipe-panel{width:33.333%;flex-shrink:0;overflow-x:hidden}
-.mob-left-panel{padding:16px 14px}
+.mob-left-panel{padding:16px 14px 80px}
 .mob-panel-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:14px;color:var(--tx);display:flex;align-items:center;gap:8px}
 .mob-panel-title::after{content:'';flex:1;height:1px;background:var(--bd)}
-.mob-feed-inner{padding:12px 14px}#mob-feed-panel{background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%)}
+.mob-feed-inner{padding:12px 14px 80px}#mob-feed-panel{background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%)}
 .post-banner{padding:12px 14px;flex-direction:column;align-items:flex-start;gap:10px}
 .post-banner-btns{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}.pb-btn{width:100%}
 .mob-gacha-grid .card .ct{font-size:12px}
 .feed-tabs .feed-tab{font-size:10px;padding:6px 4px;letter-spacing:.5px}
-.mob-right-panel{padding:16px 14px;background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%)}.mob-right-panel .widget{margin-bottom:14px}
+.mob-right-panel{padding:16px 14px 80px;background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%)}.mob-right-panel .widget{margin-bottom:14px}
 footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;display:flex!important}.footer-links{gap:12px}
 .pform{padding:20px 16px;margin:8px auto}
 .img-editor-toolbar{gap:6px;padding:8px}.editor-tool-btn{padding:8px 10px;min-width:58px}
@@ -562,7 +562,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div style="margin-top:10px;position:relative">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">
             <!-- 左カラム固定：できること(上)＋図鑑(下) -->
-            <div style="grid-column:1;grid-row:1;display:flex;flex-direction:column;gap:10px">
+            <div style="grid-column:1;grid-row:1;display:flex;flex-direction:column;gap:10px;align-self:stretch">
               <a href="/guide" id="guide-cta-mob" style="display:block;background:url(/icons/icon_guide.png) center 55% / cover;border:1px solid rgba(232,85,45,.3);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;position:relative;aspect-ratio:2/1" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.3)';this.style.transform=''">
                 <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,.3) 0%,rgba(13,13,14,.15) 40%,rgba(13,13,14,.75) 70%,rgba(13,13,14,.95) 100%)"></div>
                 <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:8px 6px 8px 14px;text-align:center;gap:1px">
@@ -570,7 +570,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
                   <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ac);letter-spacing:1px;padding-bottom:2px">GUIDE →</div>
                 </div>
               </a>
-              <a href="/pedals" id="pedal-db-cta-mob" style="display:block;background:url(/icons/icon_pedaldb.png);background-size:cover;background-position:center;border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
+              <a href="/pedals" id="pedal-db-cta-mob" style="display:block;flex:1;background:url(/icons/icon_pedaldb.png);background-size:cover;background-position:center;border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
                 <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 30%,rgba(13,13,14,.95) 100%)"></div>
                 <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:12px;text-align:center">
                   <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6);white-space:nowrap" id="pedal-db-cta-title-mob">エフェクター図鑑</div>
@@ -605,9 +605,13 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
             <button id="load-more-btn" onclick="loadMorePosts()" style="display:none;grid-column:1/-1;margin-top:4px;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">さらに読み込む</button>
             <button id="back-to-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;grid-column:1/-1;margin-top:4px;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">↑ 最新に戻る</button>
           </div>
-
         </div>
-
+        <!-- ★ モバイル用ミニフッター -->
+        <div style="margin-top:16px;padding:16px 0;border-top:1px solid var(--bd);display:flex;gap:14px;flex-wrap:wrap">
+          <a href="/privacy.html" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm);text-decoration:none;font-weight:600">プライバシーポリシー</a>
+          <a href="mailto:mygear.myboard@gmail.com" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm);text-decoration:none;font-weight:600">お問い合わせ</a>
+          <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);width:100%">© 2026 My Gear My Board. All rights reserved.</div>
+        </div>
       </div>
     </div>
     <div class="swipe-panel mob-right-panel">
