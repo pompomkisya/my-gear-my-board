@@ -661,7 +661,7 @@ function renderDBPosts(posts){
   if(gridMob){
     if(!posts.length){gridMob.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';}
     else{
-      const firstCard=makeCardHTML(posts[0],0).replace('<div class="card"','<div class="card" style="grid-column:1;grid-row:1;animation-delay:0s"');
+      const firstCard=makeCardHTML(posts[0],0).replace('<div class="card"','<div class="card" style="grid-column:1;grid-row:2;animation-delay:0s"');
       const restCards=posts.slice(1).map((p,i)=>makeCardHTML(p,i+1)).join('');
       gridMob.innerHTML=firstCard+restCards;
     }
