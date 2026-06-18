@@ -560,6 +560,26 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         </div>
         <div style="margin-top:10px;position:relative">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start">
+            <!-- ★ 左カラム：できること＋図鑑（グリッド内固定） -->
+            <div style="grid-column:1;grid-row:1;display:flex;flex-direction:column;gap:10px">
+              <!-- できることボタン -->
+              <a href="/guide" id="guide-cta-mob" style="display:block;background:url(/icons/icon_guide.png) center 55% / cover;border:1px solid rgba(232,85,45,.3);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;position:relative;aspect-ratio:2/1" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.3)';this.style.transform=''">
+                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,.3) 0%,rgba(13,13,14,.15) 40%,rgba(13,13,14,.75) 70%,rgba(13,13,14,.95) 100%)"></div>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:8px 6px 8px 14px;text-align:center;gap:1px">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1.5px;color:#fff;white-space:nowrap;text-shadow:0 2px 6px rgba(0,0,0,.9)" id="guide-cta-title-mob">MGMBで出来ること</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ac);letter-spacing:1px;padding-bottom:2px">GUIDE →</div>
+                </div>
+              </a>
+              <!-- エフェクター図鑑ボタン -->
+              <a href="/pedals" id="pedal-db-cta-mob" style="display:block;background:url(/icons/icon_pedaldb.png);background-size:cover;background-position:center;border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative;flex:1" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
+                <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 30%,rgba(13,13,14,.95) 100%)"></div>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:12px;text-align:center">
+                  <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6);white-space:nowrap" id="pedal-db-cta-title-mob">エフェクター図鑑</div>
+                  <div style="font-family:'Noto Sans JP',sans-serif;font-size:9px;color:var(--tm);letter-spacing:.5px" id="pedal-db-cta-sub-mob">エフェクター2,000件以上</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ac);opacity:.85;letter-spacing:1px;padding-bottom:2px">BROWSE →</div>
+                </div>
+              </a>
+            </div>
             <div class="gacha-grid-card" onclick="openGacha()" id="gacha-card-mob" style="grid-column:2;grid-row:1">
               <div class="gacha-iw" style="background:radial-gradient(ellipse at center,rgba(232,85,45,.1) 0%,transparent 70%);gap:5px">
                 <img id="gacha-img-mob" src="https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/gacha_idle.png" style="width:112px;height:112px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(232,85,45,.7));animation:gPulse 2.8s ease-in-out infinite" onerror="this.style.display='none';document.getElementById('gacha-fb-mob').style.display='block'">
@@ -588,33 +608,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           </div>
 
         </div>
-        <!-- ★ CTAカード（グリッド外・常時表示） -->
-        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:13px">
-          <!-- 左カラム：できること（上）＋図鑑（下） -->
-          <div style="display:flex;flex-direction:column;gap:13px">
-            <!-- できることボタン -->
-            <a href="/guide" id="guide-cta-mob" style="display:block;background:url(/icons/icon_guide.png) center 55% / cover;border:1px solid rgba(232,85,45,.3);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;position:relative;aspect-ratio:2/1" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.3)';this.style.transform=''">
-              <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,.3) 0%,rgba(13,13,14,.15) 40%,rgba(13,13,14,.75) 70%,rgba(13,13,14,.95) 100%)"></div>
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:8px;text-align:center;gap:1px">
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1.5px;color:#fff;white-space:nowrap;text-shadow:0 2px 6px rgba(0,0,0,.9)" id="guide-cta-title-mob">MGMBで出来ること</div>
-                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ac);letter-spacing:1px;padding-bottom:2px">GUIDE →</div>
-              </div>
-            </a>
-            <!-- エフェクター図鑑ボタン -->
-            <a href="/pedals" id="pedal-db-cta-mob" style="display:block;background:url(/icons/icon_pedaldb.png);background-size:cover;background-position:center;border:1px solid rgba(232,85,45,.4);border-radius:6px;overflow:hidden;text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s;aspect-ratio:1;position:relative" onmouseover="this.style.borderColor='var(--ac)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(232,85,45,.4)';this.style.transform=''">
-              <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 30%,rgba(13,13,14,.95) 100%)"></div>
-              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;padding:12px;text-align:center">
-                <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6);white-space:nowrap" id="pedal-db-cta-title-mob">エフェクター図鑑</div>
-                <div style="font-family:'Noto Sans JP',sans-serif;font-size:9px;color:var(--tm);letter-spacing:.5px" id="pedal-db-cta-sub-mob">エフェクター2,000件以上</div>
-                <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--ac);opacity:.85;letter-spacing:1px;padding-bottom:2px">BROWSE →</div>
-              </div>
-            </a>
-          </div>
-          <!-- 右カラム：特集準備中 -->
-          <div id="pedal-db-cta-right-mob" style="background:var(--sf);border:1px solid var(--bd);border-radius:6px;display:flex;align-items:center;justify-content:center">
-            <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);text-align:center;padding:8px" id="pedal-db-cta-placeholder-mob">特集・広告<br>準備中</div>
-          </div>
-        </div>
+
       </div>
     </div>
     <div class="swipe-panel mob-right-panel">
