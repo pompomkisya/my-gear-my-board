@@ -182,6 +182,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="tab" onclick="switchTab(this,'tab-maintenance')">🔧 メンテナンス</div>
     <div class="tab" onclick="switchTab(this,'tab-rakuten')">🛒 楽天画像バッチ</div>
     <div class="tab" onclick="switchTab(this,'tab-users')">👤 ユーザー管理</div>
+    <div class="tab" onclick="switchTab(this,'tab-afflinks')">🔗 アフィリエイトリンク</div>
   </div>
 
   <div class="panel on" id="tab-dashboard">
@@ -569,6 +570,24 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <input id="user-search" type="text" placeholder="ユーザー名・メール検索..." style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--tx);outline:none" oninput="filterUsersAdmin()">
     </div>
     <div id="users-table-wrap"></div>
+  </div>
+
+  <!-- ★ アフィリエイトリンク管理タブ -->
+  <div class="panel" id="tab-afflinks">
+    <div class="section-title">🔗 アフィリエイトリンク管理 <span class="badge" id="afflinks-count">-</span></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:14px;line-height:1.6">
+      💡 サウンドハウス・メルカリは個別URL発行が必要なため、ここで登録したペダルだけ専用URLに差し替わります。<br>
+      未登録のペダルは自動的に「検索結果へのリンク」（非アフィリエイト）が表示されます。
+    </div>
+    <div style="margin-bottom:8px">
+      <input class="form-input" id="afflink-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="onAffLinkSearchInput()" style="max-width:360px">
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
+      <button class="pf-btn on" id="af-filter-all" onclick="setAffLinkFilter('all')">すべて</button>
+      <button class="pf-btn" id="af-filter-set" onclick="setAffLinkFilter('set')">✅ 登録済み</button>
+      <button class="pf-btn" id="af-filter-unset" onclick="setAffLinkFilter('unset')">⬜ 未登録</button>
+    </div>
+    <div id="afflinks-list" class="loading">検索ワードを入力してください</div>
   </div>
 
   <!-- ★ 楽天画像バッチタブ -->
@@ -1002,6 +1021,7 @@ function switchTab(el,tabId){
   if(tabId==='tab-maintenance')loadMaintenance();
   if(tabId==='tab-rakuten')initRakutenTab();
   if(tabId==='tab-users')loadUsersAdmin();
+  if(tabId==='tab-afflinks')initAffLinksTab();
 }
 
 let allPosts=[],allPedals=[],allComments=[];
@@ -2260,6 +2280,73 @@ async function loadUsersAdmin(){
   if(statsEl){statsEl.innerHTML=`<div style="background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:12px 20px;text-align:center"><div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--ac)">${_allUsers.length}</div><div style="font-size:11px;color:var(--td);margin-top:2px">登録ユーザー数</div></div>`;}
   renderUsersAdmin(_allUsers);
 }
+
+// ★ アフィリエイトリンク管理
+let _afflinksInitDone=false,_afflinksMap={},_afflinksFilter='all';
+function initAffLinksTab(){
+  if(_afflinksInitDone)return;
+  _afflinksInitDone=true;
+  sb.from('pedal_affiliate_links').select('pedal_id,soundhouse_url,mercari_url').then(({data})=>{
+    (data||[]).forEach(r=>{_afflinksMap[r.pedal_id]=r;});
+    const countEl=document.getElementById('afflinks-count');
+    if(countEl)countEl.textContent=(data||[]).length+'件登録済み';
+  });
+}
+function setAffLinkFilter(f){
+  _afflinksFilter=f;
+  document.querySelectorAll('#tab-afflinks .pf-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('af-filter-'+f)?.classList.add('on');
+  onAffLinkSearchInput();
+}
+let _affSearchTimer=null;
+function onAffLinkSearchInput(){
+  clearTimeout(_affSearchTimer);
+  _affSearchTimer=setTimeout(runAffLinkSearch,300);
+}
+async function runAffLinkSearch(){
+  const q=(document.getElementById('afflink-search')?.value||'').trim();
+  const listEl=document.getElementById('afflinks-list');
+  if(!q){listEl.innerHTML='検索ワードを入力してください';return;}
+  listEl.innerHTML='<div style="padding:16px;color:var(--td)">検索中...</div>';
+  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name').or(`brand.ilike.%${q}%,model.ilike.%${q}%,full_name.ilike.%${q}%`).limit(60);
+  if(error){listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';return;}
+  let results=data||[];
+  if(_afflinksFilter==='set')results=results.filter(p=>_afflinksMap[p.id]&&(_afflinksMap[p.id].soundhouse_url||_afflinksMap[p.id].mercari_url));
+  if(_afflinksFilter==='unset')results=results.filter(p=>!_afflinksMap[p.id]||(!_afflinksMap[p.id].soundhouse_url&&!_afflinksMap[p.id].mercari_url));
+  if(!results.length){listEl.innerHTML='<div style="padding:16px;color:var(--td)">該当ペダルがありません</div>';return;}
+  listEl.innerHTML=results.map(p=>{
+    const link=_afflinksMap[p.id]||{};
+    const shVal=(link.soundhouse_url||'').replace(/"/g,'&quot;');
+    const mcVal=(link.mercari_url||'').replace(/"/g,'&quot;');
+    return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:8px">${p.brand} ${p.model}</div>
+      <div style="margin-bottom:6px">
+        <label style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">🎸 サウンドハウス個別URL</label>
+        <input type="text" id="af-sh-${p.id}" value="${shVal}" placeholder="https://www.soundhouse.co.jp/products/detail/item/..."
+          style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--tx);outline:none;margin-top:3px">
+      </div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">📮 メルカリ個別アフィリエイトURL</label>
+        <input type="text" id="af-mc-${p.id}" value="${mcVal}" placeholder="https://jp.mercari.com/item/...?afid=..."
+          style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--tx);outline:none;margin-top:3px">
+      </div>
+      <button onclick="saveAffLink(${p.id})" style="background:var(--ac);color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer">💾 保存</button>
+      <span id="af-status-${p.id}" style="font-size:11px;color:var(--td);margin-left:8px"></span>
+    </div>`;
+  }).join('');
+}
+async function saveAffLink(pedalId){
+  const sh=document.getElementById('af-sh-'+pedalId).value.trim();
+  const mc=document.getElementById('af-mc-'+pedalId).value.trim();
+  const statusEl=document.getElementById('af-status-'+pedalId);
+  statusEl.textContent='保存中...';
+  const{error}=await sb.from('pedal_affiliate_links').upsert({pedal_id:pedalId,soundhouse_url:sh||null,mercari_url:mc||null,updated_at:new Date().toISOString()},{onConflict:'pedal_id'});
+  if(error){statusEl.textContent='❌ エラー: '+error.message;statusEl.style.color='#e05050';return;}
+  _afflinksMap[pedalId]={soundhouse_url:sh||null,mercari_url:mc||null};
+  statusEl.textContent='✅ 保存しました';statusEl.style.color='#4caf50';
+  setTimeout(()=>{statusEl.textContent='';},2500);
+}
+
 function filterUsersAdmin(){
   const q=(document.getElementById('user-search')?.value||'').toLowerCase();
   const filtered=q?_allUsers.filter(u=>(u.username||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)):_allUsers;
