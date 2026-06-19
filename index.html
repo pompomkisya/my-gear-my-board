@@ -333,7 +333,7 @@ header{padding:0 14px;height:54px}
 .h-btn{padding:7px 12px;font-size:11px;letter-spacing:.5px}
 .h-icon{width:32px;height:32px;font-size:13px}
 #swipe-ui{overflow:hidden;width:100%}
-.swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd);position:sticky;top:54px;z-index:50}
+.swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
 .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block;touch-action:manipulation}
 .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
 .swipe-container{display:flex;width:300%;transition:transform .3s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start}
@@ -605,15 +605,6 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
             <button id="load-more-btn" onclick="loadMorePosts()" style="display:none;grid-column:1/-1;margin-top:4px;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">さらに読み込む</button>
             <button id="back-to-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;grid-column:1/-1;margin-top:4px;padding:11px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">↑ 最新に戻る</button>
           </div>
-        </div>
-        <!-- ★ スマホ用フッター -->
-        <div style="border-top:1px solid var(--bd);padding:20px 14px;display:flex;flex-direction:column;align-items:flex-start;gap:10px">
-          <img class="footer-logo" src="IMG_2107.PNG" alt="MY GEAR MY BOARD" onerror="this.style.display='none'">
-          <div class="footer-links" style="gap:12px">
-            <a class="footer-link" href="/privacy.html">プライバシーポリシー</a>
-            <a class="footer-link" href="mailto:mygear.myboard@gmail.com">お問い合わせ</a>
-          </div>
-          <div class="footer-copy">© 2026 My Gear My Board. All rights reserved.</div>
         </div>
       </div>
     </div>
