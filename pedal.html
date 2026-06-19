@@ -423,7 +423,10 @@ function rakutenUrl(n, itemUrl) {
   if(itemUrl) return 'https://af.moshimo.com/af/c/click?a_id=5580518&p_id=54&pc_id=54&pl_id=616&url=' + encodeURIComponent(itemUrl);
   return 'https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(n+' エフェクター')+'/';
 }
-function reverbUrl(n) { return 'https://reverb.com/marketplace?query='+encodeURIComponent(n); }
+function reverbUrl(n) {
+  const dest = 'https://reverb.com/marketplace?query=' + encodeURIComponent(n) + '&product_type=effects-and-pedals';
+  return 'https://www.awin1.com/cread.php?awinmid=67144&awinaffid=2921057&ued=' + encodeURIComponent(dest);
+}
 function ytSearchUrl(n) { return 'https://www.youtube.com/results?search_query='+encodeURIComponent(n+' demo'); }
 
 function openPedalLightbox(src, source) {
