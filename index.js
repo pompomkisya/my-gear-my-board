@@ -687,8 +687,9 @@ function filterBrand(el,brand){document.querySelectorAll('.sl .tag').forEach(t2=
 function filterFx(el,fx){document.querySelectorAll('.sl .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentFxFilter=fx;currentBrandFilter=null;currentGenreFilter='ALL';applyFilter();}
 function setTab(el,tab){
   document.querySelectorAll('.feed-tab').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentTab=tab;
-  const fh=document.getElementById('feed-heading');if(fh)fh.textContent=tab==='gear'?'GEAR':'PEDALBOARDS';
-  const fhm=document.getElementById('feed-heading-mob');if(fhm)fhm.textContent=tab==='gear'?'GEAR':'PEDALBOARDS';
+  const headingText=tab==='gear'?'GEAR':(tab==='board'?'PEDALBOARDS':'ALL');
+  const fh=document.getElementById('feed-heading');if(fh)fh.textContent=headingText;
+  const fhm=document.getElementById('feed-heading-mob');if(fhm)fhm.textContent=headingText;
   applyFilter();
 }
 function setSort(el,sort){document.querySelectorAll('.sort-b').forEach(b=>b.classList.remove('on'));el.classList.add('on');currentSort=sort;applyFilter();}
