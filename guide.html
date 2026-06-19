@@ -47,8 +47,12 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 /* Image placeholder */
 .img-placeholder{background:var(--sf2);border:1px dashed var(--bd);border-radius:10px;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
 .img-placeholder-text{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);letter-spacing:1px}
-.guide-shot-wrap{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;max-height:260px;overflow:hidden;padding:8px}
+.guide-shot-wrap{background:radial-gradient(ellipse at 50% 50%,rgba(232,85,45,.16) 0%,rgba(232,85,45,.05) 55%,transparent 80%),var(--sf2);border:1px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;max-height:260px;overflow:hidden;padding:8px;cursor:zoom-in}
 .guide-shot{max-width:100%;max-height:244px;width:auto;height:auto;object-fit:contain;border-radius:6px;display:block}
+.guide-lightbox{position:fixed;inset:0;background:rgba(8,8,9,.92);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px;cursor:zoom-out}
+.guide-lightbox.open{display:flex}
+.guide-lightbox img{max-width:100%;max-height:90vh;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 0 60px rgba(232,85,45,.25);cursor:default}
+.guide-lightbox-close{position:fixed;top:18px;right:18px;width:40px;height:40px;border-radius:50%;background:rgba(20,20,22,.9);border:1px solid var(--bd);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1001}
 
 /* Outline */
 .outline{list-style:none}
@@ -109,7 +113,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
       </div>
       <div class="section-body">
         <div class="section-inner">
-          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-post-form.jpeg" alt="投稿フォーム画面" loading="lazy"></div>
+          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-post-form.jpeg" alt="投稿フォーム画面" loading="lazy" onclick="openGuideLightbox(\'/guide-images/guide-post-form.jpeg\',\'投稿フォーム画面\')"></div>
           <ul class="outline">
             <li class="outline-item">
               <div class="outline-main"><span class="outline-icon">📸</span><span class="outline-text" id="guide-s1-p1">登録不要・匿名でOK</span></div>
@@ -152,7 +156,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
       </div>
       <div class="section-body">
         <div class="section-inner">
-          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-pedaldb.jpeg" alt="エフェクター図鑑画面" loading="lazy"></div>
+          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-pedaldb.jpeg" alt="エフェクター図鑑画面" loading="lazy" onclick="openGuideLightbox(\'/guide-images/guide-pedaldb.jpeg\',\'エフェクター図鑑画面\')"></div>
           <ul class="outline">
             <li class="outline-item">
               <div class="outline-main"><span class="outline-icon">📚</span><span class="outline-text" id="guide-s2-p1">2,000件以上のデータベース</span></div>
@@ -195,7 +199,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
       </div>
       <div class="section-body">
         <div class="section-inner">
-          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-gacha.jpeg" alt="ペダルガチャ画面" loading="lazy"></div>
+          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-gacha.jpeg" alt="ペダルガチャ画面" loading="lazy" onclick="openGuideLightbox(\'/guide-images/guide-gacha.jpeg\',\'ペダルガチャ画面\')"></div>
           <ul class="outline">
             <li class="outline-item">
               <div class="outline-main"><span class="outline-icon">🎰</span><span class="outline-text" id="guide-s3-p1">次の1台との偶然の出会い</span></div>
@@ -231,7 +235,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
       </div>
       <div class="section-body">
         <div class="section-inner">
-          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-mypage.jpeg" alt="マイページ画面" loading="lazy"></div>
+          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-mypage.jpeg" alt="マイページ画面" loading="lazy" onclick="openGuideLightbox(\'/guide-images/guide-mypage.jpeg\',\'マイページ画面\')"></div>
           <ul class="outline">
             <li class="outline-item">
               <div class="outline-main"><span class="outline-icon">📋</span><span class="outline-text" id="guide-s4-p1">投稿を一覧管理</span></div>
@@ -279,7 +283,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
       </div>
       <div class="section-body">
         <div class="section-inner">
-          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-comment.jpeg" alt="投稿・コメント画面" loading="lazy"></div>
+          <div class="guide-shot-wrap"><img class="guide-shot" src="/guide-images/guide-comment.jpeg" alt="投稿・コメント画面" loading="lazy" onclick="openGuideLightbox(\'/guide-images/guide-comment.jpeg\',\'投稿・コメント画面\')"></div>
           <ul class="outline">
             <li class="outline-item">
               <div class="outline-main"><span class="outline-icon">❤️</span><span class="outline-text" id="guide-s5-p1">いいね・コメント</span></div>
@@ -313,7 +317,26 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
   </div>
 </div>
 
+<div class="guide-lightbox" id="guide-lightbox" onclick="closeGuideLightbox(event)">
+  <div class="guide-lightbox-close" onclick="closeGuideLightbox(event)">✕</div>
+  <img id="guide-lightbox-img" src="" alt="">
+</div>
+
 <script>
+function openGuideLightbox(src,alt){
+  const lb=document.getElementById('guide-lightbox');
+  const img=document.getElementById('guide-lightbox-img');
+  img.src=src;img.alt=alt;
+  lb.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeGuideLightbox(e){
+  if(e&&e.target&&e.target.id==='guide-lightbox-img')return;
+  const lb=document.getElementById('guide-lightbox');
+  lb.classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeGuideLightbox();});
 function detectLang(){const s=localStorage.getItem('mgmb_lang');if(s)return s;const b=navigator.language||'ja';return b.toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
 const I18N={
