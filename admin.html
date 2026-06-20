@@ -579,6 +579,17 @@ tr:hover td{background:rgba(255,255,255,.02)}
       💡 サウンドハウス・メルカリは個別URL発行が必要なため、ここで登録したペダルだけ専用URLに差し替わります。<br>
       未登録のペダルは自動的に「検索結果へのリンク」（非アフィリエイト）が表示されます。
     </div>
+    <details style="margin-bottom:16px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 14px">
+      <summary style="cursor:pointer;font-size:12px;font-weight:700;color:var(--ac)">🔧 リンクコードからURLだけ抜き出すツール</summary>
+      <div style="margin-top:10px;font-size:11px;color:var(--td);margin-bottom:6px">アクセストレードで発行された &lt;a href="..."&gt; のコード全体をそのまま貼り付けてください。</div>
+      <textarea id="af-extract-input" placeholder='<a href="https://h.accesstrade.net/sp/cc?rk=...">...</a>' oninput="extractAffHref()"
+        style="width:100%;min-height:70px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--tx);outline:none;font-family:'JetBrains Mono',monospace"></textarea>
+      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+        <input type="text" id="af-extract-output" readonly placeholder="ここに抽出結果が表示されます"
+          style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:11px;color:var(--ac);outline:none">
+        <button onclick="copyAffExtract()" style="background:var(--ac);color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">📋 コピー</button>
+      </div>
+    </details>
     <div style="margin-bottom:8px">
       <input class="form-input" id="afflink-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="onAffLinkSearchInput()" style="max-width:360px">
     </div>
@@ -587,7 +598,16 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="pf-btn" id="af-filter-set" onclick="setAffLinkFilter('set')">✅ 登録済み</button>
       <button class="pf-btn" id="af-filter-unset" onclick="setAffLinkFilter('unset')">⬜ 未登録</button>
     </div>
-    <div id="afflinks-list" class="loading">検索ワードを入力してください</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="af-pri-desc" onchange="onAffPriorityChange()"> 説明文・画像あり</label>
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="af-pri-gacha" onchange="onAffPriorityChange()"> 🎰 ガチャ登録あり</label>
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="af-pri-posts" onchange="onAffPriorityChange()"> 📝 投稿あり</label>
+      <button class="pf-btn" onclick="browseAffLinksByPriority()" style="margin-left:auto">🔥 人気順で読み込む（検索なし）</button>
+    </div>
+    <div id="afflinks-list" class="loading">検索ワードを入力するか、「人気順で読み込む」をお試しください</div>
+    <div id="afflinks-loadmore-wrap" style="text-align:center;margin-top:14px;display:none">
+      <button class="pf-btn" onclick="loadMoreAffLinks()">もっと読み込む</button>
+    </div>
   </div>
 
   <!-- ★ 楽天画像バッチタブ -->
@@ -2282,7 +2302,20 @@ async function loadUsersAdmin(){
 }
 
 // ★ アフィリエイトリンク管理
-let _afflinksInitDone=false,_afflinksMap={},_afflinksFilter='all';
+function extractAffHref(){
+  const raw=document.getElementById('af-extract-input').value;
+  const out=document.getElementById('af-extract-output');
+  const m=raw.match(/href\s*=\s*"([^"]+)"/i)||raw.match(/href\s*=\s*'([^']+)'/i);
+  out.value=m?m[1]:'';
+}
+function copyAffExtract(){
+  const out=document.getElementById('af-extract-output');
+  if(!out.value)return;
+  out.select();out.setSelectionRange(0,99999);
+  navigator.clipboard?.writeText(out.value).catch(()=>document.execCommand('copy'));
+}
+let _afflinksInitDone=false,_afflinksMap={},_afflinksFilter='all',_afflinksPostNames=null,_afflinksBrowseOffset=0,_afflinksBrowseMode=false,_afflinksBrowseDone=false;
+const AFFLINKS_PAGE_SIZE=30;
 function initAffLinksTab(){
   if(_afflinksInitDone)return;
   _afflinksInitDone=true;
@@ -2292,34 +2325,97 @@ function initAffLinksTab(){
     if(countEl)countEl.textContent=(data||[]).length+'件登録済み';
   });
 }
+async function ensurePostNamesLoaded(){
+  if(_afflinksPostNames)return _afflinksPostNames;
+  const{data}=await sb.from('posts').select('gear_list').limit(1000);
+  const set=new Set();
+  (data||[]).forEach(post=>{
+    const gear=Array.isArray(post.gear_list)?post.gear_list:[];
+    gear.forEach(g=>{
+      const n=(g.name||g||'').toString().replace(/\t/g,' ').replace(/ +/g,' ').toLowerCase().trim();
+      if(n)set.add(n);
+    });
+  });
+  _afflinksPostNames=set;
+  return set;
+}
 function setAffLinkFilter(f){
   _afflinksFilter=f;
-  document.querySelectorAll('#tab-afflinks .pf-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#tab-afflinks .pf-btn[id^="af-filter-"]').forEach(b=>b.classList.remove('on'));
   document.getElementById('af-filter-'+f)?.classList.add('on');
-  onAffLinkSearchInput();
+  if(_afflinksBrowseMode)browseAffLinksByPriority(true);else onAffLinkSearchInput();
+}
+function onAffPriorityChange(){
+  if(_afflinksBrowseMode)browseAffLinksByPriority(true);
 }
 let _affSearchTimer=null;
 function onAffLinkSearchInput(){
+  _afflinksBrowseMode=false;
   clearTimeout(_affSearchTimer);
   _affSearchTimer=setTimeout(runAffLinkSearch,300);
+}
+async function applyPriorityFilters(results){
+  const useDesc=document.getElementById('af-pri-desc')?.checked;
+  const useGacha=document.getElementById('af-pri-gacha')?.checked;
+  const usePosts=document.getElementById('af-pri-posts')?.checked;
+  if(useDesc)results=results.filter(p=>(p.description||p.description_en)&&p.image_url);
+  if(useGacha)results=results.filter(p=>!!p.rarity);
+  if(usePosts){
+    const names=await ensurePostNamesLoaded();
+    results=results.filter(p=>names.has((p.full_name||'').replace(/\t/g,' ').replace(/ +/g,' ').toLowerCase().trim()));
+  }
+  return results;
+}
+function applyAffLinkSetFilter(results){
+  if(_afflinksFilter==='set')return results.filter(p=>_afflinksMap[p.id]&&(_afflinksMap[p.id].soundhouse_url||_afflinksMap[p.id].mercari_url));
+  if(_afflinksFilter==='unset')return results.filter(p=>!_afflinksMap[p.id]||(!_afflinksMap[p.id].soundhouse_url&&!_afflinksMap[p.id].mercari_url));
+  return results;
 }
 async function runAffLinkSearch(){
   const q=(document.getElementById('afflink-search')?.value||'').trim();
   const listEl=document.getElementById('afflinks-list');
-  if(!q){listEl.innerHTML='検索ワードを入力してください';return;}
+  document.getElementById('afflinks-loadmore-wrap').style.display='none';
+  if(!q){listEl.innerHTML='検索ワードを入力するか、「人気順で読み込む」をお試しください';return;}
   listEl.innerHTML='<div style="padding:16px;color:var(--td)">検索中...</div>';
-  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name').or(`brand.ilike.%${q}%,model.ilike.%${q}%,full_name.ilike.%${q}%`).limit(60);
+  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity').or(`brand.ilike.%${q}%,model.ilike.%${q}%,full_name.ilike.%${q}%`).limit(60);
   if(error){listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';return;}
-  let results=data||[];
-  if(_afflinksFilter==='set')results=results.filter(p=>_afflinksMap[p.id]&&(_afflinksMap[p.id].soundhouse_url||_afflinksMap[p.id].mercari_url));
-  if(_afflinksFilter==='unset')results=results.filter(p=>!_afflinksMap[p.id]||(!_afflinksMap[p.id].soundhouse_url&&!_afflinksMap[p.id].mercari_url));
-  if(!results.length){listEl.innerHTML='<div style="padding:16px;color:var(--td)">該当ペダルがありません</div>';return;}
-  listEl.innerHTML=results.map(p=>{
+  let results=applyAffLinkSetFilter(data||[]);
+  results=await applyPriorityFilters(results);
+  renderAffLinksList(results,false);
+}
+async function browseAffLinksByPriority(reset){
+  _afflinksBrowseMode=true;
+  if(reset){_afflinksBrowseOffset=0;_afflinksBrowseDone=false;document.getElementById('afflinks-list').innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...</div>';}
+  const listEl=document.getElementById('afflinks-list');
+  if(_afflinksBrowseOffset===0)listEl.innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...</div>';
+  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity')
+    .order('view_count',{ascending:false,nullsFirst:false})
+    .range(_afflinksBrowseOffset,_afflinksBrowseOffset+AFFLINKS_PAGE_SIZE-1);
+  if(error){listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';return;}
+  if(!data||data.length<AFFLINKS_PAGE_SIZE)_afflinksBrowseDone=true;
+  _afflinksBrowseOffset+=AFFLINKS_PAGE_SIZE;
+  let results=applyAffLinkSetFilter(data||[]);
+  results=await applyPriorityFilters(results);
+  renderAffLinksList(results,_afflinksBrowseOffset>AFFLINKS_PAGE_SIZE);
+  document.getElementById('afflinks-loadmore-wrap').style.display=_afflinksBrowseDone?'none':'block';
+}
+function loadMoreAffLinks(){
+  browseAffLinksByPriority(false);
+}
+function renderAffLinksList(results,append){
+  const listEl=document.getElementById('afflinks-list');
+  if(!results.length&&!append){listEl.innerHTML='<div style="padding:16px;color:var(--td)">該当ペダルがありません</div>';return;}
+  const html=results.map(p=>{
     const link=_afflinksMap[p.id]||{};
     const shVal=(link.soundhouse_url||'').replace(/"/g,'&quot;');
     const mcVal=(link.mercari_url||'').replace(/"/g,'&quot;');
+    const badges=[
+      (p.description||p.description_en)&&p.image_url?'<span style="background:#2a3a2a;color:#7fd87f;border-radius:4px;padding:2px 6px;font-size:9px;margin-right:4px">📝画像/説明</span>':'',
+      p.rarity?'<span style="background:#3a2a3a;color:#d87fd8;border-radius:4px;padding:2px 6px;font-size:9px;margin-right:4px">🎰ガチャ</span>':''
+    ].join('');
     return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:10px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:8px">${p.brand} ${p.model}</div>
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">${p.brand} ${p.model}</div>
+      <div style="margin-bottom:8px">${badges}</div>
       <div style="margin-bottom:6px">
         <label style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">🎸 サウンドハウス個別URL</label>
         <input type="text" id="af-sh-${p.id}" value="${shVal}" placeholder="https://www.soundhouse.co.jp/products/detail/item/..."
@@ -2327,13 +2423,14 @@ async function runAffLinkSearch(){
       </div>
       <div style="margin-bottom:8px">
         <label style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">📮 メルカリ個別アフィリエイトURL</label>
-        <input type="text" id="af-mc-${p.id}" value="${mcVal}" placeholder="https://jp.mercari.com/item/...?afid=..."
+        <input type="text" id="af-mc-${p.id}" value="${mcVal}" placeholder="https://jp.mercari.com/search?afid=...&keyword=..."
           style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--tx);outline:none;margin-top:3px">
       </div>
       <button onclick="saveAffLink(${p.id})" style="background:var(--ac);color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer">💾 保存</button>
       <span id="af-status-${p.id}" style="font-size:11px;color:var(--td);margin-left:8px"></span>
     </div>`;
   }).join('');
+  listEl.innerHTML=append?listEl.innerHTML+html:html;
 }
 async function saveAffLink(pedalId){
   const sh=document.getElementById('af-sh-'+pedalId).value.trim();
