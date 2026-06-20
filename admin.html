@@ -2325,15 +2325,25 @@ function convertShField(pedalId){
   // hrefが見つからない場合（既に素のURLが入っている場合）はそのまま変更しない
 }
 let _afflinksInitDone=false,_afflinksMap={},_afflinksFilter='all',_afflinksPostNames=null,_afflinksBrowseOffset=0,_afflinksBrowseMode=false,_afflinksBrowseDone=false;
-const AFFLINKS_PAGE_SIZE=30;
-function initAffLinksTab(){
+const AFFLINKS_PAGE_SIZE=10;
+async function initAffLinksTab(){
   if(_afflinksInitDone)return;
   _afflinksInitDone=true;
-  sb.from('pedal_affiliate_links').select('pedal_id,soundhouse_url,mercari_url').then(({data})=>{
-    (data||[]).forEach(r=>{_afflinksMap[r.pedal_id]=r;});
-    const countEl=document.getElementById('afflinks-count');
-    if(countEl)countEl.textContent=(data||[]).length+'件登録済み';
+  const{data}=await sb.from('pedal_affiliate_links').select('pedal_id,soundhouse_url,mercari_url');
+  (data||[]).forEach(r=>{_afflinksMap[r.pedal_id]=r;});
+  refreshAffLinksStats();
+}
+async function refreshAffLinksStats(){
+  const statsEl=document.getElementById('afflinks-count');
+  if(statsEl)statsEl.textContent='集計中...';
+  const{count:totalCount}=await sb.from('pedals').select('id',{count:'exact',head:true});
+  const total=totalCount||0;
+  let shSet=0,mcSet=0;
+  Object.values(_afflinksMap).forEach(r=>{
+    if(r.soundhouse_url)shSet++;
+    if(r.mercari_url)mcSet++;
   });
+  if(statsEl)statsEl.textContent=`🎸サウンドハウス ${shSet}件登録/${Math.max(total-shSet,0)}件未登録　📮メルカリ ${mcSet}件登録/${Math.max(total-mcSet,0)}件未登録`;
 }
 async function ensurePostNamesLoaded(){
   if(_afflinksPostNames)return _afflinksPostNames;
@@ -2395,18 +2405,34 @@ async function runAffLinkSearch(){
 }
 async function browseAffLinksByPriority(reset){
   _afflinksBrowseMode=true;
-  if(reset){_afflinksBrowseOffset=0;_afflinksBrowseDone=false;document.getElementById('afflinks-list').innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...</div>';}
   const listEl=document.getElementById('afflinks-list');
-  if(_afflinksBrowseOffset===0)listEl.innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...</div>';
-  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity,view_count')
-    .order('view_count',{ascending:false,nullsFirst:false})
-    .range(_afflinksBrowseOffset,_afflinksBrowseOffset+AFFLINKS_PAGE_SIZE-1);
-  if(error){listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';return;}
-  if(!data||data.length<AFFLINKS_PAGE_SIZE)_afflinksBrowseDone=true;
-  _afflinksBrowseOffset+=AFFLINKS_PAGE_SIZE;
-  let results=applyAffLinkSetFilter(data||[]);
-  results=await applyPriorityFilters(results);
-  renderAffLinksList(results,_afflinksBrowseOffset>AFFLINKS_PAGE_SIZE);
+  if(reset){_afflinksBrowseOffset=0;_afflinksBrowseDone=false;listEl.innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...</div>';}
+  const wasEmpty=_afflinksBrowseOffset===0;
+  if(!wasEmpty)listEl.insertAdjacentHTML('beforeend','<div id="afflinks-loading-spinner" style="padding:10px;color:var(--td);font-size:12px;text-align:center">読み込み中...</div>');
+  let collected=[];
+  let guard=0;
+  const MAX_ROUNDS=15; // 安全装置：絞り込みが厳しすぎて無限ループ気味になるのを防ぐ
+  while(collected.length<AFFLINKS_PAGE_SIZE && !_afflinksBrowseDone && guard<MAX_ROUNDS){
+    guard++;
+    const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity,view_count')
+      .order('view_count',{ascending:false,nullsFirst:false})
+      .range(_afflinksBrowseOffset,_afflinksBrowseOffset+AFFLINKS_PAGE_SIZE-1);
+    if(error){
+      document.getElementById('afflinks-loading-spinner')?.remove();
+      listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';
+      return;
+    }
+    if(!data||data.length<AFFLINKS_PAGE_SIZE)_afflinksBrowseDone=true;
+    _afflinksBrowseOffset+=AFFLINKS_PAGE_SIZE;
+    let filtered=applyAffLinkSetFilter(data||[]);
+    filtered=await applyPriorityFilters(filtered);
+    collected=collected.concat(filtered);
+  }
+  document.getElementById('afflinks-loading-spinner')?.remove();
+  if(!wasEmpty&&guard>=MAX_ROUNDS&&!collected.length){
+    listEl.insertAdjacentHTML('beforeend','<div style="padding:10px;color:var(--td);font-size:11px;text-align:center">この絞り込み条件に一致するペダルが見つかりませんでした（探索を打ち切りました）。もう一度押すと続きから探索します。</div>');
+  }
+  renderAffLinksList(collected,!wasEmpty);
   document.getElementById('afflinks-loadmore-wrap').style.display=_afflinksBrowseDone?'none':'block';
 }
 function loadMoreAffLinks(){
@@ -2462,6 +2488,7 @@ async function saveAffLink(pedalId){
   if(error){statusEl.textContent='❌ エラー: '+error.message;statusEl.style.color='#e05050';return;}
   _afflinksMap[pedalId]={soundhouse_url:sh||null,mercari_url:mc||null};
   statusEl.textContent='✅ 保存しました';statusEl.style.color='#4caf50';
+  refreshAffLinksStats();
   setTimeout(()=>{statusEl.textContent='';},2500);
 }
 
