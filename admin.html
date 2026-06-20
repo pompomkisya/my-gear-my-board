@@ -604,6 +604,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="af-pri-posts" onchange="onAffPriorityChange()"> 📝 投稿あり</label>
       <button class="pf-btn" onclick="browseAffLinksByPriority()" style="margin-left:auto">🔥 人気順で読み込む（検索なし）</button>
     </div>
+    <div style="margin-bottom:10px">
+      <button class="pf-btn" id="af-checklink-btn" onclick="runLinkHealthCheck()">🔍 登録済みURLの生存確認</button>
+      <span id="af-checklink-status" style="font-size:11px;color:var(--td);margin-left:8px"></span>
+    </div>
+    <div id="af-checklink-results" style="margin-bottom:14px"></div>
     <div id="afflinks-list" class="loading">検索ワードを入力するか、「人気順で読み込む」をお試しください</div>
     <div id="afflinks-loadmore-wrap" style="text-align:center;margin-top:14px;display:none">
       <button class="pf-btn" onclick="loadMoreAffLinks()">もっと読み込む</button>
@@ -2377,7 +2382,7 @@ async function runAffLinkSearch(){
   document.getElementById('afflinks-loadmore-wrap').style.display='none';
   if(!q){listEl.innerHTML='検索ワードを入力するか、「人気順で読み込む」をお試しください';return;}
   listEl.innerHTML='<div style="padding:16px;color:var(--td)">検索中...</div>';
-  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity').or(`brand.ilike.%${q}%,model.ilike.%${q}%,full_name.ilike.%${q}%`).limit(60);
+  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity,view_count').or(`brand.ilike.%${q}%,model.ilike.%${q}%,full_name.ilike.%${q}%`).limit(60);
   if(error){listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';return;}
   let results=applyAffLinkSetFilter(data||[]);
   results=await applyPriorityFilters(results);
@@ -2388,7 +2393,7 @@ async function browseAffLinksByPriority(reset){
   if(reset){_afflinksBrowseOffset=0;_afflinksBrowseDone=false;document.getElementById('afflinks-list').innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...</div>';}
   const listEl=document.getElementById('afflinks-list');
   if(_afflinksBrowseOffset===0)listEl.innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...</div>';
-  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity')
+  const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity,view_count')
     .order('view_count',{ascending:false,nullsFirst:false})
     .range(_afflinksBrowseOffset,_afflinksBrowseOffset+AFFLINKS_PAGE_SIZE-1);
   if(error){listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';return;}
@@ -2414,7 +2419,10 @@ function renderAffLinksList(results,append){
       p.rarity?'<span style="background:#3a2a3a;color:#d87fd8;border-radius:4px;padding:2px 6px;font-size:9px;margin-right:4px">🎰ガチャ</span>':''
     ].join('');
     return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:10px">
-      <div style="font-weight:700;font-size:14px;margin-bottom:4px">${p.brand} ${p.model}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <div style="font-weight:700;font-size:14px">${p.brand} ${p.model}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">👁 ${(p.view_count||0).toLocaleString()}</div>
+      </div>
       <div style="margin-bottom:8px">${badges}</div>
       <div style="margin-bottom:6px">
         <label style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">🎸 サウンドハウス個別URL</label>
@@ -2442,6 +2450,60 @@ async function saveAffLink(pedalId){
   _afflinksMap[pedalId]={soundhouse_url:sh||null,mercari_url:mc||null};
   statusEl.textContent='✅ 保存しました';statusEl.style.color='#4caf50';
   setTimeout(()=>{statusEl.textContent='';},2500);
+}
+
+// ★ リンク切れチェック
+async function checkOneUrl(url){
+  try{
+    const res=await fetch('/.netlify/functions/linkcheck?url='+encodeURIComponent(url));
+    if(!res.ok)return{ok:false,status:0,error:'request_failed'};
+    return await res.json();
+  }catch(e){return{ok:false,status:0,error:String(e)};}
+}
+async function runLinkHealthCheck(){
+  const btn=document.getElementById('af-checklink-btn');
+  const statusEl=document.getElementById('af-checklink-status');
+  const resultsEl=document.getElementById('af-checklink-results');
+  const{data,error}=await sb.from('pedal_affiliate_links').select('pedal_id,soundhouse_url,mercari_url').or('soundhouse_url.not.is.null,mercari_url.not.is.null');
+  if(error){resultsEl.innerHTML='<div style="color:#e05050;font-size:12px">エラー: '+error.message+'</div>';return;}
+  const targets=[];
+  (data||[]).forEach(r=>{
+    if(r.soundhouse_url)targets.push({pedalId:r.pedal_id,type:'soundhouse',url:r.soundhouse_url});
+    if(r.mercari_url)targets.push({pedalId:r.pedal_id,type:'mercari',url:r.mercari_url});
+  });
+  if(!targets.length){resultsEl.innerHTML='<div style="font-size:12px;color:var(--td)">チェック対象の個別URLが登録されていません</div>';return;}
+  btn.disabled=true;
+  const broken=[];
+  let done=0;
+  const CONCURRENCY=4;
+  let idx=0;
+  async function worker(){
+    while(idx<targets.length){
+      const t=targets[idx++];
+      const result=await checkOneUrl(t.url);
+      if(!result.ok)broken.push({...t,result});
+      done++;
+      statusEl.textContent=`チェック中... ${done}/${targets.length}`;
+    }
+  }
+  await Promise.all(Array.from({length:CONCURRENCY},worker));
+  btn.disabled=false;
+  if(!broken.length){
+    statusEl.textContent='✅ チェック完了：問題ありませんでした';
+    resultsEl.innerHTML='';
+    return;
+  }
+  statusEl.textContent=`⚠️ チェック完了：${broken.length}件のリンク切れの可能性`;
+  const pedalIds=[...new Set(broken.map(b=>b.pedalId))];
+  const{data:pedalsData}=await sb.from('pedals').select('id,brand,model').in('id',pedalIds);
+  const pedalNameMap={};(pedalsData||[]).forEach(p=>{pedalNameMap[p.id]=`${p.brand} ${p.model}`;});
+  resultsEl.innerHTML='<div style="background:var(--sf);border:1px solid #e05050;border-radius:10px;padding:12px 14px">'
+    +'<div style="font-weight:700;font-size:13px;color:#e05050;margin-bottom:8px">⚠️ リンク切れの可能性があるもの</div>'
+    +broken.map(b=>`<div style="font-size:11px;margin-bottom:6px;line-height:1.5">
+      <span style="color:var(--tx);font-weight:600">${pedalNameMap[b.pedalId]||('pedal_id:'+b.pedalId)}</span>
+      <span style="color:var(--td)">（${b.type==='soundhouse'?'サウンドハウス':'メルカリ'}・status: ${b.result.status||b.result.error||'不明'}）</span>
+    </div>`).join('')
+    +'</div>';
 }
 
 function filterUsersAdmin(){
