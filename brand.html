@@ -261,10 +261,12 @@ const TYPE_LABELS = {
   'overdrive':'OD','distortion':'Dist','fuzz':'Fuzz','boost':'Boost',
   'reverb':'Reverb','delay':'Delay','chorus':'Chorus','flanger':'Flanger',
   'phaser':'Phaser','modulation':'Mod','tremolo':'Tremolo','vibrato':'Vibrato',
-  'pitch':'Pitch','wah':'Wah','compressor':'Comp','comp':'Comp','eq':'EQ',
+  'pitch':'Pitch','wah':'Wah','wah_filter':'Wah/Filter','pitch_octave':'Pitch/Oct',
+  'compressor':'Comp','comp':'Comp','eq':'EQ',
   'noise_gate':'Noise Gate','looper':'Looper','volume':'Volume','tuner':'Tuner',
   'multi':'Multi FX','preamp':'Preamp','switcher':'Switcher','buffer':'Buffer',
-  'junction_box':'Junction Box','pre':'Preamp'
+  'junction_box':'Junction Box','pre':'Preamp','power_supply':'Power Supply',
+  'synth':'Synth','other':'Other'
 };
 function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()] || t; }
 
@@ -346,7 +348,7 @@ function renderBrand(brandName, pedals, posts, total, brandData) {
         imageHtml = `<span class="pedal-card-image-placeholder">🎛</span>`;
       }
     }
-    return `<a href="/pedal?slug=${p.slug}" class="pedal-card">
+    return `<a href="/pedal?slug=${p.slug}" class="pedal-card" data-types="${(p.types||[]).map(t=>(t||'').toLowerCase()).join(',')}">
       <div class="pedal-card-image">${imageHtml}</div>
       <div class="pedal-card-body">
         <div class="pedal-card-name">${p.model}</div>
@@ -457,31 +459,15 @@ function filterByType(btnEl, typeVal){
   // ボタンのon状態切り替え
   document.querySelectorAll('.type-filter-btn').forEach(b=>b.classList.remove('on'));
   btnEl.classList.add('on');
-  // ペダルグリッドをフィルタリング
+  // ペダルグリッドをフィルタリング（カードに埋め込んだ生のタイプキーで直接比較。表示ラベルの整形やバッジの表示件数制限には左右されない）
   const grid=document.getElementById('pedal-grid');
   if(!grid)return;
   const allCards=grid.querySelectorAll('a.pedal-card');
+  const typeKey=(typeVal||'').toLowerCase();
   allCards.forEach(card=>{
     if(typeVal==='__all__'){card.style.display='block';return;}
-    // カードのタイプを確認（type-badgeから）
-    const badges=card.querySelectorAll('.type-badge');
-    const types=[...badges].map(b=>b.textContent.trim().toLowerCase());
-    const typeKey=typeVal.toLowerCase();
-    // TYPE_LABELSの逆引き
-    const labelMatch=Object.entries({
-      'overdrive':['od','overdrive'],'distortion':['dist','distortion'],
-      'fuzz':['fuzz'],'boost':['boost'],'reverb':['reverb'],'delay':['delay'],
-      'chorus':['chorus'],'flanger':['flanger'],'phaser':['phaser'],
-      'modulation':['mod','modulation'],'tremolo':['tremolo'],'vibrato':['vibrato'],
-      'pitch_octave':['pitch/oct'],'wah_filter':['wah/filter'],
-      'comp':['comp'],'eq':['eq'],'noise_gate':['noise gate'],
-      'looper':['looper'],'volume':['volume'],'tuner':['tuner'],
-      'multi':['multi fx'],'preamp':['preamp'],'switcher':['switcher'],
-      'buffer':['buffer'],'junction_box':['junction box'],'power_supply':['power supply'],
-      'synth':['synth'],'other':['other']
-    }).find(([k])=>k===typeKey);
-    const searchLabels=labelMatch?labelMatch[1]:[typeKey];
-    const match=types.some(t=>searchLabels.some(sl=>t.includes(sl)));
+    const types=(card.dataset.types||'').split(',').filter(Boolean);
+    const match=types.includes(typeKey);
     card.style.display=match?'block':'none';
   });
 }
@@ -513,6 +499,7 @@ async function loadMorePedals() {
       const card = document.createElement('a');
       card.href = `/pedal?slug=${p.slug}`;
       card.className = 'pedal-card';
+      card.dataset.types = (p.types||[]).map(t=>(t||'').toLowerCase()).join(',');
       card.innerHTML = `
         <div class="pedal-card-image">${imageHtml}</div>
         <div class="pedal-card-body">
