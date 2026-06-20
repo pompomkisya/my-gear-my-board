@@ -425,9 +425,9 @@ function soundhouseUrl(n) { return 'https://www.soundhouse.co.jp/search/index?se
 function sweetwaterUrl(n) { return 'https://www.sweetwater.com/store/search.php?s='+encodeURIComponent(n); }
 function amazonJpUrl(n) { return 'https://www.amazon.co.jp/s?k='+encodeURIComponent(n)+'&tag=mgmb-22'; }
 function amazonUsUrl(n) { return 'https://www.amazon.com/s?k='+encodeURIComponent(n)+'&tag=mgmb-20'; }
-function rakutenUrl(n, itemUrl) {
-  if(itemUrl) return 'https://af.moshimo.com/af/c/click?a_id=5580518&p_id=54&pc_id=54&pl_id=616&url=' + encodeURIComponent(itemUrl);
-  return 'https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(n+' エフェクター')+'/';
+function rakutenUrl(n) {
+  const dest = 'https://search.rakuten.co.jp/search/mall/'+encodeURIComponent(n+' エフェクター ペダル')+'/';
+  return 'https://af.moshimo.com/af/c/click?a_id=5580518&p_id=54&pc_id=54&pl_id=616&url=' + encodeURIComponent(dest);
 }
 function reverbUrl(n) {
   const dest = 'https://reverb.com/marketplace?query=' + encodeURIComponent(n) + '&product_type=effects-and-pedals';
@@ -1044,7 +1044,7 @@ function renderPedal(pedal,posts){
   const updatedStr=formatUpdatedAt(pedal.updated_at);
   const descHtml=desc?`<div class="pedal-description-wrap"><div class="pedal-description" id="desc-text">${desc}</div><button class="desc-toggle-btn" id="desc-toggle-btn">${tr('readMore')}</button>${updatedStr?`<div class="desc-updated">${tr('updatedAt')}${updatedStr}</div>`:''}</div>`:`<div class="pedal-description-wrap"><div class="pedal-description empty">${tr('descEmpty')}</div></div>`;
   const boardsHtml=posts.length>0?posts.map(post=>{const thumb=post.image_urls?.length>0?`<img src="${post.image_urls[0]}" alt="" loading="lazy">`:`<div class="board-thumb-placeholder">🎸</div>`;return`<a href="/post?id=${post.id}" class="board-item"><div class="board-thumb">${thumb}</div><div class="board-meta"><div class="board-title">${post.title||tr('untitled')}</div><div class="board-user">${post.username?'@'+post.username:tr('anonUser')}</div></div></a>`;}).join(''):`<div class="empty-state"><div class="empty-state-icon">🎸</div><div class="empty-state-title">${tr('emptyBoardTitle')}</div><div class="empty-state-text">${tr('emptyBoardText')}</div><a href="/" class="empty-state-btn">${tr('emptyBoardBtn')}</a></div>`;
-  const rakutenHref=rakutenUrl(pedal.full_name,pedal.rakuten_item_url);
+  const rakutenHref=rakutenUrl(pedal.full_name);
   const soundhouseHref=(cachedAffLink&&cachedAffLink.soundhouse_url)?cachedAffLink.soundhouse_url:soundhouseUrl(pedal.full_name);
   const mercariHref=(cachedAffLink&&cachedAffLink.mercari_url)?cachedAffLink.mercari_url:mercariUrl(pedal.full_name);
   document.getElementById('content').innerHTML=`
