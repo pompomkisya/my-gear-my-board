@@ -577,19 +577,9 @@ tr:hover td{background:rgba(255,255,255,.02)}
     <div class="section-title">🔗 アフィリエイトリンク管理 <span class="badge" id="afflinks-count">-</span></div>
     <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:14px;line-height:1.6">
       💡 サウンドハウス・メルカリは個別URL発行が必要なため、ここで登録したペダルだけ専用URLに差し替わります。<br>
-      未登録のペダルは自動的に「検索結果へのリンク」（非アフィリエイト）が表示されます。
+      未登録のペダルは自動的に「検索結果へのリンク」（非アフィリエイト）が表示されます。<br>
+      🔧 サウンドハウスの欄は、アクセストレードのリンクコード（&lt;a href="..."&gt;...&lt;/a&gt;）をそのまま貼り付けて「変換」を押すとURLだけ抽出されます。
     </div>
-    <details style="margin-bottom:16px;background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:12px 14px">
-      <summary style="cursor:pointer;font-size:12px;font-weight:700;color:var(--ac)">🔧 リンクコードからURLだけ抜き出すツール</summary>
-      <div style="margin-top:10px;font-size:11px;color:var(--td);margin-bottom:6px">アクセストレードで発行された &lt;a href="..."&gt; のコード全体をそのまま貼り付けてください。</div>
-      <textarea id="af-extract-input" placeholder='<a href="https://h.accesstrade.net/sp/cc?rk=...">...</a>' oninput="extractAffHref()"
-        style="width:100%;min-height:70px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:8px 10px;font-size:11px;color:var(--tx);outline:none;font-family:'JetBrains Mono',monospace"></textarea>
-      <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-        <input type="text" id="af-extract-output" readonly placeholder="ここに抽出結果が表示されます"
-          style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:11px;color:var(--ac);outline:none">
-        <button onclick="copyAffExtract()" style="background:var(--ac);color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">📋 コピー</button>
-      </div>
-    </details>
     <div style="margin-bottom:8px">
       <input class="form-input" id="afflink-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="onAffLinkSearchInput()" style="max-width:360px">
     </div>
@@ -2307,17 +2297,32 @@ async function loadUsersAdmin(){
 }
 
 // ★ アフィリエイトリンク管理
-function extractAffHref(){
-  const raw=document.getElementById('af-extract-input').value;
-  const out=document.getElementById('af-extract-output');
-  const m=raw.match(/href\s*=\s*"([^"]+)"/i)||raw.match(/href\s*=\s*'([^']+)'/i);
-  out.value=m?m[1]:'';
+function copyPedalName(btnEl,name){
+  const done=()=>{
+    const orig=btnEl.textContent;
+    btnEl.textContent='✅';
+    setTimeout(()=>{btnEl.textContent=orig;},1200);
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(name).then(done).catch(()=>fallbackCopy(name,done));
+  }else{
+    fallbackCopy(name,done);
+  }
 }
-function copyAffExtract(){
-  const out=document.getElementById('af-extract-output');
-  if(!out.value)return;
-  out.select();out.setSelectionRange(0,99999);
-  navigator.clipboard?.writeText(out.value).catch(()=>document.execCommand('copy'));
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.focus();ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);
+  if(cb)cb();
+}
+function convertShField(pedalId){
+  const input=document.getElementById('af-sh-'+pedalId);
+  const raw=input.value;
+  const m=raw.match(/href\s*=\s*"([^"]+)"/i)||raw.match(/href\s*=\s*'([^']+)'/i);
+  if(m){input.value=m[1];}
+  // hrefが見つからない場合（既に素のURLが入っている場合）はそのまま変更しない
 }
 let _afflinksInitDone=false,_afflinksMap={},_afflinksFilter='all',_afflinksPostNames=null,_afflinksBrowseOffset=0,_afflinksBrowseMode=false,_afflinksBrowseDone=false;
 const AFFLINKS_PAGE_SIZE=30;
@@ -2419,15 +2424,22 @@ function renderAffLinksList(results,append){
       p.rarity?'<span style="background:#3a2a3a;color:#d87fd8;border-radius:4px;padding:2px 6px;font-size:9px;margin-right:4px">🎰ガチャ</span>':''
     ].join('');
     return `<div style="background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px;margin-bottom:10px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-        <div style="font-weight:700;font-size:14px">${p.brand} ${p.model}</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">👁 ${(p.view_count||0).toLocaleString()}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:8px">
+        <div style="display:flex;align-items:center;gap:6px;min-width:0">
+          <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.brand} ${p.model}</div>
+          <button onclick="copyPedalName(this,'${(p.brand+' '+p.model).replace(/'/g,"\\'")}')" title="名前をコピー"
+            style="background:var(--sf2);border:1px solid var(--bd);color:var(--td);border-radius:5px;padding:2px 7px;font-size:11px;cursor:pointer;flex-shrink:0">📋</button>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);white-space:nowrap;flex-shrink:0">👁 ${(p.view_count||0).toLocaleString()}</div>
       </div>
       <div style="margin-bottom:8px">${badges}</div>
       <div style="margin-bottom:6px">
         <label style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">🎸 サウンドハウス個別URL</label>
-        <input type="text" id="af-sh-${p.id}" value="${shVal}" placeholder="https://www.soundhouse.co.jp/products/detail/item/..."
-          style="width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--tx);outline:none;margin-top:3px">
+        <div style="display:flex;gap:6px;margin-top:3px">
+          <input type="text" id="af-sh-${p.id}" value="${shVal}" placeholder='href="..." を含むコードをそのまま貼り付けてもOK'
+            style="flex:1;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;padding:7px 10px;font-size:12px;color:var(--tx);outline:none">
+          <button onclick="convertShField(${p.id})" style="background:var(--sf2);border:1px solid var(--bd);color:var(--tx);border-radius:6px;padding:0 12px;font-size:11px;cursor:pointer;white-space:nowrap">🔄 変換</button>
+        </div>
       </div>
       <div style="margin-bottom:8px">
         <label style="font-size:10px;color:var(--td);font-family:'JetBrains Mono',monospace">📮 メルカリ個別アフィリエイトURL</label>
@@ -2441,6 +2453,7 @@ function renderAffLinksList(results,append){
   listEl.innerHTML=append?listEl.innerHTML+html:html;
 }
 async function saveAffLink(pedalId){
+  convertShField(pedalId);
   const sh=document.getElementById('af-sh-'+pedalId).value.trim();
   const mc=document.getElementById('af-mc-'+pedalId).value.trim();
   const statusEl=document.getElementById('af-status-'+pedalId);
