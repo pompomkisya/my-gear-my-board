@@ -2434,18 +2434,24 @@ async function runAffLinkSearch(){
   results=await applyPriorityFilters(results);
   renderAffLinksList(results,false);
 }
-let _afflinksBuffer=[],_afflinksRawOffset=0,_afflinksRawExhausted=false;
+let _afflinksBuffer=[],_afflinksRawOffset=0,_afflinksRawExhausted=false,_afflinksSeenIds=new Set();
 const AFFLINKS_RAW_CHUNK=200; // 内部的に一度に取得するDB件数（表示は10件ずつ小出し）
 async function fillAffBuffer(){
   while(_afflinksBuffer.length<AFFLINKS_PAGE_SIZE && !_afflinksRawExhausted){
     const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity,view_count')
       .order('view_count',{ascending:false,nullsFirst:false})
+      .order('id',{ascending:true})
       .range(_afflinksRawOffset,_afflinksRawOffset+AFFLINKS_RAW_CHUNK-1);
     if(error)return{error};
     if(!data||data.length<AFFLINKS_RAW_CHUNK)_afflinksRawExhausted=true;
     _afflinksRawOffset+=AFFLINKS_RAW_CHUNK;
     let filtered=applyAffLinkSetFilter(data||[]);
     filtered=await applyPriorityFilters(filtered);
+    filtered=filtered.filter(p=>{
+      if(_afflinksSeenIds.has(p.id))return false;
+      _afflinksSeenIds.add(p.id);
+      return true;
+    });
     _afflinksBuffer=_afflinksBuffer.concat(filtered);
     if(!data||!data.length)break; // 念のための保険（テーブル自体が空など）
   }
@@ -2455,7 +2461,7 @@ async function browseAffLinksByPriority(reset){
   _afflinksBrowseMode=true;
   const listEl=document.getElementById('afflinks-list');
   if(reset){
-    _afflinksRawOffset=0;_afflinksRawExhausted=false;_afflinksBuffer=[];
+    _afflinksRawOffset=0;_afflinksRawExhausted=false;_afflinksBuffer=[];_afflinksSeenIds=new Set();
     listEl.innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...（全件から絞り込み中）</div>';
   }
   const wasEmpty=reset;
