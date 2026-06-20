@@ -584,15 +584,17 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <input class="form-input" id="afflink-search" type="text" placeholder="🔍 ブランド・モデル名で検索..." oninput="onAffLinkSearchInput()" style="max-width:360px">
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap">
-      <button class="pf-btn on" id="af-filter-all" onclick="setAffLinkFilter('all')">すべて</button>
+      <button class="pf-btn" id="af-filter-all" onclick="setAffLinkFilter('all')">すべて</button>
       <button class="pf-btn" id="af-filter-set" onclick="setAffLinkFilter('set')">✅ 登録済み</button>
-      <button class="pf-btn" id="af-filter-unset" onclick="setAffLinkFilter('unset')">⬜ 未登録</button>
+      <button class="pf-btn on" id="af-filter-unset" onclick="setAffLinkFilter('unset')">⬜ 未登録</button>
+      <button class="pf-btn" onclick="toggleAffRegisteredTable()" style="margin-left:auto">📋 登録済み一覧（確認用）</button>
     </div>
+    <div id="af-registered-table-wrap" style="display:none;margin-bottom:14px"></div>
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td)">
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="af-pri-desc" onchange="onAffPriorityChange()"> 説明文・画像あり</label>
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="af-pri-gacha" onchange="onAffPriorityChange()"> 🎰 ガチャ登録あり</label>
       <label style="display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" id="af-pri-posts" onchange="onAffPriorityChange()"> 📝 投稿あり</label>
-      <button class="pf-btn" onclick="browseAffLinksByPriority()" style="margin-left:auto">🔥 人気順で読み込む（検索なし）</button>
+      <button class="pf-btn" onclick="browseAffLinksByPriority(true)" style="margin-left:auto">🔥 人気順で読み込む（検索なし）</button>
     </div>
     <div style="margin-bottom:10px">
       <button class="pf-btn" id="af-checklink-btn" onclick="runLinkHealthCheck()">🔍 登録済みURLの生存確認</button>
@@ -2324,7 +2326,7 @@ function convertShField(pedalId){
   if(m){input.value=m[1];}
   // hrefが見つからない場合（既に素のURLが入っている場合）はそのまま変更しない
 }
-let _afflinksInitDone=false,_afflinksMap={},_afflinksFilter='all',_afflinksPostNames=null,_afflinksBrowseOffset=0,_afflinksBrowseMode=false,_afflinksBrowseDone=false;
+let _afflinksInitDone=false,_afflinksMap={},_afflinksFilter='unset',_afflinksPostNames=null,_afflinksBrowseOffset=0,_afflinksBrowseMode=false,_afflinksBrowseDone=false;
 const AFFLINKS_PAGE_SIZE=10;
 async function initAffLinksTab(){
   if(_afflinksInitDone)return;
@@ -2344,6 +2346,35 @@ async function refreshAffLinksStats(){
     if(r.mercari_url)mcSet++;
   });
   if(statsEl)statsEl.textContent=`🎸サウンドハウス ${shSet}件登録/${Math.max(total-shSet,0)}件未登録　📮メルカリ ${mcSet}件登録/${Math.max(total-mcSet,0)}件未登録`;
+}
+async function toggleAffRegisteredTable(){
+  const wrap=document.getElementById('af-registered-table-wrap');
+  const willShow=wrap.style.display==='none';
+  wrap.style.display=willShow?'block':'none';
+  if(willShow)await renderAffRegisteredTable();
+}
+async function renderAffRegisteredTable(){
+  const wrap=document.getElementById('af-registered-table-wrap');
+  wrap.innerHTML='<div style="padding:12px;color:var(--td);font-size:12px">読み込み中...</div>';
+  const ids=Object.keys(_afflinksMap).map(Number).filter(id=>_afflinksMap[id].soundhouse_url||_afflinksMap[id].mercari_url);
+  if(!ids.length){wrap.innerHTML='<div style="padding:12px;color:var(--td);font-size:12px">登録済みのペダルはまだありません</div>';return;}
+  const{data,error}=await sb.from('pedals').select('id,brand,model').in('id',ids);
+  if(error){wrap.innerHTML='<div style="padding:12px;color:#e05050;font-size:12px">エラー: '+error.message+'</div>';return;}
+  const nameMap={};(data||[]).forEach(p=>{nameMap[p.id]=`${p.brand} ${p.model}`;});
+  const rows=ids.map(id=>({id,name:nameMap[id]||('pedal_id: '+id),sh:!!_afflinksMap[id].soundhouse_url,mc:!!_afflinksMap[id].mercari_url}));
+  rows.sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  wrap.innerHTML='<div style="font-size:11px;color:var(--td);margin-bottom:8px;font-family:\'JetBrains Mono\',monospace">合計 '+rows.length+' 件（重複なし・ユニークペダル数）— 実際にここに並んでいる行数を数えれば、取りこぼしがないか目視確認できます</div>'
+    +'<div style="max-height:420px;overflow-y:auto;border:1px solid var(--bd);border-radius:8px">'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<thead><tr style="position:sticky;top:0;background:var(--sf2)">'
+    +'<th style="text-align:left;padding:7px 10px;font-size:10px;color:var(--td)">ペダル</th>'
+    +'<th style="padding:7px 10px;font-size:10px;color:var(--td)">🎸SH</th>'
+    +'<th style="padding:7px 10px;font-size:10px;color:var(--td)">📮メルカリ</th></tr></thead>'
+    +'<tbody>'+rows.map((r,i)=>'<tr style="border-top:1px solid var(--bd)">'
+      +'<td style="padding:6px 10px">'+(i+1)+'. '+r.name+'</td>'
+      +'<td style="text-align:center">'+(r.sh?'✅':'-')+'</td>'
+      +'<td style="text-align:center">'+(r.mc?'✅':'-')+'</td></tr>').join('')
+    +'</tbody></table></div>';
 }
 async function ensurePostNamesLoaded(){
   if(_afflinksPostNames)return _afflinksPostNames;
@@ -2403,37 +2434,48 @@ async function runAffLinkSearch(){
   results=await applyPriorityFilters(results);
   renderAffLinksList(results,false);
 }
+let _afflinksBuffer=[],_afflinksRawOffset=0,_afflinksRawExhausted=false;
+const AFFLINKS_RAW_CHUNK=200; // 内部的に一度に取得するDB件数（表示は10件ずつ小出し）
+async function fillAffBuffer(){
+  while(_afflinksBuffer.length<AFFLINKS_PAGE_SIZE && !_afflinksRawExhausted){
+    const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity,view_count')
+      .order('view_count',{ascending:false,nullsFirst:false})
+      .range(_afflinksRawOffset,_afflinksRawOffset+AFFLINKS_RAW_CHUNK-1);
+    if(error)return{error};
+    if(!data||data.length<AFFLINKS_RAW_CHUNK)_afflinksRawExhausted=true;
+    _afflinksRawOffset+=AFFLINKS_RAW_CHUNK;
+    let filtered=applyAffLinkSetFilter(data||[]);
+    filtered=await applyPriorityFilters(filtered);
+    _afflinksBuffer=_afflinksBuffer.concat(filtered);
+    if(!data||!data.length)break; // 念のための保険（テーブル自体が空など）
+  }
+  return{};
+}
 async function browseAffLinksByPriority(reset){
   _afflinksBrowseMode=true;
   const listEl=document.getElementById('afflinks-list');
-  if(reset){_afflinksBrowseOffset=0;_afflinksBrowseDone=false;listEl.innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...</div>';}
-  const wasEmpty=_afflinksBrowseOffset===0;
+  if(reset){
+    _afflinksRawOffset=0;_afflinksRawExhausted=false;_afflinksBuffer=[];
+    listEl.innerHTML='<div style="padding:16px;color:var(--td)">読み込み中...（全件から絞り込み中）</div>';
+  }
+  const wasEmpty=reset;
   if(!wasEmpty)listEl.insertAdjacentHTML('beforeend','<div id="afflinks-loading-spinner" style="padding:10px;color:var(--td);font-size:12px;text-align:center">読み込み中...</div>');
-  let collected=[];
-  let guard=0;
-  const MAX_ROUNDS=15; // 安全装置：絞り込みが厳しすぎて無限ループ気味になるのを防ぐ
-  while(collected.length<AFFLINKS_PAGE_SIZE && !_afflinksBrowseDone && guard<MAX_ROUNDS){
-    guard++;
-    const{data,error}=await sb.from('pedals').select('id,brand,model,full_name,description,description_en,image_url,rarity,view_count')
-      .order('view_count',{ascending:false,nullsFirst:false})
-      .range(_afflinksBrowseOffset,_afflinksBrowseOffset+AFFLINKS_PAGE_SIZE-1);
-    if(error){
-      document.getElementById('afflinks-loading-spinner')?.remove();
-      listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';
-      return;
-    }
-    if(!data||data.length<AFFLINKS_PAGE_SIZE)_afflinksBrowseDone=true;
-    _afflinksBrowseOffset+=AFFLINKS_PAGE_SIZE;
-    let filtered=applyAffLinkSetFilter(data||[]);
-    filtered=await applyPriorityFilters(filtered);
-    collected=collected.concat(filtered);
-  }
+  const{error}=await fillAffBuffer();
   document.getElementById('afflinks-loading-spinner')?.remove();
-  if(!wasEmpty&&guard>=MAX_ROUNDS&&!collected.length){
-    listEl.insertAdjacentHTML('beforeend','<div style="padding:10px;color:var(--td);font-size:11px;text-align:center">この絞り込み条件に一致するペダルが見つかりませんでした（探索を打ち切りました）。もう一度押すと続きから探索します。</div>');
+  if(error){
+    listEl.innerHTML='<div style="padding:16px;color:#e05050">エラー: '+error.message+'</div>';
+    return;
   }
-  renderAffLinksList(collected,!wasEmpty);
-  document.getElementById('afflinks-loadmore-wrap').style.display=_afflinksBrowseDone?'none':'block';
+  const batch=_afflinksBuffer.splice(0,AFFLINKS_PAGE_SIZE);
+  if(!batch.length){
+    if(wasEmpty)listEl.innerHTML='<div style="padding:16px;color:var(--td)">この絞り込み条件に一致するペダルが見つかりませんでした（全件確認済み）</div>';
+    else listEl.insertAdjacentHTML('beforeend','<div style="padding:10px;color:var(--td);font-size:11px;text-align:center">これ以上、条件に一致するペダルはありません（全件確認済み）</div>');
+    document.getElementById('afflinks-loadmore-wrap').style.display='none';
+    return;
+  }
+  renderAffLinksList(batch,!wasEmpty);
+  const stillHasMore=_afflinksBuffer.length>0||!_afflinksRawExhausted;
+  document.getElementById('afflinks-loadmore-wrap').style.display=stillHasMore?'block':'none';
 }
 function loadMoreAffLinks(){
   browseAffLinksByPriority(false);
@@ -2489,6 +2531,8 @@ async function saveAffLink(pedalId){
   _afflinksMap[pedalId]={soundhouse_url:sh||null,mercari_url:mc||null};
   statusEl.textContent='✅ 保存しました';statusEl.style.color='#4caf50';
   refreshAffLinksStats();
+  const tableWrap=document.getElementById('af-registered-table-wrap');
+  if(tableWrap&&tableWrap.style.display!=='none')renderAffRegisteredTable();
   setTimeout(()=>{statusEl.textContent='';},2500);
 }
 
