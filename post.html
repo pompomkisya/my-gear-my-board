@@ -71,12 +71,28 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .comment-name-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;padding:8px 12px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;transition:border-color .15s;border-bottom:none}
 .comment-name-input:focus{border-color:var(--ac)}
 .comment-name-input::placeholder{color:var(--td)}
-.comment-input-wrap{display:flex;gap:8px;margin-bottom:20px;align-items:flex-end;width:100%;overflow:hidden}
+.comment-login-badge{display:flex;align-items:center;gap:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;border-bottom:none;padding:9px 12px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm)}
+.comment-login-badge img{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.comment-login-badge .av-fallback{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.comment-login-promo{position:fixed;inset:0;background:rgba(8,8,9,.75);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:900}
+.comment-login-promo.open{display:flex}
+.comment-login-promo-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:22px 20px 26px;animation:slideUpPromo .2s ease}
+@keyframes slideUpPromo{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.comment-login-promo-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:6px}
+.comment-login-promo-text{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm);line-height:1.6;margin-bottom:18px}
+.comment-login-promo-btns{display:flex;flex-direction:column;gap:8px}
+.comment-login-promo-btn{display:block;width:100%;padding:12px;border-radius:8px;text-align:center;font-family:Noto Sans JP,sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box}
+.comment-login-promo-btn.primary{background:var(--ac);color:#fff;border:none}
+.comment-login-promo-btn.secondary{background:transparent;color:var(--tm);border:1px solid var(--bd)}
+.reply-login-badge{display:flex;align-items:center;gap:7px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;border-bottom:none;padding:7px 10px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--tm)}
+.reply-login-badge img{width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.reply-login-badge .av-fallback{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0}
+.comment-input-wrap{display:block;margin-bottom:20px;width:100%}
 .comment-input-col{flex:1;min-width:0;display:flex;flex-direction:column}
 .comment-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 4px 4px;padding:10px 12px;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;outline:none;resize:none;min-height:44px;transition:border-color .15s}
 .comment-input:focus{border-color:var(--ac)}
 .comment-input::placeholder{color:var(--td)}
-.comment-submit{padding:10px 16px;background:var(--ac);border:none;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;touch-action:manipulation;min-height:44px;flex-shrink:0}
+.comment-submit{display:block;width:100%;margin-top:8px;padding:11px 16px;background:var(--ac);border:none;border-radius:4px;font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .15s;touch-action:manipulation;min-height:44px}
 .comment-submit:hover{background:#cf4c26}
 .comment{padding:14px 0;border-bottom:1px solid var(--bd);word-break:break-word;overflow-wrap:break-word}
 .comment:last-child{border-bottom:none}
@@ -525,7 +541,14 @@ function renderPost(p){
   }
   if(ytId){html+='<div class="section yt-section"><div class="section-lbl" style="margin-bottom:10px">▶ YouTube動画</div><div class="yt-embed-wrap"><iframe src="https://www.youtube.com/embed/'+ytId+'" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div></div>';}
   const _cL=lang==='en'?'Comments':'コメント',_cN=lang==='en'?'Name (optional)':'名前（任意）',_cP=lang==='en'?'Write a comment...':'コメントを投稿する...',_cB=lang==='en'?'Post':'投稿';
-  html+='<div class="section" id="comment-section"><div class="section-lbl">'+_cL+'</div><div class="comment-input-wrap"><div class="comment-input-col"><input class="comment-name-input" id="comment-name" type="text" placeholder="'+_cN+'" maxlength="30"><textarea class="comment-input" id="comment-input" placeholder="'+_cP+'" rows="2"></textarea></div><button class="comment-submit" onclick="postComment(null)">'+_cB+'</button></div><div id="comments-list"></div></div>';
+  html+='<div class="section" id="comment-section"><div class="section-lbl">'+_cL+'</div><div class="comment-input-wrap"><div class="comment-input-col"><div id="comment-name-area"><input class="comment-name-input" id="comment-name" type="text" placeholder="'+_cN+'" maxlength="30" onfocus="maybeShowCommentLoginPromo()"></div><textarea class="comment-input" id="comment-input" placeholder="'+_cP+'" rows="2" onfocus="maybeShowCommentLoginPromo()"></textarea></div><button class="comment-submit" onclick="postComment(null)">'+_cB+'</button></div><div id="comments-list"></div></div>'
+    +'<div class="comment-login-promo" id="comment-login-promo" onclick="if(event.target===this)closeCommentLoginPromo()"><div class="comment-login-promo-card">'
+    +'<div class="comment-login-promo-title">'+(lang==='en'?'Want to comment with your account?':'アカウントでコメントしませんか？')+'</div>'
+    +'<div class="comment-login-promo-text">'+(lang==='en'?'Log in or sign up to comment with your name and avatar. You can still comment anonymously without one.':'ログイン・登録すると、あなたの名前とアイコンでコメントできます。もちろん匿名のままでもコメントできます。')+'</div>'
+    +'<div class="comment-login-promo-btns">'
+    +'<a class="comment-login-promo-btn primary" href="/mypage">'+(lang==='en'?'Log in / Sign up':'ログイン・新規登録')+'</a>'
+    +'<div class="comment-login-promo-btn secondary" onclick="closeCommentLoginPromo()">'+(lang==='en'?'Continue anonymously':'このまま匿名で続ける')+'</div>'
+    +'</div></div></div>';
   document.getElementById('page-content').innerHTML=html;
   initSlider(imgs.length);
 }
@@ -571,12 +594,42 @@ function postToX(){
 }
 
 let currentCommentUserId=null;
+let currentCommentUserInfo=null;
 async function loadComments(){
   const{data:{session}}=await sb.auth.getSession();
   currentCommentUserId=session?session.user.id:null;
+  if(currentCommentUserId){
+    const{data:userData}=await sb.from('users').select('username,avatar_url').eq('id',currentCommentUserId).single();
+    currentCommentUserInfo=userData||null;
+  }else{
+    currentCommentUserInfo=null;
+  }
+  updateCommentNameArea();
   const{data,error}=await sb.from('comments').select('*,users(username,avatar_url)').eq('post_id',POST_ID).order('created_at',{ascending:true});
   if(error){console.error('comments load error',error);allComments=[];renderComments();return;}
   allComments=data||[];renderComments();
+}
+function updateCommentNameArea(){
+  const area=document.getElementById('comment-name-area');if(!area)return;
+  if(!currentCommentUserInfo){
+    area.innerHTML='<input class="comment-name-input" id="comment-name" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30" onfocus="maybeShowCommentLoginPromo()">';
+    return;
+  }
+  const avatarHtml=currentCommentUserInfo.avatar_url
+    ?'<img src="'+currentCommentUserInfo.avatar_url+'" alt="">'
+    :'<div class="av-fallback">'+((currentCommentUserInfo.username||'U')[0].toUpperCase())+'</div>';
+  area.innerHTML='<div class="comment-login-badge">'+avatarHtml+'<span>'+(lang==='en'?'Commenting as ':'コメント投稿者: ')+'<b style="color:var(--tx)">'+(currentCommentUserInfo.username||'')+'</b></span></div>';
+}
+function maybeShowCommentLoginPromo(){
+  if(currentCommentUserId)return; // ログイン中は表示しない
+  if(sessionStorage.getItem('mgmb_comment_promo_dismissed'))return;
+  const el=document.getElementById('comment-login-promo');
+  if(el)el.classList.add('open');
+}
+function closeCommentLoginPromo(){
+  sessionStorage.setItem('mgmb_comment_promo_dismissed','1');
+  const el=document.getElementById('comment-login-promo');
+  if(el)el.classList.remove('open');
 }
 function renderComments(){
   const el=document.getElementById('comments-list');if(!el)return;
@@ -606,7 +659,10 @@ function renderComment(c,depth){
   const ownerBtns=(isMine&&!isDeleted)
     ?'<span class="c-reply-btn" onclick="startEditComment(\''+c.id+'\')">✎ '+(lang==='en'?'Edit':'編集')+'</span><span class="c-reply-btn c-delete-btn" onclick="deleteComment(\''+c.id+'\')">🗑 '+(lang==='en'?'Delete':'削除')+'</span>'
     :'';
-  let html='<div class="comment" id="c-'+c.id+'"><div class="c-head">'+avHtml+nameHtml+'<div class="c-time">'+timeAgo(c.created_at)+'</div></div>'+bodyHtml+replyBtn+ownerBtns+'<div class="reply-form" id="rf-'+c.id+'"><input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30"><div class="reply-row"><textarea class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." rows="1" oninput="autoResize(this)"></textarea><button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button></div></div>';
+  const replyNameAreaHtml=currentCommentUserInfo
+    ?'<div class="reply-login-badge">'+(currentCommentUserInfo.avatar_url?'<img src="'+currentCommentUserInfo.avatar_url+'" alt="">':'<div class="av-fallback">'+((currentCommentUserInfo.username||'U')[0].toUpperCase())+'</div>')+'<span>'+(lang==='en'?'Replying as ':'返信者: ')+'<b style="color:var(--tx)">'+(currentCommentUserInfo.username||'')+'</b></span></div>'
+    :'<input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30">';
+  let html='<div class="comment" id="c-'+c.id+'"><div class="c-head">'+avHtml+nameHtml+'<div class="c-time">'+timeAgo(c.created_at)+'</div></div>'+bodyHtml+replyBtn+ownerBtns+'<div class="reply-form" id="rf-'+c.id+'">'+replyNameAreaHtml+'<div class="reply-row"><textarea class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." rows="1" oninput="autoResize(this)"></textarea><button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button></div></div>';
   if(children.length){html+='<div class="reply-indent">'+children.map(ch=>renderComment(ch,depth+1)).join('')+'</div>';}
   html+='</div>';return html;
 }
@@ -639,7 +695,7 @@ async function deleteComment(id){
   showToast(lang==='en'?'🗑 Comment deleted':'🗑 コメントを削除しました');
   await loadComments();
 }
-function openReply(parentId,name){document.querySelectorAll('.reply-form').forEach(f=>f.classList.remove('open'));const form=document.getElementById('rf-'+parentId);if(form){form.classList.add('open');document.getElementById('rn-'+parentId).focus();}}
+function openReply(parentId,name){document.querySelectorAll('.reply-form').forEach(f=>f.classList.remove('open'));const form=document.getElementById('rf-'+parentId);if(form){form.classList.add('open');const nameInput=document.getElementById('rn-'+parentId);const target=nameInput||document.getElementById('ri-'+parentId);if(target)target.focus();}}
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
 
 async function postComment(parentId,replyToName){
