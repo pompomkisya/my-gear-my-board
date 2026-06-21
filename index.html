@@ -81,8 +81,8 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .brand-group-lbl{font-family:Noto Sans JP,sans-serif;font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:#c0bcb4;margin:12px 0 5px 2px;border-bottom:1px solid var(--bd);padding-bottom:4px}
 .brand-group-lbl:first-child{margin-top:0}
 .feed{padding:20px 22px;border-right:1px solid var(--bd);min-height:calc(100vh - 86px);background:linear-gradient(180deg,#0d0d0e 0%,#0d0d0e 35%,#1a0c05 100%)}
-.feed-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.feed-h{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.feed-top{display:flex;align-items:center;justify-content:flex-end;margin-bottom:12px;position:relative;min-height:24px}
+.feed-h{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;text-align:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap}
 .sort{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
 .sort-b{padding:5px 12px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:#b0ada6;cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;touch-action:manipulation}
 .sort-b:last-child{border-right:none}
@@ -335,11 +335,9 @@ header{padding:0 14px;height:54px}
 .swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
 .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block;touch-action:manipulation}
 .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
-.swipe-arrow{display:none;width:26px;height:26px;border-radius:50%;background:var(--sf2);border:1px solid var(--bd);color:var(--tm);font-size:15px;line-height:1;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;padding:0}
+.swipe-arrow{display:flex;width:26px;height:26px;border-radius:50%;background:var(--sf2);border:1px solid var(--bd);color:var(--tm);font-size:15px;line-height:1;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;padding:0}
 .swipe-arrow:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
 .swipe-arrow:disabled{opacity:.3;cursor:default;background:var(--sf2);color:var(--tm);border-color:var(--bd)}
-/* タッチ専用デバイス（スマホ）では出さず、マウス等ホバー可能な環境でのみ矢印を表示。スマホの操作感には一切影響しない */
-@media(hover:hover) and (pointer:fine){.swipe-arrow{display:flex}}
 .swipe-container{display:flex;width:300%;transition:transform .3s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start}
 .swipe-panel{width:33.333%;flex-shrink:0;min-height:100vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .mob-left-panel{padding:16px 14px}
@@ -403,16 +401,16 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 #guide-cta-mob{
   aspect-ratio:auto!important;
   flex:1!important;
-  background-image:radial-gradient(ellipse at center,rgba(232,85,45,.35) 0%,rgba(232,85,45,.08) 55%,transparent 80%),url(/icons/icon_guide.png)!important;
-  background-size:cover,contain!important;
+  background-image:url(/icons/icon_guide.png),radial-gradient(ellipse at center,rgba(232,85,45,.35) 0%,rgba(232,85,45,.08) 55%,transparent 80%)!important;
+  background-size:contain,cover!important;
   background-repeat:no-repeat,no-repeat!important;
   background-position:center,center!important;
   background-color:var(--sf2)!important;
 }
 #pedal-db-cta-mob{
   flex:2!important;
-  background-image:radial-gradient(ellipse at center,rgba(232,85,45,.35) 0%,rgba(232,85,45,.08) 55%,transparent 80%),url(/icons/icon_pedaldb.png)!important;
-  background-size:cover,contain!important;
+  background-image:url(/icons/icon_pedaldb.png),radial-gradient(ellipse at center,rgba(232,85,45,.35) 0%,rgba(232,85,45,.08) 55%,transparent 80%)!important;
+  background-size:contain,cover!important;
   background-repeat:no-repeat,no-repeat!important;
   background-position:center,center!important;
   background-color:var(--sf2)!important;
