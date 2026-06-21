@@ -625,10 +625,21 @@ async function loadRecommendedPedals(pedal){
 async function fetchRecommended(){
   if(!recommendTypes.length)return;
   const STORAGE='https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/';
-  const{data,count}=await db.from('pedals').select('id,brand,model,slug,types,image_url,description,view_count',{count:'exact'}).contains('types',[recommendTypes[0]]).not('id','eq',recommendPedalId).not('description','is',null).not('youtube_video_id','is',null).order('view_count',{ascending:false,nullsFirst:false}).range(recommendOffset,recommendOffset+RECOMMEND_LIMIT+1);
+  const FETCH_CHUNK=RECOMMEND_LIMIT+2;
+  const{data,count,error}=await db.from('pedals').select('id,brand,model,slug,types,image_url,description,view_count',{count:'exact'}).contains('types',[recommendTypes[0]]).not('id','eq',recommendPedalId).not('description','is',null).not('youtube_video_id','is',null).order('view_count',{ascending:false,nullsFirst:false}).order('id',{ascending:true}).range(recommendOffset,recommendOffset+FETCH_CHUNK-1);
   const grid=document.getElementById('recommend-grid');if(!grid)return;
-  let newData=(data||[]).filter(p=>!recommendSeenIds.has(p.id));
-  if(!newData.length){if(recommendOffset===0)grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:24px;font-size:13px;color:var(--td)">${tr('recommendEmpty')}</div>`;return;}
+  if(error){console.error('recommend fetch error',error);return;}
+  const rawData=data||[];
+  // ★ DBから生で取得した件数ぶん、必ずオフセットを進める（重複除外後の件数で進めると同じ範囲を再取得し続けてしまうバグの原因だった）
+  recommendOffset+=rawData.length;
+  let newData=rawData.filter(p=>!recommendSeenIds.has(p.id));
+  const reachedEnd=rawData.length<FETCH_CHUNK||(count!==null&&recommendOffset>=count);
+  if(!newData.length){
+    if(grid.children.length===0)grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:24px;font-size:13px;color:var(--td)">${tr('recommendEmpty')}</div>`;
+    const btn=document.getElementById('recommend-more-btn');
+    if(btn)btn.style.display=reachedEnd?'none':'block';
+    return;
+  }
   // グリッド全体の表示数が常に偶数になるよう調整
   const currentTotal=grid.children.length;
   const targetTotal=currentTotal+newData.length;
@@ -657,9 +668,8 @@ async function fetchRecommended(){
     card.innerHTML=`<div style="width:100%;aspect-ratio:1;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--bd)">${imgHtml}</div><div style="padding:8px"><div style="font-size:10px;color:var(--ac);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.brand}</div><div style="font-size:12px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.model}</div></div>`;
     grid.appendChild(card);
   });
-  recommendOffset+=newData.length;
   const btn=document.getElementById('recommend-more-btn');
-  if(btn)btn.style.display=(count&&recommendOffset<count)?'block':'none';
+  if(btn)btn.style.display=reachedEnd?'none':'block';
 }
 async function loadMoreRecommended(){await fetchRecommended();}
 
