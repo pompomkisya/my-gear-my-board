@@ -717,7 +717,7 @@ function filterByGearName(name){
   currentBrandFilter=null;currentGenreFilter='ALL';
   const posts=allDBPosts.filter(p=>{const g=Array.isArray(p.gear_list)?p.gear_list:[];return g.some(x=>(x.name||x||'').toLowerCase()===name.toLowerCase());});
   renderDBPosts(posts.length?posts:[]);
-  if(window.innerWidth<=680)setTimeout(()=>goPanel(1),180);
+  if(window.innerWidth<=1024)setTimeout(()=>goPanel(1),180);
 }
 let currentSearchQuery='';
 function handleSearch(val){currentSearchQuery=val.trim();const clearBtn=document.getElementById('h-search-clear');if(clearBtn)clearBtn.classList.toggle('show',currentSearchQuery.length>0);applyFilter();}
@@ -1295,7 +1295,7 @@ function initSwipe(){
   window.addEventListener('resize',()=>{c.style.transition='none';c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';});
 }
 function checkMobile(){
-  const isMob=window.innerWidth<=680;const swipeUI=document.getElementById('swipe-ui');const pcWrap=document.querySelector('.wrap');
+  const isMob=window.innerWidth<=1024;const swipeUI=document.getElementById('swipe-ui');const pcWrap=document.querySelector('.wrap');
   if(swipeUI)swipeUI.style.display=isMob?'block':'none';if(pcWrap)pcWrap.style.display=isMob?'none':'grid';
 }
 window.addEventListener('resize',checkMobile);
@@ -1330,13 +1330,13 @@ function initPCScrollSync(){
   const feed=document.querySelector('.feed');const sr=document.querySelector('.sr');if(!feed||!sr)return;
   let syncLock=false;
   feed.addEventListener('scroll',()=>{
-    if(window.innerWidth<=680)return;if(syncLock)return;syncLock=true;
+    if(window.innerWidth<=1024)return;if(syncLock)return;syncLock=true;
     const ratio=feed.scrollTop/(feed.scrollHeight-feed.clientHeight||1);
     sr.scrollTop=ratio*(sr.scrollHeight-sr.clientHeight);
     requestAnimationFrame(()=>{syncLock=false;});
   },{passive:true});
   sr.addEventListener('scroll',()=>{
-    if(window.innerWidth<=680)return;if(syncLock)return;syncLock=true;
+    if(window.innerWidth<=1024)return;if(syncLock)return;syncLock=true;
     const ratio=sr.scrollTop/(sr.scrollHeight-sr.clientHeight||1);
     feed.scrollTop=ratio*(feed.scrollHeight-feed.clientHeight);
     requestAnimationFrame(()=>{syncLock=false;});
