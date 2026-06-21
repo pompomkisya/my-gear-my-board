@@ -542,6 +542,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
         <div class="tag" data-genre="FUNK" onclick="filterGenreMob(this,'FUNK')">FUNK</div>
         <div class="tag" data-genre="宅録" onclick="filterGenreMob(this,'宅録')" id="tag-tagroku-mob">宅録</div>
         <div class="tag" data-genre="初心者相談" onclick="filterGenreMob(this,'初心者相談')" id="tag-shoshinsha-mob">初心者相談</div>
+        <div class="tag" data-genre="ギタリスト" onclick="filterGenreMob(this,'ギタリスト')" id="tag-guitarist-mob">ギタリスト</div>
+        <div class="tag" data-genre="ベーシスト" onclick="filterGenreMob(this,'ベーシスト')" id="tag-bassist-mob">ベーシスト</div>
       </div>
       <div class="brand-group-lbl" id="mob-lbl-ambient">空間系</div>
       <div class="tags" style="margin-bottom:6px">
@@ -635,7 +637,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     </div>
     <div class="swipe-panel mob-right-panel">
       <div id="mob-featured-section" style="display:none">
-        <div class="mob-panel-title" id="mob-featured-title">⭐ 今週のおすすめ</div>
+        <div class="mob-panel-title" id="mob-featured-title">⭐ 今週のピックアップ</div>
         <div class="widget"><div class="featured-grid" id="featured-widget-mob"></div></div>
       </div>
       <div class="mob-panel-title">今月の人気ボード</div>
@@ -727,6 +729,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <div class="tag" data-genre="FUNK" onclick="filterGenre(this,'FUNK')">FUNK</div>
       <div class="tag" data-genre="宅録" onclick="filterGenre(this,'宅録')" id="tag-tagroku-pc">宅録</div>
       <div class="tag" data-genre="初心者相談" onclick="filterGenre(this,'初心者相談')" id="tag-shoshinsha-pc">初心者相談</div>
+      <div class="tag" data-genre="ギタリスト" onclick="filterGenre(this,'ギタリスト')" id="tag-guitarist-pc">ギタリスト</div>
+      <div class="tag" data-genre="ベーシスト" onclick="filterGenre(this,'ベーシスト')" id="tag-bassist-pc">ベーシスト</div>
     </div>
     <div class="brand-group-lbl" style="margin-top:10px" id="sl-sub-ambient">空間系</div>
     <div class="tags">
@@ -808,7 +812,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
   </div>
 </main>
 <aside class="sr">
-  <div class="widget" id="pc-featured-section" style="display:none"><div class="wt" id="pc-featured-title">⭐ 今週のおすすめ</div><div class="featured-grid" id="featured-widget-pc"></div></div>
+  <div class="widget" id="pc-featured-section" style="display:none"><div class="wt" id="pc-featured-title">⭐ 今週のピックアップ</div><div class="featured-grid" id="featured-widget-pc"></div></div>
   <div class="widget"><div class="wt">🔥 今月の人気ボード</div><div id="ranking-widget"></div></div>
   <div class="widget"><div class="wt">🎛 よく使われている機材</div><div id="gear-widget"></div></div>
   <div class="widget" id="pc-features-section" style="display:none"><div class="wt" id="pc-features-title">🗂 特集</div><div class="feature-list" id="features-widget-pc"></div></div>
@@ -924,6 +928,8 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
           <div class="gs" data-val="PUNK" onclick="toggleGenre(this)">PUNK</div>
           <div class="gs" data-val="宅録" onclick="toggleGenre(this)" id="gs-tagroku">宅録</div>
           <div class="gs" data-val="初心者相談" onclick="toggleGenre(this)" id="gs-shoshinsha">初心者相談</div>
+          <div class="gs" data-val="ギタリスト" onclick="toggleGenre(this)" id="gs-guitarist">ギタリスト</div>
+          <div class="gs" data-val="ベーシスト" onclick="toggleGenre(this)" id="gs-bassist">ベーシスト</div>
         </div>
       </div>
       <div class="form-row">
@@ -1158,7 +1164,7 @@ async function loadFeatured(){
         </div>
       </a>`;
     }).join('');
-    const title=lang==='en'?'⭐ Featured Pedals':'⭐ 今週のおすすめ';
+    const title=lang==='en'?'⭐ Featured Pedals':'⭐ 今週のピックアップ';
     const pcEl=document.getElementById('featured-widget-pc');const pcSec=document.getElementById('pc-featured-section');const pcTitle=document.getElementById('pc-featured-title');
     if(pcEl){pcEl.innerHTML=html;}if(pcSec)pcSec.style.display='block';if(pcTitle)pcTitle.textContent=title;
     const mobEl=document.getElementById('featured-widget-mob');const mobSec=document.getElementById('mob-featured-section');const mobTitle=document.getElementById('mob-featured-title');
@@ -2035,8 +2041,14 @@ const I18N_GACHA={
   'tag-tagroku-mob':{ja:'宅録',en:'Home Rec'},
   'tag-shoshinsha-pc':{ja:'初心者相談',en:'Beginner'},
   'tag-shoshinsha-mob':{ja:'初心者相談',en:'Beginner'},
+  'tag-guitarist-pc':{ja:'ギタリスト',en:'Guitarist'},
+  'tag-guitarist-mob':{ja:'ギタリスト',en:'Guitarist'},
+  'tag-bassist-pc':{ja:'ベーシスト',en:'Bassist'},
+  'tag-bassist-mob':{ja:'ベーシスト',en:'Bassist'},
   'gs-tagroku':{ja:'宅録',en:'Home Rec'},
   'gs-shoshinsha':{ja:'初心者相談',en:'Beginner'},
+  'gs-guitarist':{ja:'ギタリスト',en:'Guitarist'},
+  'gs-bassist':{ja:'ベーシスト',en:'Bassist'},
 };
 function applyGachaI18n(){
   const isEn=gLang==='en';
