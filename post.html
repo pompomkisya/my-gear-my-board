@@ -620,8 +620,11 @@ function updateCommentNameArea(){
 function maybeShowCommentLoginPromo(){
   if(currentCommentUserId)return; // ログイン中は表示しない
   if(sessionStorage.getItem('mgmb_comment_promo_dismissed'))return;
-  const el=document.getElementById('comment-login-promo');
-  if(el)el.classList.add('open');
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur(); // キーボードを閉じてから中央表示する
+  setTimeout(()=>{
+    const el=document.getElementById('comment-login-promo');
+    if(el)el.classList.add('open');
+  },150); // キーボードが閉じるアニメーションを待ってから表示（即時表示だとズレたまま出てしまう端末対策）
 }
 function closeCommentLoginPromo(){
   sessionStorage.setItem('mgmb_comment_promo_dismissed','1');
