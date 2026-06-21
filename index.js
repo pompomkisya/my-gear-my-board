@@ -443,7 +443,7 @@ async function loadPostsFromDB(){
   _postsOffset=0;
   showSkeletonCards(6);
   const{data:firstBatch,error:firstError}=await sb.from('posts')
-    .select('*').order('created_at',{ascending:false}).limit(_postsPerPage+1);
+    .select('*,users(avatar_url)').order('created_at',{ascending:false}).limit(_postsPerPage+1);
   if(firstError){console.error(firstError);return;}
   const hasMore=(firstBatch||[]).length>_postsPerPage;
   const batch=(firstBatch||[]).slice(0,_postsPerPage);
@@ -464,7 +464,7 @@ async function loadPostsFromDB(){
 
 async function loadMorePosts(){
   const btn=document.getElementById('load-more-btn');if(btn){btn.disabled=true;btn.textContent=lang==='en'?'Loading...':'読み込み中...';}
-  const{data:batch}=await sb.from('posts').select('*').order('created_at',{ascending:false}).range(_postsOffset,_postsOffset+_postsPerPage);
+  const{data:batch}=await sb.from('posts').select('*,users(avatar_url)').order('created_at',{ascending:false}).range(_postsOffset,_postsOffset+_postsPerPage);
   if(!batch||!batch.length){updateLoadMoreBtn(false);return;}
   const newPosts=batch.map(p=>({
     ...p,
@@ -498,7 +498,7 @@ function updateLoadMoreBtn(hasMore,isMax=false){
 
 async function loadAllPostsBackground(){
   const[postsResult,ccResult]=await Promise.all([
-    sb.from('posts').select('*').order('created_at',{ascending:false}),
+    sb.from('posts').select('*,users(avatar_url)').order('created_at',{ascending:false}),
     sb.from('comments').select('post_id')
   ]);
   if(postsResult.error){console.error(postsResult.error);return;}
@@ -636,6 +636,10 @@ function renderDBPosts(posts){
   const anonName=lang==='en'?'Anonymous':'匿名ユーザー';
   function makeCardHTML(p,i){
     const init=(p.username||'匿')[0].toUpperCase();
+    const avatarUrl=p.users?.avatar_url||null;
+    const avHtml=avatarUrl
+      ?'<div class="av" style="padding:0;overflow:hidden"><img src="'+avatarUrl+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>'
+      :'<div class="av">'+init+'</div>';
     const gear=Array.isArray(p.gear_list)?p.gear_list:[];
     const SHOW=2;
     const tags=gear.slice(0,SHOW).map(g=>'<span class="ptag">'+(g.name||g)+'</span>').join('');
@@ -647,7 +651,7 @@ function renderDBPosts(posts){
     return '<div class="card" onclick="location.href=\''+destUrl+'\'" style="animation-delay:'+(i*.05)+'s">'
       +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy" onclick="event.stopPropagation();openLightbox(this.src)" style="cursor:zoom-in">':'<div style="font-size:40px;opacity:.2">'+(isGear?'🎸':'🎛')+'</div>')
       +'<div class="iw-ov"></div>'+(isGear?'<div class="bdg gear-bdg">'+(lang==='en'?'Gear':'機材')+'</div>':(glabel?'<div class="bdg">'+glabel+'</div>':''))+ytBadge+'</div>'
-      +'<div class="body"><div class="cu"><div class="av">'+init+'</div>'
+      +'<div class="body"><div class="cu">'+avHtml
       +'<div class="av-name">'+(p.username||anonName)+'</div>'
       +'<div class="av-time">'+timeAgo(p.created_at)+'</div></div>'
       +'<div class="ct">'+p.title+'</div><div class="ptags">'+tags+moreBadge+'</div>'
@@ -1275,6 +1279,9 @@ function goPanel(n){
   currentPanel=Math.max(0,Math.min(2,n));const c=document.getElementById('swipe-container');if(!c)return;
   c.style.transition='transform .3s cubic-bezier(.25,.46,.45,.94)';c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';
   document.querySelectorAll('.swipe-dot').forEach((d,i)=>d.classList.toggle('on',i===currentPanel));
+  const leftArrow=document.getElementById('swipe-arrow-left');const rightArrow=document.getElementById('swipe-arrow-right');
+  if(leftArrow)leftArrow.disabled=currentPanel===0;
+  if(rightArrow)rightArrow.disabled=currentPanel===2;
 }
 function initSwipe(){
   const c=document.getElementById('swipe-container');if(!c)return;
@@ -1292,6 +1299,21 @@ function initSwipe(){
     if(!isHorizSwipe){goPanel(currentPanel);return;}const dx=e.changedTouches[0].clientX-swipeStartX;
     if(dx<-SWIPE_THRESHOLD)goPanel(currentPanel+1);else if(dx>SWIPE_THRESHOLD)goPanel(currentPanel-1);else goPanel(currentPanel);
   },{passive:true});
+  // ★ マウスドラッグ対応（PCでウィンドウを縮めてこのレイアウトになった場合用。タッチ用の変数・ロジックとは完全に独立しており、スマホの操作には影響しない）
+  let mouseDown=false,mouseStartX=0;
+  c.addEventListener('mousedown',e=>{mouseDown=true;mouseStartX=e.clientX;c.style.transition='none';e.preventDefault();});
+  window.addEventListener('mousemove',e=>{
+    if(!mouseDown)return;
+    const dx=e.clientX-mouseStartX;
+    let offset=-currentPanel*window.innerWidth+dx;
+    if((currentPanel===0&&dx>0)||(currentPanel===2&&dx<0))offset=-currentPanel*window.innerWidth+dx*0.25;
+    c.style.transform='translateX('+offset+'px)';
+  });
+  window.addEventListener('mouseup',e=>{
+    if(!mouseDown)return;mouseDown=false;
+    const dx=e.clientX-mouseStartX;
+    if(dx<-SWIPE_THRESHOLD)goPanel(currentPanel+1);else if(dx>SWIPE_THRESHOLD)goPanel(currentPanel-1);else goPanel(currentPanel);
+  });
   window.addEventListener('resize',()=>{c.style.transition='none';c.style.transform='translateX('+(-currentPanel*window.innerWidth)+'px)';});
 }
 function checkMobile(){
