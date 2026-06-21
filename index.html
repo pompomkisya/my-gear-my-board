@@ -335,6 +335,11 @@ header{padding:0 14px;height:54px}
 .swipe-indicator{display:flex;justify-content:center;align-items:center;gap:10px;padding:9px 0 8px;background:var(--bg);border-bottom:1px solid var(--bd)}
 .swipe-dot{width:8px;height:8px;border-radius:50%;background:var(--bd);transition:all .22s;cursor:pointer;border:none;padding:0;display:block;touch-action:manipulation}
 .swipe-dot.on{background:var(--ac);transform:scale(1.3)}
+.swipe-arrow{display:none;width:26px;height:26px;border-radius:50%;background:var(--sf2);border:1px solid var(--bd);color:var(--tm);font-size:15px;line-height:1;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;padding:0}
+.swipe-arrow:hover{background:var(--ac);color:#fff;border-color:var(--ac)}
+.swipe-arrow:disabled{opacity:.3;cursor:default;background:var(--sf2);color:var(--tm);border-color:var(--bd)}
+/* タッチ専用デバイス（スマホ）では出さず、マウス等ホバー可能な環境でのみ矢印を表示。スマホの操作感には一切影響しない */
+@media(hover:hover) and (pointer:fine){.swipe-arrow{display:flex}}
 .swipe-container{display:flex;width:300%;transition:transform .3s cubic-bezier(.25,.46,.45,.94);will-change:transform;align-items:flex-start}
 .swipe-panel{width:33.333%;flex-shrink:0;min-height:100vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
 .mob-left-panel{padding:16px 14px}
@@ -398,18 +403,18 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 #guide-cta-mob{
   aspect-ratio:auto!important;
   flex:1!important;
-  background-image:url(/icons/icon_guide.png)!important;
-  background-size:contain!important;
-  background-repeat:no-repeat!important;
-  background-position:center!important;
+  background-image:radial-gradient(ellipse at center,rgba(232,85,45,.35) 0%,rgba(232,85,45,.08) 55%,transparent 80%),url(/icons/icon_guide.png)!important;
+  background-size:cover,contain!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-position:center,center!important;
   background-color:var(--sf2)!important;
 }
 #pedal-db-cta-mob{
   flex:2!important;
-  background-image:url(/icons/icon_pedaldb.png)!important;
-  background-size:contain!important;
-  background-repeat:no-repeat!important;
-  background-position:center!important;
+  background-image:radial-gradient(ellipse at center,rgba(232,85,45,.35) 0%,rgba(232,85,45,.08) 55%,transparent 80%),url(/icons/icon_pedaldb.png)!important;
+  background-size:cover,contain!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-position:center,center!important;
   background-color:var(--sf2)!important;
 }
 }
@@ -459,9 +464,11 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 
 <div id="swipe-ui" style="display:none">
   <div class="swipe-indicator">
+    <button class="swipe-arrow" id="swipe-arrow-left" onclick="goPanel(currentPanel-1)" aria-label="前へ">‹</button>
     <div class="swipe-dot" onclick="goPanel(0)"></div>
     <div class="swipe-dot on" onclick="goPanel(1)"></div>
     <div class="swipe-dot" onclick="goPanel(2)"></div>
+    <button class="swipe-arrow" id="swipe-arrow-right" onclick="goPanel(currentPanel+1)" aria-label="次へ">›</button>
   </div>
   <div class="swipe-container" id="swipe-container">
     <div class="swipe-panel mob-left-panel">
