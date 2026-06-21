@@ -250,8 +250,8 @@ function applyLangUI(){
   const mobNews=document.querySelector('#news-widget-mob')?.closest('.widget')?.previousElementSibling;
   if(mobNews&&mobNews.classList.contains('mob-panel-title'))mobNews.innerHTML=tr('widgetNewsMob')+mobSpan;
 
-  // 今週のおすすめタイトル（PC・スマホ）
-  const featuredTitle=isEn?'⭐ Featured Pedals':'⭐ 今週のおすすめ';
+  // 今週のピックアップタイトル（PC・スマホ）
+  const featuredTitle=isEn?'⭐ Featured Pedals':'⭐ 今週のピックアップ';
   set('pc-featured-title',featuredTitle);
   set('mob-featured-title',featuredTitle);
 
@@ -574,7 +574,7 @@ function genreMatches(post,filter){
 }
 function translateGenre(g){
   if(lang!=='en')return g;
-  const map={'初心者相談':'Beginner','宅録':'Home Rec','ROCK':'ROCK','BLUES':'BLUES','JAZZ':'JAZZ','METAL':'METAL','FUNK':'FUNK','AMBIENT':'AMBIENT','SHOEGAZE':'SHOEGAZE','POST ROCK':'POST ROCK','INDIE':'INDIE','ALTERNATIVE':'ALTERNATIVE','PUNK':'PUNK'};
+  const map={'初心者相談':'Beginner','宅録':'Home Rec','ギタリスト':'Guitarist','ベーシスト':'Bassist','ROCK':'ROCK','BLUES':'BLUES','JAZZ':'JAZZ','METAL':'METAL','FUNK':'FUNK','AMBIENT':'AMBIENT','SHOEGAZE':'SHOEGAZE','POST ROCK':'POST ROCK','INDIE':'INDIE','ALTERNATIVE':'ALTERNATIVE','PUNK':'PUNK'};
   return map[g]||g;
 }
 function applyFilter(){
