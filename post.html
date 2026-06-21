@@ -491,6 +491,11 @@ async function loadPost(){
   renderPost(data);loadComments();
 }
 
+function translateGenrePost(g){
+  if(lang!=='en')return g;
+  const map={'初心者相談':'Beginner','宅録':'Home Rec','ギタリスト':'Guitarist','ベーシスト':'Bassist','ROCK':'ROCK','BLUES':'BLUES','JAZZ':'JAZZ','METAL':'METAL','FUNK':'FUNK','AMBIENT':'AMBIENT','SHOEGAZE':'SHOEGAZE','POST ROCK':'POST ROCK','INDIE':'INDIE','ALTERNATIVE':'ALTERNATIVE','PUNK':'PUNK'};
+  return map[g]||g;
+}
 function renderPost(p){
   const isGear=p.post_type==='gear';
   const imgs=p.image_urls||[];const gear=Array.isArray(p.gear_list)?p.gear_list:[];
@@ -518,7 +523,7 @@ function renderPost(p){
     +'<div class="act-btn" onclick="openEditModal()">✏️ '+(lang==='en'?'Edit':'編集')+'</div>'
     +'<div class="act-btn" style="color:#e05050;border-color:rgba(224,80,80,.3)" onclick="openReport()">🚩 '+(lang==='en'?'Report':'通報')+'</div>'
     +'</div>';
-  if(genres.length){html+='<div class="genre-tags">'+genres.map(g=>'<span class="gtag">'+g+'</span>').join('')+'</div>';}
+  if(genres.length){html+='<div class="genre-tags">'+genres.map(g=>'<span class="gtag">'+translateGenrePost(g)+'</span>').join('')+'</div>';}
   if(gear.length){
     html+='<div class="section"><div class="section-lbl">'+(lang==='en'?'Gear List':'使用機材リスト')+'</div>';
     gear.forEach(g=>{
