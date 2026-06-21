@@ -74,10 +74,10 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .comment-login-badge{display:flex;align-items:center;gap:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;border-bottom:none;padding:9px 12px;font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm)}
 .comment-login-badge img{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0}
 .comment-login-badge .av-fallback{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
-.comment-login-promo{position:fixed;inset:0;background:rgba(8,8,9,.75);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:900}
+.comment-login-promo{position:fixed;inset:0;background:rgba(8,8,9,.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:900;padding:20px}
 .comment-login-promo.open{display:flex}
-.comment-login-promo-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px 16px 0 0;width:100%;max-width:520px;padding:22px 20px 26px;animation:slideUpPromo .2s ease}
-@keyframes slideUpPromo{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.comment-login-promo-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;width:100%;max-width:380px;padding:24px 20px;animation:popInPromo .2s ease}
+@keyframes popInPromo{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
 .comment-login-promo-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:6px}
 .comment-login-promo-text{font-family:Noto Sans JP,sans-serif;font-size:12px;color:var(--tm);line-height:1.6;margin-bottom:18px}
 .comment-login-promo-btns{display:flex;flex-direction:column;gap:8px}
@@ -228,14 +228,12 @@ textarea.form-input{resize:vertical;min-height:80px}
 <body>
 <header>
   <div class="logo" onclick="goBack()">
-    <img class="logo-img" src="IMG_0206.PNG" alt="MGMB" onerror="this.style.display='none'">
     <div class="logo-text">
       <div class="logo-main">My Gear My Board</div>
-      <div class="logo-sub">ペダルボード投稿&データベース</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <div class="back-btn" id="back-btn" onclick="goBack()">← ボード一覧</div>
+    <div class="back-btn" id="back-btn" onclick="goBack()">ホーム</div>
     <div id="lang-btn" onclick="toggleLang()" title="Switch Language / 言語切替"
       style="display:flex;align-items:center;gap:4px;padding:6px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;cursor:pointer;transition:all .15s;touch-action:manipulation;font-size:12px;font-weight:600;color:var(--tm)"
       onmouseover="this.style.borderColor='var(--ac)';this.style.color='var(--ac)'"
@@ -406,10 +404,9 @@ function toggleLang(){
   const label=document.getElementById('post-lang-label');
   if(label)label.textContent=lang==='ja'?'EN':'JA';
   const backBtn=document.getElementById('back-btn');
-  if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧';
-  const logosub=document.querySelector('.logo-sub');
-  if(logosub)logosub.textContent=lang==='en'?'Pedalboard Posts & Database':'ペダルボード投稿&データベース';
+  if(backBtn)backBtn.textContent=lang==='en'?'Home':'ホーム';
   if(currentPost)renderPost(currentPost);
+  loadComments();
 }
 function goBack(){location.href='/';}
 
@@ -543,8 +540,8 @@ function renderPost(p){
   const _cL=lang==='en'?'Comments':'コメント',_cN=lang==='en'?'Name (optional)':'名前（任意）',_cP=lang==='en'?'Write a comment...':'コメントを投稿する...',_cB=lang==='en'?'Post':'投稿';
   html+='<div class="section" id="comment-section"><div class="section-lbl">'+_cL+'</div><div class="comment-input-wrap"><div class="comment-input-col"><div id="comment-name-area"><input class="comment-name-input" id="comment-name" type="text" placeholder="'+_cN+'" maxlength="30" onfocus="maybeShowCommentLoginPromo()"></div><textarea class="comment-input" id="comment-input" placeholder="'+_cP+'" rows="2" onfocus="maybeShowCommentLoginPromo()"></textarea></div><button class="comment-submit" onclick="postComment(null)">'+_cB+'</button></div><div id="comments-list"></div></div>'
     +'<div class="comment-login-promo" id="comment-login-promo" onclick="if(event.target===this)closeCommentLoginPromo()"><div class="comment-login-promo-card">'
-    +'<div class="comment-login-promo-title">'+(lang==='en'?'Want to comment with your account?':'アカウントでコメントしませんか？')+'</div>'
-    +'<div class="comment-login-promo-text">'+(lang==='en'?'Log in or sign up to comment with your name and avatar. You can still comment anonymously without one.':'ログイン・登録すると、あなたの名前とアイコンでコメントできます。もちろん匿名のままでもコメントできます。')+'</div>'
+    +'<div class="comment-login-promo-title">'+(lang==='en'?'Want to comment with your account?':'マイアカウントでコメントしませんか？')+'</div>'
+    +'<div class="comment-login-promo-text">'+(lang==='en'?'Log in or sign up to comment with your name and avatar. After logging in, you can also edit or delete your comments later. You can still comment anonymously without one.':'ログイン・登録すると、あなたの名前とアイコンでコメントできます。ログイン後のコメントは、後から再編集や削除が可能になります。もちろん匿名のままでもコメントできます。')+'</div>'
     +'<div class="comment-login-promo-btns">'
     +'<a class="comment-login-promo-btn primary" href="/mypage">'+(lang==='en'?'Log in / Sign up':'ログイン・新規登録')+'</a>'
     +'<div class="comment-login-promo-btn secondary" onclick="closeCommentLoginPromo()">'+(lang==='en'?'Continue anonymously':'このまま匿名で続ける')+'</div>'
@@ -1015,8 +1012,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     c.addEventListener('touchstart',canvasPointerDown,{passive:false});c.addEventListener('touchmove',canvasPointerMove,{passive:false});c.addEventListener('touchend',canvasPointerUp,{passive:false});
   },500);
   const label=document.getElementById('post-lang-label');if(label)label.textContent=lang==='ja'?'EN':'JA';
-  const backBtn=document.getElementById('back-btn');if(backBtn)backBtn.textContent=lang==='en'?'← Back to List':'← ボード一覧';
-  const logosub=document.querySelector('.logo-sub');if(logosub)logosub.textContent=lang==='en'?'Pedalboard Posts & Database':'ペダルボード投稿&データベース';
+  const backBtn=document.getElementById('back-btn');if(backBtn)backBtn.textContent=lang==='en'?'Home':'ホーム';
   loadPost();
 });
 </script>
