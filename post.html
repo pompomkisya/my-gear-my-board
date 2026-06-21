@@ -86,6 +86,10 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .c-time{font-family:Noto Sans JP,sans-serif;font-size:10px;color:#c0bcb4;margin-left:auto;white-space:nowrap;padding-left:8px}
 .c-body{font-size:14px;line-height:1.65;color:#b8b5ae;padding-left:36px;word-break:break-word;overflow-wrap:break-word}
 .c-reply-btn{display:inline-flex;align-items:center;gap:4px;font-family:Noto Sans JP,sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--ac);cursor:pointer;margin-top:8px;transition:all .15s;touch-action:manipulation;background:transparent;border:none;padding:5px 10px 5px 36px;border-radius:3px}
+.c-body-deleted{font-style:italic;color:var(--td)!important}
+.c-edited{font-size:10px;color:var(--td);font-style:italic;margin-left:4px}
+.c-delete-btn{color:#e05050}
+.c-edit-form{margin-left:36px}
 .c-reply-btn:hover{background:rgba(232,85,45,.1)}
 .c-mention{color:var(--ac);font-weight:500}
 .reply-indent{padding-left:16px;border-left:2px solid var(--bd);margin-top:8px;word-break:break-word;overflow-wrap:break-word}
@@ -566,7 +570,10 @@ function postToX(){
   window.open('https://twitter.com/intent/tweet?text='+text+'&url='+ogUrl,'_blank','width=550,height=420');
 }
 
+let currentCommentUserId=null;
 async function loadComments(){
+  const{data:{session}}=await sb.auth.getSession();
+  currentCommentUserId=session?session.user.id:null;
   const{data,error}=await sb.from('comments').select('*,users(username,avatar_url)').eq('post_id',POST_ID).order('created_at',{ascending:true});
   if(error){console.error('comments load error',error);allComments=[];renderComments();return;}
   allComments=data||[];renderComments();
@@ -578,6 +585,8 @@ function renderComments(){
   el.innerHTML=roots.map(c=>renderComment(c,0)).join('');
 }
 function renderComment(c,depth){
+  const isDeleted=!!c.deleted_at;
+  const isMine=!!(currentCommentUserId&&c.user_id&&c.user_id===currentCommentUserId);
   const init=(c.username||'匿')[0].toUpperCase();
   const avatarUrl=c.users?.avatar_url||null;
   const linkUsername=c.user_id&&c.users?.username?c.users.username:null;
@@ -589,9 +598,46 @@ function renderComment(c,depth){
     :'<div class="c-name">'+(c.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div>';
   const children=allComments.filter(x=>x.parent_id===c.id);
   const mention=c.reply_to_name?'<span class="c-mention">@'+c.reply_to_name+'</span> ':'';
-  let html='<div class="comment" id="c-'+c.id+'"><div class="c-head">'+avHtml+nameHtml+'<div class="c-time">'+timeAgo(c.created_at)+'</div></div><div class="c-body">'+mention+escHtml(c.content)+'</div><span class="c-reply-btn" onclick="openReply(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">↩ '+(lang==='en'?'Reply':'返信')+'</span><div class="reply-form" id="rf-'+c.id+'"><input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30"><div class="reply-row"><textarea class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." rows="1" oninput="autoResize(this)"></textarea><button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button></div></div>';
+  const editedBadge=(c.edited_at&&!isDeleted)?'<span class="c-edited">（'+(lang==='en'?'edited':'編集済み')+'）</span>':'';
+  const bodyHtml=isDeleted
+    ?'<div class="c-body c-body-deleted" id="cb-'+c.id+'">'+(lang==='en'?'[This comment has been deleted]':'[削除されたコメントです]')+'</div>'
+    :'<div class="c-body" id="cb-'+c.id+'">'+mention+escHtml(c.content)+editedBadge+'</div>';
+  const replyBtn=isDeleted?'':'<span class="c-reply-btn" onclick="openReply(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">↩ '+(lang==='en'?'Reply':'返信')+'</span>';
+  const ownerBtns=(isMine&&!isDeleted)
+    ?'<span class="c-reply-btn" onclick="startEditComment(\''+c.id+'\')">✎ '+(lang==='en'?'Edit':'編集')+'</span><span class="c-reply-btn c-delete-btn" onclick="deleteComment(\''+c.id+'\')">🗑 '+(lang==='en'?'Delete':'削除')+'</span>'
+    :'';
+  let html='<div class="comment" id="c-'+c.id+'"><div class="c-head">'+avHtml+nameHtml+'<div class="c-time">'+timeAgo(c.created_at)+'</div></div>'+bodyHtml+replyBtn+ownerBtns+'<div class="reply-form" id="rf-'+c.id+'"><input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30"><div class="reply-row"><textarea class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." rows="1" oninput="autoResize(this)"></textarea><button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button></div></div>';
   if(children.length){html+='<div class="reply-indent">'+children.map(ch=>renderComment(ch,depth+1)).join('')+'</div>';}
   html+='</div>';return html;
+}
+function startEditComment(id){
+  const c=allComments.find(x=>x.id===id);if(!c)return;
+  const bodyEl=document.getElementById('cb-'+id);if(!bodyEl)return;
+  const rawContent=c.content||'';
+  bodyEl.outerHTML='<div class="c-edit-form" id="cb-'+id+'"><textarea class="reply-input" id="ce-input-'+id+'" rows="2" oninput="autoResize(this)">'+escHtml(rawContent)+'</textarea>'
+    +'<div class="reply-row" style="margin-top:6px;justify-content:flex-end;gap:8px">'
+    +'<span class="c-reply-btn" onclick="cancelEditComment(\''+id+'\')">'+(lang==='en'?'Cancel':'キャンセル')+'</span>'
+    +'<button class="reply-submit" onclick="saveEditComment(\''+id+'\')">'+(lang==='en'?'Save':'保存')+'</button>'
+    +'</div></div>';
+  const ta=document.getElementById('ce-input-'+id);if(ta){ta.focus();autoResize(ta);}
+}
+function cancelEditComment(id){renderComments();}
+async function saveEditComment(id){
+  const ta=document.getElementById('ce-input-'+id);if(!ta)return;
+  const newContent=ta.value.trim();
+  if(!newContent){showToast(lang==='en'?'❌ Please enter a comment':'❌ コメントを入力してください');return;}
+  const{error}=await sb.from('comments').update({content:newContent,edited_at:new Date().toISOString()}).eq('id',id).eq('user_id',currentCommentUserId);
+  if(error){showToast(lang==='en'?'❌ Failed to update':'❌ 更新に失敗しました');console.error(error);return;}
+  showToast(lang==='en'?'✅ Comment updated':'✅ コメントを更新しました');
+  await loadComments();
+}
+async function deleteComment(id){
+  const ok=confirm(lang==='en'?'Delete this comment? This cannot be undone.':'このコメントを削除しますか？元に戻せません。');
+  if(!ok)return;
+  const{error}=await sb.from('comments').update({deleted_at:new Date().toISOString()}).eq('id',id).eq('user_id',currentCommentUserId);
+  if(error){showToast(lang==='en'?'❌ Failed to delete':'❌ 削除に失敗しました');console.error(error);return;}
+  showToast(lang==='en'?'🗑 Comment deleted':'🗑 コメントを削除しました');
+  await loadComments();
 }
 function openReply(parentId,name){document.querySelectorAll('.reply-form').forEach(f=>f.classList.remove('open'));const form=document.getElementById('rf-'+parentId);if(form){form.classList.add('open');document.getElementById('rn-'+parentId).focus();}}
 function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
