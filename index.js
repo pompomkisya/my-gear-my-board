@@ -1342,6 +1342,24 @@ function renderGearWidgetMob(posts){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeGearReportModal();}});
 document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();initPCScrollSync();applyLangUI();});
+// ★ iOS Safari の bfcache（戻る/進むキャッシュ）対策。
+// ページがJS再実行なしで「凍結復元」された場合、画面幅の判定や言語設定が古いまま固まることがあるため、
+// 復元を検知したら明示的に再同期する。通常の新規読み込みには一切影響しない（persistedがtrueの時だけ動く）。
+window.addEventListener('pageshow',function(event){
+  if(!event.persisted)return; // 通常の読み込みでは何もしない
+  try{
+    const storedLang=localStorage.getItem('mgmb_lang');
+    if(storedLang&&storedLang!==lang){
+      lang=storedLang;
+      applyLangUI();
+      if(allDBPosts.length)applyFilter();
+      if(typeof loadNotices==='function')loadNotices();
+      if(typeof loadFeatured==='function')loadFeatured();
+      if(typeof loadFeatures==='function')loadFeatures();
+    }
+    checkMobile(); // 画面幅・レイアウト判定をその場の実際の値で再評価
+  }catch(e){console.warn('bfcache resync error',e);}
+});
 function openLightbox(src){
   const lb=document.getElementById('lightbox');const img=document.getElementById('lightbox-img');
   if(!lb||!img)return;img.src=src;lb.classList.add('open');document.body.style.overflow='hidden';
