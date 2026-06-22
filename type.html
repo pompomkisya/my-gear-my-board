@@ -193,12 +193,12 @@ const TYPE_LABELS_JA = {
   'wah':'ワウ','comp':'コンプレッサー','compressor':'コンプレッサー',
   'eq':'イコライザー','noise_gate':'ノイズゲート','looper':'ルーパー',
   'volume':'ボリューム','tuner':'チューナー','multi':'マルチエフェクター',
-  'preamp':'プリアンプ','pre':'プリアンプ','switcher':'スイッチャー',
+  'preamp':'プリアンプ','pre':'プリアンプ','switcher_selector':'スイッチャー/セレクター',
   'buffer':'バッファー','junction_box':'ジャンクションボックス','other':'その他',
   'pitch_octave':'ピッチ/オクターブ','wah_filter':'ワウ/フィルター',
   'sequence_rhythm':'シークエンス/リズム','glitch':'グリッチ',
   'acoustic':'アコースティック','vocal':'ボーカル',
-  'power_supply':'パワーサプライ','synth':'シンセ',
+  'power_supply':'パワーサプライ','synth':'シンセ','bass':'ベース',
 };
 const TYPE_LABELS_EN = {
   'overdrive':'Overdrive (OD)','od':'Overdrive (OD)',
@@ -210,12 +210,12 @@ const TYPE_LABELS_EN = {
   'wah':'Wah','comp':'Compressor','compressor':'Compressor',
   'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
   'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','pre':'Preamp','switcher':'Switcher',
+  'preamp':'Preamp','pre':'Preamp','switcher_selector':'Switcher / Selector',
   'buffer':'Buffer','junction_box':'Junction Box','other':'Other',
   'pitch_octave':'Pitch / Octave','wah_filter':'Wah / Filter',
   'sequence_rhythm':'Sequence / Rhythm','glitch':'Glitch',
   'acoustic':'Acoustic','vocal':'Vocal',
-  'power_supply':'Power Supply','synth':'Synth',
+  'power_supply':'Power Supply','synth':'Synth','bass':'Bass',
 };
 function getTypeDisplayName(t) {
   const map = lang === 'ja' ? TYPE_LABELS_JA : TYPE_LABELS_EN;
@@ -229,8 +229,8 @@ const TYPE_BADGES = {
   'pitch':'Pitch','wah':'Wah','compressor':'Comp','comp':'Comp',
   'eq':'EQ','noise_gate':'Noise Gate','looper':'Looper',
   'volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer',
-  'pitch_octave':'Pitch/Oct','wah_filter':'Wah/Filter',
+  'preamp':'Preamp','switcher_selector':'Sw/Sel','buffer':'Buffer',
+  'pitch_octave':'Pitch/Oct','wah_filter':'Wah/Filter','bass':'Bass',
 };
 function getTypeBadge(t) { return TYPE_BADGES[t?.toLowerCase()] || t; }
 
