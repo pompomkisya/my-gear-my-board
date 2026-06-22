@@ -394,7 +394,7 @@ const TYPE_LABELS = {
   'tremolo':'Tremolo','vibrato':'Vibrato','pitch':'Pitch','wah':'Wah',
   'compressor':'Comp','comp':'Comp','eq':'EQ','noise_gate':'Noise Gate',
   'looper':'Looper','volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer','pre':'Preamp'
+  'preamp':'Preamp','switcher_selector':'Sw/Sel','buffer':'Buffer','pre':'Preamp','bass':'Bass'
 };
 const TYPE_LABELS_JA = {
   'overdrive':'オーバードライブ','od':'オーバードライブ','distortion':'ディストーション','dist':'ディストーション',
@@ -403,7 +403,7 @@ const TYPE_LABELS_JA = {
   'tremolo':'トレモロ','vibrato':'ビブラート','pitch':'ピッチ','wah':'ワウ',
   'compressor':'コンプレッサー','comp':'コンプレッサー','eq':'イコライザー','noise_gate':'ノイズゲート',
   'looper':'ルーパー','volume':'ボリューム','tuner':'チューナー','multi':'マルチエフェクター',
-  'preamp':'プリアンプ','switcher':'スイッチャー','buffer':'バッファー','pre':'プリアンプ'
+  'preamp':'プリアンプ','switcher_selector':'スイッチャー/セレクター','buffer':'バッファー','pre':'プリアンプ','bass':'ベース'
 };
 const TYPE_LABELS_EN = {
   'overdrive':'Overdrive','od':'Overdrive','distortion':'Distortion','dist':'Distortion',
@@ -412,7 +412,7 @@ const TYPE_LABELS_EN = {
   'tremolo':'Tremolo','vibrato':'Vibrato','pitch':'Pitch Shifter','wah':'Wah',
   'compressor':'Compressor','comp':'Compressor','eq':'EQ','noise_gate':'Noise Gate',
   'looper':'Looper','volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer','pre':'Preamp'
+  'preamp':'Preamp','switcher_selector':'Switcher / Selector','buffer':'Buffer','pre':'Preamp','bass':'Bass'
 };
 function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()]||t; }
 function getRecommendTitle(type){
