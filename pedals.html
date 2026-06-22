@@ -192,7 +192,8 @@
       <option value="acoustic" id="type-acoustic">Acoustic（アコースティック）</option>
       <option value="vocal" id="type-vocal">Vocal（ボーカル）</option>
       <option value="power_supply" id="type-power_supply">Power Supply（パワーサプライ）</option>
-      <option value="switcher" id="type-switcher">Switcher（スイッチャー）</option>
+      <option value="switcher_selector" id="type-switcher_selector">Switcher / Selector（スイッチャー/セレクター）</option>
+      <option value="bass" id="type-bass">Bass（ベース）</option>
       <option value="buffer" id="type-buffer">Buffer（バッファー）</option>
       <option value="synth" id="type-synth">Synth（シンセ）</option>
       <option value="junction_box" id="type-junction_box">Junction Box</option>
@@ -251,8 +252,8 @@ const I18N = {
       preamp:'Preamp（プリアンプ）',modulation:'Modulation（モジュレーション）',
       sequence_rhythm:'Sequence / Rhythm（シークエンス/リズム）',glitch:'Glitch（グリッチ）',
       acoustic:'Acoustic（アコースティック）',vocal:'Vocal（ボーカル）',
-      power_supply:'Power Supply（パワーサプライ）',switcher:'Switcher（スイッチャー）',
-      buffer:'Buffer（バッファー）',synth:'Synth（シンセ）',
+      power_supply:'Power Supply（パワーサプライ）',switcher_selector:'Switcher / Selector（スイッチャー/セレクター）',
+      buffer:'Buffer（バッファー）',synth:'Synth（シンセ）',bass:'Bass（ベース）',
       junction_box:'Junction Box（ジャンクションボックス）',other:'Other（その他）'
     }
   },
@@ -274,7 +275,7 @@ const I18N = {
       looper:'Looper',volume:'Volume',tuner:'Tuner',multi:'Multi FX',
       preamp:'Preamp',modulation:'Modulation',sequence_rhythm:'Sequence / Rhythm',
       glitch:'Glitch',acoustic:'Acoustic',vocal:'Vocal',power_supply:'Power Supply',
-      switcher:'Switcher',buffer:'Buffer',synth:'Synth',
+      switcher_selector:'Switcher / Selector',buffer:'Buffer',synth:'Synth',bass:'Bass',
       junction_box:'Junction Box',other:'Other'
     }
   }
@@ -322,9 +323,9 @@ const TYPE_LABELS = {
   'pitch_octave':'Pitch/Oct','wah_filter':'Wah/Filter',
   'compressor':'Comp','comp':'Comp','eq':'EQ','noise_gate':'Noise Gate',
   'looper':'Looper','volume':'Volume','tuner':'Tuner','multi':'Multi FX',
-  'preamp':'Preamp','switcher':'Switcher','buffer':'Buffer',
+  'preamp':'Preamp','switcher_selector':'Sw/Sel','buffer':'Buffer',
   'sequence_rhythm':'Seq/Rhythm','glitch':'Glitch','acoustic':'Acoustic',
-  'vocal':'Vocal','power_supply':'Power Supply','synth':'Synth',
+  'vocal':'Vocal','power_supply':'Power Supply','synth':'Synth','bass':'Bass',
   'junction_box':'Junction Box','other':'Other'
 };
 function getTypeLabel(t) { return TYPE_LABELS[t?.toLowerCase()] || t; }
