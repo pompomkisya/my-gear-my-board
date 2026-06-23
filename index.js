@@ -744,30 +744,19 @@ function searchMatches(post,query){
 }
 let selectedGears=[],acResults=[],acFocusIdx=-1;
 let _acComposing=false,_acTimer=null;
-// ★ カタカナ/ひらがな→英語ブランド名変換テーブル
-const BRAND_KANA_MAP={
-  'ボス':'BOSS','ぼす':'BOSS','ボッス':'BOSS',
-  'イバニーズ':'Ibanez','いばにーず':'Ibanez',
-  'エレハモ':'Electro-Harmonix','えれはも':'Electro-Harmonix',
-  'てぃーしー':'TC Electronic','ティーシー':'TC Electronic',
-  'ストライモン':'Strymon','すとらいもん':'Strymon',
-  'ワンプラー':'Wampler','わんぷらー':'Wampler','ワンプラ':'Wampler',
-  'マーシャル':'Marshall','まーしゃる':'Marshall',
-  'フェンダー':'Fender','ふぇんだー':'Fender',
-  'ギブソン':'Gibson','ぎぶそん':'Gibson',
-  'ベリンガー':'Behringer','べりんがー':'Behringer',
-  'デジテック':'Digitech','でじてっく':'Digitech',
-  'ケンパー':'Kemper','けんぱー':'Kemper',
-  'ビッグマフ':'Big Muff','びっぐまふ':'Big Muff',
-  'チューブスクリーマー':'Tube Screamer','ちゅーぶすくりーまー':'Tube Screamer',
-  'ラット':'RAT','らっと':'RAT',
-  'ブルースドライバー':'Blues Driver','ぶるーすどらいばー':'Blues Driver',
-  'ケンタウルス':'Klon','けんたうるす':'Klon',
-};
+// ★ カタカナ/ひらがな→英語変換テーブル (DBの kana_aliases テーブルから動的ロード)
+let _kanaAliasMap={};
+async function loadKanaAliases(){
+  try{
+    const{data}=await sb.from('kana_aliases').select('kana,english');
+    _kanaAliasMap={};
+    (data||[]).forEach(r=>{_kanaAliasMap[r.kana]=r.english;});
+  }catch(e){console.warn('kana_aliases load error',e);}
+}
 function expandQueryWithKana(q){
   const results=[q];
-  for(const[kana,en] of Object.entries(BRAND_KANA_MAP)){
-    if(q.includes(kana)||q.toLowerCase().includes(kana.toLowerCase()))results.push(q.replace(new RegExp(kana,'gi'),en));
+  for(const[kana,en] of Object.entries(_kanaAliasMap)){
+    if(q.includes(kana))results.push(q.replace(new RegExp(kana,'g'),en));
   }
   return[...new Set(results)];
 }
@@ -1403,7 +1392,7 @@ function renderGearWidgetMob(posts){
   el.innerHTML=sorted.map(([n,c])=>renderGearWidgetHTML(n,c)).join('');
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeGearReportModal();}});
-document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();updateStepUI();loadNewsWidget();initPCScrollSync();applyLangUI();});
+document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();loadPedalDataBackground();loadKanaAliases();updateStepUI();loadNewsWidget();initPCScrollSync();applyLangUI();});
 // ★ iOS Safari の bfcache（戻る/進むキャッシュ）対策。
 // ページがJS再実行なしで「凍結復元」された場合、画面幅の判定や言語設定が古いまま固まることがあるため、
 // 復元を検知したら明示的に再同期する。通常の新規読み込みには一切影響しない（persistedがtrueの時だけ動く）。
