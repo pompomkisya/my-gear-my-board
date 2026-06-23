@@ -236,9 +236,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
 
   <div class="panel" id="tab-aliases">
     <div class="section-title">🔗 エイリアス管理 <span class="badge" id="aliases-count">-</span></div>
-    <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">ユーザーの入力表記（エイリアス）をDBの正式名称に対応付けます。例：「BOSS RC-1」→「BOSS RC-1 Loop Station」</p>
+
+    <!-- ① ペダル名エイリアス -->
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">ユーザーの入力表記（エイリアス）をDBの正式名称に対応付けます。例：「BOSS RC-1」→「BOSS RC-1 Loop Station」</div>
     <div class="alias-form">
-      <div class="add-news-title">＋ エイリアスを追加</div>
+      <div class="add-news-title">＋ ペダル名エイリアスを追加</div>
       <div class="alias-row">
         <div style="flex:1;min-width:160px">
           <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:4px;letter-spacing:1px;text-transform:uppercase">エイリアス（ユーザーの入力）</div>
@@ -255,6 +257,26 @@ tr:hover td{background:rgba(255,255,255,.02)}
       <button class="add-btn" onclick="addAlias()">＋ 追加する</button>
     </div>
     <div id="aliases-list" class="loading">読み込み中...</div>
+
+    <!-- ② カタカナ→英語変換 -->
+    <div class="section-title" style="margin-top:28px">🈴 カタカナ変換テーブル <span class="badge" id="kana-count">-</span></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--td);margin-bottom:16px">カタカナ/ひらがなの入力を英語ブランド・機種名に展開します。例：「ボス」→「BOSS」</div>
+    <div class="alias-form">
+      <div class="add-news-title">＋ カタカナ変換を追加</div>
+      <div class="alias-row">
+        <div style="flex:1;min-width:160px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:4px;letter-spacing:1px;text-transform:uppercase">カタカナ/ひらがな</div>
+          <input class="alias-input" id="kana-from" type="text" placeholder="例: アイバニーズ" autocomplete="off">
+        </div>
+        <div class="alias-arrow">→</div>
+        <div style="flex:1;min-width:160px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--td);margin-bottom:4px;letter-spacing:1px;text-transform:uppercase">英語表記</div>
+          <input class="alias-input" id="kana-to" type="text" placeholder="例: Ibanez" autocomplete="off">
+        </div>
+      </div>
+      <button class="add-btn" onclick="addKanaAlias()">＋ 追加する</button>
+    </div>
+    <div id="kana-aliases-list" class="loading">読み込み中...</div>
   </div>
 
   <div class="panel" id="tab-news">
@@ -1334,6 +1356,7 @@ async function loadAliases(){
   const{data}=await sb.from('pedal_aliases').select('*').order('alias');
   allAliases=data||[];renderAliases();
   const badge=document.getElementById('aliases-count');if(badge)badge.textContent=allAliases.length;
+  loadKanaAliasesAdmin();
 }
 
 function renderAliases(){
@@ -1390,6 +1413,45 @@ async function deleteAlias(id,name){
   const{error}=await sb.from('pedal_aliases').delete().eq('id',id);
   if(error){showToast('❌ 削除に失敗しました');return;}
   showToast('🗑 削除しました');await loadAliases();
+}
+
+// ★ カタカナ変換テーブル管理
+async function loadKanaAliasesAdmin(){
+  const{data,error}=await sb.from('kana_aliases').select('*').order('kana');
+  const el=document.getElementById('kana-aliases-list');if(!el)return;
+  const badge=document.getElementById('kana-count');if(badge)badge.textContent=(data||[]).length+'件';
+  if(error||!data||!data.length){el.innerHTML='<div class="empty-msg">カタカナ変換が登録されていません。</div>';return;}
+  el.innerHTML='<div class="table-wrap"><table class="alias-table">'
+    +'<thead><tr><th>カタカナ/ひらがな</th><th></th><th>英語展開</th><th>登録日</th><th>操作</th></tr></thead>'
+    +'<tbody>'
+    +data.map(r=>'<tr>'
+      +'<td class="alias-from">'+escHtml(r.kana)+'</td>'
+      +'<td style="color:var(--ac);font-size:14px;text-align:center">→</td>'
+      +'<td class="alias-to">'+escHtml(r.english)+'</td>'
+      +'<td style="font-size:11px;color:var(--td)">'+timeAgo(r.created_at)+'</td>'
+      +'<td><button class="del-btn" onclick="deleteKanaAlias(\''+r.id+'\',\''+escHtml(r.kana)+'\')">🗑 削除</button></td>'
+      +'</tr>').join('')
+    +'</tbody></table></div>';
+}
+async function addKanaAlias(){
+  const kana=document.getElementById('kana-from').value.trim();
+  const en=document.getElementById('kana-to').value.trim();
+  if(!kana||!en){showToast('❌ 両方入力してください');return;}
+  const{error}=await sb.from('kana_aliases').insert({kana,english:en});
+  if(error){
+    if(error.code==='23505')showToast('⚠️ このカタカナ変換はすでに登録されています');
+    else showToast('❌ 追加に失敗しました: '+error.message);
+    return;
+  }
+  showToast('✅ カタカナ変換を追加しました');
+  document.getElementById('kana-from').value='';document.getElementById('kana-to').value='';
+  await loadKanaAliasesAdmin();
+}
+async function deleteKanaAlias(id,kana){
+  if(!confirm('「'+kana+'」のカタカナ変換を削除しますか？'))return;
+  const{error}=await sb.from('kana_aliases').delete().eq('id',id);
+  if(error){showToast('❌ 削除に失敗しました');return;}
+  showToast('🗑 削除しました');await loadKanaAliasesAdmin();
 }
 
 let pedalFilterMode='all';
