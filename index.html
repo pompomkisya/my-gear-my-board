@@ -165,13 +165,17 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .gear-tag-x{cursor:pointer;font-size:12px;color:var(--ac);opacity:.7;background:none;border:none;padding:0}
 .gear-text-input{background:transparent;border:none;outline:none;font-size:16px;color:var(--tx);font-family:Noto Sans JP,sans-serif;min-width:140px;flex:1;padding:1px 2px}
 .gear-text-input::placeholder{color:var(--td)}
-.ac-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:200;max-height:200px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.ac-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--sf);border:1px solid var(--bd);border-radius:4px;z-index:200;max-height:320px;overflow-y:auto;display:none;box-shadow:0 8px 24px rgba(0,0,0,.5);scroll-behavior:smooth}
 .ac-dropdown.open{display:block}
-.ac-item{padding:8px 12px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .12s;border-bottom:1px solid var(--bd)}
+.ac-dropdown-wrap{position:relative}
+.ac-dropdown-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:36px;background:linear-gradient(transparent,var(--sf));pointer-events:none;border-radius:0 0 4px 4px;opacity:0;transition:opacity .15s}
+.ac-dropdown-wrap.has-scroll::after{opacity:1}
+.ac-item{padding:11px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .12s;border-bottom:1px solid var(--bd);min-height:44px}
 .ac-item:last-child{border-bottom:none}
 .ac-item:hover,.ac-item.focus{background:rgba(232,85,45,.1)}
 .ac-item-name{flex:1;color:var(--tx)}
 .ac-item-brand{font-family:Noto Sans JP,sans-serif;font-size:11px;color:#9a9890}
+.ac-tier-label{padding:4px 14px;font-size:9px;letter-spacing:1px;color:var(--td);font-family:'JetBrains Mono',monospace;background:var(--sf2);border-bottom:1px solid var(--bd)}
 .ac-empty{padding:10px 12px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td);text-align:center}
 .upload-progress-wrap{margin-top:10px;display:none}
 .upload-progress-wrap.show{display:block}
@@ -888,7 +892,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       <div class="form-row">
         <label class="form-lbl" id="gear-step-lbl">使用機材（1つ以上推奨）</label>
         <div id="gear-hint1" style="font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--tm);margin-bottom:6px">※入力すると閲覧数が上がります</div>
-        <div class="gear-input-wrap">
+        <div class="gear-input-wrap ac-dropdown-wrap">
           <div class="gear-tags" id="gear-tags" onclick="document.getElementById('gear-search').focus()">
             <input class="gear-text-input" id="gear-search" type="text"
               placeholder="機材名を入力（例: DS-1, Big Muff）"
