@@ -744,6 +744,33 @@ function searchMatches(post,query){
 }
 let selectedGears=[],acResults=[],acFocusIdx=-1;
 let _acComposing=false,_acTimer=null;
+// ★ カタカナ/ひらがな→英語ブランド名変換テーブル
+const BRAND_KANA_MAP={
+  'ボス':'BOSS','ぼす':'BOSS','ボッス':'BOSS',
+  'イバニーズ':'Ibanez','いばにーず':'Ibanez',
+  'エレハモ':'Electro-Harmonix','えれはも':'Electro-Harmonix',
+  'てぃーしー':'TC Electronic','ティーシー':'TC Electronic',
+  'ストライモン':'Strymon','すとらいもん':'Strymon',
+  'ワンプラー':'Wampler','わんぷらー':'Wampler','ワンプラ':'Wampler',
+  'マーシャル':'Marshall','まーしゃる':'Marshall',
+  'フェンダー':'Fender','ふぇんだー':'Fender',
+  'ギブソン':'Gibson','ぎぶそん':'Gibson',
+  'ベリンガー':'Behringer','べりんがー':'Behringer',
+  'デジテック':'Digitech','でじてっく':'Digitech',
+  'ケンパー':'Kemper','けんぱー':'Kemper',
+  'ビッグマフ':'Big Muff','びっぐまふ':'Big Muff',
+  'チューブスクリーマー':'Tube Screamer','ちゅーぶすくりーまー':'Tube Screamer',
+  'ラット':'RAT','らっと':'RAT',
+  'ブルースドライバー':'Blues Driver','ぶるーすどらいばー':'Blues Driver',
+  'ケンタウルス':'Klon','けんたうるす':'Klon',
+};
+function expandQueryWithKana(q){
+  const results=[q];
+  for(const[kana,en] of Object.entries(BRAND_KANA_MAP)){
+    if(q.includes(kana)||q.toLowerCase().includes(kana.toLowerCase()))results.push(q.replace(new RegExp(kana,'gi'),en));
+  }
+  return[...new Set(results)];
+}
 function normACQuery(q){return(q||'').toLowerCase().replace(/[-_\s\.]/g,'');}
 function expandACQuery(q){
   const p=[q];
@@ -751,29 +778,64 @@ function expandACQuery(q){
   const s1=q.replace(/([a-zA-Z])([0-9])/g,'$1 $2');
   const h2=q.replace(/([0-9])([a-zA-Z])/g,'$1-$2');
   if(h1!==q)p.push(h1);if(s1!==q)p.push(s1);if(h2!==q&&h2!==h1)p.push(h2);
+  expandQueryWithKana(q).forEach(x=>{if(x!==q&&!p.includes(x))p.push(x);});
   return[...new Set(p)];
+}
+function sortTier1(results){
+  return results.slice().sort((a,b)=>{
+    const ba=(a.brand||'').toLowerCase(),bb=(b.brand||'').toLowerCase();
+    if(ba!==bb)return ba<bb?-1:1;
+    return(a.model||'').toLowerCase()<(b.model||'').toLowerCase()?-1:1;
+  });
+}
+function sortTier2(results){return results.slice().sort((a,b)=>(b.view_count||0)-(a.view_count||0));}
+function updateACFade(){
+  const dd=document.getElementById('ac-dropdown');
+  const wrap=dd?.closest('.ac-dropdown-wrap');if(!wrap)return;
+  const scrollable=dd.scrollHeight>dd.clientHeight+2;
+  wrap.classList.toggle('has-scroll',scrollable&&dd.classList.contains('open'));
 }
 async function searchGear(val){
   const q=val.trim();closeAC();if(!q)return;
-  const qNorm=normACQuery(q);
   const patterns=expandACQuery(q);
   const orParts=patterns.flatMap(p=>['brand.ilike.'+p+'%','model.ilike.'+p+'%','full_name.ilike.'+p+'%']).join(',');
-  const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name,search_query').or(orParts).limit(10);
-  let results=prefixData||[];
-  if(results.length<5){
+  const aliasOrParts=patterns.map(p=>'alias.ilike.'+p+'%').join(',');
+  const[{data:prefixData},{data:aliasData}]=await Promise.all([
+    sb.from('pedals').select('brand,model,full_name,search_query,view_count').or(orParts).limit(15),
+    sb.from('pedal_aliases').select('alias,pedal_full_name').or(aliasOrParts).limit(10)
+  ]);
+  let tier1=sortTier1(prefixData||[]);
+  if(aliasData&&aliasData.length){
+    const aliasNames=[...new Set(aliasData.map(a=>a.pedal_full_name))].filter(n=>!tier1.find(r=>r.full_name===n));
+    if(aliasNames.length){
+      const{data:aliasPedals}=await sb.from('pedals').select('brand,model,full_name,search_query,view_count').in('full_name',aliasNames).limit(10);
+      if(aliasPedals)sortTier1(aliasPedals).forEach(x=>{if(!tier1.find(r=>r.full_name===x.full_name))tier1.push(x);});
+    }
+  }
+  let tier2=[];
+  if(tier1.length<5){
     const fuzzyOr=patterns.map(p=>'full_name.ilike.%'+p+'%').join(',');
-    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').or(fuzzyOr).limit(10);
-    if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
+    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query,view_count').or(fuzzyOr).limit(15);
+    const fuzzyResults=fuzzy||[];
+    tier2=sortTier2(fuzzyResults.filter(x=>!tier1.find(r=>r.full_name===x.full_name)));
   }
-  if(results.length<5&&qNorm.length>=2){
-    const{data:allData}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('model',qNorm[0]+'%').limit(200);
-    if(allData)allData.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name)&&normACQuery(x.full_name).includes(qNorm))results.push(x);});
-  }
-  results=results.slice(0,10);acResults=results;acFocusIdx=-1;
+  const combined=[...tier1,...tier2].slice(0,15);
+  acResults=combined;acFocusIdx=-1;
   const dd=document.getElementById('ac-dropdown');
-  if(!results.length){dd.innerHTML='<div class="ac-empty">「'+q+'」— '+(lang==='en'?'No suggestions. Press Enter to add':'候補なし　Enterで追加')+'</div>';dd.classList.add('open');return;}
-  dd.innerHTML=results.map((x,i)=>'<div class="ac-item" onmousedown="selectGear('+i+')" onmouseover="setACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>').join('');
-  dd.classList.add('open');
+  if(!combined.length){
+    dd.innerHTML='<div class="ac-empty">「'+q+'」— '+(lang==='en'?'No suggestions. Press Enter to add':'候補なし　Enterで追加')+'</div>';
+    dd.classList.add('open');updateACFade();return;
+  }
+  const hasTier2=tier2.length>0&&tier1.length>0&&tier1.length<15;
+  let html='';
+  tier1.slice(0,15).forEach((x,i)=>{html+='<div class="ac-item" onmousedown="selectGear('+i+')" onmouseover="setACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>';});
+  if(hasTier2){
+    html+='<div class="ac-tier-label">'+(lang==='en'?'▸ Also found':'▸ 関連候補')+'</div>';
+    tier2.forEach((x,i)=>{const idx=tier1.length+i;html+='<div class="ac-item" onmousedown="selectGear('+idx+')" onmouseover="setACFocus('+idx+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>';});
+  }
+  dd.innerHTML=html;dd.classList.add('open');dd.scrollTop=0;
+  dd.addEventListener('scroll',updateACFade,{passive:true});
+  setTimeout(updateACFade,50);
 }
 function setACFocus(i){acFocusIdx=i;document.querySelectorAll('.ac-item').forEach((el,j)=>el.classList.toggle('focus',j===i));}
 function selectGear(i){const x=acResults[i];if(!x)return;addGearTag({name:x.full_name,brand:x.brand,search_query:x.search_query||null});closeAC();}
