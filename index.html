@@ -1998,8 +1998,8 @@ async function gDoShare(){
   const rk=RR[gResult._rk];const isEn=gLang==='en';
   const shareUrl=`https://mygearmyboard.com/gacha-share?pedal_id=${gResult.id}&rk=${gResult._rk}&slug=${encodeURIComponent(gResult.slug||'')}`;
   const text=isEn
-    ?`GACHA Result [${rk.l}] Met "${gResult.model}"!\n#MGMB #guitarpedals\n${shareUrl}`
-    :`GACHA結果【${rk.l}】「${gResult.model}」と出会った！\n#MGMB #エフェクター\n${shareUrl}`;
+    ?`Today's GACHA✨ Met "${gResult.model}"!\n#MGMB #guitarpedals #pedalGacha\n${shareUrl}`
+    :`今日のGACHA結果✨「${gResult.model}」と出会った！\n#MGMB #エフェクター#ペダルガチャ\n${shareUrl}`;
   try{
     if(navigator.share)await navigator.share({title:'MGMB PEDAL GACHA',text});
     else{await navigator.clipboard.writeText(text).catch(()=>{});alert(isEn?'Copied!':'コピーしました');}
