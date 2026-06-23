@@ -350,6 +350,24 @@ async function loadBrands() {
   });
 }
 
+// ★ カタカナ変換テーブル(kana_aliasesテーブルから読み込む)
+let _pedalsKanaMap = {};
+async function loadPedalsKanaAliases() {
+  try {
+    const { data } = await db.from('kana_aliases').select('kana,english');
+    _pedalsKanaMap = {};
+    (data || []).forEach(r => { _pedalsKanaMap[r.kana] = r.english; });
+  } catch(e) { console.warn('kana_aliases load error', e); }
+}
+function expandPedalsSearch(q) {
+  const results = [q];
+  for (const [kana, en] of Object.entries(_pedalsKanaMap)) {
+    if (q.includes(kana)) results.push(q.replace(new RegExp(kana, 'g'), en));
+  }
+  return [...new Set(results)];
+}
+loadPedalsKanaAliases();
+
 async function fetchPedals(reset = false) {
   if (reset) {
     offset = 0;
@@ -362,16 +380,10 @@ async function fetchPedals(reset = false) {
     .order('created_at', { ascending: false })
     .range(offset, offset + LIMIT - 1);
   if (currentSearch) {
-    const searchNorm = currentSearch.replace(/\s+/g, '');
-    // 3文字以上かつスペースなし入力の場合は3文字チャンクで%区切りワイルドカード検索
-    if (searchNorm.length >= 3 && searchNorm === currentSearch) {
-      const chunks = [];
-      for (let i = 0; i < searchNorm.length; i += 3) chunks.push(searchNorm.slice(i, i + 3));
-      const wildcard = '%' + chunks.join('%') + '%';
-      query = query.or(`full_name.ilike.%${currentSearch}%,full_name.ilike.${wildcard}`);
-    } else {
-      query = query.ilike('full_name', `%${currentSearch}%`);
-    }
+    // カタカナ変換を展開し、複数の検索ワードをOR条件で結合
+    const expandedTerms = expandPedalsSearch(currentSearch);
+    const orParts = expandedTerms.map(term => `full_name.ilike.%${term}%`).join(',');
+    query = query.or(orParts);
   }
   if (currentBrand) query = query.eq('brand', currentBrand);
   if (currentType) query = query.contains('types', [currentType]);
