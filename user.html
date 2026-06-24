@@ -35,7 +35,9 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .error-box{text-align:center;padding:60px;color:var(--td)}
 
 /* ── Profile Hero ── */
-.profile-hero{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:24px;margin-bottom:16px}
+.profile-hero{background:var(--sf);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:16px}
+.profile-hero-cover{width:100%;height:120px;background:linear-gradient(135deg,rgba(232,85,45,.25),rgba(13,13,14,.6));background-size:cover;background-position:center}
+.profile-hero-body{padding:24px}
 .profile-hero-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
 .profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;border:2px solid var(--bd);overflow:hidden}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
@@ -197,7 +199,7 @@ async function loadUser(){
   const username=params.get('username');
   if(!username){showError(tr('notFound'));return;}
   const{data:user}=await sb.from('users')
-    .select('id,username,bio,amp,x_url,instagram_url,avatar_url,gear_list_public,created_at')
+    .select('id,username,bio,amp,x_url,instagram_url,avatar_url,cover_image_url,gear_list_public,created_at')
     .eq('username',username).maybeSingle();
   if(!user){showError(tr('notFound'));return;}
   _userData=user;
@@ -233,6 +235,8 @@ function renderUser(user,posts,gear,reviews,wishlist,pageUrl){
   const gearCount=gear.length;
   const html=`
     <div class="profile-hero">
+      <div class="profile-hero-cover" id="profile-cover" style="${user.cover_image_url?`background-image:url(${user.cover_image_url});background-size:cover;background-position:center`:''}"></div>
+      <div class="profile-hero-body">
       <div class="profile-hero-top">
         <div class="profile-avatar">${avatarHtml}</div>
         <div class="profile-info">
@@ -247,6 +251,7 @@ function renderUser(user,posts,gear,reviews,wishlist,pageUrl){
         <div class="stat-item"><div class="stat-value">${gearCount}</div><div class="stat-label">${tr('statGear')}</div></div>
         <div class="stat-item"><div class="stat-value">${reviews.length}</div><div class="stat-label">${tr('statReviews')}</div></div>
         <div class="stat-item"><div class="stat-value">${wishlist.length}</div><div class="stat-label">${tr('sectionWishlist')}</div></div>
+      </div>
       </div>
     </div>
 
