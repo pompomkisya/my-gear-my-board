@@ -129,6 +129,8 @@ textarea.edit-input{resize:vertical;min-height:70px}
 /* ── Avatar Menu ── */
 .avatar-menu{position:fixed;background:var(--sf);border:1px solid var(--bd);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.7);z-index:500;min-width:180px;overflow:hidden;animation:fadeInMenu .15s ease}
 @keyframes fadeInMenu{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.mp-info-chevron.open{transform:rotate(180deg)}
+div[style*="max-height:0"].open{max-height:600px!important}
 .avatar-menu-item{display:flex;align-items:center;gap:8px;padding:11px 14px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:500;color:var(--tx);cursor:pointer;transition:background .12s;border-bottom:1px solid var(--bd)}
 .avatar-menu-item:last-child{border-bottom:none}
 .avatar-menu-item:hover{background:rgba(232,85,45,.08);color:var(--ac)}
@@ -277,6 +279,22 @@ textarea.edit-input{resize:vertical;min-height:70px}
 
   <!-- ── MyPage ── -->
   <div class="mypage-wrap" id="mypage-wrap">
+
+    <!-- 説明パネル -->
+    <div style="background:var(--sf);border:1px solid var(--bd);border-radius:12px;margin-bottom:14px;overflow:hidden">
+      <div onclick="this.nextElementSibling.classList.toggle('open');this.querySelector('.mp-info-chevron').classList.toggle('open')"
+        style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--tm);user-select:none">
+        <span>❓ マイページ / ユーザーページについて</span>
+        <span class="mp-info-chevron" style="font-size:10px;transition:transform .25s;display:inline-block">▼</span>
+      </div>
+      <div style="max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1)">
+        <div style="padding:0 16px 16px;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tm);line-height:1.8">
+          <p style="margin:0 0 12px;padding:10px 12px;background:rgba(232,85,45,.06);border-left:3px solid var(--ac);border-radius:0 6px 6px 0"><b style="color:var(--tx)">マイページ</b><br>プロフィールや機材メモ、保存したお気に入りペダルなどの編集・確認ができます。<br>機材メモは公開/非公開設定をすることで、ユーザーページへの表示/非表示を選択できます。</p>
+          <p style="margin:0;padding:10px 12px;background:rgba(232,85,45,.06);border-left:3px solid var(--ac);border-radius:0 6px 6px 0"><b style="color:var(--tx)">ユーザーページ</b><br>シェア・公開用のページです。<br>ユーザーページのURLをXなどのプロフィールに貼ったり、ツイートなどでシェアすることで、友人などもあなたのボードアーカイブや機材リストを閲覧できます。</p>
+        </div>
+      </div>
+    </div>
+
     <!-- Profile Card -->
     <div class="profile-card">
       <div class="profile-card-header" onclick="toggleProfileBody()">
@@ -288,7 +306,6 @@ textarea.edit-input{resize:vertical;min-height:70px}
         </div>
         <div class="profile-info" style="min-width:0;overflow:hidden">
           <div class="profile-name" id="profile-name">USER</div>
-          <div class="profile-email" id="profile-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
           <div style="position:relative;display:flex;align-items:center;gap:5px;padding:5px 11px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);white-space:nowrap;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
@@ -322,6 +339,11 @@ textarea.edit-input{resize:vertical;min-height:70px}
           <input class="edit-input" id="edit-instagram-url" type="url" placeholder="https://instagram.com/yourname">
         </div>
         <button class="save-btn" id="mp-save-btn" onclick="saveProfile()">プロフィールを保存</button>
+        <div style="margin-top:14px;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px">
+          <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);margin-bottom:4px">登録済みメールアドレス</div>
+          <div id="profile-email" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tm);word-break:break-all"></div>
+          <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);margin-top:5px">このメールアドレスは確認用です。ユーザーページには表示されません。</div>
+        </div>
       </div>
     </div>
 
