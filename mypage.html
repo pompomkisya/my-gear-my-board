@@ -290,7 +290,7 @@ div[style*="max-height:0"].open{max-height:600px!important}
       <div style="max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1)">
         <div style="padding:0 16px 16px;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tm);line-height:1.8">
           <p style="margin:0 0 12px;padding:10px 12px;background:rgba(232,85,45,.06);border-left:3px solid var(--ac);border-radius:0 6px 6px 0"><b style="color:var(--tx)">マイページ</b><br>プロフィールや機材メモ、保存したお気に入りペダルなどの編集・確認ができます。<br>機材メモは公開/非公開設定をすることで、ユーザーページへの表示/非表示を選択できます。</p>
-          <p style="margin:0;padding:10px 12px;background:rgba(232,85,45,.06);border-left:3px solid var(--ac);border-radius:0 6px 6px 0"><b style="color:var(--tx)">ユーザーページ</b><br>シェア・公開用のページです。<br>ユーザーページのURLをXなどのプロフィールに貼ったり、ツイートなどでシェアすることで、友人などもあなたのボードアーカイブや機材リストを閲覧できます。</p>
+          <p style="margin:0;padding:10px 12px;background:rgba(232,85,45,.06);border-left:3px solid var(--ac);border-radius:0 6px 6px 0"><b style="color:var(--tx)">ユーザーページ</b><br>シェア・公開用のページです。<br>ユーザーページのURLをXなどのプロフィールに貼ったり、ツイートなどでシェアすることで、あなたのボードアーカイブや機材リストを公開できます。</p>
         </div>
       </div>
     </div>
@@ -308,6 +308,8 @@ div[style*="max-height:0"].open{max-height:600px!important}
           <div class="profile-name" id="profile-name">USER</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <button id="mp-userpage-btn" onclick="openUserPage()" style="padding:5px 11px;background:transparent;border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">👤 ユーザーページ</button>
+          <button id="mp-share-btn" onclick="shareUserPage()" style="padding:5px 11px;background:transparent;border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">🔗 シェア</button>
           <div style="position:relative;display:flex;align-items:center;gap:5px;padding:5px 11px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);white-space:nowrap;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
             <span id="profile-edit-hint">編集</span>
             <span class="profile-chevron" id="profile-chevron" style="font-size:9px;margin-left:1px">▼</span>
@@ -946,6 +948,20 @@ async function toggleGearPublic(isPublic){
   if(!currentUser)return;
   await sb.from('users').update({gear_list_public:isPublic}).eq('id',currentUser.id);
   await loadGearList();
+}
+function openUserPage(){
+  if(!currentUser)return;
+  const username=document.getElementById('edit-username')?.value.trim()||document.getElementById('profile-name')?.textContent||'';
+  if(!username){showToast('ユーザー名を設定してください');return;}
+  window.open('/user?username='+encodeURIComponent(username),'_blank');
+}
+function shareUserPage(){
+  if(!currentUser)return;
+  const username=document.getElementById('edit-username')?.value.trim()||document.getElementById('profile-name')?.textContent||'';
+  if(!username){showToast('ユーザー名を設定してください');return;}
+  const url=location.origin+'/user?username='+encodeURIComponent(username);
+  if(navigator.share){navigator.share({title:'My Gear My Board',url}).catch(()=>{});}
+  else{navigator.clipboard.writeText(url).then(()=>showToast('🔗 URLをコピーしました')).catch(()=>prompt('URLをコピーしてください:',url));}
 }
 function copyGearShareUrl(url){
   navigator.clipboard.writeText(url).then(()=>showToast(tr('gearCopied'))).catch(()=>prompt('URLをコピーしてください:',url));
