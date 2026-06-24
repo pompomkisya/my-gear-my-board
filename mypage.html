@@ -47,7 +47,9 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .mypage-wrap{display:none}
 .mypage-wrap.show{display:block}
 .profile-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;margin-bottom:16px;overflow:hidden}
-.profile-card-header{display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;transition:background .15s;user-select:none}
+.profile-card-header{display:flex;flex-direction:column;gap:10px;padding:18px 20px;cursor:pointer;transition:background .15s;user-select:none}
+.profile-card-header-row1{display:flex;align-items:center;gap:12px;width:100%}
+.profile-card-header-row2{display:flex;align-items:center;gap:6px;padding-left:2px;flex-wrap:wrap}
 .profile-card-header:hover{background:rgba(255,255,255,.03)}
 .profile-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0;position:relative;border:2px solid var(--bd);overflow:hidden}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
@@ -279,6 +281,7 @@ div[style*="max-height:0"].open{max-height:600px!important}
 
   <!-- ── MyPage ── -->
   <div class="mypage-wrap" id="mypage-wrap">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:12px;padding-left:2px">MY PAGE</div>
 
     <!-- 説明パネル -->
     <div style="background:var(--sf);border:1px solid var(--bd);border-radius:12px;margin-bottom:14px;overflow:hidden">
@@ -297,25 +300,30 @@ div[style*="max-height:0"].open{max-height:600px!important}
 
     <!-- Profile Card -->
     <div class="profile-card">
-      <div class="profile-card-header" onclick="toggleProfileBody()">
-        <div class="profile-avatar" id="profile-avatar" onclick="openAvatarMenu(event)">
-          <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center">
-            <span id="avatar-initial">U</span>
-            <div id="av-edit-lbl" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:'Noto Sans JP',sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">変更</div>
+      <div class="profile-card-header">
+        <!-- 1行目: アバター・名前・編集・ログアウト -->
+        <div class="profile-card-header-row1" onclick="toggleProfileBody()">
+          <div class="profile-avatar" id="profile-avatar" onclick="openAvatarMenu(event)">
+            <div style="position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center">
+              <span id="avatar-initial">U</span>
+              <div id="av-edit-lbl" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:'Noto Sans JP',sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">変更</div>
+            </div>
           </div>
-        </div>
-        <div class="profile-info" style="min-width:0;overflow:hidden">
-          <div class="profile-name" id="profile-name">USER</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-          <button id="mp-userpage-btn" onclick="openUserPage()" style="padding:5px 11px;background:transparent;border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">👤 ユーザーページ</button>
-          <button id="mp-share-btn" onclick="shareUserPage()" style="padding:5px 11px;background:transparent;border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">🔗 シェア</button>
-          <div style="position:relative;display:flex;align-items:center;gap:5px;padding:5px 11px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);white-space:nowrap;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">
-            <span id="profile-edit-hint">編集</span>
+          <div class="profile-info" style="min-width:0;overflow:hidden;flex:1">
+            <div class="profile-name" id="profile-name">USER</div>
+          </div>
+          <div style="position:relative;display:flex;align-items:center;gap:5px;padding:5px 11px;background:var(--sf2);border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:var(--tm);white-space:nowrap;cursor:pointer;transition:all .15s;flex-shrink:0">
+            <span id="profile-edit-hint">✏️ 編集</span>
             <span class="profile-chevron" id="profile-chevron" style="font-size:9px;margin-left:1px">▼</span>
             <span class="notif-dot" id="notif-header-dot" style="position:absolute;top:-3px;right:-3px;display:none"></span>
           </div>
-          <button onclick="event.stopPropagation();doLogout()" id="mp-logout-header-btn" style="padding:5px 11px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.background='rgba(224,80,80,.1)'" onmouseout="this.style.background='transparent'">ログアウト</button>
+          <button onclick="event.stopPropagation();doLogout()" id="mp-logout-header-btn" style="padding:5px 11px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0" onmouseover="this.style.background='rgba(224,80,80,.1)'" onmouseout="this.style.background='transparent'">ログアウト</button>
+        </div>
+        <!-- 2行目: ユーザーページ・シェア -->
+        <div class="profile-card-header-row2">
+          <button id="mp-userpage-btn" onclick="openUserPage()" style="padding:5px 12px;background:transparent;border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">👤 ユーザーページを確認</button>
+          <button id="mp-share-btn" onclick="shareUserPage()" style="padding:5px 12px;background:transparent;border:1px solid var(--bd);border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;white-space:nowrap" onmouseover="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='var(--tx)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--tm)'">🔗 ユーザーページをシェア</button>
+        </div>
         </div>
       </div>
       <div class="profile-body" id="profile-body">
