@@ -177,6 +177,11 @@ div[style*="max-height:0"].open{max-height:600px!important}
 .gear-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .gear-modal.open{display:flex}
 .gear-modal-box{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:24px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.gear-img-preview{width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;cursor:pointer;border:1px solid var(--bd)}
+.gear-img-placeholder{width:60px;height:60px;border-radius:8px;background:var(--sf2);border:1px dashed var(--bd);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;flex-shrink:0}
+.cover-upload-area{width:100%;height:100px;background:var(--sf2);border:1px dashed var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--td);transition:all .15s;position:relative;overflow:hidden;margin-bottom:8px}
+.cover-upload-area:hover{border-color:var(--ac);color:var(--tm)}
+.cover-upload-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px}
 .gear-modal-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--ac);margin-bottom:20px}
 .gear-modal-row{margin-bottom:12px}
 .gear-modal-lbl{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:#b0ada6;margin-bottom:5px;display:block}
@@ -348,6 +353,15 @@ div[style*="max-height:0"].open{max-height:600px!important}
           <label class="edit-lbl" id="mp-lbl-ig">Instagram URL</label>
           <input class="edit-input" id="edit-instagram-url" type="url" placeholder="https://instagram.com/yourname">
         </div>
+        <div class="edit-form-row">
+          <label class="edit-lbl">ユーザーページの背景画像</label>
+          <div class="cover-upload-area" id="cover-upload-area" onclick="document.getElementById('cover-file-input').click()">
+            <img id="cover-preview-img" src="" alt="" style="display:none">
+            <span id="cover-upload-hint">📷 タップして画像を選択</span>
+          </div>
+          <input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="onCoverFileSelected(event)">
+          <div id="cover-upload-status" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-top:4px"></div>
+        </div>
         <button class="save-btn" id="mp-save-btn" onclick="saveProfile()">プロフィールを保存</button>
         <div style="margin-top:14px;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px">
           <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);margin-bottom:4px">登録済みメールアドレス</div>
@@ -434,6 +448,17 @@ div[style*="max-height:0"].open{max-height:600px!important}
     <div class="gear-modal-row">
       <label class="gear-modal-lbl" id="gear-lbl-memo">メモ</label>
       <input class="gear-modal-input" id="gear-input-memo" type="text" maxlength="200">
+    </div>
+    <div class="gear-modal-row">
+      <label class="gear-modal-lbl">写真（任意）</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="gear-img-thumb" class="gear-img-placeholder" onclick="document.getElementById('gear-file-input').click()">📷</div>
+        <div style="flex:1">
+          <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);line-height:1.6">タップで画像を選択</div>
+          <div id="gear-img-status" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-top:4px"></div>
+        </div>
+      </div>
+      <input type="file" id="gear-file-input" accept="image/*" style="display:none" onchange="onGearFileSelected(event)">
     </div>
     <div class="gear-modal-actions">
       <button class="gear-add-btn" id="gear-modal-save-btn" onclick="saveGearItem()">保存</button>
@@ -656,11 +681,25 @@ async function saveProfile(){
   const username=document.getElementById('edit-username').value.trim();if(!username){showToast(tr('toastUsernameReq'));return;}
   const bio=document.getElementById('edit-bio').value.trim();const amp=document.getElementById('edit-amp').value.trim();
   const x_url=document.getElementById('edit-x-url').value.trim();const instagram_url=document.getElementById('edit-instagram-url').value.trim();
-  const{error}=await sb.from('users').upsert({id:currentUser.id,email:currentUser.email,username,bio,amp,x_url,instagram_url,password_hash:''},{onConflict:'id'});
-  if(error){showToast(tr('toastSaveFail'));return;}
+  const btn=document.getElementById('mp-save-btn');btn.disabled=true;btn.textContent='保存中...';
+  let cover_image_url=undefined;
+  if(_pendingCoverFile){
+    try{
+      const statusEl=document.getElementById('cover-upload-status');
+      if(statusEl)statusEl.textContent='アップロード中...';
+      cover_image_url=await uploadCoverImage(_pendingCoverFile);
+      _pendingCoverFile=null;
+      if(statusEl)statusEl.textContent='✅ アップロード完了';
+    }catch(e){showToast('❌ 背景画像のアップロードに失敗しました');btn.disabled=false;btn.textContent='プロフィールを保存';return;}
+  }
+  const updateData={id:currentUser.id,email:currentUser.email,username,bio,amp,x_url,instagram_url,password_hash:''};
+  if(cover_image_url!==undefined)updateData.cover_image_url=cover_image_url;
+  const{error}=await sb.from('users').upsert(updateData,{onConflict:'id'});
+  if(error){showToast(tr('toastSaveFail'));btn.disabled=false;btn.textContent='プロフィールを保存';return;}
   await sb.auth.updateUser({data:{username}});
   document.getElementById('profile-name').textContent=username;
   document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
+  btn.disabled=false;btn.textContent='プロフィールを保存';
   showToast(tr('toastSaveDone'));
   const body=document.getElementById('profile-body');const chevron=document.getElementById('profile-chevron');
   body.classList.remove('open');chevron.classList.remove('open');
@@ -880,15 +919,20 @@ function renderGearList(gear,isPublic,username,pedalSlugMap={}){
             <button class="gear-del-btn" onclick="deleteGearItem('${g.id}')">✕</button>
           </div>
         </div>
-        <div class="gear-item-row3">
-          <div class="gear-item-model">${escHtml(dispModel)}</div>
-          ${pedalBtn}
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          ${g.image_url?`<img src="${g.image_url}" onclick="openGearImgLightbox('${g.image_url}')" style="width:52px;height:52px;border-radius:8px;object-fit:cover;flex-shrink:0;cursor:zoom-in;border:1px solid var(--bd)" loading="lazy">`:''}
+          <div style="flex:1;min-width:0">
+            <div class="gear-item-row3">
+              <div class="gear-item-model">${escHtml(dispModel)}</div>
+              ${pedalBtn}
+            </div>
+            <div class="gear-item-meta" style="margin-bottom:${g.memo?'4px':'0'}">
+              ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
+              ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
+            </div>
+            ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
+          </div>
         </div>
-        <div class="gear-item-meta" style="margin-bottom:${g.memo?'4px':'0'}">
-          ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
-          ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
-        </div>
-        ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
       </div>`;
     }).join('');
   }
@@ -957,6 +1001,63 @@ async function toggleGearPublic(isPublic){
   await sb.from('users').update({gear_list_public:isPublic}).eq('id',currentUser.id);
   await loadGearList();
 }
+// ★ 機材画像ライトボックス
+function openGearImgLightbox(url){
+  let lb=document.getElementById('gear-img-lightbox');
+  if(!lb){
+    lb=document.createElement('div');lb.id='gear-img-lightbox';
+    lb.style.cssText='position:fixed;inset:0;background:rgba(8,8,9,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:24px;cursor:zoom-out';
+    lb.innerHTML='<div style="position:fixed;top:18px;right:18px;width:40px;height:40px;border-radius:50%;background:rgba(20,20,22,.9);border:1px solid var(--bd);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1001" onclick="this.parentElement.remove()">✕</div><img style="max-width:100%;max-height:90vh;object-fit:contain;border-radius:10px">';
+    document.body.appendChild(lb);
+    lb.addEventListener('click',e=>{if(e.target===lb)lb.remove();});
+  }
+  lb.querySelector('img').src=url;lb.style.display='flex';
+  document.addEventListener('keydown',function esc(e){if(e.key==='Escape'){lb.remove();document.removeEventListener('keydown',esc);}});
+}
+// ★ カバー画像アップロード
+let _pendingCoverFile=null;
+function onCoverFileSelected(e){
+  const file=e.target.files[0];if(!file)return;
+  _pendingCoverFile=file;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=document.getElementById('cover-preview-img');
+    const hint=document.getElementById('cover-upload-hint');
+    img.src=ev.target.result;img.style.display='block';
+    if(hint)hint.style.display='none';
+    document.getElementById('cover-upload-status').textContent='保存ボタンを押すとアップロードされます';
+  };
+  reader.readAsDataURL(file);
+}
+async function uploadCoverImage(file){
+  const ext=file.name.split('.').pop().toLowerCase();
+  const path=`covers/${currentUser.id}/cover.${ext}`;
+  const{error}=await sb.storage.from('user-content').upload(path,file,{upsert:true,contentType:file.type});
+  if(error)throw error;
+  const{data}=sb.storage.from('user-content').getPublicUrl(path);
+  return data.publicUrl+'?t='+Date.now();
+}
+// ★ 機材画像アップロード
+let _pendingGearFile=null;let _gearImgUrl=null;
+function onGearFileSelected(e){
+  const file=e.target.files[0];if(!file)return;
+  _pendingGearFile=file;
+  const thumb=document.getElementById('gear-img-thumb');
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    thumb.innerHTML=`<img src="${ev.target.result}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">`;
+    document.getElementById('gear-img-status').textContent='保存時にアップロードされます';
+  };
+  reader.readAsDataURL(file);
+}
+async function uploadGearImage(file,gearId){
+  const ext=file.name.split('.').pop().toLowerCase();
+  const path=`gear/${currentUser.id}/${gearId}.${ext}`;
+  const{error}=await sb.storage.from('user-content').upload(path,file,{upsert:true,contentType:file.type});
+  if(error)throw error;
+  const{data}=sb.storage.from('user-content').getPublicUrl(path);
+  return data.publicUrl+'?t='+Date.now();
+}
 function openUserPage(){
   if(!currentUser)return;
   const username=document.getElementById('edit-username')?.value.trim()||document.getElementById('profile-name')?.textContent||'';
@@ -989,6 +1090,16 @@ function openGearModal(gearId){
   document.getElementById('gear-input-currency').value=gear?.currency||'JPY';
   document.getElementById('gear-input-date').value=gear?.purchased_at?gear.purchased_at.split('T')[0]:'';
   document.getElementById('gear-input-memo').value=gear?.memo||'';
+  // 画像の初期化・復元
+  _pendingGearFile=null;_gearImgUrl=gear?.image_url||null;
+  const thumb=document.getElementById('gear-img-thumb');
+  if(gear?.image_url){
+    thumb.innerHTML=`<img src="${gear.image_url}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">`;
+  }else{
+    thumb.innerHTML='📷';thumb.className='gear-img-placeholder';
+  }
+  document.getElementById('gear-img-status').textContent='';
+  document.getElementById('gear-file-input').value='';
   document.getElementById('gear-modal-save-btn').textContent=tr('gearSaveBtn');
   closeGearAC();
   const cancelBtn=document.getElementById('gear-modal-cancel-btn');if(cancelBtn)cancelBtn.textContent=tr('gearCancelBtn');
@@ -1011,13 +1122,24 @@ async function saveGearItem(){
   const purchased_at=document.getElementById('gear-input-date').value||null;
   const memo=document.getElementById('gear-input-memo').value.trim()||null;
   const btn=document.getElementById('gear-modal-save-btn');btn.disabled=true;
+  let savedId=editingGearId;
   if(editingGearId){
     const{error}=await sb.from('user_gear').update({name,brand,price,currency,purchased_at,memo}).eq('id',editingGearId).eq('user_id',currentUser.id);
     if(error){showToast('❌ '+error.message);btn.disabled=false;return;}
   }else{
     const maxOrder=gearList.length?Math.max(...gearList.map(g=>g.sort_order||0))+1:0;
-    const{error}=await sb.from('user_gear').insert({user_id:currentUser.id,name,brand,price,currency,purchased_at,memo,sort_order:maxOrder});
+    const{data,error}=await sb.from('user_gear').insert({user_id:currentUser.id,name,brand,price,currency,purchased_at,memo,sort_order:maxOrder}).select('id').single();
     if(error){showToast('❌ '+error.message);btn.disabled=false;return;}
+    savedId=data.id;
+  }
+  // 画像アップロード
+  if(_pendingGearFile&&savedId){
+    try{
+      document.getElementById('gear-img-status').textContent='アップロード中...';
+      const imgUrl=await uploadGearImage(_pendingGearFile,savedId);
+      await sb.from('user_gear').update({image_url:imgUrl}).eq('id',savedId).eq('user_id',currentUser.id);
+      _pendingGearFile=null;
+    }catch(e){showToast('⚠️ 画像のアップロードに失敗しましたが、機材情報は保存されました');}
   }
   btn.disabled=false;closeGearModal();showToast(tr('gearSaved'));await loadGearList();
   // カウント更新
