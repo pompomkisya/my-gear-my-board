@@ -306,7 +306,7 @@ async function loadBrand() {
   const typeFilter=currentTypeFilter!=='__all__'?currentTypeFilter:null;
   const [countRes, pedalsRes, postsRes, brandRes] = await Promise.all([
     typeFilter
-      ? db.from('pedals').select('*', { count: 'exact', head: true }).eq('brand', currentBrand).contains('types',[typeFilter])
+      ? db.from('pedals').select('*', { count: 'exact', head: true }).eq('brand', currentBrand).overlaps('types',getTypeSynonyms(typeFilter))
       : db.from('pedals').select('*', { count: 'exact', head: true }).eq('brand', currentBrand),
     db.from('pedals').select('id, brand, model, full_name, slug, types, image_url')
       .eq('brand', currentBrand).order('model', { ascending: true }).range(0, PEDAL_LIMIT - 1),
@@ -458,9 +458,20 @@ function initDescAccordion() {
   };
 }
 
+// 同じ表示ラベルになるDBキーのグループ（短縮形と正式名が混在する対策）
+const TYPE_SYNONYMS={
+  'overdrive':['overdrive','od'],'od':['overdrive','od'],
+  'distortion':['distortion','dist'],'dist':['distortion','dist'],
+  'modulation':['modulation','mod'],'mod':['modulation','mod'],
+  'compressor':['compressor','comp'],'comp':['compressor','comp'],
+  'preamp':['preamp','pre'],'pre':['preamp','pre'],
+};
+function getTypeSynonyms(t){return TYPE_SYNONYMS[t]||[t];}
+
 let currentTypeFilter='__all__';
 async function filterByType(btnEl, typeVal){
   currentTypeFilter=(typeVal||'__all__').toLowerCase();
+  const synonyms=getTypeSynonyms(currentTypeFilter);
   document.querySelectorAll('.type-filter-btn').forEach(b=>b.classList.remove('on'));
   btnEl.classList.add('on');
   const grid=document.getElementById('pedal-grid');
@@ -469,16 +480,16 @@ async function filterByType(btnEl, typeVal){
   allCards.forEach(card=>{
     if(currentTypeFilter==='__all__'){card.style.display='block';return;}
     const types=(card.dataset.types||'').split(',').filter(Boolean);
-    card.style.display=types.includes(currentTypeFilter)?'block':'none';
+    card.style.display=types.some(t=>synonyms.includes(t))?'block':'none';
   });
-  // タイプ別の総件数をDBから取得してloadMoreボタンを更新
+  // タイプ別の総件数をDBから取得してloadMoreボタンを更新（overlapsで同義キーをOR検索）
   let countQuery=db.from('pedals').select('*',{count:'exact',head:true}).eq('brand',currentBrand);
-  if(currentTypeFilter!=='__all__')countQuery=countQuery.contains('types',[currentTypeFilter]);
+  if(currentTypeFilter!=='__all__')countQuery=countQuery.overlaps('types',synonyms);
   const{count}=await countQuery;
   totalPedals=count||0;
   pedalOffset=cachedPedals.filter(p=>{
     if(currentTypeFilter==='__all__')return true;
-    return(p.types||[]).map(t=>(t||'').toLowerCase()).includes(currentTypeFilter);
+    return(p.types||[]).map(t=>(t||'').toLowerCase()).some(t=>synonyms.includes(t));
   }).length;
   const btn=document.getElementById('load-more-btn');
   if(btn){
@@ -493,7 +504,7 @@ async function loadMorePedals() {
     .select('id, brand, model, full_name, slug, types, image_url')
     .eq('brand', currentBrand).order('model', { ascending: true })
     .range(pedalOffset, pedalOffset + PEDAL_LIMIT - 1);
-  if(currentTypeFilter!=='__all__') query=query.contains('types',[currentTypeFilter]);
+  if(currentTypeFilter!=='__all__') query=query.overlaps('types',getTypeSynonyms(currentTypeFilter));
   const { data: pedals } = await query;
   pedalOffset += PEDAL_LIMIT;
   cachedPedals = [...cachedPedals, ...(pedals || [])];
@@ -526,8 +537,9 @@ async function loadMorePedals() {
         </div>`;
       // 現在のタイプフィルターを適用
       if(currentTypeFilter!=='__all__'){
+        const synonyms=getTypeSynonyms(currentTypeFilter);
         const cardTypes=(p.types||[]).map(t=>(t||'').toLowerCase());
-        card.style.display=cardTypes.includes(currentTypeFilter)?'block':'none';
+        card.style.display=cardTypes.some(t=>synonyms.includes(t))?'block':'none';
       }
       grid.appendChild(card);
     });
