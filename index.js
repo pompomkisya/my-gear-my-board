@@ -520,6 +520,7 @@ async function loadAllPostsBackground(){
   buildTicker(allDBPosts);
   renderRankingWidget(allDBPosts);renderGearWidget(allDBPosts);
   renderRankingWidgetMob(allDBPosts);renderGearWidgetMob(allDBPosts);
+  updateLoadMoreBtn(false); // 全件ロード完了したのでボタンを非表示
   loadPedalDataBackground(posts,cm);
 }
 
@@ -1355,7 +1356,11 @@ function initSwipe(){
   },{passive:true});
   // ★ マウスドラッグ対応（PCでウィンドウを縮めてこのレイアウトになった場合用。タッチ用の変数・ロジックとは完全に独立しており、スマホの操作には影響しない）
   let mouseDown=false,mouseStartX=0;
-  c.addEventListener('mousedown',e=>{mouseDown=true;mouseStartX=e.clientX;c.style.transition='none';e.preventDefault();});
+  c.addEventListener('mousedown',e=>{
+    // select/option要素をタップした場合はpreventDefaultしない（iOSのネイティブ選択UIが開かなくなるため）
+    if(e.target.tagName==='SELECT'||e.target.tagName==='OPTION'||e.target.closest('select'))return;
+    mouseDown=true;mouseStartX=e.clientX;c.style.transition='none';e.preventDefault();
+  });
   window.addEventListener('mousemove',e=>{
     if(!mouseDown)return;
     const dx=e.clientX-mouseStartX;
