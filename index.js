@@ -464,9 +464,13 @@ async function loadPostsFromDB(){
 
 async function loadMorePosts(){
   const btn=document.getElementById('load-more-btn');if(btn){btn.disabled=true;btn.textContent=lang==='en'?'Loading...':'読み込み中...';}
+  // range(from,to)は両端込みなので_postsPerPage件取るにはto=from+_postsPerPage-1
+  // +1件余分に取ってhasMoreを判定する
   const{data:batch}=await sb.from('posts').select('*,users(avatar_url)').order('created_at',{ascending:false}).range(_postsOffset,_postsOffset+_postsPerPage);
   if(!batch||!batch.length){updateLoadMoreBtn(false);return;}
-  const newPosts=batch.map(p=>({
+  const hasMore=batch.length>_postsPerPage;
+  const actualBatch=batch.slice(0,_postsPerPage);
+  const newPosts=actualBatch.map(p=>({
     ...p,
     comment_count:0,
     gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
@@ -477,8 +481,7 @@ async function loadMorePosts(){
   allDBPosts=[...allDBPosts,...newPosts];
   _postsOffset=allDBPosts.length;
   applyFilter();
-  const hasMore=batch.length>=_postsPerPage&&allDBPosts.length<_postsMax;
-  updateLoadMoreBtn(hasMore,allDBPosts.length>=_postsMax);
+  updateLoadMoreBtn(hasMore&&allDBPosts.length<_postsMax,allDBPosts.length>=_postsMax);
 }
 
 function updateLoadMoreBtn(hasMore,isMax=false){
@@ -701,7 +704,7 @@ function renderRankingWidget(posts){
   const el=document.getElementById('ranking-widget');if(!el)return;
   const bp=posts.filter(p=>!p.post_type||p.post_type==='board');
   const monthAgo=Date.now()-30*24*60*60*1000;const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);
-  const target=monthly.length>=3?monthly:bp;
+  const target=monthly;
   const sorted=[...target].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noPost')+'</div>';return;}
   const anon=lang==='en'?'Anonymous':'匿名';
@@ -1378,7 +1381,7 @@ function filterFxMob(el,fx){document.querySelectorAll('#swipe-ui .tag').forEach(
 function renderRankingWidgetMob(posts){
   const el=document.getElementById('ranking-widget-mob');if(!el)return;
   const bp=posts.filter(p=>!p.post_type||p.post_type==='board');const monthAgo=Date.now()-30*24*60*60*1000;
-  const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);const target=monthly.length>=3?monthly:bp;
+  const monthly=bp.filter(p=>new Date(p.created_at).getTime()>monthAgo);const target=monthly;
   const sorted=[...target].sort((a,b)=>(b.likes||0)-(a.likes||0)).slice(0,5);
   if(!sorted.length){el.innerHTML='<div style="font-size:10px;color:var(--td);font-family:Noto Sans JP,sans-serif">'+tr('noPost')+'</div>';return;}
   const anon=lang==='en'?'Anonymous':'匿名';
