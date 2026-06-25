@@ -628,6 +628,15 @@ async function loadProfile(){
     const inner=av.querySelector('div');
     if(inner)inner.innerHTML=`<img src="${data.avatar_url}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:50%"><div id="av-edit-lbl" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.65);font-family:'Noto Sans JP',sans-serif;font-size:8px;text-align:center;padding:3px;color:#fff">${lang==='en'?'Edit':'変更'}</div>`;
   }
+  // 登録済みカバー画像をプレビューに表示
+  if(data?.cover_image_url){
+    const previewImg=document.getElementById('cover-preview-img');
+    const hint=document.getElementById('cover-upload-hint');
+    const delBtn=document.getElementById('cover-delete-btn');
+    if(previewImg){previewImg.src=data.cover_image_url;previewImg.style.display='block';}
+    if(hint)hint.style.display='none';
+    if(delBtn)delBtn.style.display='block';
+  }
 }
 
 function openAvatarMenu(e){
@@ -708,10 +717,10 @@ async function saveProfile(){
   try{await sb.auth.updateUser({data:{username}});}catch(e){console.warn('auth update warn',e);}
   document.getElementById('profile-name').textContent=username;
   document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
+  btn.disabled=false;btn.textContent='プロフィールを保存';
   showToast(tr('toastSaveDone'));
   const body=document.getElementById('profile-body');const chevron=document.getElementById('profile-chevron');
   body.classList.remove('open');chevron.classList.remove('open');
-  btn.disabled=false;btn.textContent='プロフィールを保存';
 }
 
 // ── Tab counts ──
