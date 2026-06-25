@@ -38,14 +38,14 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .profile-hero{background:var(--sf);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:16px}
 .profile-hero-cover{display:none}
 .profile-hero-body{padding:24px;position:relative}
-.profile-cover-overlay{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.15;border-radius:16px;pointer-events:none}
+.profile-cover-overlay{position:absolute;top:0;left:0;right:0;height:110px;background-size:cover;background-position:center top;opacity:.22;border-radius:16px 16px 0 0;pointer-events:none;mask-image:linear-gradient(to bottom,rgba(0,0,0,.9) 0%,rgba(0,0,0,.4) 70%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.9) 0%,rgba(0,0,0,.4) 70%,transparent 100%)}
 .profile-hero-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
 .profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;border:2px solid var(--bd);overflow:hidden;position:relative;z-index:1}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .profile-info{flex:1;min-width:0}
 .profile-username{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:4px}
-.profile-bio{font-size:13px;color:var(--tm);margin-bottom:8px;line-height:1.6}
-.profile-amp{font-size:12px;color:var(--td);margin-bottom:8px}
+.profile-bio{font-size:13px;color:var(--tx);margin-bottom:8px;line-height:1.6}
+.profile-amp{font-size:12px;color:var(--tm);margin-bottom:8px}
 .profile-links{display:flex;gap:8px;flex-wrap:wrap}
 .profile-link{display:flex;align-items:center;gap:5px;padding:5px 10px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;font-size:11px;font-weight:600;color:var(--tm);text-decoration:none;transition:all .15s}
 .profile-link:hover{border-color:var(--ac);color:var(--ac)}
