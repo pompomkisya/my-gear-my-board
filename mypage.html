@@ -359,8 +359,11 @@ div[style*="max-height:0"].open{max-height:600px!important}
             <img id="cover-preview-img" src="" alt="" style="display:none">
             <span id="cover-upload-hint">📷 タップして画像を選択</span>
           </div>
-          <input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="onCoverFileSelected(event)">
-          <div id="cover-upload-status" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-top:4px"></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="file" id="cover-file-input" accept="image/*" style="display:none" onchange="onCoverFileSelected(event)">
+            <div id="cover-upload-status" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);flex:1"></div>
+            <button id="cover-delete-btn" onclick="deleteCoverImage()" style="display:none;padding:4px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-size:11px;color:#e05050;cursor:pointer">🗑 削除</button>
+          </div>
         </div>
         <button class="save-btn" id="mp-save-btn" onclick="saveProfile()">プロフィールを保存</button>
         <div style="margin-top:14px;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px">
@@ -456,6 +459,7 @@ div[style*="max-height:0"].open{max-height:600px!important}
         <div style="flex:1">
           <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);line-height:1.6">タップで画像を選択</div>
           <div id="gear-img-status" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-top:4px"></div>
+          <button id="gear-img-delete-btn" onclick="clearGearImage()" style="display:none;margin-top:6px;padding:3px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-size:11px;color:#e05050;cursor:pointer">🗑 画像を削除</button>
         </div>
       </div>
       <input type="file" id="gear-file-input" accept="image/*" style="display:none" onchange="onGearFileSelected(event)">
@@ -704,10 +708,10 @@ async function saveProfile(){
   await sb.auth.updateUser({data:{username}});
   document.getElementById('profile-name').textContent=username;
   document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
-  btn.disabled=false;btn.textContent='プロフィールを保存';
   showToast(tr('toastSaveDone'));
   const body=document.getElementById('profile-body');const chevron=document.getElementById('profile-chevron');
   body.classList.remove('open');chevron.classList.remove('open');
+  btn.disabled=false;btn.textContent='プロフィールを保存';
 }
 
 // ── Tab counts ──
@@ -1031,8 +1035,33 @@ function onCoverFileSelected(e){
     img.src=ev.target.result;img.style.display='block';
     if(hint)hint.style.display='none';
     document.getElementById('cover-upload-status').textContent='保存ボタンを押すとアップロードされます';
+    const delBtn=document.getElementById('cover-delete-btn');if(delBtn)delBtn.style.display='block';
   };
   reader.readAsDataURL(file);
+}
+async function deleteCoverImage(){
+  if(!confirm('背景画像を削除しますか？'))return;
+  // DBのcover_image_urlをクリア
+  const{error}=await sb.from('users').update({cover_image_url:null}).eq('id',currentUser.id);
+  if(error){showToast('❌ 削除に失敗しました');return;}
+  // Storageから削除（パス特定のため既存URLを使う）
+  const{data:userData}=await sb.from('users').select('cover_image_url').eq('id',currentUser.id).single();
+  // UIリセット
+  _pendingCoverFile=null;
+  const img=document.getElementById('cover-preview-img');img.src='';img.style.display='none';
+  const hint=document.getElementById('cover-upload-hint');if(hint)hint.style.display='';
+  document.getElementById('cover-upload-status').textContent='';
+  document.getElementById('cover-file-input').value='';
+  const delBtn=document.getElementById('cover-delete-btn');if(delBtn)delBtn.style.display='none';
+  showToast('🗑 背景画像を削除しました');
+}
+function clearGearImage(){
+  // モーダル内のUI上から削除フラグを立てる（保存時にnullで更新）
+  _pendingGearFile=null;_gearImgUrl='__delete__';
+  const thumb=document.getElementById('gear-img-thumb');
+  thumb.innerHTML='📷';thumb.className='gear-img-placeholder';
+  document.getElementById('gear-img-status').textContent='保存時に削除されます';
+  const delBtn=document.getElementById('gear-img-delete-btn');if(delBtn)delBtn.style.display='none';
 }
 async function uploadCoverImage(file){
   const ext=file.name.split('.').pop().toLowerCase();
@@ -1098,10 +1127,13 @@ function openGearModal(gearId){
   // 画像の初期化・復元
   _pendingGearFile=null;_gearImgUrl=gear?.image_url||null;
   const thumb=document.getElementById('gear-img-thumb');
+  const delBtn=document.getElementById('gear-img-delete-btn');
   if(gear?.image_url){
     thumb.innerHTML=`<img src="${gear.image_url}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">`;
+    if(delBtn)delBtn.style.display='block';
   }else{
     thumb.innerHTML='📷';thumb.className='gear-img-placeholder';
+    if(delBtn)delBtn.style.display='none';
   }
   document.getElementById('gear-img-status').textContent='';
   document.getElementById('gear-file-input').value='';
@@ -1137,8 +1169,11 @@ async function saveGearItem(){
     if(error){showToast('❌ '+error.message);btn.disabled=false;return;}
     savedId=data.id;
   }
-  // 画像アップロード
-  if(_pendingGearFile&&savedId){
+  // 画像アップロード or 削除
+  if(_gearImgUrl==='__delete__'&&savedId){
+    await sb.from('user_gear').update({image_url:null}).eq('id',savedId).eq('user_id',currentUser.id);
+    _gearImgUrl=null;
+  }else if(_pendingGearFile&&savedId){
     try{
       document.getElementById('gear-img-status').textContent='アップロード中...';
       const imgUrl=await uploadGearImage(_pendingGearFile,savedId);
