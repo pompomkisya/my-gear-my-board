@@ -455,20 +455,18 @@ function initDescAccordion() {
   };
 }
 
+let currentTypeFilter='__all__';
 function filterByType(btnEl, typeVal){
-  // ボタンのon状態切り替え
+  currentTypeFilter=(typeVal||'__all__').toLowerCase();
   document.querySelectorAll('.type-filter-btn').forEach(b=>b.classList.remove('on'));
   btnEl.classList.add('on');
-  // ペダルグリッドをフィルタリング（カードに埋め込んだ生のタイプキーで直接比較。表示ラベルの整形やバッジの表示件数制限には左右されない）
   const grid=document.getElementById('pedal-grid');
   if(!grid)return;
   const allCards=grid.querySelectorAll('a.pedal-card');
-  const typeKey=(typeVal||'').toLowerCase();
   allCards.forEach(card=>{
-    if(typeVal==='__all__'){card.style.display='block';return;}
+    if(currentTypeFilter==='__all__'){card.style.display='block';return;}
     const types=(card.dataset.types||'').split(',').filter(Boolean);
-    const match=types.includes(typeKey);
-    card.style.display=match?'block':'none';
+    card.style.display=types.includes(currentTypeFilter)?'block':'none';
   });
 }
 
@@ -506,6 +504,11 @@ async function loadMorePedals() {
           <div class="pedal-card-name">${p.model}</div>
           <div class="pedal-card-types">${typesHtml}</div>
         </div>`;
+      // 現在のタイプフィルターを適用
+      if(currentTypeFilter!=='__all__'){
+        const cardTypes=(p.types||[]).map(t=>(t||'').toLowerCase());
+        card.style.display=cardTypes.includes(currentTypeFilter)?'block':'none';
+      }
       grid.appendChild(card);
     });
   }
