@@ -690,7 +690,12 @@ async function saveProfile(){
       cover_image_url=await uploadCoverImage(_pendingCoverFile);
       _pendingCoverFile=null;
       if(statusEl)statusEl.textContent='✅ アップロード完了';
-    }catch(e){showToast('❌ 背景画像のアップロードに失敗しました');btn.disabled=false;btn.textContent='プロフィールを保存';return;}
+    }catch(e){
+      const msg=e?.message||e?.error||JSON.stringify(e)||'不明なエラー';
+      showToast('❌ 背景画像エラー: '+msg);
+      console.error('cover upload error',e);
+      btn.disabled=false;btn.textContent='プロフィールを保存';return;
+    }
   }
   const updateData={id:currentUser.id,email:currentUser.email,username,bio,amp,x_url,instagram_url,password_hash:''};
   if(cover_image_url!==undefined)updateData.cover_image_url=cover_image_url;
@@ -1139,7 +1144,11 @@ async function saveGearItem(){
       const imgUrl=await uploadGearImage(_pendingGearFile,savedId);
       await sb.from('user_gear').update({image_url:imgUrl}).eq('id',savedId).eq('user_id',currentUser.id);
       _pendingGearFile=null;
-    }catch(e){showToast('⚠️ 画像のアップロードに失敗しましたが、機材情報は保存されました');}
+    }catch(e){
+      const msg=e?.message||e?.error||JSON.stringify(e)||'不明なエラー';
+      showToast('⚠️ 画像エラー: '+msg);
+      console.error('gear upload error',e);
+    }
   }
   btn.disabled=false;closeGearModal();showToast(tr('gearSaved'));await loadGearList();
   // カウント更新
