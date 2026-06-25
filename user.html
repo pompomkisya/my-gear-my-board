@@ -38,7 +38,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .profile-hero{background:var(--sf);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:16px}
 .profile-hero-cover{display:none}
 .profile-hero-body{padding:24px;position:relative}
-.profile-hero-body.has-cover::before{content:'';position:absolute;inset:0;background-image:var(--cover-bg);background-size:cover;background-position:center;opacity:.15;border-radius:16px;pointer-events:none}
+.profile-cover-overlay{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.15;border-radius:16px;pointer-events:none}
 .profile-hero-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
 .profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;flex-shrink:0;border:2px solid var(--bd);overflow:hidden;position:relative;z-index:1}
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
@@ -236,7 +236,8 @@ function renderUser(user,posts,gear,reviews,wishlist,pageUrl){
   const gearCount=gear.length;
   const html=`
     <div class="profile-hero">
-      <div class="profile-hero-body ${user.cover_image_url?'has-cover':''}" style="${user.cover_image_url?`--cover-bg:url(${user.cover_image_url})`:''}">
+      <div class="profile-hero-body">
+        ${user.cover_image_url?`<div class="profile-cover-overlay" style="background-image:url(${user.cover_image_url})"></div>`:''}
       <div class="profile-hero-top">
         <div class="profile-avatar">${avatarHtml}</div>
         <div class="profile-info">
