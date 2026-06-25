@@ -705,7 +705,7 @@ async function saveProfile(){
   if(cover_image_url!==undefined)updateData.cover_image_url=cover_image_url;
   const{error}=await sb.from('users').upsert(updateData,{onConflict:'id'});
   if(error){showToast(tr('toastSaveFail'));btn.disabled=false;btn.textContent='プロフィールを保存';return;}
-  await sb.auth.updateUser({data:{username}});
+  try{await sb.auth.updateUser({data:{username}});}catch(e){console.warn('auth update warn',e);}
   document.getElementById('profile-name').textContent=username;
   document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
   showToast(tr('toastSaveDone'));
