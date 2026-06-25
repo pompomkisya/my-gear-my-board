@@ -303,8 +303,11 @@ async function loadBrand() {
   if(brandCanEl) brandCanEl.setAttribute('href', brandUrl);
 
   // ★ brandsテーブルからブランド説明を取得（並列）
+  const typeFilter=currentTypeFilter!=='__all__'?currentTypeFilter:null;
   const [countRes, pedalsRes, postsRes, brandRes] = await Promise.all([
-    db.from('pedals').select('*', { count: 'exact', head: true }).eq('brand', currentBrand),
+    typeFilter
+      ? db.from('pedals').select('*', { count: 'exact', head: true }).eq('brand', currentBrand).contains('types',[typeFilter])
+      : db.from('pedals').select('*', { count: 'exact', head: true }).eq('brand', currentBrand),
     db.from('pedals').select('id, brand, model, full_name, slug, types, image_url')
       .eq('brand', currentBrand).order('model', { ascending: true }).range(0, PEDAL_LIMIT - 1),
     db.from('posts').select('id, title, username, image_urls, gear_list, created_at')
@@ -456,7 +459,7 @@ function initDescAccordion() {
 }
 
 let currentTypeFilter='__all__';
-function filterByType(btnEl, typeVal){
+async function filterByType(btnEl, typeVal){
   currentTypeFilter=(typeVal||'__all__').toLowerCase();
   document.querySelectorAll('.type-filter-btn').forEach(b=>b.classList.remove('on'));
   btnEl.classList.add('on');
@@ -468,13 +471,30 @@ function filterByType(btnEl, typeVal){
     const types=(card.dataset.types||'').split(',').filter(Boolean);
     card.style.display=types.includes(currentTypeFilter)?'block':'none';
   });
+  // タイプ別の総件数をDBから取得してloadMoreボタンを更新
+  let countQuery=db.from('pedals').select('*',{count:'exact',head:true}).eq('brand',currentBrand);
+  if(currentTypeFilter!=='__all__')countQuery=countQuery.contains('types',[currentTypeFilter]);
+  const{count}=await countQuery;
+  totalPedals=count||0;
+  pedalOffset=cachedPedals.filter(p=>{
+    if(currentTypeFilter==='__all__')return true;
+    return(p.types||[]).map(t=>(t||'').toLowerCase()).includes(currentTypeFilter);
+  }).length;
+  const btn=document.getElementById('load-more-btn');
+  if(btn){
+    const remaining=totalPedals-pedalOffset;
+    if(remaining<=0)btn.style.display='none';
+    else{btn.style.display='';btn.textContent=`${tr('loadMore')}（${tr('remaining')} ${remaining} 件）`;}
+  }
 }
 
 async function loadMorePedals() {
-  const { data: pedals } = await db.from('pedals')
+  let query = db.from('pedals')
     .select('id, brand, model, full_name, slug, types, image_url')
     .eq('brand', currentBrand).order('model', { ascending: true })
     .range(pedalOffset, pedalOffset + PEDAL_LIMIT - 1);
+  if(currentTypeFilter!=='__all__') query=query.contains('types',[currentTypeFilter]);
+  const { data: pedals } = await query;
   pedalOffset += PEDAL_LIMIT;
   cachedPedals = [...cachedPedals, ...(pedals || [])];
   const grid = document.getElementById('pedal-grid');
