@@ -2352,7 +2352,7 @@ function renderRegionPosts(){
 let _allUsers=[];
 async function loadUsersAdmin(){
   document.getElementById('users-table-wrap').innerHTML='<div style="padding:20px;color:var(--td)">読み込み中...</div>';
-  const{data,error}=await sb.from('users').select('id,username,email,created_at,bio').order('created_at',{ascending:false}).limit(500);
+  const{data,error}=await sb.from('users').select('id,username,created_at,bio').order('created_at',{ascending:false}).limit(500);
   if(error){document.getElementById('users-table-wrap').innerHTML='<div style="padding:20px;color:#e05050">エラー: '+error.message+'</div>';return;}
   _allUsers=data||[];
   const statsEl=document.getElementById('users-stats');
@@ -2660,16 +2660,15 @@ async function runLinkHealthCheck(){
 
 function filterUsersAdmin(){
   const q=(document.getElementById('user-search')?.value||'').toLowerCase();
-  const filtered=q?_allUsers.filter(u=>(u.username||'').toLowerCase().includes(q)||(u.email||'').toLowerCase().includes(q)):_allUsers;
+  const filtered=q?_allUsers.filter(u=>(u.username||'').toLowerCase().includes(q)):_allUsers;
   renderUsersAdmin(filtered);
 }
 function renderUsersAdmin(users){
   const wrap=document.getElementById('users-table-wrap');
   if(!users.length){wrap.innerHTML='<div style="padding:20px;color:var(--td)">ユーザーが見つかりません</div>';return;}
-  wrap.innerHTML='<div class="table-wrap"><table><thead><tr><th>ユーザー名</th><th>メール</th><th>登録日</th><th>自己紹介</th></tr></thead><tbody>'
+  wrap.innerHTML='<div class="table-wrap"><table><thead><tr><th>ユーザー名</th><th>登録日</th><th>自己紹介</th></tr></thead><tbody>'
     +users.map(u=>`<tr>
       <td><a href="/user?username=${encodeURIComponent(u.username||'')}" target="_blank" style="color:var(--ac);text-decoration:none;font-weight:600">${u.username||'(未設定)'}</a></td>
-      <td style="font-size:11px;color:var(--td)">${u.email||''}</td>
       <td style="font-size:11px;color:var(--td);white-space:nowrap">${u.created_at?u.created_at.slice(0,10):''}</td>
       <td style="font-size:11px;color:var(--td);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.bio||''}</td>
     </tr>`).join('')+'</tbody></table></div>';
