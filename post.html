@@ -867,29 +867,43 @@ function addPostEditGearItem(){
 }
 
 // ★修正4: 機材名追加欄 オートコンプリート
-var _postEditPedalData=null,_postEditACItems=[],_postEditACIdx=-1;
-async function loadPostEditPedalData(){
-  if(_postEditPedalData)return _postEditPedalData;
-  const res=await sb.from('pedals').select('full_name,brand,model').limit(3000);
-  _postEditPedalData=res.data||[];return _postEditPedalData;
+var _postEditACItems=[],_postEditACIdx=-1;
+function _postEditNorm(q){return(q||'').toLowerCase().replace(/[-_\s\.]/g,'');}
+function _postEditExpand(q){
+  const p=[q];
+  const h1=q.replace(/([a-zA-Z])([0-9])/g,'$1-$2');const s1=q.replace(/([a-zA-Z])([0-9])/g,'$1 $2');const h2=q.replace(/([0-9])([a-zA-Z])/g,'$1-$2');
+  if(h1!==q)p.push(h1);if(s1!==q)p.push(s1);if(h2!==q&&h2!==h1)p.push(h2);
+  return[...new Set(p)];
 }
 async function searchPostEditGear(val){
   const dd=document.getElementById('post-edit-ac-dropdown');if(!dd)return;
   const q=val.trim();
   if(!q){dd.classList.remove('open');dd.innerHTML='';_postEditACItems=[];return;}
-  const pedals=await loadPostEditPedalData();
-  const ql=q.toLowerCase();
-  const results=pedals.filter(function(p){return(p.full_name||'').toLowerCase().includes(ql)||(p.brand||'').toLowerCase().includes(ql)||(p.model||'').toLowerCase().includes(ql);}).slice(0,8);
-  _postEditACIdx=-1;
+  const patterns=_postEditExpand(q);
+  const qNorm=_postEditNorm(q);
+  const orParts=patterns.flatMap(function(p){return['brand.ilike.'+p+'%','model.ilike.'+p+'%','full_name.ilike.'+p+'%'];}).join(',');
+  const{data:prefixData}=await sb.from('pedals').select('full_name,brand,model,search_query').or(orParts).limit(10);
+  let results=prefixData||[];
+  const fuzzyOr=[
+    ...patterns.map(function(p){return'full_name.ilike.%'+p+'%';}),
+    ...patterns.map(function(p){return'brand.ilike.%'+p+'%';}),
+    ...patterns.map(function(p){return'model.ilike.%'+p+'%';}),
+    ...(qNorm&&qNorm!==q.toLowerCase()?['full_name.ilike.%'+qNorm+'%','model.ilike.%'+qNorm+'%']:[])
+  ].join(',');
+  const{data:fuzzy}=await sb.from('pedals').select('full_name,brand,model,search_query').or(fuzzyOr).limit(20);
+  if(fuzzy)fuzzy.forEach(function(x){if(!results.find(function(r){return r.full_name===x.full_name;}))results.push(x);});
+  results=results.slice(0,10);_postEditACIdx=-1;
   if(!results.length){dd.innerHTML='<div class="ac-empty">「'+q+'」で候補なし。そのまま追加できます</div>';dd.classList.add('open');_postEditACItems=[];return;}
   _postEditACItems=results;
-  dd.innerHTML=results.map(function(p,i){return'<div class="ac-item" onmousedown="selectPostEditGear('+i+')">'+'<div class="ac-item-name">'+(p.full_name||'')+'</div>'+'<div class="ac-item-brand">'+(p.brand||'')+'</div>'+'</div>';}).join('');
+  dd.innerHTML=results.map(function(p,i){return'<div class="ac-item" onmousedown="selectPostEditGear('+i+')"><div class="ac-item-name">'+(p.full_name||'')+'</div><div class="ac-item-brand">'+(p.brand||'')+'</div></div>';}).join('');
   dd.classList.add('open');
 }
 function selectPostEditGear(idx){
   const item=_postEditACItems[idx];if(!item)return;
-  const inp=document.getElementById('post-edit-gear-add');if(inp)inp.value=item.full_name||'';
-  closePostEditAC();addPostEditGearItem();
+  postEditGearList.push({name:item.full_name||'',brand:item.brand||'',search_query:item.search_query||null});
+  renderPostEditGearSortList();
+  const inp=document.getElementById('post-edit-gear-add');if(inp)inp.value='';
+  closePostEditAC();
 }
 function closePostEditAC(){
   const dd=document.getElementById('post-edit-ac-dropdown');
