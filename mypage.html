@@ -617,7 +617,7 @@ async function loadProfile(){
   const initial=username[0].toUpperCase();
   document.getElementById('profile-name').textContent=username;
   document.getElementById('profile-email').textContent=currentUser.email;
-  document.getElementById('avatar-initial').textContent=initial;
+  const aiInit=document.getElementById('avatar-initial');if(aiInit)aiInit.textContent=initial;
   document.getElementById('edit-username').value=username;
   document.getElementById('edit-bio').value=data?.bio||'';
   document.getElementById('edit-amp').value=data?.amp||'';
@@ -716,7 +716,7 @@ async function saveProfile(){
   if(error){showToast(tr('toastSaveFail'));btn.disabled=false;btn.textContent='プロフィールを保存';return;}
   try{await sb.auth.updateUser({data:{username}});}catch(e){console.warn('auth update warn',e);}
   document.getElementById('profile-name').textContent=username;
-  document.getElementById('avatar-initial').textContent=username[0].toUpperCase();
+  const aiEl=document.getElementById('avatar-initial');if(aiEl)aiEl.textContent=username[0].toUpperCase();
   btn.disabled=false;btn.textContent='プロフィールを保存';
   showToast(tr('toastSaveDone'));
   const body=document.getElementById('profile-body');const chevron=document.getElementById('profile-chevron');
