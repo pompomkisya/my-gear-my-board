@@ -805,26 +805,30 @@ async function searchGear(val){
       if(aliasPedals)sortTier1(aliasPedals).forEach(x=>{if(!tier1.find(r=>r.full_name===x.full_name))tier1.push(x);});
     }
   }
-  let tier2=[];
-  if(tier1.length<5){
-    const fuzzyOr=patterns.map(p=>'full_name.ilike.%'+p+'%').join(',');
-    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query,view_count').or(fuzzyOr).limit(15);
-    const fuzzyResults=fuzzy||[];
-    tier2=sortTier2(fuzzyResults.filter(x=>!tier1.find(r=>r.full_name===x.full_name)));
-  }
-  const combined=[...tier1,...tier2].slice(0,15);
+  const qNorm=normACQuery(q);
+  const fuzzyOr=[
+    ...patterns.map(p=>'full_name.ilike.%'+p+'%'),
+    ...patterns.map(p=>'brand.ilike.%'+p+'%'),
+    ...patterns.map(p=>'model.ilike.%'+p+'%'),
+    ...(qNorm&&qNorm!==q.toLowerCase()?['full_name.ilike.%'+qNorm+'%','model.ilike.%'+qNorm+'%']:[])
+  ].join(',');
+  const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query,view_count').or(fuzzyOr).limit(20);
+  const tier2=sortTier2((fuzzy||[]).filter(x=>!tier1.find(r=>r.full_name===x.full_name)));
+  const tier1Capped=tier1.slice(0,15);
+  const tier2Capped=tier2.slice(0,15-tier1Capped.length);
+  const combined=[...tier1Capped,...tier2Capped];
   acResults=combined;acFocusIdx=-1;
   const dd=document.getElementById('ac-dropdown');
   if(!combined.length){
     dd.innerHTML='<div class="ac-empty">「'+q+'」— '+(lang==='en'?'No suggestions. Press Enter to add':'候補なし　Enterで追加')+'</div>';
     dd.classList.add('open');updateACFade();return;
   }
-  const hasTier2=tier2.length>0&&tier1.length>0&&tier1.length<15;
+  const hasTier2=tier2Capped.length>0&&tier1Capped.length>0;
   let html='';
-  tier1.slice(0,15).forEach((x,i)=>{html+='<div class="ac-item" onmousedown="selectGear('+i+')" onmouseover="setACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>';});
+  tier1Capped.forEach((x,i)=>{html+='<div class="ac-item" onmousedown="selectGear('+i+')" onmouseover="setACFocus('+i+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>';});
   if(hasTier2){
     html+='<div class="ac-tier-label">'+(lang==='en'?'▸ Also found':'▸ 関連候補')+'</div>';
-    tier2.forEach((x,i)=>{const idx=tier1.length+i;html+='<div class="ac-item" onmousedown="selectGear('+idx+')" onmouseover="setACFocus('+idx+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>';});
+    tier2Capped.forEach((x,i)=>{const idx=tier1Capped.length+i;html+='<div class="ac-item" onmousedown="selectGear('+idx+')" onmouseover="setACFocus('+idx+')"><div class="ac-item-name">'+x.full_name+'</div><div class="ac-item-brand">'+x.brand+'</div></div>';});
   }
   dd.innerHTML=html;dd.classList.add('open');dd.scrollTop=0;
   dd.addEventListener('scroll',updateACFade,{passive:true});
