@@ -1223,15 +1223,14 @@ async function searchGearAC(val){
   const orParts=patterns.flatMap(p=>[`brand.ilike.${p}%`,`model.ilike.${p}%`,`full_name.ilike.${p}%`]).join(',');
   const{data:prefixData}=await sb.from('pedals').select('brand,model,full_name,search_query').or(orParts).limit(10);
   let results=prefixData||[];
-  if(results.length<5){
-    const fuzzyOr=patterns.map(p=>`full_name.ilike.%${p}%`).join(',');
-    const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').or(fuzzyOr).limit(10);
-    if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
-  }
-  if(results.length<5&&qNorm.length>=2){
-    const{data:allData}=await sb.from('pedals').select('brand,model,full_name,search_query').ilike('model',qNorm[0]+'%').limit(200);
-    if(allData)allData.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name)&&normalizeQuery(x.full_name).includes(qNorm))results.push(x);});
-  }
+  const fuzzyOr=[
+    ...patterns.map(p=>`full_name.ilike.%${p}%`),
+    ...patterns.map(p=>`brand.ilike.%${p}%`),
+    ...patterns.map(p=>`model.ilike.%${p}%`),
+    ...(qNorm&&qNorm!==q.toLowerCase()?[`full_name.ilike.%${qNorm}%`,`model.ilike.%${qNorm}%`]:[])
+  ].join(',');
+  const{data:fuzzy}=await sb.from('pedals').select('brand,model,full_name,search_query').or(fuzzyOr).limit(20);
+  if(fuzzy)fuzzy.forEach(x=>{if(!results.find(r=>r.full_name===x.full_name))results.push(x);});
   const aliasOr=patterns.map(p=>`alias.ilike.%${p}%`).join(',');
   const{data:aliasData}=await sb.from('pedal_aliases').select('alias,pedal_full_name').or(aliasOr).limit(4);
   if(aliasData){
