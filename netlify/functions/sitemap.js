@@ -9,8 +9,8 @@ const TYPES = [
   'overdrive','distortion','fuzz','boost','reverb','delay','chorus','flanger',
   'phaser','tremolo','vibrato','pitch_octave','wah_filter','comp','eq',
   'noise_gate','looper','volume','tuner','multi','preamp','modulation',
-  'sequence_rhythm','glitch','acoustic','vocal','power_supply','switcher',
-  'buffer','synth','junction_box','other'
+  'sequence_rhythm','glitch','acoustic','vocal','power_supply','switcher_selector',
+  'buffer','synth','junction_box','bass','other'
 ];
 
 function escXml(str) {
