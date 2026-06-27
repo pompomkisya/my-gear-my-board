@@ -53,7 +53,7 @@ exports.handler = async (event) => {
 
   try {
     const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-    const { data, error } = await sb.from('posts').select('id,title,description,image_urls,username').eq('id', id).single();
+    const { data, error } = await sb.from('posts').select('id,title,description,image_urls,username,gear_list').eq('id', id).single();
     if (error || !data) {
       return { statusCode: 302, headers: { Location: 'https://mygearmyboard.com' } };
     }
@@ -67,6 +67,15 @@ exports.handler = async (event) => {
       ? 'https://mygearmyboard.com/.netlify/functions/og?id=' + id + '&proxy=1'
       : 'https://mygearmyboard.com/IMG_2107.PNG';
     const postUrl = 'https://mygearmyboard.com/post?id=' + id;
+
+    // SEO用テキスト（Googleクローラーが読む・人間には見えない）
+    const gearList = Array.isArray(data.gear_list) ? data.gear_list : [];
+    const gearHtml = gearList.length
+      ? '<h2>使用機材</h2><ul>' + gearList.map(g => '<li>' + escHtml(g.name || '') + (g.brand ? ' (' + escHtml(g.brand) + ')' : '') + '</li>').join('') + '</ul>'
+      : '';
+    const bodyText = '<h1>' + escHtml(title) + '</h1>'
+      + (data.description ? '<p>' + escHtml(data.description) + '</p>' : '')
+      + gearHtml;
 
     const html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
       + '<meta property="og:title" content="' + escHtml(title) + ' — My Gear My Board">'
@@ -84,7 +93,7 @@ exports.handler = async (event) => {
       + '<meta name="twitter:site" content="@MGMBpedalboard">'
       + '<meta http-equiv="refresh" content="0;url=' + postUrl + '">'
       + '<title>' + escHtml(title) + ' — My Gear My Board</title>'
-      + '</head><body><script>window.location.href="' + postUrl + '";</script></body></html>';
+      + '</head><body>' + bodyText + '<script>window.location.href="' + postUrl + '";</script></body></html>';
 
     return {
       statusCode: 200,
