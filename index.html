@@ -483,7 +483,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </div>
       <div class="mob-search-badge" id="mob-search-badge"></div>
       <a href="/mypage" class="sl-item" style="display:flex;margin-bottom:16px;font-size:14px;font-weight:500;color:var(--tx);border-color:var(--bd)">
-        👤 &nbsp;<span id="mob-mypage-text">マイページ / 登録・ログイン</span>
+        👤 &nbsp;<span id="mob-mypage-text">アカウント / 登録・ログイン</span>
       </a>
       <div style="height:1px;background:var(--bd);margin-bottom:16px"></div>
       <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;margin-bottom:10px;color:var(--ac);display:flex;align-items:center;justify-content:center;gap:8px" id="mob-title-encyclopedia">エフェクター図鑑</div>
@@ -666,7 +666,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 <aside class="sl">
   <div style="margin-bottom:8px">
     <a href="/mypage" class="sl-item" style="font-size:13px;font-weight:500;color:var(--tx);border-color:var(--bd)">
-      👤 &nbsp;<span id="sl-mypage-text">マイページ / 登録・ログイン</span>
+      👤 &nbsp;<span id="sl-mypage-text">アカウント / 登録・ログイン</span>
     </a>
   </div>
   <div style="margin-bottom:16px">
@@ -1085,7 +1085,7 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
       </button>
       <button onclick="gDoSave()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px 0;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.35);border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#e8552d;cursor:pointer">
         <span style="font-size:13px">🔖</span>
-        <span id="g-save-txt">マイページに保存</span>
+        <span id="g-save-txt">アカウントに保存</span>
       </button>
     </div>
     <div style="margin-top:12px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:5px">
@@ -1313,7 +1313,7 @@ function applyGachaLang(){
   set('g-sub1',isEn?'Find your next pedal':'次の相棒に出会おう');
   set('g-sub2',isEn?'Handpicked from our gear database':'ペダル図鑑から厳選紹介');
   set('g-share-txt',isEn?'Share':'シェアする');
-  set('g-save-txt',isEn?'Save to My Page':'マイページに保存');
+  set('g-save-txt',isEn?'Save to Account':'アカウントに保存');
   set('g-hist-lbl',isEn?'— RECENT ROLLS —':'— 直近履歴 —');
   set('g-tt-box',isEn?"Rarity is our own playful take. A pedal's true value is found in the player's sound, not the market. With respect to all who craft these instruments.":'レアリティの基準は当サイト独自の遊び心です。ペダルの価値は市場の評価ではなく、弾き手の音の中で決まるものです。機材製作者に敬意を込めて');
   set('g-close-txt',isEn?'✕ Close':'✕ 閉じる');
@@ -2017,13 +2017,13 @@ async function gDoSave(){
     const{error}=await sb2.from('gacha_saves').insert({user_id:session.user.id,pedal_id:gResult.id,rarity:gResult._rk});
     if(error&&error.code==='42P01'){alert(isEn?'Save feature coming soon!':'保存機能は近日公開予定です！');return;}
     if(error)throw error;
-    alert(isEn?'Saved to My Page!':'マイページに保存しました！');
+    alert(isEn?'Saved to Account!':'アカウントに保存しました！');
   }catch(e){console.error('save error',e);alert(isEn?'Could not save.':'保存に失敗しました。');}
 }
 // toggleLangはindex.jsで一元管理（applyGachaLang/applyGachaI18nも呼ばれる）
 const I18N_GACHA={
-  'sl-mypage-text':{ja:'マイページ / 登録・ログイン',en:'My Page / Sign Up · Login'},
-  'mob-mypage-text':{ja:'マイページ / 登録・ログイン',en:'My Page / Sign Up · Login'},
+  'sl-mypage-text':{ja:'アカウント / 登録・ログイン',en:'Account / Sign Up · Login'},
+  'mob-mypage-text':{ja:'アカウント / 登録・ログイン',en:'Account / Sign Up · Login'},
   'sl-encyclopedia-text':{ja:'エフェクター図鑑',en:'Pedal Encyclopedia'},
   'mob-title-encyclopedia':{ja:'エフェクター図鑑',en:'Pedal Encyclopedia'},
   'sl-encyclopedia-link-text':{ja:'🎛️ エフェクター図鑑を開く 📚',en:'🎛️ Open Pedal Encyclopedia 📚'},
