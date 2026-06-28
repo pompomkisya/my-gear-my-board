@@ -183,6 +183,7 @@ function shareUserToX(url,username){
 // ── Tab state ──
 let _userData=null,_posts=[],_gear=[],_reviews=[];
 let _currentTab='posts';
+let _reviewsLoaded=false;
 function switchTab(tab){
   _currentTab=tab;
   ['posts','gear','reviews'].forEach(t=>{
@@ -191,6 +192,24 @@ function switchTab(tab){
     if(btn)btn.classList.toggle('on',t===tab);
     if(panel)panel.style.display=t===tab?'block':'none';
   });
+  // レビューは初回のみロード
+  if(tab==='reviews'&&!_reviewsLoaded){
+    _reviewsLoaded=true;
+    loadUserReviews();
+  }
+}
+async function loadUserReviews(){
+  if(!_userData)return;
+  const el=document.getElementById('upanel-reviews');
+  el.innerHTML=`<div class="empty-msg">${tr('noReviews')}</div>`;
+  const{data:reviews}=await sb.from('pedal_reviews')
+    .select('id,body,rating_score,likes,created_at,pedal_id,pedals(full_name,slug)')
+    .eq('user_id',_userData.id).order('created_at',{ascending:false}).limit(20);
+  _reviews=reviews||[];
+  // レビュー数をstatsに反映
+  const statEl=document.getElementById('ustat-reviews');
+  if(statEl)statEl.textContent=_reviews.length;
+  el.innerHTML=renderReviews(_reviews);
 }
 
 async function loadUser(){
@@ -209,18 +228,20 @@ async function loadUser(){
   document.querySelector('meta[property="og:description"]')?.setAttribute('content',
     lang==='en'?`${user.username} on My Gear My Board`:`${user.username}のボード・機材 — My Gear My Board`);
 
-  const[postsRes,gearRes,reviewsRes]=await Promise.all([
-    sb.from('posts').select('id,title,image_urls,likes,created_at,post_type').eq('user_id',user.id).order('created_at',{ascending:false}).limit(12),
+  // ギアとボードを並行取得（レビューは遅延）
+  const[gearRes,postsRes]=await Promise.all([
     sb.from('user_gear').select('*').eq('user_id',user.id).order('updated_at',{ascending:false}).order('created_at',{ascending:false}),
-    sb.from('pedal_reviews').select('id,body,rating_score,likes,created_at,pedal_id,pedals(full_name,slug)').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20),
+    sb.from('posts').select('id,title,image_urls,likes,created_at,post_type').eq('user_id',user.id).order('created_at',{ascending:false}).limit(12),
   ]);
-  _posts=postsRes.data||[];
   _gear=gearRes.data||[];
-  _reviews=reviewsRes.data||[];
-  renderUser(user,_posts,_gear,_reviews,pageUrl);
+  _posts=postsRes.data||[];
+  _reviews=[];
+  // 初期タブ：ギアがあればGEAR、なければBOARD
+  const initTab=_gear.length>0?'gear':'posts';
+  renderUser(user,_posts,_gear,pageUrl,initTab);
 }
 
-function renderUser(user,posts,gear,reviews,pageUrl){
+function renderUser(user,posts,gear,pageUrl,initTab='gear'){
   const avatarHtml=user.avatar_url
     ?`<img src="${escHtml(user.avatar_url)}" alt="${escHtml(user.username)}">`
     :`<span style="font-size:28px;font-weight:700">${user.username[0].toUpperCase()}</span>`;
@@ -242,9 +263,9 @@ function renderUser(user,posts,gear,reviews,pageUrl){
           </div>
         </div>
         <div class="stats-grid">
-          <div class="stat-item"><div class="stat-value">${posts.length}</div><div class="stat-label">${tr('statPosts')}</div></div>
           <div class="stat-item"><div class="stat-value">${gear.length}</div><div class="stat-label">${tr('statGear')}</div></div>
-          <div class="stat-item"><div class="stat-value">${reviews.length}</div><div class="stat-label">${tr('statReviews')}</div></div>
+          <div class="stat-item"><div class="stat-value">${posts.length}</div><div class="stat-label">${tr('statPosts')}</div></div>
+          <div class="stat-item"><div class="stat-value" id="ustat-reviews">—</div><div class="stat-label">${tr('statReviews')}</div></div>
         </div>
       </div>
     </div>
@@ -255,22 +276,23 @@ function renderUser(user,posts,gear,reviews,pageUrl){
     </div>
 
     <div class="tab-grid">
-      <div class="tab-btn on" id="utab-posts" style="background-image:url(/icons/icon_posts.png)" onclick="switchTab('posts')">
-        <span class="tab-btn-label">${tr('tabBoard')}</span>
-      </div>
-      <div class="tab-btn" id="utab-gear" style="background-image:url(/icons/icon_gear.png)" onclick="switchTab('gear')">
+      <div class="tab-btn ${initTab==='gear'?'on':''}" id="utab-gear" style="background-image:url(/icons/icon_gear.png)" onclick="switchTab('gear')">
         <span class="tab-btn-label">${tr('tabGear')}</span>
+      </div>
+      <div class="tab-btn ${initTab==='posts'?'on':''}" id="utab-posts" style="background-image:url(/icons/icon_posts.png)" onclick="switchTab('posts')">
+        <span class="tab-btn-label">${tr('tabBoard')}</span>
       </div>
       <div class="tab-btn" id="utab-reviews" style="background-image:url(/icons/icon_reviews.png)" onclick="switchTab('reviews')">
         <span class="tab-btn-label">${tr('tabReviews')}</span>
       </div>
     </div>
 
-    <div id="upanel-posts">${renderPosts(posts)}</div>
-    <div id="upanel-gear" style="display:none">${renderGear(gear)}</div>
-    <div id="upanel-reviews" style="display:none">${renderReviews(reviews)}</div>
+    <div id="upanel-gear" ${initTab!=='gear'?'style="display:none"':''}>${renderGear(gear)}</div>
+    <div id="upanel-posts" ${initTab!=='posts'?'style="display:none"':''}>${renderPosts(posts)}</div>
+    <div id="upanel-reviews" style="display:none"></div>
   `;
   document.getElementById('content').innerHTML=html;
+  _currentTab=initTab;
 }
 
 function renderPosts(posts){
