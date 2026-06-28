@@ -82,6 +82,28 @@ textarea.edit-input{resize:vertical;min-height:70px}
 .tab-btn.on .tab-btn-label{color:var(--ac)}
 .tab-btn-count{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ac);padding-bottom:8px}
 .tab-btn.on .tab-btn-count{color:var(--ac)}
+/* ── Bookmark Accordion ── */
+.bookmark-accordion{margin-bottom:20px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.bookmark-accordion-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:var(--tm);transition:color .15s;user-select:none}
+.bookmark-accordion-header:hover{color:var(--tx)}
+.bookmark-chevron{font-size:10px;transition:transform .25s;display:inline-block}
+.bookmark-chevron.open{transform:rotate(180deg)}
+.bookmark-accordion-body{padding:12px}
+/* ── Gear Cards (mypage) ── */
+.my-gear-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.my-gear-card{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;overflow:hidden;color:var(--tx);display:block;transition:border-color .2s;cursor:pointer}
+.my-gear-card:hover{border-color:rgba(232,85,45,.4)}
+.my-gear-card-thumb{width:100%;aspect-ratio:1;background:var(--bg);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.my-gear-card-thumb img{width:100%;height:100%;object-fit:cover}
+.my-gear-card-no-image{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.my-gear-card-body{padding:8px 10px}
+.my-gear-card-brand{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ac);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.my-gear-card-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+.my-gear-card-edit{display:flex;align-items:center;gap:6px;width:100%;padding:6px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:6px;font-size:11px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;margin-top:4px}
+.my-gear-card-edit:hover{border-color:var(--ac);color:var(--ac)}
+/* ── Tab top action btn ── */
+.tab-action-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:rgba(232,85,45,.08);border:1px solid rgba(232,85,45,.25);border-radius:10px;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;color:var(--ac);cursor:pointer;transition:all .15s;margin-bottom:14px;text-decoration:none}
+.tab-action-btn:hover{background:rgba(232,85,45,.14);border-color:rgba(232,85,45,.5)}
 .notif-dot{position:absolute;top:8px;right:8px;width:9px;height:9px;background:var(--ac);border-radius:50%;display:none;z-index:2;box-shadow:0 0 0 2px var(--sf)}
 
 /* ── Post List ── */
@@ -368,36 +390,48 @@ div[style*="max-height:0"].open{max-height:600px!important}
 
     <!-- Tab Grid -->
     <div class="tab-grid">
-      <div class="tab-btn on" id="my-tab-posts" style="background-image:url(/icons/icon_posts.png)" onclick="switchMyTab('posts')">
-        <span class="tab-btn-label" id="my-tab-posts-lbl">自分の投稿</span>
-        <span class="tab-btn-count" id="my-count-posts">—</span>
-      </div>
-      <div class="tab-btn" id="my-tab-gear" style="background-image:url(/icons/icon_gear.png);background-position:center 20%" onclick="switchMyTab('gear')">
-        <span class="tab-btn-label" id="my-tab-gear-lbl">機材リスト</span>
+      <div class="tab-btn on" id="my-tab-gear" style="background-image:url(/icons/icon_gear.png);background-position:center 20%" onclick="switchMyTab('gear')">
+        <span class="tab-btn-label" id="my-tab-gear-lbl">MY GEAR</span>
         <span class="tab-btn-count" id="my-count-gear">—</span>
       </div>
+      <div class="tab-btn" id="my-tab-posts" style="background-image:url(/icons/icon_posts.png)" onclick="switchMyTab('posts')">
+        <span class="tab-btn-label" id="my-tab-posts-lbl">MY BOARD</span>
+        <span class="tab-btn-count" id="my-count-posts">—</span>
+      </div>
       <div class="tab-btn" id="my-tab-reviews" style="background-image:url(/icons/icon_reviews.png)" onclick="switchMyTab('reviews')">
-        <span class="tab-btn-label" id="my-tab-reviews-lbl">レビュー</span>
+        <span class="tab-btn-label" id="my-tab-reviews-lbl">REVIEWS</span>
         <span class="tab-btn-count" id="my-count-reviews">—</span>
       </div>
-      <div class="tab-btn" id="my-tab-likes" style="background-image:url(/icons/icon_likes.png)" onclick="switchMyTab('likes')">
-        <span class="tab-btn-label" id="my-tab-likes-lbl">いいね</span>
-        <span class="tab-btn-count" id="my-count-likes">—</span>
+    </div>
+
+    <!-- ブックマーク アコーディオン -->
+    <div class="bookmark-accordion" id="bookmark-accordion">
+      <div class="bookmark-accordion-header" onclick="toggleBookmarks()">
+        <span>🔖 BOOKMARKS</span>
+        <span class="bookmark-chevron" id="bookmark-chevron">▼</span>
       </div>
-      <div class="tab-btn" id="my-tab-gacha" style="background-image:url(/icons/icon_gacha.png)" onclick="switchMyTab('gacha')">
-        <span class="tab-btn-label" id="my-tab-gacha-lbl">ガチャ保存</span>
-        <span class="tab-btn-count" id="my-count-gacha">—</span>
-      </div>
-      <div class="tab-btn" style="background-image:url(/icons/icon_wishlist.png);position:relative" id="my-tab-wishlist" onclick="switchMyTab('wishlist')">
-        <span class="tab-btn-label" id="my-tab-wishlist-lbl">欲しいリスト</span>
-        <span class="tab-btn-count" id="my-count-wishlist">—</span>
-        <span class="notif-dot" id="notif-dot" style="position:absolute;top:6px;right:6px;z-index:2"></span>
+      <div class="bookmark-accordion-body" id="bookmark-body" style="display:none">
+        <div class="tab-grid" style="margin-bottom:0">
+          <div class="tab-btn" id="my-tab-likes" style="background-image:url(/icons/icon_likes.png)" onclick="switchMyTab('likes')">
+            <span class="tab-btn-label" id="my-tab-likes-lbl">いいね</span>
+            <span class="tab-btn-count" id="my-count-likes">—</span>
+          </div>
+          <div class="tab-btn" id="my-tab-gacha" style="background-image:url(/icons/icon_gacha.png)" onclick="switchMyTab('gacha')">
+            <span class="tab-btn-label" id="my-tab-gacha-lbl">ガチャ結果</span>
+            <span class="tab-btn-count" id="my-count-gacha">—</span>
+          </div>
+          <div class="tab-btn" id="my-tab-wishlist" style="background-image:url(/icons/icon_wishlist.png);position:relative" onclick="switchMyTab('wishlist')">
+            <span class="tab-btn-label" id="my-tab-wishlist-lbl">ペダルブックマーク</span>
+            <span class="tab-btn-count" id="my-count-wishlist">—</span>
+            <span class="notif-dot" id="notif-dot" style="position:absolute;top:6px;right:6px;z-index:2"></span>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Panels -->
-    <div id="my-panel-posts" class="post-list"></div>
-    <div id="my-panel-gear" style="display:none"></div>
+    <div id="my-panel-gear"></div>
+    <div id="my-panel-posts" class="post-list" style="display:none"></div>
     <div id="my-panel-reviews" style="display:none"></div>
     <div id="my-panel-likes" class="post-list" style="display:none"></div>
     <div id="my-panel-gacha" class="gacha-save-list" style="display:none"></div>
@@ -531,7 +565,10 @@ function showAuthWrap(){document.getElementById('auth-wrap').style.display='bloc
 function showMyPage(){
   document.getElementById('auth-wrap').style.display='none';
   document.getElementById('mypage-wrap').classList.add('show');
-  loadProfile();loadMyPosts();loadNotifCount();loadCounts();
+  loadProfile();loadNotifCount();loadCounts();
+  // 初期タブはMY GEAR
+  _tabLoaded['gear']=true;
+  loadGearList();
   // ★ session_idの匿名投稿を自分のアカウントに自動紐付け
   linkSessionPosts();
 }
@@ -742,25 +779,42 @@ async function loadCounts(){
   if(headerDot)headerDot.style.display=notifCount>0?'block':'none';
 }
 
+// タブ別ロード済みフラグ
+const _tabLoaded={gear:false,posts:false,reviews:false,likes:false,gacha:false,wishlist:false};
+
 function switchMyTab(tab){
-  ['posts','gear','reviews','likes','gacha','wishlist'].forEach(t=>{
+  ['gear','posts','reviews','likes','gacha','wishlist'].forEach(t=>{
     const btn=document.getElementById('my-tab-'+t);
     const panel=document.getElementById('my-panel-'+t);
     if(btn)btn.classList.toggle('on',t===tab);
     if(panel)panel.style.display=t===tab?'block':'none';
   });
-  if(tab==='gear')loadGearList();
-  if(tab==='likes')loadLikedPosts();
-  if(tab==='gacha')loadGachaSaves();
-  if(tab==='wishlist')loadWishlistTab();
-  if(tab==='reviews')loadMyReviews();
+  if(!_tabLoaded[tab]){
+    _tabLoaded[tab]=true;
+    if(tab==='gear')loadGearList();
+    else if(tab==='posts')loadMyPosts();
+    else if(tab==='reviews')loadMyReviews();
+    else if(tab==='likes')loadLikedPosts();
+    else if(tab==='gacha')loadGachaSaves();
+    else if(tab==='wishlist')loadWishlistTab();
+  }
+}
+
+function toggleBookmarks(){
+  const body=document.getElementById('bookmark-body');
+  const chevron=document.getElementById('bookmark-chevron');
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  chevron.classList.toggle('open',!isOpen);
 }
 
 async function loadMyPosts(){
-  if(!currentUser)return;const el=document.getElementById('my-panel-posts');el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
+  if(!currentUser)return;const el=document.getElementById('my-panel-posts');
+  el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
   const{data}=await sb.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  if(!data||!data.length){el.innerHTML=`<div class="empty-msg">${tr('emptyPosts')}</div>`;return;}
-  el.innerHTML=data.map(p=>postItemHTML(p)).join('');
+  const postBtn=`<a class="tab-action-btn" href="/" onclick="setTimeout(()=>document.querySelector('.h-btn')?.click(),500);return false;">＋ ${lang==='en'?'Post a Board':'ボードを投稿する'}</a>`;
+  if(!data||!data.length){el.innerHTML=postBtn+`<div class="empty-msg">${tr('emptyPosts')}</div>`;return;}
+  el.innerHTML=postBtn+data.map(p=>postItemHTML(p)).join('');
 }
 async function loadLikedPosts(){
   if(!currentUser)return;const el=document.getElementById('my-panel-likes');el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
@@ -898,67 +952,33 @@ async function loadGearList(){
 }
 function renderGearList(gear,username,pedalSlugMap={}){
   const el=document.getElementById('my-panel-gear');
-  let totalJpy=0,totalUsd=0,hasJpy=false,hasUsd=false;
-  gear.forEach(g=>{if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}});
   window._pedalSlugMap=pedalSlugMap;
-  const shareUrl=`${location.origin}/user?username=${encodeURIComponent(username)}`;
-  let totalHtml='';
-  if(gear.length>0){
-    let rows='';
-    if(hasJpy)rows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('gearTotalJpy')}</span><span class="gear-total-value">¥${totalJpy.toLocaleString()}</span></div>`;
-    if(hasUsd)rows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('gearTotalUsd')}</span><span class="gear-total-value">$${totalUsd.toLocaleString()}</span></div>`;
-    if(rows)totalHtml=`<div class="gear-total-box"><div class="gear-total-title">${tr('gearTotalTitle')}</div>${rows}</div>`;
+  const addBtn=`<button class="tab-action-btn" onclick="openGearModal(null)">＋ ${lang==='en'?'Add Gear':'ギアを追加する'}</button>`;
+  if(!gear.length){
+    el.innerHTML=addBtn+`<div class="empty-msg">${tr('gearEmpty')}</div>`;
+    return;
   }
-  let itemsHtml='';
-  if(!gear.length){itemsHtml=`<div class="empty-msg">${tr('gearEmpty')}</div>`;}
-  else{
-    itemsHtml=gear.map(g=>{
-      const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
-      const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
-      const slug=pedalSlugMap[g.name]||null;
-      const pedalBtn=slug?`<a href="/pedal?slug=${slug}" class="gear-pedal-btn">🎛 ${lang==='en'?'Pedal →':'ペダル詳細 →'}</a>`:'';
-      const dispBrand=g.brand||'';
-      const dispModel=(g.brand&&g.name.startsWith(g.brand))?g.name.slice(g.brand.length).trim():g.name;
-      return`<div class="gear-item" id="gear-item-${g.id}">
-        <div class="gear-item-row1">
-          ${dispBrand?`<div class="gear-item-brand">${escHtml(dispBrand)}</div>`:''}
-          <div class="gear-item-actions">
-            <button class="gear-edit-btn" onclick="openGearModal('${g.id}')">✏️</button>
-            <button class="gear-del-btn" onclick="deleteGearItem('${g.id}')">✕</button>
-          </div>
+  const cardsHtml=gear.map(g=>{
+    const imgUrl=g.image_urls&&g.image_urls[0]?g.image_urls[0]:(g.image_url||null);
+    const thumbHtml=imgUrl
+      ?`<img src="${escHtml(imgUrl)}" loading="lazy">`
+      :`<div class="my-gear-card-no-image"><span style="font-size:32px;opacity:.2">📷</span><span style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--td)">NO IMAGE</span></div>`;
+    const dispBrand=g.brand||'';
+    const dispModel=(dispBrand&&g.name.startsWith(dispBrand))?g.name.slice(dispBrand.length).trim():g.name;
+    return`<div class="my-gear-card" id="gear-item-${g.id}">
+      <a href="/gear?id=${g.id}" style="display:block;text-decoration:none;color:inherit">
+        <div class="my-gear-card-thumb">${thumbHtml}</div>
+        <div class="my-gear-card-body">
+          ${dispBrand?`<div class="my-gear-card-brand">${escHtml(dispBrand)}</div>`:''}
+          <div class="my-gear-card-name">${escHtml(dispModel)}</div>
         </div>
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          ${g.image_url?`<img src="${g.image_url}" onclick="openGearImgLightbox('${g.image_url}')" style="width:52px;height:52px;border-radius:8px;object-fit:cover;flex-shrink:0;cursor:zoom-in;border:1px solid var(--bd)" loading="lazy">`:''}
-          <div style="flex:1;min-width:0">
-            <div class="gear-item-row3">
-              <div class="gear-item-model">${escHtml(dispModel)}</div>
-              ${pedalBtn}
-            </div>
-            <div class="gear-item-meta" style="margin-bottom:${g.memo?'4px':'0'}">
-              ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
-              ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
-            </div>
-            ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-  const sortSelect=`<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-    <span style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td)">${tr('gearSortLabel')}</span>
-    <select id="gear-sort-select" onchange="applyGearSort()"
-      style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:0 10px;height:36px;font-size:11px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;cursor:pointer">
-      <option value="default">${tr('gearSortDefault')}</option>
-      <option value="date_asc">${tr('gearSortDateAsc')}</option>
-      <option value="date_desc">${tr('gearSortDateDesc')}</option>
-      <option value="price_asc">${tr('gearSortPriceAsc')}</option>
-      <option value="price_desc">${tr('gearSortPriceDesc')}</option>
-      <option value="name_asc">${tr('gearSortNameAsc')}</option>
-      <option value="name_desc">${tr('gearSortNameDesc')}</option>
-    </select>
-  </div>`;
-  const shareBtn=`<button class="gear-share-btn" onclick="copyGearShareUrl('${shareUrl}')">${tr('gearShareBtn')}</button>`;
-  el.innerHTML=`<div class="gear-list-header"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">${shareBtn}</div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${sortSelect}<button class="gear-add-btn" onclick="openGearModal(null)">${tr('gearAddBtn')}</button></div></div>${totalHtml}<div class="gear-list-wrap" id="gear-items-wrap">${itemsHtml}</div>`;
+      </a>
+      <div style="padding:0 10px 10px">
+        <button class="my-gear-card-edit" onclick="openGearModal('${g.id}')">✏️ ${lang==='en'?'Edit':'編集する'}</button>
+      </div>
+    </div>`;
+  }).join('');
+  el.innerHTML=addBtn+`<div class="my-gear-grid">${cardsHtml}</div>`;
 }
 function applyGearSort(){
   const sel=document.getElementById('gear-sort-select');
@@ -1176,7 +1196,7 @@ async function saveGearItem(){
       console.error('gear upload error',e);
     }
   }
-  btn.disabled=false;closeGearModal();showToast(tr('gearSaved'));await loadGearList();
+  btn.disabled=false;closeGearModal();showToast(tr('gearSaved'));_tabLoaded['gear']=false;await loadGearList();
   // カウント更新
   const{count}=await sb.from('user_gear').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id);
   const el=document.getElementById('my-count-gear');if(el)el.textContent=count||0;
@@ -1185,7 +1205,7 @@ async function deleteGearItem(gearId){
   if(!confirm(tr('gearDeleteConfirm')))return;
   const{error}=await sb.from('user_gear').delete().eq('id',gearId).eq('user_id',currentUser.id);
   if(error){showToast('❌ '+error.message);return;}
-  showToast(tr('gearDeleted'));await loadGearList();
+  showToast(tr('gearDeleted'));_tabLoaded['gear']=false;await loadGearList();
 }
 
 // ── Gear AC ──
