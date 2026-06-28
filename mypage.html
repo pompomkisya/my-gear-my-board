@@ -55,7 +55,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .profile-info{flex:1;min-width:0}
 .profile-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:2px}
-.profile-email{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td)}
 .profile-chevron{font-size:12px;color:var(--td);transition:transform .25s;flex-shrink:0}
 .profile-chevron.open{transform:rotate(180deg)}
 .profile-body{padding:0 20px;max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1),padding .35s}
@@ -364,11 +363,6 @@ div[style*="max-height:0"].open{max-height:600px!important}
           </div>
         </div>
         <button class="save-btn" id="mp-save-btn" onclick="saveProfile()">プロフィールを保存</button>
-        <div style="margin-top:14px;padding:10px 12px;background:var(--sf2);border:1px solid var(--bd);border-radius:8px">
-          <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);margin-bottom:4px">登録済みメールアドレス</div>
-          <div id="profile-email" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tm);word-break:break-all"></div>
-          <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);margin-top:5px">このメールアドレスは確認用です。公開ページには表示されません。</div>
-        </div>
       </div>
     </div>
 
@@ -614,7 +608,6 @@ async function loadProfile(){
   const username=data?.username||currentUser.user_metadata?.username||'User';
   const initial=username[0].toUpperCase();
   document.getElementById('profile-name').textContent=username;
-  document.getElementById('profile-email').textContent=currentUser.email;
   const aiInit=document.getElementById('avatar-initial');if(aiInit)aiInit.textContent=initial;
   document.getElementById('edit-username').value=username;
   document.getElementById('edit-bio').value=data?.bio||'';
@@ -886,13 +879,12 @@ async function loadNotifications(){
 }
 
 // ── Gear List ──
-let gearList=[];let editingGearId=null;let isGearPublic=false;
+let gearList=[];let editingGearId=null;
 async function loadGearList(){
   if(!currentUser)return;
   const el=document.getElementById('my-panel-gear');
   el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
-  const{data:userData}=await sb.from('users').select('gear_list_public,username').eq('id',currentUser.id).single();
-  isGearPublic=userData?.gear_list_public||false;
+  const{data:userData}=await sb.from('users').select('username').eq('id',currentUser.id).single();
   const username=userData?.username||'';
   const{data:gear}=await sb.from('user_gear').select('*').eq('user_id',currentUser.id).order('sort_order').order('created_at');
   let pedalSlugMap={};
@@ -902,9 +894,9 @@ async function loadGearList(){
     if(pedals)pedals.forEach(p=>{pedalSlugMap[p.full_name]=p.slug;});
   }
   gearList=gear||[];
-  renderGearList(gearList,isGearPublic,username,pedalSlugMap);
+  renderGearList(gearList,username,pedalSlugMap);
 }
-function renderGearList(gear,isPublic,username,pedalSlugMap={}){
+function renderGearList(gear,username,pedalSlugMap={}){
   const el=document.getElementById('my-panel-gear');
   let totalJpy=0,totalUsd=0,hasJpy=false,hasUsd=false;
   gear.forEach(g=>{if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}});
@@ -952,7 +944,6 @@ function renderGearList(gear,isPublic,username,pedalSlugMap={}){
       </div>`;
     }).join('');
   }
-  const publicToggle=`<label class="gear-public-toggle"><input type="checkbox" id="gear-public-check" ${isPublic?'checked':''} onchange="toggleGearPublic(this.checked)"><span>${tr('gearPublicLabel')}</span><span style="font-weight:700;color:${isPublic?'var(--ac)':'var(--td)'}" id="gear-public-status">${isPublic?tr('gearPublicOn'):tr('gearPublicOff')}</span></label>`;
   const sortSelect=`<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
     <span style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td)">${tr('gearSortLabel')}</span>
     <select id="gear-sort-select" onchange="applyGearSort()"
@@ -966,10 +957,8 @@ function renderGearList(gear,isPublic,username,pedalSlugMap={}){
       <option value="name_desc">${tr('gearSortNameDesc')}</option>
     </select>
   </div>`;
-  const shareBtn=isPublic
-    ?`<button class="gear-share-btn" onclick="copyGearShareUrl('${shareUrl}')">${tr('gearShareBtn')}</button>`
-    :`<span style="font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tm);font-weight:500">${tr('gearPrivateNote')}</span>`;
-  el.innerHTML=`<div class="gear-list-header"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">${publicToggle}${shareBtn}</div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${sortSelect}<button class="gear-add-btn" onclick="openGearModal(null)">${tr('gearAddBtn')}</button></div></div>${totalHtml}<div class="gear-list-wrap" id="gear-items-wrap">${itemsHtml}</div>`;
+  const shareBtn=`<button class="gear-share-btn" onclick="copyGearShareUrl('${shareUrl}')">${tr('gearShareBtn')}</button>`;
+  el.innerHTML=`<div class="gear-list-header"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">${shareBtn}</div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${sortSelect}<button class="gear-add-btn" onclick="openGearModal(null)">${tr('gearAddBtn')}</button></div></div>${totalHtml}<div class="gear-list-wrap" id="gear-items-wrap">${itemsHtml}</div>`;
 }
 function applyGearSort(){
   const sel=document.getElementById('gear-sort-select');
@@ -1011,11 +1000,6 @@ function applyGearSort(){
       ${g.memo?`<div class="gear-item-memo">${escHtml(g.memo)}</div>`:''}
     </div>`;
   }).join('');
-}
-async function toggleGearPublic(isPublic){
-  if(!currentUser)return;
-  await sb.from('users').update({gear_list_public:isPublic}).eq('id',currentUser.id);
-  await loadGearList();
 }
 // ★ 機材画像ライトボックス
 function openGearImgLightbox(url){
