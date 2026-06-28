@@ -145,7 +145,6 @@ const I18N={
     logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',langLabel:'EN',
     notFound:'ユーザーが見つかりませんでした',backHome:'← ホームに戻る',
     tabBoard:'BOARD',tabGear:'GEAR',tabReviews:'REVIEWS',
-    gearPrivate:'このユーザーのギアは非公開です',
     gearEmpty:'まだギアが投稿されていません',
     noPosts:'まだ投稿がありません',noReviews:'まだレビューがありません',
     ampLabel:'使用アンプ：',untitled:'無題のボード',
@@ -157,7 +156,6 @@ const I18N={
     logoSub:'Pedalboard Posts & Database',backBtn:'← Home',langLabel:'JA',
     notFound:'User not found',backHome:'← Back to Home',
     tabBoard:'BOARD',tabGear:'GEAR',tabReviews:'REVIEWS',
-    gearPrivate:'This user\'s gear is private',
     gearEmpty:'No gear posted yet',
     noPosts:'No posts yet',noReviews:'No reviews yet',
     ampLabel:'Amp: ',untitled:'Untitled Board',
@@ -200,7 +198,7 @@ async function loadUser(){
   const username=params.get('username');
   if(!username){showError(tr('notFound'));return;}
   const{data:user}=await sb.from('users')
-    .select('id,username,bio,amp,x_url,instagram_url,avatar_url,cover_image_url,gear_list_public,created_at')
+    .select('id,username,bio,amp,x_url,instagram_url,avatar_url,cover_image_url,created_at')
     .eq('username',username).maybeSingle();
   if(!user){showError(tr('notFound'));return;}
   _userData=user;
@@ -213,9 +211,7 @@ async function loadUser(){
 
   const[postsRes,gearRes,reviewsRes]=await Promise.all([
     sb.from('posts').select('id,title,image_urls,likes,created_at,post_type').eq('user_id',user.id).order('created_at',{ascending:false}).limit(12),
-    user.gear_list_public
-      ?sb.from('user_gear').select('*').eq('user_id',user.id).order('updated_at',{ascending:false}).order('created_at',{ascending:false})
-      :Promise.resolve({data:null}),
+    sb.from('user_gear').select('*').eq('user_id',user.id).order('updated_at',{ascending:false}).order('created_at',{ascending:false}),
     sb.from('pedal_reviews').select('id,body,rating_score,likes,created_at,pedal_id,pedals(full_name,slug)').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20),
   ]);
   _posts=postsRes.data||[];
@@ -271,7 +267,7 @@ function renderUser(user,posts,gear,reviews,pageUrl){
     </div>
 
     <div id="upanel-posts">${renderPosts(posts)}</div>
-    <div id="upanel-gear" style="display:none">${renderGear(gear,user.gear_list_public)}</div>
+    <div id="upanel-gear" style="display:none">${renderGear(gear)}</div>
     <div id="upanel-reviews" style="display:none">${renderReviews(reviews)}</div>
   `;
   document.getElementById('content').innerHTML=html;
@@ -291,8 +287,7 @@ function renderPosts(posts){
   }).join('')}</div>`;
 }
 
-function renderGear(gear,isPublic){
-  if(!isPublic)return`<div class="section-card"><div class="empty-msg">${tr('gearPrivate')}</div></div>`;
+function renderGear(gear){
   if(!gear||!gear.length)return`<div class="empty-msg">${tr('gearEmpty')}</div>`;
   return`<div class="gear-grid">${gear.map(g=>{
     const imgUrl=g.image_urls&&g.image_urls[0]?g.image_urls[0]:(g.image_url||null);
