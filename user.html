@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ユーザーページ — My Gear My Board</title>
+<title>My Gear My Board</title>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="My Gear My Board">
-<meta property="og:title" content="ユーザーページ — My Gear My Board">
+<meta property="og:title" content="My Gear My Board">
 <meta property="og:description" content="ペダルボード投稿&データベース">
 <meta property="og:image" content="https://mygearmyboard.com/ogp.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -36,7 +36,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 
 /* ── Profile Hero ── */
 .profile-hero{background:var(--sf);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:16px}
-.profile-hero-cover{display:none}
 .profile-hero-body{padding:24px;position:relative}
 .profile-cover-overlay{position:absolute;top:0;left:0;right:0;height:110px;background-size:cover;background-position:center top;opacity:.27;border-radius:16px 16px 0 0;pointer-events:none;mask-image:linear-gradient(to bottom,rgba(0,0,0,.9) 0%,rgba(0,0,0,.4) 70%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.9) 0%,rgba(0,0,0,.4) 70%,transparent 100%)}
 .profile-hero-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px}
@@ -51,7 +50,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .profile-link:hover{border-color:var(--ac);color:var(--ac)}
 
 /* ── Stats Grid ── */
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:0}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:0}
 .stat-item{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 8px;text-align:center}
 .stat-value{font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--ac);line-height:1}
 .stat-label{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--td);margin-top:4px}
@@ -62,8 +61,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .tab-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(13,13,14,0) 35%,rgba(13,13,14,.85) 100%);pointer-events:none}
 .tab-btn:hover{border-color:rgba(232,85,45,.5);transform:translateY(-1px)}
 .tab-btn.on{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac) inset}
-.tab-btn-icon{display:none}
-.tab-btn-label{position:relative;z-index:1;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:700;color:var(--tx);white-space:nowrap;padding-bottom:8px}
+.tab-btn-label{position:relative;z-index:1;font-family:'Bebas Neue',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:var(--tx);white-space:nowrap;padding-bottom:8px}
 .tab-btn.on .tab-btn-label{color:var(--ac)}
 
 /* ── Posts Grid ── */
@@ -76,23 +74,19 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .post-card-title{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
 .post-card-meta{font-size:10px;color:var(--td)}
 
-/* ── Gear List ── */
-.gear-item{padding:12px 0;border-bottom:1px solid var(--bd)}
-.gear-item:last-child{border-bottom:none}
-.gear-item-row1{display:flex;align-items:center;gap:8px;margin-bottom:3px}
-.gear-item-name{font-size:13px;font-weight:600;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gear-item-brand{font-size:11px;color:var(--td);margin-bottom:5px}
-.gear-item-row3{display:flex;align-items:center;gap:8px;min-height:22px}
-.gear-item-price{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);font-weight:700;flex-shrink:0}
-.gear-item-date{font-size:11px;color:var(--td)}
-.gear-pedal-btn{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:rgba(232,85,45,.13);border-radius:4px;font-size:11px;font-weight:600;color:var(--ac);text-decoration:none;transition:background .15s;white-space:nowrap;margin-left:auto;flex-shrink:0}
-.gear-pedal-btn:hover{background:rgba(232,85,45,.26)}
-.gear-item-model{font-size:14px;font-weight:600;color:var(--tx);margin-bottom:5px;display:inline-block;text-decoration:underline;text-decoration-color:rgba(255,255,255,.18);text-underline-offset:4px;text-decoration-thickness:1px}
-.gear-total-box{background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;margin-top:12px}
-.gear-total-row{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;margin-bottom:4px}
-.gear-total-row:last-child{margin-bottom:0}
-.gear-total-label{color:var(--tm)}
-.gear-total-value{color:var(--ac);font-weight:700}
+/* ── Gear Cards ── */
+.gear-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.gear-card{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--tx);display:block;transition:border-color .2s}
+.gear-card:hover{border-color:var(--ac)}
+.gear-card-thumb{width:100%;aspect-ratio:1;background:var(--bg);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+.gear-card-thumb img{width:100%;height:100%;object-fit:cover}
+.gear-card-no-image{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.gear-card-no-image-icon{font-size:32px;opacity:.2}
+.gear-card-no-image-text{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--td)}
+.gear-card-body{padding:8px 10px}
+.gear-card-brand{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ac);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gear-card-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.gear-card-meta{font-size:10px;color:var(--td);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ── Review ── */
 .review-item{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
@@ -103,7 +97,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 
 /* ── Section Card ── */
 .section-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:16px}
-.section-title{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;margin-bottom:14px;color:var(--tx)}
 .empty-msg{text-align:center;padding:32px;font-size:13px;color:var(--td)}
 
 /* ── Share ── */
@@ -113,7 +106,13 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .share-btn-x:hover{border-color:var(--ac)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px 18px;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:480px){.posts-grid{grid-template-columns:1fr}.profile-hero-top{flex-direction:column;align-items:center;text-align:center}.profile-links{justify-content:center}.stats-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:480px){
+  .posts-grid{grid-template-columns:1fr}
+  .gear-grid{grid-template-columns:repeat(2,1fr)}
+  .profile-hero-top{flex-direction:column;align-items:center;text-align:center}
+  .profile-links{justify-content:center}
+  .stats-grid{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2870402328259616" crossorigin="anonymous"></script>
 </head>
@@ -142,30 +141,30 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 function detectLang(){const saved=localStorage.getItem('mgmb_lang');if(saved)return saved;const bl=navigator.language||'ja';return bl.toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
 const I18N={
-  ja:{logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',langLabel:'EN',
+  ja:{
+    logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',langLabel:'EN',
     notFound:'ユーザーが見つかりませんでした',backHome:'← ホームに戻る',
-    sectionPosts:'投稿一覧',sectionGear:'機材リスト',sectionReviews:'レビュー',
-    gearPrivate:'このユーザーの機材リストは非公開です',
-    gearEmpty:'機材が登録されていません',
-    noPosts:'まだ投稿がありません',noReviews:'まだレビューがありません',sectionWishlist:'欲しいリスト',noWishlist:'欲しいリストは非公開か空です',
-    totalJpy:'円合計',totalUsd:'ドル合計',
-    gearSortLabel:'並べ替え：',gearSortDefault:'登録順',gearSortDateAsc:'購入日（古い順）',gearSortDateDesc:'購入日（新しい順）',
-    gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',
-    ampLabel:'使用アンプ：',untitled:'無題のボード',anon:'匿名',
+    tabBoard:'BOARD',tabGear:'GEAR',tabReviews:'REVIEWS',
+    gearPrivate:'このユーザーのギアは非公開です',
+    gearEmpty:'まだギアが投稿されていません',
+    noPosts:'まだ投稿がありません',noReviews:'まだレビューがありません',
+    ampLabel:'使用アンプ：',untitled:'無題のボード',
     shareBtn:'🔗 シェア',shareBtnX:'𝕏 Xに投稿',
-    statPosts:'投稿',statGear:'機材',statReviews:'レビュー'},
-  en:{logoSub:'Pedalboard Posts & Database',backBtn:'← Home',langLabel:'JA',
+    statPosts:'BOARD',statGear:'GEAR',statReviews:'REVIEWS',
+    gearDateLabel:'購入日',
+  },
+  en:{
+    logoSub:'Pedalboard Posts & Database',backBtn:'← Home',langLabel:'JA',
     notFound:'User not found',backHome:'← Back to Home',
-    sectionPosts:'Posts',sectionGear:'Gear List',sectionReviews:'Reviews',
-    gearPrivate:'This user\'s gear list is private',
-    gearEmpty:'No gear registered',
-    noPosts:'No posts yet',noReviews:'No reviews yet',sectionWishlist:'Wish List',noWishlist:'Wish list is private or empty',
-    totalJpy:'JPY Total',totalUsd:'USD Total',
-    gearSortLabel:'Sort: ',gearSortDefault:'Default',gearSortDateAsc:'Date (oldest)',gearSortDateDesc:'Date (newest)',
-    gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',
-    ampLabel:'Amp: ',untitled:'Untitled Board',anon:'Anonymous',
+    tabBoard:'BOARD',tabGear:'GEAR',tabReviews:'REVIEWS',
+    gearPrivate:'This user\'s gear is private',
+    gearEmpty:'No gear posted yet',
+    noPosts:'No posts yet',noReviews:'No reviews yet',
+    ampLabel:'Amp: ',untitled:'Untitled Board',
     shareBtn:'🔗 Share',shareBtnX:'𝕏 Post to X',
-    statPosts:'Posts',statGear:'Gear',statReviews:'Reviews'}
+    statPosts:'BOARD',statGear:'GEAR',statReviews:'REVIEWS',
+    gearDateLabel:'Purchased',
+  }
 };
 function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
 function applyLang(){
@@ -179,16 +178,16 @@ function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(d>=86
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 function copyUserUrl(url){navigator.clipboard.writeText(url).then(()=>showToast('🔗 '+(lang==='en'?'Copied!':'コピーしました'))).catch(()=>prompt('URLをコピーしてください:',url));}
 function shareUserToX(url,username){
-  const text=encodeURIComponent((username||'')+(lang==='en'?' pedalboard — My Gear My Board #MGMB':'のペダルボード — My Gear My Board #MGMB #エフェクター'));
+  const text=encodeURIComponent((username||'')+(lang==='en'?' — My Gear My Board #MGMB':'のボード・機材 — My Gear My Board #MGMB #エフェクター'));
   window.open('https://twitter.com/intent/tweet?text='+text+'&url='+encodeURIComponent(url),'_blank','width=550,height=420');
 }
 
 // ── Tab state ──
-let _userData=null,_posts=[],_gear=[],_reviews=[],_wishlist=[];
+let _userData=null,_posts=[],_gear=[],_reviews=[];
 let _currentTab='posts';
 function switchTab(tab){
   _currentTab=tab;
-  ['posts','gear','reviews','wishlist'].forEach(t=>{
+  ['posts','gear','reviews'].forEach(t=>{
     const btn=document.getElementById('utab-'+t);
     const panel=document.getElementById('upanel-'+t);
     if(btn)btn.classList.toggle('on',t===tab);
@@ -210,50 +209,47 @@ async function loadUser(){
   document.querySelector('meta[property="og:title"]')?.setAttribute('content',`${user.username} — My Gear My Board`);
   document.querySelector('meta[property="og:url"]')?.setAttribute('content',pageUrl);
   document.querySelector('meta[property="og:description"]')?.setAttribute('content',
-    lang==='en'?`${user.username}'s pedalboard — My Gear My Board`:`${user.username}のペダルボード — My Gear My Board`);
+    lang==='en'?`${user.username} on My Gear My Board`:`${user.username}のボード・機材 — My Gear My Board`);
 
-  const[postsRes,gearRes,reviewsRes,wishlistRes]=await Promise.all([
+  const[postsRes,gearRes,reviewsRes]=await Promise.all([
     sb.from('posts').select('id,title,image_urls,likes,created_at,post_type').eq('user_id',user.id).order('created_at',{ascending:false}).limit(12),
     user.gear_list_public
-      ?sb.from('user_gear').select('*').eq('user_id',user.id).order('sort_order').order('created_at')
+      ?sb.from('user_gear').select('*').eq('user_id',user.id).order('updated_at',{ascending:false}).order('created_at',{ascending:false})
       :Promise.resolve({data:null}),
     sb.from('pedal_reviews').select('id,body,rating_score,likes,created_at,pedal_id,pedals(full_name,slug)').eq('user_id',user.id).order('created_at',{ascending:false}).limit(20),
-    sb.from('pedal_wishlists').select('id,created_at,pedals(id,brand,model,full_name,slug,image_url,types)').eq('user_id',user.id).order('created_at',{ascending:false}).limit(50)
   ]);
   _posts=postsRes.data||[];
   _gear=gearRes.data||[];
   _reviews=reviewsRes.data||[];
-  _wishlist=wishlistRes.data||[];
-  renderUser(user,_posts,_gear,_reviews,_wishlist,pageUrl);
+  renderUser(user,_posts,_gear,_reviews,pageUrl);
 }
 
-function renderUser(user,posts,gear,reviews,wishlist,pageUrl){
+function renderUser(user,posts,gear,reviews,pageUrl){
   const avatarHtml=user.avatar_url
     ?`<img src="${escHtml(user.avatar_url)}" alt="${escHtml(user.username)}">`
     :`<span style="font-size:28px;font-weight:700">${user.username[0].toUpperCase()}</span>`;
   const links=[];
   if(user.x_url)links.push(`<a class="profile-link" href="${escHtml(user.x_url)}" target="_blank" rel="noopener">𝕏 X</a>`);
   if(user.instagram_url)links.push(`<a class="profile-link" href="${escHtml(user.instagram_url)}" target="_blank" rel="noopener">📷 Instagram</a>`);
-  const gearCount=gear.length;
+
   const html=`
     <div class="profile-hero">
       <div class="profile-hero-body">
         ${user.cover_image_url?`<div class="profile-cover-overlay" style="background-image:url(${user.cover_image_url})"></div>`:''}
-      <div class="profile-hero-top">
-        <div class="profile-avatar">${avatarHtml}</div>
-        <div class="profile-info">
-          <div class="profile-username">${escHtml(user.username)}</div>
-          ${user.bio?`<div class="profile-bio">${escHtml(user.bio)}</div>`:''}
-          ${user.amp?`<div class="profile-amp">${escHtml(tr('ampLabel'))}${escHtml(user.amp)}</div>`:''}
-          ${links.length?`<div class="profile-links">${links.join('')}</div>`:''}
+        <div class="profile-hero-top">
+          <div class="profile-avatar">${avatarHtml}</div>
+          <div class="profile-info">
+            <div class="profile-username">${escHtml(user.username)}</div>
+            ${user.bio?`<div class="profile-bio">${escHtml(user.bio)}</div>`:''}
+            ${user.amp?`<div class="profile-amp">${escHtml(tr('ampLabel'))}${escHtml(user.amp)}</div>`:''}
+            ${links.length?`<div class="profile-links">${links.join('')}</div>`:''}
+          </div>
         </div>
-      </div>
-      <div class="stats-grid">
-        <div class="stat-item"><div class="stat-value">${posts.length}</div><div class="stat-label">${tr('statPosts')}</div></div>
-        <div class="stat-item"><div class="stat-value">${gearCount}</div><div class="stat-label">${tr('statGear')}</div></div>
-        <div class="stat-item"><div class="stat-value">${reviews.length}</div><div class="stat-label">${tr('statReviews')}</div></div>
-        <div class="stat-item"><div class="stat-value">${wishlist.length}</div><div class="stat-label">${tr('sectionWishlist')}</div></div>
-      </div>
+        <div class="stats-grid">
+          <div class="stat-item"><div class="stat-value">${posts.length}</div><div class="stat-label">${tr('statPosts')}</div></div>
+          <div class="stat-item"><div class="stat-value">${gear.length}</div><div class="stat-label">${tr('statGear')}</div></div>
+          <div class="stat-item"><div class="stat-value">${reviews.length}</div><div class="stat-label">${tr('statReviews')}</div></div>
+        </div>
       </div>
     </div>
 
@@ -262,25 +258,21 @@ function renderUser(user,posts,gear,reviews,wishlist,pageUrl){
       <button class="share-btn-x" onclick="shareUserToX('${escHtml(pageUrl)}','${escHtml(user.username)}')">${tr('shareBtnX')}</button>
     </div>
 
-    <div class="tab-grid" style="grid-template-columns:repeat(4,1fr)">
+    <div class="tab-grid">
       <div class="tab-btn on" id="utab-posts" style="background-image:url(/icons/icon_posts.png)" onclick="switchTab('posts')">
-        <span class="tab-btn-label">${tr('sectionPosts')}</span>
+        <span class="tab-btn-label">${tr('tabBoard')}</span>
       </div>
       <div class="tab-btn" id="utab-gear" style="background-image:url(/icons/icon_gear.png)" onclick="switchTab('gear')">
-        <span class="tab-btn-label">${tr('sectionGear')}</span>
+        <span class="tab-btn-label">${tr('tabGear')}</span>
       </div>
       <div class="tab-btn" id="utab-reviews" style="background-image:url(/icons/icon_reviews.png)" onclick="switchTab('reviews')">
-        <span class="tab-btn-label">${tr('sectionReviews')}</span>
-      </div>
-      <div class="tab-btn" style="background-image:url(/icons/icon_wishlist.png)" id="utab-wishlist" onclick="switchTab('wishlist')">
-        <span class="tab-btn-label">${tr('sectionWishlist')}</span>
+        <span class="tab-btn-label">${tr('tabReviews')}</span>
       </div>
     </div>
 
     <div id="upanel-posts">${renderPosts(posts)}</div>
     <div id="upanel-gear" style="display:none">${renderGear(gear,user.gear_list_public)}</div>
     <div id="upanel-reviews" style="display:none">${renderReviews(reviews)}</div>
-    <div id="upanel-wishlist" style="display:none">${renderWishlist(wishlist,user.wishlist_public)}</div>
   `;
   document.getElementById('content').innerHTML=html;
 }
@@ -288,7 +280,7 @@ function renderUser(user,posts,gear,reviews,wishlist,pageUrl){
 function renderPosts(posts){
   if(!posts.length)return`<div class="empty-msg">${tr('noPosts')}</div>`;
   return`<div class="posts-grid">${posts.map(p=>{
-    const imgHtml=p.image_urls&&p.image_urls[0]?`<img src="${escHtml(p.image_urls[0])}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:`<span>${p.post_type==='gear'?'🎸':'🎛'}</span>`;
+    const imgHtml=p.image_urls&&p.image_urls[0]?`<img src="${escHtml(p.image_urls[0])}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:`<span>🎛</span>`;
     return`<a class="post-card" href="/post?id=${p.id}">
       <div class="post-thumb">${imgHtml}</div>
       <div class="post-card-body">
@@ -301,105 +293,27 @@ function renderPosts(posts){
 
 function renderGear(gear,isPublic){
   if(!isPublic)return`<div class="section-card"><div class="empty-msg">${tr('gearPrivate')}</div></div>`;
-  if(!gear||!gear.length)return`<div class="section-card"><div class="empty-msg">${tr('gearEmpty')}</div></div>`;
-  let sortedGear=[...gear];
-  let totalJpy=0,totalUsd=0,hasJpy=false,hasUsd=false;
-  gear.forEach(g=>{if(g.price){if(g.currency==='USD'){totalUsd+=g.price;hasUsd=true;}else{totalJpy+=g.price;hasJpy=true;}}});
-  const sortSelect=`<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
-    <span style="font-size:11px;color:var(--td)">${tr('gearSortLabel')}</span>
-    <select id="user-gear-sort" onchange="applyUserGearSort()" style="background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:0 10px;height:32px;font-size:11px;color:var(--tx);outline:none;cursor:pointer">
-      <option value="default">${tr('gearSortDefault')}</option>
-      <option value="date_asc">${tr('gearSortDateAsc')}</option>
-      <option value="date_desc">${tr('gearSortDateDesc')}</option>
-      <option value="price_asc">${tr('gearSortPriceAsc')}</option>
-      <option value="price_desc">${tr('gearSortPriceDesc')}</option>
-      <option value="name_asc">${tr('gearSortNameAsc')}</option>
-      <option value="name_desc">${tr('gearSortNameDesc')}</option>
-    </select>
-  </div>`;
-  let totalHtml='';
-  if(hasJpy||hasUsd){
-    let rows='';
-    if(hasJpy)rows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('totalJpy')}</span><span class="gear-total-value">¥${totalJpy.toLocaleString()}</span></div>`;
-    if(hasUsd)rows+=`<div class="gear-total-row"><span class="gear-total-label">${tr('totalUsd')}</span><span class="gear-total-value">$${totalUsd.toLocaleString()}</span></div>`;
-    totalHtml=`<div class="gear-total-box">${rows}</div>`;
-  }
-  return`<div class="section-card">${sortSelect}<div id="user-gear-items">${renderGearItems(gear)}</div>${totalHtml}</div>`;
-}
-
-function renderGearItems(gear){
-  return gear.map(g=>{
-    const priceStr=g.price?(g.currency==='USD'?`$${g.price.toLocaleString()}`:`¥${g.price.toLocaleString()}`): '';
-    const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
+  if(!gear||!gear.length)return`<div class="empty-msg">${tr('gearEmpty')}</div>`;
+  return`<div class="gear-grid">${gear.map(g=>{
+    const imgUrl=g.image_urls&&g.image_urls[0]?g.image_urls[0]:(g.image_url||null);
+    const thumbHtml=imgUrl
+      ?`<img src="${escHtml(imgUrl)}" loading="lazy">`
+      :`<div class="gear-card-no-image"><div class="gear-card-no-image-icon">📷</div><div class="gear-card-no-image-text">NO IMAGE</div></div>`;
     const dispBrand=g.brand||'';
-    const dispModel=(g.brand&&g.name.startsWith(g.brand))?g.name.slice(g.brand.length).trim():g.name;
-    const pedalSlug=g.pedal_slug||null;
-    const pedalBtn=pedalSlug?`<a href="/pedal?slug=${pedalSlug}" class="gear-pedal-btn">🎛 ${lang==='en'?'Pedal →':'ペダル詳細 →'}</a>`:'';
-    const imgHtml=g.image_url?`<img src="${escHtml(g.image_url)}" onclick="openGearImgLightbox('${escHtml(g.image_url)}')" style="width:52px;height:52px;border-radius:8px;object-fit:cover;flex-shrink:0;cursor:zoom-in;border:1px solid var(--bd)" loading="lazy">`:'';
-    return`<div class="gear-item">
-      ${dispBrand?`<div class="gear-item-brand">${escHtml(dispBrand)}</div>`:''}
-      <div style="display:flex;align-items:flex-start;gap:10px">
-        ${imgHtml}
-        <div style="flex:1;min-width:0">
-          <div class="gear-item-row3">
-            <div class="gear-item-model">${escHtml(dispModel)}</div>
-            ${pedalBtn}
-          </div>
-          ${(priceStr||dateStr)?`<div style="display:flex;gap:8px;margin-top:4px">
-            ${priceStr?`<span class="gear-item-price">${priceStr}</span>`:''}
-            ${dateStr?`<span class="gear-item-date">${dateStr}</span>`:''}
-          </div>`:''}
-          ${g.memo?`<div style="font-size:11px;color:var(--tm);margin-top:4px;line-height:1.5">${escHtml(g.memo)}</div>`:''}
-        </div>
+    const dispModel=(dispBrand&&g.name.startsWith(dispBrand))?g.name.slice(dispBrand.length).trim():g.name;
+    const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
+    const metaStr=dateStr?`${tr('gearDateLabel')}: ${dateStr}`:'';
+    return`<a class="gear-card" href="/gear?id=${g.id}">
+      <div class="gear-card-thumb">${thumbHtml}</div>
+      <div class="gear-card-body">
+        ${dispBrand?`<div class="gear-card-brand">${escHtml(dispBrand)}</div>`:''}
+        <div class="gear-card-name">${escHtml(dispModel)}</div>
+        ${metaStr?`<div class="gear-card-meta">${escHtml(metaStr)}</div>`:''}
       </div>
-    </div>`;
-  }).join('');
-}
-function openGearImgLightbox(url){
-  let lb=document.getElementById('gear-img-lightbox');
-  if(!lb){
-    lb=document.createElement('div');lb.id='gear-img-lightbox';
-    lb.style.cssText='position:fixed;inset:0;background:rgba(8,8,9,.92);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:24px;cursor:zoom-out';
-    lb.innerHTML='<div style="position:fixed;top:18px;right:18px;width:40px;height:40px;border-radius:50%;background:rgba(20,20,22,.9);border:1px solid var(--bd);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1001" onclick="this.parentElement.remove()">✕</div><img style="max-width:100%;max-height:90vh;object-fit:contain;border-radius:10px">';
-    document.body.appendChild(lb);
-    lb.addEventListener('click',e=>{if(e.target===lb)lb.remove();});
-  }
-  lb.querySelector('img').src=url;lb.style.display='flex';
-  document.addEventListener('keydown',function esc(e){if(e.key==='Escape'){lb.remove();document.removeEventListener('keydown',esc);}});
-}
-
-function applyUserGearSort(){
-  const val=document.getElementById('user-gear-sort')?.value;
-  if(!val||!_gear.length)return;
-  let sorted=[..._gear];
-  if(val==='date_asc')sorted.sort((a,b)=>(a.purchased_at||'').localeCompare(b.purchased_at||''));
-  else if(val==='date_desc')sorted.sort((a,b)=>(b.purchased_at||'').localeCompare(a.purchased_at||''));
-  else if(val==='price_asc')sorted.sort((a,b)=>{const av=(a.price||0)*(a.currency==='USD'?150:1);const bv=(b.price||0)*(b.currency==='USD'?150:1);return av-bv;});
-  else if(val==='price_desc')sorted.sort((a,b)=>{const av=(a.price||0)*(a.currency==='USD'?150:1);const bv=(b.price||0)*(b.currency==='USD'?150:1);return bv-av;});
-  else if(val==='name_asc')sorted.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
-  else if(val==='name_desc')sorted.sort((a,b)=>(b.name||'').localeCompare(a.name||''));
-  else sorted=[..._gear];
-  const wrap=document.getElementById('user-gear-items');
-  if(wrap)wrap.innerHTML=renderGearItems(sorted);
-}
-
-function renderWishlist(wishlist,isPublic){
-  if(!wishlist||!wishlist.length)return`<div class="section-card"><div class="empty-msg">${tr('noWishlist')}</div></div>`;
-  return`<div>${wishlist.map(w=>{
-    const p=w.pedals;if(!p)return'';
-    const imgSrc=p.image_url||'';
-    const typeIcon=p.types&&p.types[0]?`https://yzqfockzgyfjmngygbhp.supabase.co/storage/v1/object/public/pedal-images/type-icons/type_${p.types[0]}.png`:'';
-    const imgEl=imgSrc?`<img src="${escHtml(imgSrc)}" loading="lazy" style="width:48px;height:48px;object-fit:contain;border-radius:6px;background:var(--sf2);border:1px solid var(--bd);flex-shrink:0" onerror="this.src='${escHtml(typeIcon)}'">`:typeIcon?`<img src="${escHtml(typeIcon)}" loading="lazy" style="width:48px;height:48px;object-fit:contain;border-radius:6px;background:var(--sf2);border:1px solid var(--bd);flex-shrink:0">`:`<div style="width:48px;height:48px;border-radius:6px;background:var(--sf2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎛</div>`;
-    return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);cursor:pointer" onclick="location.href='/pedal?slug=${escHtml(p.slug)}'">
-      ${imgEl}
-      <div style="flex:1;min-width:0">
-        <div style="font-size:11px;color:var(--td);font-weight:600;letter-spacing:.5px">${escHtml(p.brand)}</div>
-        <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.model)}</div>
-      </div>
-      <div style="font-family:'Noto Sans JP',sans-serif;font-size:10px;color:var(--ac);flex-shrink:0">${lang==='en'?'Detail →':'詳細 →'}</div>
-    </div>`;
+    </a>`;
   }).join('')}</div>`;
 }
+
 function renderReviews(reviews){
   if(!reviews||!reviews.length)return`<div class="section-card"><div class="empty-msg">${tr('noReviews')}</div></div>`;
   return`<div>${reviews.map(r=>{
