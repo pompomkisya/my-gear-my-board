@@ -220,6 +220,14 @@ div[style*="max-height:0"].open{max-height:600px!important}
 .gear-modal-input:focus{border-color:var(--ac)}
 .gear-modal-input::placeholder{color:var(--td)}
 .gear-modal-actions{display:flex;gap:8px;margin-top:16px}
+/* ── Gear Image Slots ── */
+.gear-img-slot{position:relative;width:90px;height:90px;border-radius:10px;border:1.5px dashed var(--bd);background:var(--sf2);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;flex-shrink:0;transition:border-color .15s}
+.gear-img-slot:hover{border-color:var(--ac)}
+.gear-img-slot.has-image{border-style:solid;border-color:var(--bd)}
+.gear-img-slot-icon{font-size:22px;opacity:.4;pointer-events:none}
+.gear-img-slot-del{position:absolute;top:4px;right:4px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.7);border:none;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;line-height:1}
+.gear-img-slot-sub{opacity:.5}
+.gear-img-slot-sub.unlocked{opacity:1}
 .currency-select{background:var(--sf2);border:1px solid var(--bd);border-radius:8px;padding:9px 10px;font-size:13px;color:var(--tx);font-family:'JetBrains Mono',monospace;outline:none;cursor:pointer;flex-shrink:0}
 .currency-select:focus{border-color:var(--ac)}
 .gear-ac-wrap{position:relative}
@@ -434,6 +442,40 @@ div[style*="max-height:0"].open{max-height:600px!important}
 <div class="gear-modal" id="gear-modal">
   <div class="gear-modal-box">
     <div class="gear-modal-title" id="gear-modal-title">機材を追加</div>
+
+    <!-- 画像（必須・一番上・3枚まで） -->
+    <div class="gear-modal-row">
+      <label class="gear-modal-lbl" id="gear-lbl-image">写真 * <span style="font-weight:300;color:var(--td)">（3枚まで）</span></label>
+      <div id="gear-img-slots" style="display:flex;gap:8px;margin-bottom:8px">
+        <div class="gear-img-slot" id="gear-slot-0" onclick="triggerGearFile(0)">
+          <span class="gear-img-slot-icon">📷</span>
+          <img id="gear-slot-img-0" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px">
+          <button class="gear-img-slot-del" id="gear-slot-del-0" onclick="removeGearImage(event,0)" style="display:none">✕</button>
+        </div>
+        <div class="gear-img-slot gear-img-slot-sub" id="gear-slot-1" onclick="triggerGearFile(1)">
+          <span class="gear-img-slot-icon">＋</span>
+          <img id="gear-slot-img-1" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px">
+          <button class="gear-img-slot-del" id="gear-slot-del-1" onclick="removeGearImage(event,1)" style="display:none">✕</button>
+        </div>
+        <div class="gear-img-slot gear-img-slot-sub" id="gear-slot-2" onclick="triggerGearFile(2)">
+          <span class="gear-img-slot-icon">＋</span>
+          <img id="gear-slot-img-2" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:8px">
+          <button class="gear-img-slot-del" id="gear-slot-del-2" onclick="removeGearImage(event,2)" style="display:none">✕</button>
+        </div>
+      </div>
+      <input type="file" id="gear-file-input-0" accept="image/*" style="display:none" onchange="onGearFileSelected(event,0)">
+      <input type="file" id="gear-file-input-1" accept="image/*" style="display:none" onchange="onGearFileSelected(event,1)">
+      <input type="file" id="gear-file-input-2" accept="image/*" style="display:none" onchange="onGearFileSelected(event,2)">
+      <div id="gear-img-required-msg" style="display:none;font-size:11px;color:#e05050;margin-top:4px">写真を1枚以上追加してください</div>
+    </div>
+
+    <!-- ブランド -->
+    <div class="gear-modal-row">
+      <label class="gear-modal-lbl" id="gear-lbl-brand">ブランド *</label>
+      <input class="gear-modal-input" id="gear-input-brand" type="text" maxlength="60" autocomplete="off">
+    </div>
+
+    <!-- 機材名 -->
     <div class="gear-modal-row">
       <label class="gear-modal-lbl" id="gear-lbl-name">機材名 *</label>
       <div class="gear-ac-wrap">
@@ -447,10 +489,8 @@ div[style*="max-height:0"].open{max-height:600px!important}
         <div id="gear-ac-hint" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-top:5px">ローマ字入力で自動予測変換できます。候補をクリックで簡単追加！</div>
       </div>
     </div>
-    <div class="gear-modal-row">
-      <label class="gear-modal-lbl" id="gear-lbl-brand">ブランド</label>
-      <input class="gear-modal-input" id="gear-input-brand" type="text" maxlength="60" autocomplete="off">
-    </div>
+
+    <!-- 購入金額 -->
     <div class="gear-modal-row">
       <label class="gear-modal-lbl" id="gear-lbl-price">購入金額</label>
       <div style="display:flex;gap:6px">
@@ -461,26 +501,19 @@ div[style*="max-height:0"].open{max-height:600px!important}
         </select>
       </div>
     </div>
+
+    <!-- 購入日 -->
     <div class="gear-modal-row">
       <label class="gear-modal-lbl" id="gear-lbl-date">購入日</label>
       <input class="gear-modal-input" id="gear-input-date" type="date">
     </div>
+
+    <!-- 紹介文 -->
     <div class="gear-modal-row">
-      <label class="gear-modal-lbl" id="gear-lbl-memo">メモ</label>
-      <input class="gear-modal-input" id="gear-input-memo" type="text" maxlength="200">
+      <label class="gear-modal-lbl" id="gear-lbl-memo">紹介文</label>
+      <textarea class="gear-modal-input" id="gear-input-memo" maxlength="500" rows="4" style="resize:vertical;line-height:1.6"></textarea>
     </div>
-    <div class="gear-modal-row">
-      <label class="gear-modal-lbl">写真（任意）</label>
-      <div style="display:flex;align-items:center;gap:12px">
-        <div id="gear-img-thumb" class="gear-img-placeholder" onclick="document.getElementById('gear-file-input').click()">📷</div>
-        <div style="flex:1">
-          <div style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);line-height:1.6">タップで画像を選択</div>
-          <div id="gear-img-status" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-top:4px"></div>
-          <button id="gear-img-delete-btn" onclick="clearGearImage()" style="display:none;margin-top:6px;padding:3px 10px;background:transparent;border:1px solid #5a1a1a;border-radius:4px;font-size:11px;color:#e05050;cursor:pointer">🗑 画像を削除</button>
-        </div>
-      </div>
-      <input type="file" id="gear-file-input" accept="image/*" style="display:none" onchange="onGearFileSelected(event)">
-    </div>
+
     <div class="gear-modal-actions">
       <button class="gear-add-btn" id="gear-modal-save-btn" onclick="saveGearItem()">保存</button>
       <button class="gear-share-btn" onclick="closeGearModal()" id="gear-modal-cancel-btn">キャンセル</button>
@@ -497,8 +530,8 @@ const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 function detectLang(){const saved=localStorage.getItem('mgmb_lang');if(saved)return saved;const bl=navigator.language||navigator.userLanguage||'ja';return bl.toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
 const MP_I18N={
-  ja:{logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとアカウントを作れます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'MY BOARD',tabGear:'MY GEAR',tabReviews:'レビュー',tabLikes:'いいね',tabGacha:'ガチャ保存',tabWishlist:'欲しいリスト',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyGacha:'ガチャ保存がまだありません',emptyReviews:'まだレビューがありません',gachaDeleteConfirm:'このガチャ保存を削除しますか？',gachaDeleted:'削除しました',emptyWishlist:'欲しいリストはまだ空です',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました',profileToggleOpen:'プロフィールを編集',profileToggleClose:'閉じる',avEditLbl:'変更',profileEditHint:'✏️ プロフィール編集',gearTotalTitle:'TOTAL GEAR VALUE',gearTotalJpy:'JPY 合計',gearTotalUsd:'USD 合計',gearPublicLabel:'マイギアを公開する',gearPublicOn:'公開中',gearPublicOff:'非公開',gearShareBtn:'🔗 シェア',gearPrivateNote:'マイギアは非公開です',gearSortLabel:'並べ替え：',gearSortDefault:'登録順',gearSortDateAsc:'購入日（古い順）',gearSortDateDesc:'購入日（新しい順）',gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',gearAddBtn:'＋ 機材を追加',gearModalAddTitle:'機材を追加',gearModalEditTitle:'機材を編集',gearLblName:'機材名 *',gearLblBrand:'ブランド',gearLblPrice:'購入金額',gearLblDate:'購入日',gearLblMemo:'メモ',gearSaveBtn:'保存',gearCancelBtn:'キャンセル',gearNameRequired:'機材名を入力してください',gearSaved:'✅ 保存しました',gearDeleted:'✅ 削除しました',gearDeleteConfirm:'この機材を削除しますか？',gearCopied:'🔗 URLをコピーしました'},
-  en:{logoSub:'Pedalboard Posts & Database',backBtn:'← Home',tabLogin:'Login',tabRegister:'Register',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Register',rfSub:'Post without signing up, or create an account for more features',rfLblName:'Username',rfLblEmail:'Email',rfLblPw:'Password (6+ chars)',registerBtn:'Register',registerBtnLoading:'Registering...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:'We will send a reset link to your registered email',rstLblEmail:'Email',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Amp, music genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Logout',confirmLogout:'Are you sure you want to logout?',tabPosts:'MY BOARD',tabGear:'MY GEAR',tabReviews:'Reviews',tabLikes:'Liked',tabGacha:'Gacha Saves',tabWishlist:'Wish List',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyGacha:'No gacha saves yet',emptyReviews:'No reviews yet',gachaDeleteConfirm:'Delete this gacha save?',gachaDeleted:'Deleted',emptyWishlist:'Your wish list is empty',loading:'Loading...',errEmailPw:'Please enter email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email is already registered',errResetEmail:'Please enter your email',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New Password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',profileToggleOpen:'Edit Profile',profileToggleClose:'Close',avEditLbl:'Edit',profileEditHint:'✏️ Edit Profile',gearTotalTitle:'TOTAL GEAR VALUE',gearTotalJpy:'JPY Total',gearTotalUsd:'USD Total',gearPublicLabel:'Make My Gear public',gearPublicOn:'Public',gearPublicOff:'Private',gearShareBtn:'🔗 Share',gearPrivateNote:'My Gear is private',gearSortLabel:'Sort: ',gearSortDefault:'Default',gearSortDateAsc:'Date (oldest)',gearSortDateDesc:'Date (newest)',gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',gearAddBtn:'＋ Add Gear',gearModalAddTitle:'Add Gear',gearModalEditTitle:'Edit Gear',gearLblName:'Gear Name *',gearLblBrand:'Brand',gearLblPrice:'Purchase Price',gearLblDate:'Purchase Date',gearLblMemo:'Memo',gearSaveBtn:'Save',gearCancelBtn:'Cancel',gearNameRequired:'Please enter a gear name',gearSaved:'✅ Saved',gearDeleted:'✅ Deleted',gearDeleteConfirm:'Delete this gear item?',gearCopied:'🔗 URL copied'}
+  ja:{logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',tabLogin:'ログイン',tabRegister:'新規登録',lfTitle:'ログイン',lfSub:'メールアドレスとパスワードでログイン',lfLblEmail:'メールアドレス',lfLblPw:'パスワード',loginBtn:'ログイン',loginBtnLoading:'ログイン中...',resetLink:'パスワードを忘れた方はこちら',rfTitle:'新規登録',rfSub:'登録不要で投稿できますが、登録するとアカウントを作れます',rfLblName:'ユーザー名',rfLblEmail:'メールアドレス',rfLblPw:'パスワード（6文字以上）',registerBtn:'登録する',registerBtnLoading:'登録中...',rfNote:'登録後、確認メールが届きます。メールのリンクをクリックして登録完了です。',regUsernamePh:'あなたの名前',rstTitle:'パスワードリセット',rstSub:'登録済みのメールアドレスにリセットリンクを送ります',rstLblEmail:'メールアドレス',resetBtn:'リセットメールを送る',resetBtnLoading:'送信中...',rstBackLink:'← ログインに戻る',sectionProfile:'プロフィール編集',lblUsername:'ユーザー名',lblBio:'自己紹介',lblAmp:'使用アンプ',lblX:'X（Twitter）URL',lblIg:'Instagram URL',bioPh:'使用アンプ、音楽のジャンルなど...',ampPh:'例: Fender Twin Reverb',pwPh:'6文字以上',regPwPh:'6文字以上',saveBtn:'プロフィールを保存',logoutBtn:'ログアウト',confirmLogout:'ログアウトしますか？',tabPosts:'MY BOARD',tabGear:'MY GEAR',tabReviews:'レビュー',tabLikes:'いいね',tabGacha:'ガチャ保存',tabWishlist:'欲しいリスト',emptyPosts:'まだ投稿がありません',emptyLikes:'まだいいねした投稿がありません',emptyGacha:'ガチャ保存がまだありません',emptyReviews:'まだレビューがありません',gachaDeleteConfirm:'このガチャ保存を削除しますか？',gachaDeleted:'削除しました',emptyWishlist:'欲しいリストはまだ空です',loading:'読み込み中...',errEmailPw:'メールアドレスとパスワードを入力してください',errInvalidLogin:'❌ メールアドレスまたはパスワードが違います',errNotConfirmed:'❌ メールアドレスの確認が完了していません。届いたメールのリンクをクリックしてください。',errUsername:'ユーザー名を入力してください',errEmail:'メールアドレスを入力してください',errPwShort:'パスワードは6文字以上で設定してください',errAlreadyReg:'❌ このメールアドレスはすでに登録されています',errResetEmail:'メールアドレスを入力してください',toastRegister:'✅ 確認メールを送信しました。メールのリンクをクリックして登録完了です。',toastReset:'✅ パスワードリセットメールを送りました',toastSaveFail:'❌ 保存に失敗しました',toastSaveDone:'✅ プロフィールを保存しました',toastUsernameReq:'ユーザー名を入力してください',toastLogout:'ログアウトしました',newPwTitle:'新しいパスワードを設定',newPwSub:'新しいパスワードを入力してください（6文字以上）',newPwLbl:'新しいパスワード',newPwBtn:'パスワードを更新する',newPwShort:'6文字以上で入力してください',toastPwDone:'✅ パスワードを更新しました',profileToggleOpen:'プロフィールを編集',profileToggleClose:'閉じる',avEditLbl:'変更',profileEditHint:'✏️ プロフィール編集',gearTotalTitle:'TOTAL GEAR VALUE',gearTotalJpy:'JPY 合計',gearTotalUsd:'USD 合計',gearPublicLabel:'マイギアを公開する',gearPublicOn:'公開中',gearPublicOff:'非公開',gearShareBtn:'🔗 シェア',gearPrivateNote:'マイギアは非公開です',gearSortLabel:'並べ替え：',gearSortDefault:'登録順',gearSortDateAsc:'購入日（古い順）',gearSortDateDesc:'購入日（新しい順）',gearSortPriceAsc:'金額（安い順）',gearSortPriceDesc:'金額（高い順）',gearSortNameAsc:'名前（A→Z）',gearSortNameDesc:'名前（Z→A）',gearAddBtn:'＋ 機材を追加',gearModalAddTitle:'機材を追加',gearModalEditTitle:'機材を編集',gearLblName:'機材名 *',gearLblBrand:'ブランド',gearLblPrice:'購入金額',gearLblDate:'購入日',gearLblMemo:'紹介文',gearSaveBtn:'保存',gearCancelBtn:'キャンセル',gearNameRequired:'機材名を入力してください',gearSaved:'✅ 保存しました',gearDeleted:'✅ 削除しました',gearDeleteConfirm:'この機材を削除しますか？',gearCopied:'🔗 URLをコピーしました'},
+  en:{logoSub:'Pedalboard Posts & Database',backBtn:'← Home',tabLogin:'Login',tabRegister:'Register',lfTitle:'Login',lfSub:'Sign in with your email and password',lfLblEmail:'Email',lfLblPw:'Password',loginBtn:'Login',loginBtnLoading:'Logging in...',resetLink:'Forgot your password?',rfTitle:'Register',rfSub:'Post without signing up, or create an account for more features',rfLblName:'Username',rfLblEmail:'Email',rfLblPw:'Password (6+ chars)',registerBtn:'Register',registerBtnLoading:'Registering...',rfNote:'A confirmation email will be sent. Click the link to complete registration.',regUsernamePh:'Your name',rstTitle:'Reset Password',rstSub:'We will send a reset link to your registered email',rstLblEmail:'Email',resetBtn:'Send Reset Email',resetBtnLoading:'Sending...',rstBackLink:'← Back to Login',sectionProfile:'Edit Profile',lblUsername:'Username',lblBio:'Bio',lblAmp:'Amp',lblX:'X (Twitter) URL',lblIg:'Instagram URL',bioPh:'Amp, music genre, etc...',ampPh:'e.g. Fender Twin Reverb',pwPh:'6+ characters',regPwPh:'6+ characters',saveBtn:'Save Profile',logoutBtn:'Logout',confirmLogout:'Are you sure you want to logout?',tabPosts:'MY BOARD',tabGear:'MY GEAR',tabReviews:'Reviews',tabLikes:'Liked',tabGacha:'Gacha Saves',tabWishlist:'Wish List',emptyPosts:'No posts yet',emptyLikes:'No liked posts yet',emptyGacha:'No gacha saves yet',emptyReviews:'No reviews yet',gachaDeleteConfirm:'Delete this gacha save?',gachaDeleted:'Deleted',emptyWishlist:'Your wish list is empty',loading:'Loading...',errEmailPw:'Please enter email and password',errInvalidLogin:'❌ Invalid email or password',errNotConfirmed:'❌ Email not confirmed. Please click the link in the confirmation email.',errUsername:'Please enter a username',errEmail:'Please enter an email',errPwShort:'Password must be at least 6 characters',errAlreadyReg:'❌ This email is already registered',errResetEmail:'Please enter your email',toastRegister:'✅ Confirmation email sent. Click the link to complete registration.',toastReset:'✅ Password reset email sent',toastSaveFail:'❌ Save failed',toastSaveDone:'✅ Profile saved',toastUsernameReq:'Please enter a username',toastLogout:'Logged out',newPwTitle:'Set New Password',newPwSub:'Enter your new password (6+ characters)',newPwLbl:'New Password',newPwBtn:'Update Password',newPwShort:'Please enter at least 6 characters',toastPwDone:'✅ Password updated',profileToggleOpen:'Edit Profile',profileToggleClose:'Close',avEditLbl:'Edit',profileEditHint:'✏️ Edit Profile',gearTotalTitle:'TOTAL GEAR VALUE',gearTotalJpy:'JPY Total',gearTotalUsd:'USD Total',gearPublicLabel:'Make My Gear public',gearPublicOn:'Public',gearPublicOff:'Private',gearShareBtn:'🔗 Share',gearPrivateNote:'My Gear is private',gearSortLabel:'Sort: ',gearSortDefault:'Default',gearSortDateAsc:'Date (oldest)',gearSortDateDesc:'Date (newest)',gearSortPriceAsc:'Price (low→high)',gearSortPriceDesc:'Price (high→low)',gearSortNameAsc:'Name (A→Z)',gearSortNameDesc:'Name (Z→A)',gearAddBtn:'＋ Add Gear',gearModalAddTitle:'Add Gear',gearModalEditTitle:'Edit Gear',gearLblName:'Gear Name *',gearLblBrand:'Brand',gearLblPrice:'Purchase Price',gearLblDate:'Purchase Date',gearLblMemo:'Description',gearSaveBtn:'Save',gearCancelBtn:'Cancel',gearNameRequired:'Please enter a gear name',gearSaved:'✅ Saved',gearDeleted:'✅ Deleted',gearDeleteConfirm:'Delete this gear item?',gearCopied:'🔗 URL copied'}
 };
 function tr(key){return(MP_I18N[lang]||MP_I18N.ja)[key]||MP_I18N.ja[key]||key;}
 function setTxt(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt;}
@@ -1090,14 +1123,6 @@ async function deleteCoverImage(){
   const delBtn=document.getElementById('cover-delete-btn');if(delBtn)delBtn.style.display='none';
   showToast('🗑 背景画像を削除しました');
 }
-function clearGearImage(){
-  // モーダル内のUI上から削除フラグを立てる（保存時にnullで更新）
-  _pendingGearFile=null;_gearImgUrl='__delete__';
-  const thumb=document.getElementById('gear-img-thumb');
-  thumb.innerHTML='📷';thumb.className='gear-img-placeholder';
-  document.getElementById('gear-img-status').textContent='保存時に削除されます';
-  const delBtn=document.getElementById('gear-img-delete-btn');if(delBtn)delBtn.style.display='none';
-}
 async function uploadCoverImage(file){
   const ext=file.name.split('.').pop().toLowerCase();
   const path=`covers/${currentUser.id}/cover.${ext}`;
@@ -1106,22 +1131,75 @@ async function uploadCoverImage(file){
   const{data}=sb.storage.from('user-content').getPublicUrl(path);
   return data.publicUrl+'?t='+Date.now();
 }
-// ★ 機材画像アップロード
-let _pendingGearFile=null;let _gearImgUrl=null;
-function onGearFileSelected(e){
+// ★ 機材画像アップロード（3枚対応）
+let _pendingGearFiles=[null,null,null];
+let _gearImgUrls=[null,null,null];
+
+function triggerGearFile(idx){
+  document.getElementById('gear-file-input-'+idx).click();
+}
+function onGearFileSelected(e,idx){
   const file=e.target.files[0];if(!file)return;
-  _pendingGearFile=file;
-  const thumb=document.getElementById('gear-img-thumb');
+  _pendingGearFiles[idx]=file;
   const reader=new FileReader();
   reader.onload=ev=>{
-    thumb.innerHTML=`<img src="${ev.target.result}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">`;
-    document.getElementById('gear-img-status').textContent='保存時にアップロードされます';
+    const img=document.getElementById('gear-slot-img-'+idx);
+    const icon=document.querySelector('#gear-slot-'+idx+' .gear-img-slot-icon');
+    const del=document.getElementById('gear-slot-del-'+idx);
+    const slot=document.getElementById('gear-slot-'+idx);
+    img.src=ev.target.result;img.style.display='block';
+    if(icon)icon.style.display='none';
+    if(del)del.style.display='flex';
+    slot.classList.add('has-image');
+    // 次のスロットを解放
+    if(idx<2){
+      document.getElementById('gear-slot-'+(idx+1)).classList.add('unlocked');
+    }
+    document.getElementById('gear-img-required-msg').style.display='none';
   };
   reader.readAsDataURL(file);
 }
-async function uploadGearImage(file,gearId){
+function removeGearImage(e,idx){
+  e.stopPropagation();
+  _pendingGearFiles[idx]=null;_gearImgUrls[idx]='__delete__';
+  const img=document.getElementById('gear-slot-img-'+idx);
+  const icon=document.querySelector('#gear-slot-'+idx+' .gear-img-slot-icon');
+  const del=document.getElementById('gear-slot-del-'+idx);
+  const slot=document.getElementById('gear-slot-'+idx);
+  img.src='';img.style.display='none';
+  if(icon)icon.style.display='block';
+  if(del)del.style.display='none';
+  slot.classList.remove('has-image');
+  document.getElementById('gear-file-input-'+idx).value='';
+}
+function initGearImageSlots(gear){
+  const urls=gear?.image_urls&&gear.image_urls.length?gear.image_urls:[gear?.image_url||null,null,null];
+  _pendingGearFiles=[null,null,null];
+  _gearImgUrls=[urls[0]||null,urls[1]||null,urls[2]||null];
+  for(let i=0;i<3;i++){
+    const img=document.getElementById('gear-slot-img-'+i);
+    const icon=document.querySelector('#gear-slot-'+i+' .gear-img-slot-icon');
+    const del=document.getElementById('gear-slot-del-'+i);
+    const slot=document.getElementById('gear-slot-'+i);
+    if(_gearImgUrls[i]){
+      img.src=_gearImgUrls[i];img.style.display='block';
+      if(icon)icon.style.display='none';
+      if(del)del.style.display='flex';
+      slot.classList.add('has-image','unlocked');
+    }else{
+      img.src='';img.style.display='none';
+      if(icon)icon.style.display='block';
+      if(del)del.style.display='none';
+      slot.classList.remove('has-image');
+      if(i>0)slot.classList.remove('unlocked');
+    }
+    document.getElementById('gear-file-input-'+i).value='';
+  }
+  document.getElementById('gear-img-required-msg').style.display='none';
+}
+async function uploadGearImage(file,gearId,idx){
   const ext=file.name.split('.').pop().toLowerCase();
-  const path=`gear/${currentUser.id}/${gearId}.${ext}`;
+  const path=`gear/${currentUser.id}/${gearId}_${idx}.${ext}`;
   const{error}=await sb.storage.from('user-content').upload(path,file,{upsert:true,contentType:file.type});
   if(error)throw error;
   const{data}=sb.storage.from('user-content').getPublicUrl(path);
@@ -1159,24 +1237,12 @@ function openGearModal(gearId){
   document.getElementById('gear-input-currency').value=gear?.currency||'JPY';
   document.getElementById('gear-input-date').value=gear?.purchased_at?gear.purchased_at.split('T')[0]:'';
   document.getElementById('gear-input-memo').value=gear?.memo||'';
-  // 画像の初期化・復元
-  _pendingGearFile=null;_gearImgUrl=gear?.image_url||null;
-  const thumb=document.getElementById('gear-img-thumb');
-  const delBtn=document.getElementById('gear-img-delete-btn');
-  if(gear?.image_url){
-    thumb.innerHTML=`<img src="${gear.image_url}" style="width:60px;height:60px;border-radius:8px;object-fit:cover">`;
-    if(delBtn)delBtn.style.display='block';
-  }else{
-    thumb.innerHTML='📷';thumb.className='gear-img-placeholder';
-    if(delBtn)delBtn.style.display='none';
-  }
-  document.getElementById('gear-img-status').textContent='';
-  document.getElementById('gear-file-input').value='';
+  initGearImageSlots(gear);
   document.getElementById('gear-modal-save-btn').textContent=tr('gearSaveBtn');
   closeGearAC();
   const cancelBtn=document.getElementById('gear-modal-cancel-btn');if(cancelBtn)cancelBtn.textContent=tr('gearCancelBtn');
   document.getElementById('gear-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('gear-input-name').focus(),100);
+  setTimeout(()=>document.getElementById('gear-input-brand').focus(),100);
 }
 function closeGearModal(){
   closeGearAC();
@@ -1186,8 +1252,12 @@ function closeGearModal(){
 async function saveGearItem(){
   if(!currentUser)return;
   const name=document.getElementById('gear-input-name').value.trim();
-  if(!name){showToast(tr('gearNameRequired'));return;}
   const brand=document.getElementById('gear-input-brand').value.trim()||null;
+  if(!name){showToast(tr('gearNameRequired'));return;}
+  if(!brand){showToast(lang==='en'?'Please enter a brand name':'ブランドを入力してください');return;}
+  // 画像必須チェック
+  const hasImage=_gearImgUrls.some(u=>u&&u!=='__delete__')||_pendingGearFiles.some(f=>f);
+  if(!hasImage){document.getElementById('gear-img-required-msg').style.display='block';return;}
   const priceRaw=document.getElementById('gear-input-price').value.replace(/[０-９]/g,s=>String.fromCharCode(s.charCodeAt(0)-0xFEE0)).replace(/[^0-9]/g,'');
   const price=priceRaw?parseInt(priceRaw):null;
   const currency=document.getElementById('gear-input-currency').value;
@@ -1196,7 +1266,7 @@ async function saveGearItem(){
   const btn=document.getElementById('gear-modal-save-btn');btn.disabled=true;
   let savedId=editingGearId;
   if(editingGearId){
-    const{error}=await sb.from('user_gear').update({name,brand,price,currency,purchased_at,memo}).eq('id',editingGearId).eq('user_id',currentUser.id);
+    const{error}=await sb.from('user_gear').update({name,brand,price,currency,purchased_at,memo,updated_at:new Date().toISOString()}).eq('id',editingGearId).eq('user_id',currentUser.id);
     if(error){showToast('❌ '+error.message);btn.disabled=false;return;}
   }else{
     const maxOrder=gearList.length?Math.max(...gearList.map(g=>g.sort_order||0))+1:0;
@@ -1204,24 +1274,20 @@ async function saveGearItem(){
     if(error){showToast('❌ '+error.message);btn.disabled=false;return;}
     savedId=data.id;
   }
-  // 画像アップロード or 削除
-  if(_gearImgUrl==='__delete__'&&savedId){
-    await sb.from('user_gear').update({image_url:null}).eq('id',savedId).eq('user_id',currentUser.id);
-    _gearImgUrl=null;
-  }else if(_pendingGearFile&&savedId){
-    try{
-      document.getElementById('gear-img-status').textContent='アップロード中...';
-      const imgUrl=await uploadGearImage(_pendingGearFile,savedId);
-      await sb.from('user_gear').update({image_url:imgUrl}).eq('id',savedId).eq('user_id',currentUser.id);
-      _pendingGearFile=null;
-    }catch(e){
-      const msg=e?.message||e?.error||JSON.stringify(e)||'不明なエラー';
-      showToast('⚠️ 画像エラー: '+msg);
-      console.error('gear upload error',e);
+  // 画像アップロード（3枚）
+  const finalUrls=[];
+  for(let i=0;i<3;i++){
+    if(_pendingGearFiles[i]){
+      try{
+        const url=await uploadGearImage(_pendingGearFiles[i],savedId,i);
+        finalUrls.push(url);
+      }catch(e){showToast('⚠️ 画像エラー: '+(e?.message||''));console.error(e);}
+    }else if(_gearImgUrls[i]&&_gearImgUrls[i]!=='__delete__'){
+      finalUrls.push(_gearImgUrls[i]);
     }
   }
+  await sb.from('user_gear').update({image_urls:finalUrls,image_url:finalUrls[0]||null}).eq('id',savedId).eq('user_id',currentUser.id);
   btn.disabled=false;closeGearModal();showToast(tr('gearSaved'));_tabLoaded['gear']=false;await loadGearList();
-  // カウント更新
   const{count}=await sb.from('user_gear').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id);
   const el=document.getElementById('my-count-gear');if(el)el.textContent=count||0;
 }
