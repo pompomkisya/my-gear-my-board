@@ -34,23 +34,36 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .loading{text-align:center;padding:60px;color:var(--td)}
 .error-box{text-align:center;padding:60px;color:var(--td)}
 
-/* ── Image ── */
-.gear-image-wrap{width:100%;aspect-ratio:1;background:var(--sf2);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:20px;cursor:zoom-in;position:relative}
-.gear-image-wrap img{width:100%;height:100%;object-fit:contain}
+/* ── Image Swipe ── */
+.gear-images-wrap{position:relative;width:100%;aspect-ratio:1;background:var(--sf2);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:12px}
+.gear-images-track{display:flex;height:100%;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.gear-image-slide{flex-shrink:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;cursor:zoom-in}
+.gear-image-slide img{width:100%;height:100%;object-fit:contain}
 .no-image{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:default}
 .no-image-icon{font-size:48px;opacity:.25}
 .no-image-text{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--td)}
+.gear-img-dots{display:flex;justify-content:center;gap:6px;margin-bottom:16px}
+.gear-img-dot{width:6px;height:6px;border-radius:50%;background:var(--bd);transition:background .2s}
+.gear-img-dot.on{background:var(--ac)}
 
 /* ── Meta ── */
 .gear-brand{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
-.gear-name{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;line-height:1.1;margin-bottom:20px}
+.gear-name{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;line-height:1.1;margin-bottom:12px}
+.gear-desc{font-size:14px;line-height:1.8;color:var(--tx);margin-bottom:20px;white-space:pre-wrap}
+
+/* ── Actions (like/comment count) ── */
+.gear-actions{display:flex;gap:8px;margin-bottom:16px}
+.gear-act-btn{display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;font-size:13px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;flex:1;justify-content:center}
+.gear-act-btn:hover{border-color:var(--ac);color:var(--ac)}
+.gear-act-btn.liked{border-color:var(--ac);color:var(--ac);background:rgba(232,85,45,.08)}
+
+/* ── Detail Box ── */
 .gear-detail-box{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:16px}
 .gear-detail-row{display:flex;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
 .gear-detail-row:last-child{border-bottom:none}
 .gear-detail-label{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);flex-shrink:0;width:72px}
 .gear-detail-value{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--tx);font-weight:600;flex:1}
 .gear-detail-value.price{color:var(--ac);font-size:15px}
-.gear-detail-value.memo{font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:300;line-height:1.7;white-space:pre-wrap}
 .gear-detail-value.empty{color:var(--td);font-weight:300;font-family:'Noto Sans JP',sans-serif}
 
 /* ── User ── */
@@ -70,15 +83,37 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .pedal-link-name{font-size:13px;font-weight:600;color:var(--tx)}
 .pedal-link-arrow{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--ac);white-space:nowrap;flex-shrink:0}
 
+/* ── Comments ── */
+.comment-section{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:16px}
+.comment-section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--tm);margin-bottom:14px}
+.comment-input-wrap{margin-bottom:16px}
+.comment-name-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:6px 6px 0 0;padding:9px 12px;font-size:14px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
+.comment-name-input:focus{border-color:var(--ac)}
+.comment-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-top:none;border-radius:0 0 6px 6px;padding:10px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;resize:none;min-height:60px;transition:border-color .15s}
+.comment-input:focus{border-color:var(--ac)}
+.comment-input::placeholder{color:var(--td)}
+.comment-submit{margin-top:8px;padding:9px 20px;background:var(--ac);border:none;border-radius:6px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:opacity .15s}
+.comment-submit:hover{opacity:.85}
+.comment-submit:disabled{opacity:.4;cursor:default}
+.comment-item{padding:12px 0;border-bottom:1px solid var(--bd)}
+.comment-item:last-child{border-bottom:none}
+.comment-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.comment-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;overflow:hidden}
+.comment-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.comment-name{font-size:12px;font-weight:700;color:var(--tx)}
+.comment-time{font-size:10px;color:var(--td);margin-left:auto}
+.comment-body{font-size:13px;line-height:1.6;color:var(--tx);padding-left:36px;white-space:pre-wrap}
+.comment-empty{font-size:13px;color:var(--td);text-align:center;padding:20px 0}
+.comment-del-btn{font-size:10px;color:var(--td);cursor:pointer;margin-left:8px;transition:color .15s}
+.comment-del-btn:hover{color:#e05050}
+
 /* ── Lightbox ── */
 .lightbox{position:fixed;inset:0;background:rgba(8,8,9,.95);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px;cursor:zoom-out}
 .lightbox.show{display:flex}
 .lightbox-close{position:fixed;top:18px;right:18px;width:40px;height:40px;border-radius:50%;background:rgba(20,20,22,.9);border:1px solid var(--bd);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:1001}
 .lightbox img{max-width:100%;max-height:90vh;object-fit:contain;border-radius:10px}
-
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px 18px;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
 @media(max-width:480px){
   .gear-name{font-size:26px}
   .gear-detail-label{width:60px}
@@ -100,11 +135,9 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
     <div class="lang-btn" onclick="toggleLang()">🌐 <span id="lang-label">EN</span></div>
   </div>
 </header>
-
 <div class="page">
   <div id="content"><div class="loading">読み込み中...</div></div>
 </div>
-
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <div class="lightbox-close" onclick="closeLightbox()">✕</div>
   <img id="lightbox-img" src="" alt="">
@@ -116,28 +149,35 @@ const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-function detectLang(){const saved=localStorage.getItem('mgmb_lang');if(saved)return saved;const bl=navigator.language||'ja';return bl.toLowerCase().startsWith('ja')?'ja':'en';}
+function detectLang(){const s=localStorage.getItem('mgmb_lang');if(s)return s;return(navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
-
 const I18N={
   ja:{
     logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',langLabel:'EN',
     loading:'読み込み中...',notFound:'機材が見つかりませんでした',backHome:'← ホームに戻る',
-    labelBrand:'ブランド',labelDate:'購入日',labelPrice:'購入金額',labelMemo:'メモ',
+    labelBrand:'ブランド',labelDate:'購入日',labelPrice:'購入金額',
     empty:'—',
     pedalLinkLabel:'🎛 図鑑で見る',pedalLinkArrow:'詳細ページへ →',
     postedBy:'投稿者',viewProfile:'プロフィールを見る →',
+    likeBtn:'いいね',commentTitle:'コメント',commentNamePh:'名前（任意）',
+    commentPh:'コメントを入力...',commentSubmit:'送信',commentEmpty:'まだコメントはありません',
+    commentDeleted:'削除されました',commentDeleteConfirm:'このコメントを削除しますか？',
+    justNow:'たった今',mAgo:'分前',hAgo:'時間前',
   },
   en:{
     logoSub:'Pedalboard Posts & Database',backBtn:'← Home',langLabel:'JA',
     loading:'Loading...',notFound:'Gear not found',backHome:'← Back to Home',
-    labelBrand:'Brand',labelDate:'Purchased',labelPrice:'Price',labelMemo:'Memo',
+    labelBrand:'Brand',labelDate:'Purchased',labelPrice:'Price',
     empty:'—',
     pedalLinkLabel:'🎛 View in Database',pedalLinkArrow:'View pedal page →',
     postedBy:'Posted by',viewProfile:'View profile →',
+    likeBtn:'Like',commentTitle:'Comments',commentNamePh:'Name (optional)',
+    commentPh:'Write a comment...',commentSubmit:'Post',commentEmpty:'No comments yet',
+    commentDeleted:'Deleted',commentDeleteConfirm:'Delete this comment?',
+    justNow:'just now',mAgo:'m ago',hAgo:'h ago',
   }
 };
-function tr(key){return(I18N[lang]||I18N.ja)[key]||I18N.ja[key]||key;}
+function tr(k){return(I18N[lang]||I18N.ja)[k]||I18N.ja[k]||k;}
 function applyLang(){
   document.getElementById('logo-sub').textContent=tr('logoSub');
   document.getElementById('back-btn').textContent=tr('backBtn');
@@ -146,122 +186,190 @@ function applyLang(){
 function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();loadGear();}
 function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(d>=86400){const dt=new Date(ts);return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');}if(d<60)return tr('justNow');if(d<3600)return Math.floor(d/60)+tr('mAgo');return Math.floor(d/3600)+tr('hAgo');}
+function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+Math.random().toString(36).slice(2)+Date.now();localStorage.setItem('mgmb_sid',s);}return s;}
 
-function openLightbox(url){
-  document.getElementById('lightbox-img').src=url;
-  document.getElementById('lightbox').classList.add('show');
-  document.addEventListener('keydown',escLightbox);
+let GEAR_ID=null;let _liked=false;let _likeCount=0;let _currentUser=null;let _imgUrls=[];let _imgIdx=0;
+
+function openLightbox(url){document.getElementById('lightbox-img').src=url;document.getElementById('lightbox').classList.add('show');document.addEventListener('keydown',escLb);}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('show');document.removeEventListener('keydown',escLb);}
+function escLb(e){if(e.key==='Escape')closeLightbox();}
+
+// ── Image swipe ──
+function initImageSwipe(urls){
+  _imgUrls=urls;_imgIdx=0;
+  const wrap=document.getElementById('gear-images-wrap');if(!wrap)return;
+  const track=document.getElementById('gear-images-track');
+  track.innerHTML=urls.map((u,i)=>`<div class="gear-image-slide" onclick="openLightbox('${escHtml(u)}')"><img src="${escHtml(u)}" loading="${i===0?'eager':'lazy'}"></div>`).join('');
+  const dots=document.getElementById('gear-img-dots');
+  if(urls.length>1){
+    dots.innerHTML=urls.map((_,i)=>`<div class="gear-img-dot${i===0?' on':''}"></div>`).join('');
+    dots.style.display='flex';
+  }else{dots.style.display='none';}
+  let startX=0;
+  wrap.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
+  wrap.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-startX;
+    if(Math.abs(dx)>40){dx<0?gotoImg(_imgIdx+1):gotoImg(_imgIdx-1);}
+  });
 }
-function closeLightbox(){
-  document.getElementById('lightbox').classList.remove('show');
-  document.removeEventListener('keydown',escLightbox);
+function gotoImg(idx){
+  if(idx<0||idx>=_imgUrls.length)return;
+  _imgIdx=idx;
+  document.getElementById('gear-images-track').style.transform=`translateX(-${idx*100}%)`;
+  document.querySelectorAll('.gear-img-dot').forEach((d,i)=>d.classList.toggle('on',i===idx));
 }
-function escLightbox(e){if(e.key==='Escape')closeLightbox();}
 
 async function loadGear(){
   const params=new URLSearchParams(window.location.search);
   const id=params.get('id');
   if(!id){showError(tr('notFound'));return;}
+  GEAR_ID=id;
+  const SID=getSessionId();
+  const{data:{session}}=await sb.auth.getSession();
+  _currentUser=session?.user||null;
 
-  const{data:gear}=await sb.from('user_gear')
-    .select('*')
-    .eq('id',id)
-    .maybeSingle();
-
+  const[gearRes,userRes,likeRes,commentCountRes]=await Promise.all([
+    sb.from('user_gear').select('*').eq('id',id).maybeSingle(),
+    null,
+    sb.from('gear_likes').select('id').eq('gear_id',id).eq('session_id',SID).maybeSingle(),
+    sb.from('gear_comments').select('id',{count:'exact',head:true}).eq('gear_id',id).is('deleted_at',null),
+  ]);
+  const gear=gearRes.data;
   if(!gear){showError(tr('notFound'));return;}
 
-  // ユーザー情報取得
-  const{data:user}=await sb.from('users')
-    .select('id,username,avatar_url')
-    .eq('id',gear.user_id)
-    .maybeSingle();
-
-  // ペダル図鑑情報取得（pedal_slugがある場合）
+  const{data:user}=await sb.from('users').select('id,username,avatar_url').eq('id',gear.user_id).maybeSingle();
   let pedal=null;
-  const slug=gear.pedal_slug||null;
-  if(slug){
-    const{data:p}=await sb.from('pedals').select('full_name,slug,brand').eq('slug',slug).maybeSingle();
-    pedal=p||null;
-  }
+  if(gear.pedal_slug){const{data:p}=await sb.from('pedals').select('full_name,slug,brand').eq('slug',gear.pedal_slug).maybeSingle();pedal=p||null;}
 
-  renderGear(gear,user,pedal);
+  _liked=!!likeRes.data;
+  _likeCount=gear.likes||0;
+  const commentCount=commentCountRes.count||0;
+
+  document.title=`${gear.name} — My Gear My Board`;
+  renderGear(gear,user,pedal,commentCount);
+  loadComments();
 }
 
-function renderGear(gear,user,pedal){
-  // タイトル更新
+function renderGear(gear,user,pedal,commentCount){
   const dispBrand=gear.brand||'';
   const dispModel=(dispBrand&&gear.name.startsWith(dispBrand))?gear.name.slice(dispBrand.length).trim():gear.name;
-  document.title=`${gear.name} — My Gear My Board`;
-
-  // 画像
-  const imgUrl=gear.image_urls&&gear.image_urls[0]?gear.image_urls[0]:(gear.image_url||null);
-  const imageHtml=imgUrl
-    ?`<div class="gear-image-wrap" onclick="openLightbox('${escHtml(imgUrl)}')"><img src="${escHtml(imgUrl)}" alt="${escHtml(gear.name)}" loading="lazy"></div>`
-    :`<div class="gear-image-wrap"><div class="no-image"><div class="no-image-icon">📷</div><div class="no-image-text">NO IMAGE</div></div></div>`;
-
-  // 価格
-  const priceStr=gear.price
-    ?(gear.currency==='USD'?`$${gear.price.toLocaleString()}`:`¥${gear.price.toLocaleString()}`)
-    :null;
-
-  // 購入日
+  const imgUrls=(gear.image_urls&&gear.image_urls.length)?gear.image_urls:(gear.image_url?[gear.image_url]:[]);
+  const priceStr=gear.price?(gear.currency==='USD'?`$${gear.price.toLocaleString()}`:`¥${gear.price.toLocaleString()}`):null;
   const dateStr=gear.purchased_at?gear.purchased_at.split('T')[0]:null;
 
-  // メモ
-  const memoStr=gear.memo||null;
+  const imageHtml=imgUrls.length
+    ?`<div class="gear-images-wrap" id="gear-images-wrap"><div class="gear-images-track" id="gear-images-track"></div></div><div class="gear-img-dots" id="gear-img-dots"></div>`
+    :`<div class="gear-images-wrap"><div class="no-image"><div class="no-image-icon">📷</div><div class="no-image-text">NO IMAGE</div></div></div>`;
 
-  // 詳細ボックス
   const detailRows=[
     {label:tr('labelBrand'),value:dispBrand||null},
     {label:tr('labelDate'),value:dateStr},
     {label:tr('labelPrice'),value:priceStr,cls:'price'},
-    {label:tr('labelMemo'),value:memoStr,cls:'memo'},
-  ];
-  const detailHtml=detailRows.map(row=>`
-    <div class="gear-detail-row">
-      <span class="gear-detail-label">${escHtml(row.label)}</span>
-      <span class="gear-detail-value${row.value?(' '+(row.cls||'')):'empty'}">${row.value?escHtml(row.value):tr('empty')}</span>
-    </div>`).join('');
+  ].filter(r=>r.value);
+  const detailHtml=detailRows.length?`<div class="gear-detail-box">${detailRows.map(r=>`<div class="gear-detail-row"><span class="gear-detail-label">${escHtml(r.label)}</span><span class="gear-detail-value${r.cls?' '+r.cls:''}">${escHtml(r.value)}</span></div>`).join('')}</div>`:'';
 
-  // ユーザーボックス
-  const avatarHtml=user?.avatar_url
-    ?`<img src="${escHtml(user.avatar_url)}" alt="${escHtml(user?.username||'')}">`
-    :`<span>${(user?.username||'?')[0].toUpperCase()}</span>`;
-  const userHtml=user
-    ?`<a class="gear-user-box" href="/user?username=${encodeURIComponent(user.username)}">
-        <div class="gear-user-avatar">${avatarHtml}</div>
-        <div class="gear-user-info">
-          <div class="gear-user-label">${tr('postedBy')}</div>
-          <div class="gear-user-name">${escHtml(user.username)}</div>
-        </div>
-        <div class="gear-user-arrow">${tr('viewProfile')}</div>
-      </a>`
-    :'';
-
-  // 図鑑リンク
-  const pedalHtml=pedal
-    ?`<a class="pedal-link-btn" href="/pedal?slug=${escHtml(pedal.slug)}">
-        <div>
-          <div class="pedal-link-label">${tr('pedalLinkLabel')}</div>
-          <div class="pedal-link-name">${escHtml(pedal.full_name)}</div>
-        </div>
-        <div class="pedal-link-arrow">${tr('pedalLinkArrow')}</div>
-      </a>`
-    :'';
+  const avatarHtml=user?.avatar_url?`<img src="${escHtml(user.avatar_url)}" alt="">`:`<span>${(user?.username||'?')[0].toUpperCase()}</span>`;
+  const userHtml=user?`<a class="gear-user-box" href="/user?username=${encodeURIComponent(user.username)}"><div class="gear-user-avatar">${avatarHtml}</div><div class="gear-user-info"><div class="gear-user-label">${tr('postedBy')}</div><div class="gear-user-name">${escHtml(user.username)}</div></div><div class="gear-user-arrow">${tr('viewProfile')}</div></a>`:'';
+  const pedalHtml=pedal?`<a class="pedal-link-btn" href="/pedal?slug=${escHtml(pedal.slug)}"><div><div class="pedal-link-label">${tr('pedalLinkLabel')}</div><div class="pedal-link-name">${escHtml(pedal.full_name)}</div></div><div class="pedal-link-arrow">${tr('pedalLinkArrow')}</div></a>`:'';
 
   document.getElementById('content').innerHTML=`
     ${imageHtml}
     ${dispBrand?`<div class="gear-brand">${escHtml(dispBrand)}</div>`:''}
     <div class="gear-name">${escHtml(dispModel)}</div>
-    <div class="gear-detail-box">${detailHtml}</div>
+    ${gear.memo?`<div class="gear-desc">${escHtml(gear.memo)}</div>`:''}
+    <div class="gear-actions">
+      <button class="gear-act-btn${_liked?' liked':''}" id="gear-like-btn" onclick="toggleLike()">
+        ${_liked?'❤️':'🤍'} ${tr('likeBtn')} <span id="gear-like-count">${_likeCount}</span>
+      </button>
+      <button class="gear-act-btn" onclick="document.getElementById('gear-comment-input').focus()">
+        💬 ${commentCount}
+      </button>
+    </div>
+    ${detailHtml}
     ${pedalHtml}
     ${userHtml}
+    <div class="comment-section">
+      <div class="comment-section-title">${tr('commentTitle')}</div>
+      <div class="comment-input-wrap">
+        <input class="comment-name-input" id="gear-comment-name" type="text" placeholder="${tr('commentNamePh')}" maxlength="30">
+        <textarea class="comment-input" id="gear-comment-input" placeholder="${tr('commentPh')}" rows="2"></textarea>
+        <button class="comment-submit" id="gear-comment-submit" onclick="postGearComment()">${tr('commentSubmit')}</button>
+      </div>
+      <div id="gear-comments-list"></div>
+    </div>
   `;
+
+  if(imgUrls.length)initImageSwipe(imgUrls);
 }
 
-function showError(msg){
-  document.getElementById('content').innerHTML=`<div class="error-box"><p>${msg}</p><a href="/" style="color:var(--ac);display:block;margin-top:16px">${tr('backHome')}</a></div>`;
+// ── Like ──
+async function toggleLike(){
+  const SID=getSessionId();
+  const btn=document.getElementById('gear-like-btn');
+  const countEl=document.getElementById('gear-like-count');
+  if(!btn)return;
+  if(_liked){
+    _liked=false;_likeCount=Math.max(0,_likeCount-1);
+    btn.className='gear-act-btn';btn.innerHTML=`🤍 ${tr('likeBtn')} <span id="gear-like-count">${_likeCount}</span>`;
+    await sb.from('gear_likes').delete().eq('gear_id',GEAR_ID).eq('session_id',SID);
+    await sb.from('user_gear').update({likes:_likeCount}).eq('id',GEAR_ID);
+  }else{
+    _liked=true;_likeCount++;
+    btn.className='gear-act-btn liked';btn.innerHTML=`❤️ ${tr('likeBtn')} <span id="gear-like-count">${_likeCount}</span>`;
+    await sb.from('gear_likes').insert({gear_id:GEAR_ID,session_id:SID});
+    await sb.from('user_gear').update({likes:_likeCount}).eq('id',GEAR_ID);
+  }
 }
+
+// ── Comments ──
+async function loadComments(){
+  const{data:comments}=await sb.from('gear_comments').select('*').eq('gear_id',GEAR_ID).is('deleted_at',null).order('created_at',{ascending:true});
+  const el=document.getElementById('gear-comments-list');if(!el)return;
+  if(!comments||!comments.length){el.innerHTML=`<div class="comment-empty">${tr('commentEmpty')}</div>`;return;}
+  el.innerHTML=comments.map(c=>{
+    const avatarHtml=c.avatar_url?`<img src="${escHtml(c.avatar_url)}" alt="">`:`<span>${(c.username||'?')[0].toUpperCase()}</span>`;
+    const canDelete=_currentUser&&c.user_id===_currentUser.id;
+    return`<div class="comment-item" id="comment-${c.id}">
+      <div class="comment-header">
+        <div class="comment-avatar">${avatarHtml}</div>
+        <div class="comment-name">${escHtml(c.username||'匿名')}</div>
+        <div class="comment-time">${timeAgo(c.created_at)}${canDelete?`<span class="comment-del-btn" onclick="deleteGearComment('${c.id}')">🗑</span>`:''}</div>
+      </div>
+      <div class="comment-body">${escHtml(c.body||c.content||'')}</div>
+    </div>`;
+  }).join('');
+}
+
+async function postGearComment(){
+  const body=document.getElementById('gear-comment-input')?.value.trim();
+  if(!body)return;
+  const name=document.getElementById('gear-comment-name')?.value.trim()||null;
+  const btn=document.getElementById('gear-comment-submit');
+  btn.disabled=true;
+  const SID=getSessionId();
+  const{data:{session}}=await sb.auth.getSession();
+  const user=session?.user||null;
+  let username=name;let avatar_url=null;let user_id=null;
+  if(user){
+    const{data:u}=await sb.from('users').select('username,avatar_url').eq('id',user.id).maybeSingle();
+    if(u){username=u.username;avatar_url=u.avatar_url;user_id=user.id;}
+  }
+  await sb.from('gear_comments').insert({gear_id:GEAR_ID,user_id,username:username||'匿名',avatar_url,content:body});
+  const count=document.querySelector('.gear-actions .gear-act-btn:last-child');
+  if(count){const n=parseInt(count.textContent.replace(/[^0-9]/g,''))||0;count.innerHTML=`💬 ${n+1}`;}
+  document.getElementById('gear-comment-input').value='';
+  btn.disabled=false;
+  await loadComments();
+}
+
+async function deleteGearComment(id){
+  if(!confirm(tr('commentDeleteConfirm')))return;
+  await sb.from('gear_comments').update({deleted_at:new Date().toISOString()}).eq('id',id);
+  await loadComments();
+}
+
+function showError(msg){document.getElementById('content').innerHTML=`<div class="error-box"><p>${msg}</p><a href="/" style="color:var(--ac);display:block;margin-top:16px">${tr('backHome')}</a></div>`;}
 
 applyLang();
 loadGear();
