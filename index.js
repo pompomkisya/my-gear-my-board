@@ -582,9 +582,10 @@ function translateGenre(g){
   return map[g]||g;
 }
 function applyFilter(){
+  // GEARタブはrenderGearTabが管理するのでスキップ
+  if(currentTab==='gear')return;
   let posts=[...allDBPosts];
   if(currentTab==='board')posts=posts.filter(p=>!p.post_type||p.post_type==='board');
-  else if(currentTab==='gear')posts=posts.filter(p=>p.post_type==='gear');
   if(currentGenreFilter!=='ALL')posts=posts.filter(p=>genreMatches(p,currentGenreFilter));
   if(currentBrandFilter){
     posts=posts.filter(p=>{
