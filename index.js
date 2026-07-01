@@ -716,35 +716,51 @@ function setTab(el,tab){
   }
 }
 async function loadGearTab(){
-  // user_gearとposts(gear)を並行取得
-  const[ugRes,pgRes]=await Promise.all([
-    sb.from('user_gear').select('*,users(username,avatar_url)').order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(40),
-    sb.from('posts').select('*,users(avatar_url)').eq('post_type','gear').order('created_at',{ascending:false}).limit(20),
-  ]);
-  // user_gearを統一フォーマットに変換
-  const ugItems=(ugRes.data||[]).map(g=>({
-    _type:'user_gear',id:g.id,
-    name:g.name,brand:g.brand||'',
-    image_urls:g.image_urls&&g.image_urls.length?g.image_urls:(g.image_url?[g.image_url]:[]),
-    memo:g.memo||null,likes:g.likes||0,comments_count:g.comments_count||0,
-    username:g.users?.username||null,avatar_url:g.users?.avatar_url||null,
-    created_at:g.updated_at||g.created_at,
-    url:`/gear?id=${g.id}`,
-  }));
-  // posts(gear)を統一フォーマットに変換
-  const pgItems=(pgRes.data||[]).map(p=>({
-    _type:'post_gear',id:p.id,
-    name:p.title||'',brand:'',
-    image_urls:p.image_urls||[],
-    memo:p.description||null,likes:p.likes||0,comments_count:p.comment_count||0,
-    username:p.username||null,avatar_url:p.users?.avatar_url||null,
-    created_at:p.created_at,
-    url:`/post?id=${p.id}`,
-  }));
-  // 時系列でマージ
-  _gearTabData=[...ugItems,...pgItems].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-  _gearTabLoaded=true;
-  renderGearTab(_gearTabData);
+  try{
+    // user_gearとposts(gear)を並行取得（JOINなし）
+    const[ugRes,pgRes]=await Promise.all([
+      sb.from('user_gear').select('id,name,brand,image_url,image_urls,memo,likes,comments_count,user_id,updated_at,created_at').order('updated_at',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false}).limit(40),
+      sb.from('posts').select('id,title,image_urls,description,likes,comment_count,username,user_id,created_at').eq('post_type','gear').order('created_at',{ascending:false}).limit(20),
+    ]);
+    const ugData=ugRes.data||[];
+    const pgData=pgRes.data||[];
+    // user_gearのuser_idからusers情報を別取得
+    const userIds=[...new Set(ugData.map(g=>g.user_id).filter(Boolean))];
+    let usersMap={};
+    if(userIds.length){
+      const{data:users}=await sb.from('users').select('id,username,avatar_url').in('id',userIds);
+      (users||[]).forEach(u=>{usersMap[u.id]=u;});
+    }
+    // 統一フォーマットに変換
+    const ugItems=ugData.map(g=>({
+      _type:'user_gear',id:g.id,
+      name:g.name,brand:g.brand||'',
+      image_urls:g.image_urls&&g.image_urls.length?g.image_urls:(g.image_url?[g.image_url]:[]),
+      memo:g.memo||null,likes:g.likes||0,comments_count:g.comments_count||0,
+      username:usersMap[g.user_id]?.username||null,
+      avatar_url:usersMap[g.user_id]?.avatar_url||null,
+      created_at:g.updated_at||g.created_at,
+      url:`/gear?id=${g.id}`,
+    }));
+    const pgItems=pgData.map(p=>({
+      _type:'post_gear',id:p.id,
+      name:p.title||'',brand:'',
+      image_urls:p.image_urls||[],
+      memo:p.description||null,likes:p.likes||0,comments_count:p.comment_count||0,
+      username:p.username||null,avatar_url:null,
+      created_at:p.created_at,
+      url:`/post?id=${p.id}`,
+    }));
+    _gearTabData=[...ugItems,...pgItems].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    _gearTabLoaded=true;
+    renderGearTab(_gearTabData);
+  }catch(e){
+    console.error('loadGearTab error',e);
+    const grid=document.getElementById('card-grid');
+    const gridMob=document.getElementById('card-grid-mob');
+    const msg='<div style="grid-column:1/-1;text-align:center;padding:40px;font-size:11px;color:var(--td)">読み込みに失敗しました</div>';
+    if(grid)grid.innerHTML=msg;if(gridMob)gridMob.innerHTML=msg;
+  }
 }
 
 function renderGearTab(items){
