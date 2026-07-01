@@ -11,7 +11,7 @@ function detectLang(){
   return bl.toLowerCase().startsWith('ja')?'ja':'en';
 }
 let lang=detectLang();
-let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentFxFilter=null,currentTab='all',currentSort='new',currentDBPost=null;
+let allDBPosts=[],currentGenreFilter='ALL',currentBrandFilter=null,currentFxFilter=null,currentTab='board',currentSort='new',currentDBPost=null;
 let pedalSlugMap={};
 function normalizeName(name){return(name||'').toLowerCase().trim().replace(/\s+/g,' ');}
 function getSlugByName(name){return pedalSlugMap[normalizeName(name)]||null;}
