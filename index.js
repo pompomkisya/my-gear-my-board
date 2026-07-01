@@ -692,15 +692,95 @@ async function toggleDBLike(e,postId,el){
 }
 function filterGenre(el,genre){document.querySelectorAll('.sl .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentGenreFilter=genre||'ALL';currentBrandFilter=null;currentFxFilter=null;applyFilter();}
 function filterBrand(el,brand){document.querySelectorAll('.sl .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentBrandFilter=brand;currentGenreFilter='ALL';currentFxFilter=null;applyFilter();}
+function setSort(el,sort){
+  document.querySelectorAll('.sort-b').forEach(b=>b.classList.remove('on'));el.classList.add('on');currentSort=sort;
+  if(currentTab==='gear'&&_gearTabLoaded){
+    const sorted=sort==='likes'?[..._gearTabData].sort((a,b)=>(b.likes||0)-(a.likes||0)):[..._gearTabData].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    renderGearTab(sorted);
+  }else{applyFilter();}
+}
 function filterFx(el,fx){document.querySelectorAll('.sl .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentFxFilter=fx;currentBrandFilter=null;currentGenreFilter='ALL';applyFilter();}
+let _gearTabData=null;let _gearTabLoaded=false;
+
 function setTab(el,tab){
   document.querySelectorAll('.feed-tab').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentTab=tab;
   const headingText=tab==='gear'?'GEAR':(tab==='board'?'PEDALBOARDS':'ALL');
   const fh=document.getElementById('feed-heading');if(fh)fh.textContent=headingText;
   const fhm=document.getElementById('feed-heading-mob');if(fhm)fhm.textContent=headingText;
-  applyFilter();
+  if(tab==='gear'){
+    if(_gearTabLoaded){renderGearTab(_gearTabData);}
+    else{showSkeletonCards(6);loadGearTab();}
+  }else{
+    applyFilter();
+  }
 }
-function setSort(el,sort){document.querySelectorAll('.sort-b').forEach(b=>b.classList.remove('on'));el.classList.add('on');currentSort=sort;applyFilter();}
+async function loadGearTab(){
+  // user_gearとposts(gear)を並行取得
+  const[ugRes,pgRes]=await Promise.all([
+    sb.from('user_gear').select('*,users(username,avatar_url)').order('updated_at',{ascending:false}).order('created_at',{ascending:false}).limit(40),
+    sb.from('posts').select('*,users(avatar_url)').eq('post_type','gear').order('created_at',{ascending:false}).limit(20),
+  ]);
+  // user_gearを統一フォーマットに変換
+  const ugItems=(ugRes.data||[]).map(g=>({
+    _type:'user_gear',id:g.id,
+    name:g.name,brand:g.brand||'',
+    image_urls:g.image_urls&&g.image_urls.length?g.image_urls:(g.image_url?[g.image_url]:[]),
+    memo:g.memo||null,likes:g.likes||0,comments_count:g.comments_count||0,
+    username:g.users?.username||null,avatar_url:g.users?.avatar_url||null,
+    created_at:g.updated_at||g.created_at,
+    url:`/gear?id=${g.id}`,
+  }));
+  // posts(gear)を統一フォーマットに変換
+  const pgItems=(pgRes.data||[]).map(p=>({
+    _type:'post_gear',id:p.id,
+    name:p.title||'',brand:'',
+    image_urls:p.image_urls||[],
+    memo:p.description||null,likes:p.likes||0,comments_count:p.comment_count||0,
+    username:p.username||null,avatar_url:p.users?.avatar_url||null,
+    created_at:p.created_at,
+    url:`/post?id=${p.id}`,
+  }));
+  // 時系列でマージ
+  _gearTabData=[...ugItems,...pgItems].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  _gearTabLoaded=true;
+  renderGearTab(_gearTabData);
+}
+
+function renderGearTab(items){
+  const grid=document.getElementById('card-grid');
+  const gridMob=document.getElementById('card-grid-mob');
+  if(!items||!items.length){
+    const empty='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
+    if(grid)grid.innerHTML=empty;if(gridMob)gridMob.innerHTML=empty;return;
+  }
+  const anonName=lang==='en'?'Anonymous':'匿名ユーザー';
+  function makeGearCardHTML(g,i){
+    const init=(g.username||'匿')[0].toUpperCase();
+    const avHtml=g.avatar_url
+      ?'<div class="av" style="padding:0;overflow:hidden"><img src="'+g.avatar_url+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>'
+      :'<div class="av">'+init+'</div>';
+    const imgHtml=g.image_urls&&g.image_urls[0]
+      ?'<img src="'+g.image_urls[0]+'" loading="lazy">'
+      :'<div style="font-size:40px;opacity:.2">🎸</div>';
+    const dispBrand=g.brand||'';
+    const dispModel=(dispBrand&&g.name.startsWith(dispBrand))?g.name.slice(dispBrand.length).trim():g.name;
+    const descHtml=g.memo?'<div style="font-size:10px;color:var(--td);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"><span style="color:var(--ac)">📝</span> '+escHtml(g.memo)+'</div>':'';
+    return '<div class="card" onclick="location.href=\''+g.url+'\'" style="animation-delay:'+(i*.05)+'s">'
+      +'<div class="iw">'+imgHtml+'<div class="iw-ov"></div>'
+      +(dispBrand?'<div class="bdg gear-bdg">'+escHtml(dispBrand)+'</div>':'')
+      +'</div>'
+      +'<div class="body"><div class="cu">'+avHtml
+      +'<div class="av-name">'+(g.username||anonName)+'</div>'
+      +'<div class="av-time">'+timeAgo(g.created_at)+'</div></div>'
+      +'<div class="ct">'+escHtml(dispModel)+'</div>'
+      +descHtml
+      +'<div class="cf"><div class="st">❤️ <span>'+(g.likes||0)+'</span></div>'
+      +'<div class="st">💬 <span>'+(g.comments_count||0)+'</span></div></div></div></div>';
+  }
+  const html=items.map((g,i)=>makeGearCardHTML(g,i)).join('');
+  if(grid)grid.innerHTML=html;
+  if(gridMob)gridMob.innerHTML=html;
+}
 function renderRankingWidget(posts){
   const el=document.getElementById('ranking-widget');if(!el)return;
   const bp=posts.filter(p=>!p.post_type||p.post_type==='board');
