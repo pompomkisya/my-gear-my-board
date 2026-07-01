@@ -440,7 +440,7 @@ div[style*="max-height:0"].open{max-height:600px!important}
 
 <!-- ★ 機材追加・編集モーダル -->
 <div class="gear-modal" id="gear-modal">
-  <div class="gear-modal-box">
+  <div class="gear-modal-box" autocomplete="off">
     <div class="gear-modal-title" id="gear-modal-title">機材を追加</div>
 
     <!-- 画像（必須・一番上・3枚まで） -->
@@ -469,12 +469,6 @@ div[style*="max-height:0"].open{max-height:600px!important}
       <div id="gear-img-required-msg" style="display:none;font-size:11px;color:#e05050;margin-top:4px">写真を1枚以上追加してください</div>
     </div>
 
-    <!-- ブランド -->
-    <div class="gear-modal-row">
-      <label class="gear-modal-lbl" id="gear-lbl-brand">ブランド *</label>
-      <input class="gear-modal-input" id="gear-input-brand" type="text" maxlength="60" autocomplete="off">
-    </div>
-
     <!-- 機材名 -->
     <div class="gear-modal-row">
       <label class="gear-modal-lbl" id="gear-lbl-name">機材名 *</label>
@@ -488,6 +482,7 @@ div[style*="max-height:0"].open{max-height:600px!important}
         <div class="gear-ac-dropdown" id="gear-ac-dropdown"></div>
         <div id="gear-ac-hint" style="font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--td);margin-top:5px">ローマ字入力で自動予測変換できます。候補をクリックで簡単追加！</div>
       </div>
+      <input type="hidden" id="gear-input-brand">
     </div>
 
     <!-- 購入金額 -->
@@ -1136,7 +1131,17 @@ let _pendingGearFiles=[null,null,null];
 let _gearImgUrls=[null,null,null];
 
 function triggerGearFile(idx){
+  // 1枚目が未選択の場合2・3枚目はタップ不可
+  if(idx>0&&!_gearImgUrls[0]&&!_pendingGearFiles[0])return;
   document.getElementById('gear-file-input-'+idx).click();
+}
+function updateSlotLockState(){
+  for(let i=1;i<3;i++){
+    const slot=document.getElementById('gear-slot-'+i);
+    const hasImg=(_gearImgUrls[i-1]&&_gearImgUrls[i-1]!=='__delete__')||_pendingGearFiles[i-1];
+    if(hasImg){slot.classList.add('unlocked');slot.style.opacity='1';slot.style.cursor='pointer';}
+    else{slot.classList.remove('unlocked');slot.style.opacity='.3';slot.style.cursor='default';}
+  }
 }
 function onGearFileSelected(e,idx){
   const file=e.target.files[0];if(!file)return;
@@ -1156,6 +1161,7 @@ function onGearFileSelected(e,idx){
       document.getElementById('gear-slot-'+(idx+1)).classList.add('unlocked');
     }
     document.getElementById('gear-img-required-msg').style.display='none';
+    updateSlotLockState();
   };
   reader.readAsDataURL(file);
 }
@@ -1171,6 +1177,7 @@ function removeGearImage(e,idx){
   if(del)del.style.display='none';
   slot.classList.remove('has-image');
   document.getElementById('gear-file-input-'+idx).value='';
+  updateSlotLockState();
 }
 function initGearImageSlots(gear){
   const urls=gear?.image_urls&&gear.image_urls.length?gear.image_urls:[gear?.image_url||null,null,null];
@@ -1195,6 +1202,7 @@ function initGearImageSlots(gear){
     }
     document.getElementById('gear-file-input-'+i).value='';
   }
+  updateSlotLockState();
   document.getElementById('gear-img-required-msg').style.display='none';
 }
 async function uploadGearImage(file,gearId,idx){
@@ -1227,7 +1235,6 @@ function openGearModal(gearId){
   const gear=isEdit?gearList.find(g=>g.id===gearId):null;
   document.getElementById('gear-modal-title').textContent=isEdit?tr('gearModalEditTitle'):tr('gearModalAddTitle');
   document.getElementById('gear-lbl-name').textContent=tr('gearLblName');
-  document.getElementById('gear-lbl-brand').textContent=tr('gearLblBrand');
   document.getElementById('gear-lbl-price').textContent=tr('gearLblPrice');
   document.getElementById('gear-lbl-date').textContent=tr('gearLblDate');
   document.getElementById('gear-lbl-memo').textContent=tr('gearLblMemo');
@@ -1242,7 +1249,7 @@ function openGearModal(gearId){
   closeGearAC();
   const cancelBtn=document.getElementById('gear-modal-cancel-btn');if(cancelBtn)cancelBtn.textContent=tr('gearCancelBtn');
   document.getElementById('gear-modal').classList.add('open');
-  setTimeout(()=>document.getElementById('gear-input-brand').focus(),100);
+  setTimeout(()=>document.getElementById('gear-input-name').focus(),100);
 }
 function closeGearModal(){
   closeGearAC();
@@ -1254,7 +1261,6 @@ async function saveGearItem(){
   const name=document.getElementById('gear-input-name').value.trim();
   const brand=document.getElementById('gear-input-brand').value.trim()||null;
   if(!name){showToast(tr('gearNameRequired'));return;}
-  if(!brand){showToast(lang==='en'?'Please enter a brand name':'ブランドを入力してください');return;}
   // 画像必須チェック
   const hasImage=_gearImgUrls.some(u=>u&&u!=='__delete__')||_pendingGearFiles.some(f=>f);
   if(!hasImage){document.getElementById('gear-img-required-msg').style.display='block';return;}
