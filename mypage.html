@@ -513,6 +513,9 @@ div[style*="max-height:0"].open{max-height:600px!important}
       <button class="gear-add-btn" id="gear-modal-save-btn" onclick="saveGearItem()">保存</button>
       <button class="gear-share-btn" onclick="closeGearModal()" id="gear-modal-cancel-btn">キャンセル</button>
     </div>
+    <div id="gear-modal-delete-wrap" style="display:none;margin-top:10px">
+      <button onclick="deleteGearItemFromModal()" style="width:100%;padding:10px;background:transparent;border:1px solid #5a1a1a;border-radius:6px;font-size:12px;font-weight:600;color:#e05050;cursor:pointer;transition:all .15s" onmouseover="this.style.background='rgba(224,80,80,.08)'" onmouseout="this.style.background='transparent'">🗑 この機材を削除する</button>
+    </div>
   </div>
 </div>
 
@@ -1246,6 +1249,8 @@ function openGearModal(gearId){
   document.getElementById('gear-input-memo').value=gear?.memo||'';
   initGearImageSlots(gear);
   document.getElementById('gear-modal-save-btn').textContent=tr('gearSaveBtn');
+  const deleteWrap=document.getElementById('gear-modal-delete-wrap');
+  if(deleteWrap)deleteWrap.style.display=isEdit?'block':'none';
   closeGearAC();
   const cancelBtn=document.getElementById('gear-modal-cancel-btn');if(cancelBtn)cancelBtn.textContent=tr('gearCancelBtn');
   document.getElementById('gear-modal').classList.add('open');
@@ -1296,6 +1301,14 @@ async function saveGearItem(){
   btn.disabled=false;closeGearModal();showToast(tr('gearSaved'));_tabLoaded['gear']=false;await loadGearList();
   const{count}=await sb.from('user_gear').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id);
   const el=document.getElementById('my-count-gear');if(el)el.textContent=count||0;
+}
+async function deleteGearItemFromModal(){
+  if(!editingGearId)return;
+  if(!confirm(tr('gearDeleteConfirm')))return;
+  const{error}=await sb.from('user_gear').delete().eq('id',editingGearId).eq('user_id',currentUser.id);
+  if(error){showToast('❌ '+error.message);return;}
+  closeGearModal();
+  showToast(tr('gearDeleted'));_tabLoaded['gear']=false;await loadGearList();
 }
 async function deleteGearItem(gearId){
   if(!confirm(tr('gearDeleteConfirm')))return;
