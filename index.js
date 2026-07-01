@@ -463,6 +463,10 @@ async function loadPostsFromDB(){
 }
 
 async function loadMorePosts(){
+  if(currentTab==='gear'){
+    renderGearTab(_gearTabData);
+    return;
+  }
   const btn=document.getElementById('load-more-btn');if(btn){btn.disabled=true;btn.textContent=lang==='en'?'Loading...':'読み込み中...';}
   // range(from,to)は両端込みなので_postsPerPage件取るにはto=from+_postsPerPage-1
   // +1件余分に取ってhasMoreを判定する
@@ -500,27 +504,57 @@ function updateLoadMoreBtn(hasMore,isMax=false){
 }
 
 async function loadAllPostsBackground(){
-  const[postsResult,ccResult]=await Promise.all([
+  const[postsResult,ccResult,ugResult]=await Promise.all([
     sb.from('posts').select('*,users(avatar_url)').order('created_at',{ascending:false}),
-    sb.from('comments').select('post_id')
+    sb.from('comments').select('post_id'),
+    sb.from('user_gear').select('id,name,brand,image_url,image_urls,memo,likes,comments_count,user_id,updated_at,created_at').order('updated_at',{ascending:false,nullsFirst:false}),
   ]);
   if(postsResult.error){console.error(postsResult.error);return;}
   const posts=postsResult.data||[];
   const cm={};
   if(ccResult.data)ccResult.data.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  allDBPosts=posts.map(p=>({
+  // user_gearのuser_id→username/avatar_url取得
+  const ugData=ugResult.data||[];
+  const userIds=[...new Set(ugData.map(g=>g.user_id).filter(Boolean))];
+  let usersMap={};
+  if(userIds.length){
+    const{data:users}=await sb.from('users').select('id,username,avatar_url').in('id',userIds);
+    (users||[]).forEach(u=>{usersMap[u.id]=u;});
+  }
+  // user_gearをpostsと同じフォーマットに変換
+  const ugPosts=ugData.map(g=>({
+    id:g.id,
+    post_type:'user_gear',
+    title:g.name||'',
+    brand:g.brand||'',
+    image_urls:g.image_urls&&g.image_urls.length?g.image_urls:(g.image_url?[g.image_url]:[]),
+    description:g.memo||null,
+    likes:g.likes||0,
+    comment_count:g.comments_count||0,
+    username:usersMap[g.user_id]?.username||null,
+    users:{avatar_url:usersMap[g.user_id]?.avatar_url||null},
+    created_at:g.updated_at||g.created_at,
+    gear_list:[],
+    _gearUrl:'/gear?id='+g.id,
+  }));
+  allDBPosts=[...posts.map(p=>({
     ...p,
     comment_count:cm[p.id]||0,
     gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
       ...g,
       types:pedalTypesMap[g.name]||[]
     }))
-  }));
-  applyFilter();
+  })),...ugPosts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  // GEARタブ以外は現在の表示件数を維持してapplyFilter
+  if(currentTab!=='gear'){
+    const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter||currentFxFilter||currentSearchQuery;
+    const hasMore=!isFiltered&&currentSort!=='likes'&&allDBPosts.length>_postsOffset;
+    applyFilter();
+    updateLoadMoreBtn(hasMore);
+  }
   buildTicker(allDBPosts);
   renderRankingWidget(allDBPosts);renderGearWidget(allDBPosts);
   renderRankingWidgetMob(allDBPosts);renderGearWidgetMob(allDBPosts);
-  updateLoadMoreBtn(false); // 全件ロード完了したのでボタンを非表示
   loadPedalDataBackground(posts,cm);
 }
 
@@ -612,7 +646,10 @@ function applyFilter(){
     const mobBadge=document.getElementById('mob-search-badge');if(mobBadge)mobBadge.classList.remove('show');
   }
   if(currentSort==='likes')posts.sort((a,b)=>(b.likes||0)-(a.likes||0));
-  renderDBPosts(posts);
+  // フィルターなし・新着ソートの時はページネーション件数で制限
+  const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter||currentFxFilter||currentSearchQuery;
+  const displayPosts=(!isFiltered&&currentSort!=='likes')?posts.slice(0,_postsOffset):posts;
+  renderDBPosts(displayPosts);
 }
 function timeAgo(ts){
   const d=Math.floor((Date.now()-new Date(ts))/1000);
@@ -651,16 +688,21 @@ function renderDBPosts(posts){
     const moreCount=gear.length-SHOW;
     const moreBadge=moreCount>0?'<span class="ptag-more">…'+(lang==='en'?moreCount+' more':'他'+moreCount+'件')+'</span>':'';
     const isGear=p.post_type==='gear';
+    const isUserGear=p.post_type==='user_gear';
     const genres=parseGenre(p.genre);const glabel=genres.slice(0,2).map(translateGenre).join(' · ');
-    const destUrl='/post?id='+p.id;const ytBadge=p.youtube_url?'<div class="yt-bdg">▶ YouTube</div>':'';
+    const destUrl=isUserGear?(p._gearUrl||'/gear?id='+p.id):'/post?id='+p.id;
+    const ytBadge=p.youtube_url?'<div class="yt-bdg">▶ YouTube</div>':'';
+    const dispBrand=p.brand||'';
+    const badge=isUserGear?(dispBrand?'<div class="bdg gear-bdg">'+dispBrand+'</div>':'<div class="bdg gear-bdg">GEAR</div>'):isGear?'<div class="bdg gear-bdg">'+(lang==='en'?'Gear':'機材')+'</div>':(glabel?'<div class="bdg">'+glabel+'</div>':'');
+    const noImgIcon=isGear||isUserGear?'🎸':'🎛';
     return '<div class="card" onclick="location.href=\''+destUrl+'\'" style="animation-delay:'+(i*.05)+'s">'
-      +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy" onclick="event.stopPropagation();openLightbox(this.src)" style="cursor:zoom-in">':'<div style="font-size:40px;opacity:.2">'+(isGear?'🎸':'🎛')+'</div>')
-      +'<div class="iw-ov"></div>'+(isGear?'<div class="bdg gear-bdg">'+(lang==='en'?'Gear':'機材')+'</div>':(glabel?'<div class="bdg">'+glabel+'</div>':''))+ytBadge+'</div>'
+      +'<div class="iw">'+(p.image_urls&&p.image_urls[0]?'<img src="'+p.image_urls[0]+'" loading="lazy"'+(isUserGear?'':' onclick="event.stopPropagation();openLightbox(this.src)" style="cursor:zoom-in"')+'>':'<div style="font-size:40px;opacity:.2">'+noImgIcon+'</div>')
+      +'<div class="iw-ov"></div>'+badge+ytBadge+'</div>'
       +'<div class="body"><div class="cu">'+avHtml
       +'<div class="av-name">'+(p.username||anonName)+'</div>'
       +'<div class="av-time">'+timeAgo(p.created_at)+'</div></div>'
-      +'<div class="ct">'+p.title+'</div><div class="ptags">'+tags+moreBadge+'</div>'
-      +'<div class="cf"><div class="st" onclick="toggleDBLike(event,\''+p.id+'\',this)">❤️ <span>'+(p.likes||0)+'</span></div>'
+      +'<div class="ct">'+(p.title||'')+'</div><div class="ptags">'+tags+moreBadge+'</div>'
+      +'<div class="cf"><div class="st"'+(isUserGear?'':' onclick="toggleDBLike(event,\''+p.id+'\',this)"')+'>❤️ <span>'+(p.likes||0)+'</span></div>'
       +'<div class="st">💬 <span>'+(p.comment_count||0)+'</span></div></div></div></div>';
   }
   if(grid){
@@ -679,13 +721,15 @@ function renderDBPosts(posts){
 
 async function toggleDBLike(e,postId,el){
   e.stopPropagation();const cnt=el.querySelector('span');
+  const{data:{session}}=await sb.auth.getSession();
+  const userId=session?.user?.id||null;
   const{data:ex}=await sb.from('likes').select('id').eq('post_id',postId).eq('session_id',SESSION_ID);
   if(ex&&ex.length){
     await sb.from('likes').delete().eq('post_id',postId).eq('session_id',SESSION_ID);
     const n=Math.max(0,(parseInt(cnt.textContent)||1)-1);
     await sb.from('posts').update({likes:n}).eq('id',postId);cnt.textContent=n;el.classList.remove('liked');
   }else{
-    await sb.from('likes').insert({post_id:postId,session_id:SESSION_ID});
+    await sb.from('likes').insert({post_id:postId,session_id:SESSION_ID,user_id:userId});
     const n=(parseInt(cnt.textContent)||0)+1;
     await sb.from('posts').update({likes:n}).eq('id',postId);cnt.textContent=n;el.classList.add('liked');
     showToast(lang==='en'?'❤️ Liked!':'❤️ いいねしました');
@@ -702,6 +746,7 @@ function setSort(el,sort){
 }
 function filterFx(el,fx){document.querySelectorAll('.sl .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentFxFilter=fx;currentBrandFilter=null;currentGenreFilter='ALL';applyFilter();}
 let _gearTabData=null;let _gearTabLoaded=false;
+let _gearOffset=0;const _gearPerPage=8;
 function _escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 function setTab(el,tab){
@@ -751,7 +796,8 @@ async function loadGearTab(){
     }));
     _gearTabData=[...ugItems,...pgItems].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
     _gearTabLoaded=true;
-    renderGearTab(_gearTabData);
+    _gearOffset=0;
+    renderGearTab(_gearTabData,true);
   }catch(e){
     console.error('loadGearTab error',e);
     const msg='<div style="grid-column:1/-1;text-align:center;padding:40px;font-size:11px;color:var(--td)">読み込みに失敗しました</div>';
@@ -760,13 +806,18 @@ async function loadGearTab(){
   }
 }
 
-function renderGearTab(items){
+function renderGearTab(items,reset=false){
+  if(reset)_gearOffset=0;
   const grid=document.getElementById('card-grid');
   const gridMob=document.getElementById('card-grid-mob');
   if(!items||!items.length){
     const empty='<div style="grid-column:1/-1;text-align:center;padding:40px;font-family:Noto Sans JP,sans-serif;font-size:11px;color:var(--td)">'+tr('noPostGeneral')+'</div>';
-    if(grid)grid.innerHTML=empty;if(gridMob)gridMob.innerHTML=empty;return;
+    if(grid)grid.innerHTML=empty;if(gridMob)gridMob.innerHTML=empty;
+    updateLoadMoreBtn(false);return;
   }
+  const page=items.slice(0,_gearOffset+_gearPerPage);
+  _gearOffset=page.length;
+  const hasMore=items.length>_gearOffset;
   const anonName=lang==='en'?'Anonymous':'匿名ユーザー';
   function makeGearCardHTML(g,i){
     const init=(g.username||'匿')[0].toUpperCase();
@@ -791,9 +842,10 @@ function renderGearTab(items){
       +'<div class="cf"><div class="st">❤️ <span>'+(g.likes||0)+'</span></div>'
       +'<div class="st">💬 <span>'+(g.comments_count||0)+'</span></div></div></div></div>';
   }
-  const html=items.map((g,i)=>makeGearCardHTML(g,i)).join('');
+  const html=page.map((g,i)=>makeGearCardHTML(g,i)).join('');
   if(grid)grid.innerHTML=html;
   if(gridMob)gridMob.innerHTML=html;
+  updateLoadMoreBtn(hasMore);
 }
 function renderRankingWidget(posts){
   const el=document.getElementById('ranking-widget');if(!el)return;
