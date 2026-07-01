@@ -87,6 +87,9 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .gear-card-brand{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ac);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gear-card-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
 .gear-card-meta{font-size:10px;color:var(--td);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gear-card-desc{font-size:11px;color:var(--td);line-height:1.4;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gear-card-desc-icon{color:var(--ac);margin-right:2px}
+.gear-card-stats{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:10px;color:var(--td)}
 
 /* ── Review ── */
 .review-item{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
@@ -318,14 +321,17 @@ function renderGear(gear){
       :`<div class="gear-card-no-image"><div class="gear-card-no-image-icon">📷</div><div class="gear-card-no-image-text">NO IMAGE</div></div>`;
     const dispBrand=g.brand||'';
     const dispModel=(dispBrand&&g.name.startsWith(dispBrand))?g.name.slice(dispBrand.length).trim():g.name;
-    const dateStr=g.purchased_at?g.purchased_at.split('T')[0]:'';
-    const metaStr=dateStr?`${tr('gearDateLabel')}: ${dateStr}`:'';
+    const dateStr=g.purchased_at?g.purchased_at.split('T')[0].slice(0,7):'';
+    const descHtml=g.memo?`<div class="gear-card-desc"><span class="gear-card-desc-icon">📝</span>${escHtml(g.memo)}</div>`:'';
+    const likes=g.likes||0;const comments=g.comments_count||0;
+    const statsHtml=`<div class="gear-card-stats">${likes?`❤️ ${likes} `:''}${comments?`💬 ${comments} `:''}${dateStr?`<span>${dateStr}</span>`:''}</div>`;
     return`<a class="gear-card" href="/gear?id=${g.id}">
       <div class="gear-card-thumb">${thumbHtml}</div>
       <div class="gear-card-body">
         ${dispBrand?`<div class="gear-card-brand">${escHtml(dispBrand)}</div>`:''}
         <div class="gear-card-name">${escHtml(dispModel)}</div>
-        ${metaStr?`<div class="gear-card-meta">${escHtml(metaStr)}</div>`:''}
+        ${descHtml}
+        ${statsHtml}
       </div>
     </a>`;
   }).join('')}</div>`;
