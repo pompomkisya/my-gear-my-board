@@ -765,7 +765,7 @@ async function loadGearTab(){
   try{
     const[ugRes,pgRes]=await Promise.all([
       sb.from('user_gear').select('id,name,brand,image_url,image_urls,memo,likes,comments_count,user_id,updated_at,created_at').order('updated_at',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false}).limit(40),
-      sb.from('posts').select('id,title,image_urls,description,likes,comment_count,username,created_at').eq('post_type','gear').order('created_at',{ascending:false}).limit(20),
+      sb.from('posts').select('id,title,image_urls,description,likes,username,created_at').eq('post_type','gear').order('created_at',{ascending:false}).limit(20),
     ]);
     const ugData=ugRes.data||[];
     const pgData=pgRes.data||[];
@@ -815,9 +815,8 @@ function renderGearTab(items,reset=false){
     if(grid)grid.innerHTML=empty;if(gridMob)gridMob.innerHTML=empty;
     updateLoadMoreBtn(false);return;
   }
-  const page=items.slice(0,_gearOffset+_gearPerPage);
-  _gearOffset=page.length;
-  const hasMore=items.length>_gearOffset;
+  const newItems=items.slice(_gearOffset,_gearOffset+_gearPerPage);
+  const hasMore=items.length>_gearOffset+_gearPerPage;
   const anonName=lang==='en'?'Anonymous':'匿名ユーザー';
   function makeGearCardHTML(g,i){
     const init=(g.username||'匿')[0].toUpperCase();
@@ -842,9 +841,15 @@ function renderGearTab(items,reset=false){
       +'<div class="cf"><div class="st">❤️ <span>'+(g.likes||0)+'</span></div>'
       +'<div class="st">💬 <span>'+(g.comments_count||0)+'</span></div></div></div></div>';
   }
-  const html=page.map((g,i)=>makeGearCardHTML(g,i)).join('');
-  if(grid)grid.innerHTML=html;
-  if(gridMob)gridMob.innerHTML=html;
+  const html=newItems.map((g,i)=>makeGearCardHTML(g,_gearOffset+i)).join('');
+  if(reset||_gearOffset===0){
+    if(grid)grid.innerHTML=html;
+    if(gridMob)gridMob.innerHTML=html;
+  }else{
+    if(grid)grid.insertAdjacentHTML('beforeend',html);
+    if(gridMob)gridMob.insertAdjacentHTML('beforeend',html);
+  }
+  _gearOffset+=newItems.length;
   updateLoadMoreBtn(hasMore);
 }
 function renderRankingWidget(posts){
