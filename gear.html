@@ -33,7 +33,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .page{max-width:600px;margin:0 auto;padding:24px 16px 60px}
 .loading{text-align:center;padding:60px;color:var(--td)}
 .error-box{text-align:center;padding:60px;color:var(--td)}
-
 /* ── Image Swipe ── */
 .gear-images-wrap{position:relative;width:100%;aspect-ratio:1;background:var(--sf2);border:1px solid var(--bd);border-radius:16px;overflow:hidden;margin-bottom:12px}
 .gear-images-track{display:flex;height:100%;transition:transform .3s cubic-bezier(.4,0,.2,1)}
@@ -45,18 +44,15 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .gear-img-dots{display:flex;justify-content:center;gap:6px;margin-bottom:16px}
 .gear-img-dot{width:6px;height:6px;border-radius:50%;background:var(--bd);transition:background .2s}
 .gear-img-dot.on{background:var(--ac)}
-
 /* ── Meta ── */
 .gear-brand{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ac);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
 .gear-name{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;line-height:1.1;margin-bottom:12px}
 .gear-desc{font-size:14px;line-height:1.8;color:var(--tx);margin-bottom:20px;white-space:pre-wrap}
-
-/* ── Actions (like/comment count) ── */
+/* ── Actions ── */
 .gear-actions{display:flex;gap:8px;margin-bottom:16px}
 .gear-act-btn{display:flex;align-items:center;gap:6px;padding:10px 18px;background:var(--sf);border:1px solid var(--bd);border-radius:8px;font-size:13px;font-weight:600;color:var(--tm);cursor:pointer;transition:all .15s;flex:1;justify-content:center}
 .gear-act-btn:hover{border-color:var(--ac);color:var(--ac)}
 .gear-act-btn.liked{border-color:var(--ac);color:var(--ac);background:rgba(232,85,45,.08)}
-
 /* ── Detail Box ── */
 .gear-detail-box{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:16px}
 .gear-detail-row{display:flex;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
@@ -65,7 +61,6 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .gear-detail-value{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--tx);font-weight:600;flex:1}
 .gear-detail-value.price{color:var(--ac);font-size:15px}
 .gear-detail-value.empty{color:var(--td);font-weight:300;font-family:'Noto Sans JP',sans-serif}
-
 /* ── User ── */
 .gear-user-box{display:flex;align-items:center;gap:12px;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:16px;cursor:pointer;transition:border-color .15s;text-decoration:none;color:inherit}
 .gear-user-box:hover{border-color:rgba(232,85,45,.4)}
@@ -75,38 +70,65 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .gear-user-label{font-size:10px;color:var(--td);margin-bottom:2px}
 .gear-user-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px}
 .gear-user-arrow{font-size:14px;color:var(--td)}
-
 /* ── Pedal Link ── */
 .pedal-link-btn{display:flex;align-items:center;justify-content:space-between;gap:12px;background:rgba(232,85,45,.08);border:1px solid rgba(232,85,45,.25);border-radius:12px;padding:14px 16px;margin-bottom:16px;cursor:pointer;transition:all .15s;text-decoration:none;color:inherit}
 .pedal-link-btn:hover{background:rgba(232,85,45,.14);border-color:rgba(232,85,45,.4)}
 .pedal-link-label{font-size:11px;color:var(--ac);font-weight:700;letter-spacing:.5px;margin-bottom:2px}
 .pedal-link-name{font-size:13px;font-weight:600;color:var(--tx)}
 .pedal-link-arrow{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--ac);white-space:nowrap;flex-shrink:0}
-
-/* ── Comments ── */
-.comment-section{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:16px}
-.comment-section-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--tm);margin-bottom:14px}
-.comment-input-wrap{margin-bottom:16px}
-.comment-name-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:6px 6px 0 0;padding:9px 12px;font-size:14px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s}
+/* ── Comment System (post.htmlと同じ) ── */
+.comment-name-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;padding:8px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s;border-bottom:none}
 .comment-name-input:focus{border-color:var(--ac)}
-.comment-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-top:none;border-radius:0 0 6px 6px;padding:10px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;resize:none;min-height:60px;transition:border-color .15s}
+.comment-name-input::placeholder{color:var(--td)}
+.comment-login-badge{display:flex;align-items:center;gap:8px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;border-bottom:none;padding:9px 12px;font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tm)}
+.comment-login-badge img{width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.comment-login-badge .av-fallback{width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.comment-login-promo{position:fixed;inset:0;background:rgba(8,8,9,.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:900;padding:20px}
+.comment-login-promo.open{display:flex}
+.comment-login-promo-card{background:var(--sf);border:1px solid var(--bd);border-radius:16px;width:100%;max-width:380px;padding:24px 20px;animation:popInPromo .2s ease}
+@keyframes popInPromo{from{transform:scale(.94);opacity:0}to{transform:scale(1);opacity:1}}
+.comment-login-promo-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:6px}
+.comment-login-promo-text{font-family:'Noto Sans JP',sans-serif;font-size:12px;color:var(--tm);line-height:1.6;margin-bottom:18px}
+.comment-login-promo-btns{display:flex;flex-direction:column;gap:8px}
+.comment-login-promo-btn{display:block;width:100%;padding:12px;border-radius:8px;text-align:center;font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box}
+.comment-login-promo-btn.primary{background:var(--ac);color:#fff;border:none}
+.comment-login-promo-btn.secondary{background:transparent;color:var(--tm);border:1px solid var(--bd)}
+.reply-login-badge{display:flex;align-items:center;gap:7px;background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;border-bottom:none;padding:7px 10px;font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--tm)}
+.reply-login-badge img{width:18px;height:18px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.reply-login-badge .av-fallback{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0}
+.comment-input-wrap{display:block;margin-bottom:20px;width:100%}
+.comment-input-col{flex:1;min-width:0;display:flex;flex-direction:column}
+.comment-input{width:100%;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 4px 4px;padding:10px 12px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;resize:none;min-height:44px;transition:border-color .15s}
 .comment-input:focus{border-color:var(--ac)}
 .comment-input::placeholder{color:var(--td)}
-.comment-submit{margin-top:8px;padding:9px 20px;background:var(--ac);border:none;border-radius:6px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:opacity .15s}
-.comment-submit:hover{opacity:.85}
-.comment-submit:disabled{opacity:.4;cursor:default}
-.comment-item{padding:12px 0;border-bottom:1px solid var(--bd)}
-.comment-item:last-child{border-bottom:none}
-.comment-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.comment-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#e85c2f,#b03020);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;overflow:hidden}
-.comment-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.comment-name{font-size:12px;font-weight:700;color:var(--tx)}
-.comment-time{font-size:10px;color:var(--td);margin-left:auto}
-.comment-body{font-size:13px;line-height:1.6;color:var(--tx);padding-left:36px;white-space:pre-wrap}
-.comment-empty{font-size:13px;color:var(--td);text-align:center;padding:20px 0}
-.comment-del-btn{font-size:10px;color:var(--td);cursor:pointer;margin-left:8px;transition:color .15s}
-.comment-del-btn:hover{color:#e05050}
-
+.comment-submit{display:block;width:100%;margin-top:8px;padding:11px 16px;background:var(--ac);border:none;border-radius:4px;font-family:'Noto Sans JP',sans-serif;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;transition:all .15s;touch-action:manipulation;min-height:44px}
+.comment-submit:hover{background:#cf4c26}
+.comment{padding:14px 0;border-bottom:1px solid var(--bd);word-break:break-word;overflow-wrap:break-word}
+.comment:last-child{border-bottom:none}
+.c-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.c-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:linear-gradient(135deg,#e85c2f,#b03020);flex-shrink:0}
+.c-name{font-size:12px;font-weight:500}
+.c-time{font-family:'Noto Sans JP',sans-serif;font-size:10px;color:#c0bcb4;margin-left:auto;white-space:nowrap;padding-left:8px}
+.c-body{font-size:14px;line-height:1.65;color:#b8b5ae;padding-left:36px;word-break:break-word;overflow-wrap:break-word}
+.c-reply-btn{display:inline-flex;align-items:center;gap:4px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;letter-spacing:.5px;color:var(--ac);cursor:pointer;margin-top:8px;transition:all .15s;touch-action:manipulation;background:transparent;border:none;padding:5px 10px 5px 36px;border-radius:3px}
+.c-body-deleted{font-style:italic;color:var(--td)!important}
+.c-edited{font-size:10px;color:var(--td);font-style:italic;margin-left:4px}
+.c-delete-btn{color:#e05050}
+.c-reply-btn:hover{background:rgba(232,85,45,.1)}
+.c-edit-form{margin-left:36px}
+.c-mention{color:var(--ac);font-weight:500}
+.reply-indent{padding-left:16px;border-left:2px solid var(--bd);margin-top:8px;word-break:break-word;overflow-wrap:break-word}
+.reply-form{padding-left:36px;margin-top:8px;display:none}
+.reply-form.open{display:flex;flex-direction:column;gap:4px}
+.reply-name-input{background:var(--sf2);border:1px solid var(--bd);border-radius:3px 3px 0 0;padding:6px 10px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;border-bottom:none}
+.reply-name-input:focus{border-color:var(--ac)}
+.reply-name-input::placeholder{color:var(--td)}
+.reply-row{display:flex;gap:6px}
+.reply-input{flex:1;min-width:0;background:var(--sf2);border:1px solid var(--bd);border-radius:0 0 3px 3px;padding:7px 10px;font-size:16px;color:var(--tx);font-family:'Noto Sans JP',sans-serif;outline:none;transition:border-color .15s;resize:none;min-height:44px;overflow-y:hidden}
+.reply-input:focus{border-color:var(--ac)}
+.reply-submit{padding:7px 12px;background:var(--ac);border:none;border-radius:3px;font-family:'Noto Sans JP',sans-serif;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#fff;cursor:pointer;touch-action:manipulation;white-space:nowrap;flex-shrink:0}
+.section{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:16px}
+.section-lbl{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--tm);margin-bottom:14px}
 /* ── Lightbox ── */
 .lightbox{position:fixed;inset:0;background:rgba(8,8,9,.95);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px;cursor:zoom-out}
 .lightbox.show{display:flex}
@@ -114,10 +136,7 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .lightbox img{max-width:100%;max-height:90vh;object-fit:contain;border-radius:10px}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:10px 18px;font-size:12px;color:var(--tx);z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:480px){
-  .gear-name{font-size:26px}
-  .gear-detail-label{width:60px}
-}
+@media(max-width:480px){.gear-name{font-size:26px}.gear-detail-label{width:60px}}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2870402328259616" crossorigin="anonymous"></script>
 </head>
@@ -143,172 +162,112 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
   <img id="lightbox-img" src="" alt="">
 </div>
 <div class="toast" id="toast"></div>
-
 <script>
 const SUPABASE_URL='https://yzqfockzgyfjmngygbhp.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6cWZvY2t6Z3lmam1uZ3lnYmhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwOTYxODksImV4cCI6MjA4OTY3MjE4OX0.Cn4UMJ8y6CHuIMDeFEShej4t1p4syweLgo5ZXZNs-_g';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
 function detectLang(){const s=localStorage.getItem('mgmb_lang');if(s)return s;return(navigator.language||'ja').toLowerCase().startsWith('ja')?'ja':'en';}
 let lang=detectLang();
-const I18N={
-  ja:{
-    logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',langLabel:'EN',
-    loading:'読み込み中...',notFound:'機材が見つかりませんでした',backHome:'← ホームに戻る',
-    labelBrand:'ブランド',labelDate:'購入日',labelPrice:'購入金額',
-    empty:'—',
-    pedalLinkLabel:'🎛 図鑑で見る',pedalLinkArrow:'詳細ページへ →',
-    postedBy:'投稿者',viewProfile:'プロフィールを見る →',
-    likeBtn:'いいね',commentTitle:'コメント',commentNamePh:'名前（任意）',
-    commentPh:'コメントを入力...',commentSubmit:'送信',commentEmpty:'まだコメントはありません',
-    commentDeleted:'削除されました',commentDeleteConfirm:'このコメントを削除しますか？',
-    justNow:'たった今',mAgo:'分前',hAgo:'時間前',
-  },
-  en:{
-    logoSub:'Pedalboard Posts & Database',backBtn:'← Home',langLabel:'JA',
-    loading:'Loading...',notFound:'Gear not found',backHome:'← Back to Home',
-    labelBrand:'Brand',labelDate:'Purchased',labelPrice:'Price',
-    empty:'—',
-    pedalLinkLabel:'🎛 View in Database',pedalLinkArrow:'View pedal page →',
-    postedBy:'Posted by',viewProfile:'View profile →',
-    likeBtn:'Like',commentTitle:'Comments',commentNamePh:'Name (optional)',
-    commentPh:'Write a comment...',commentSubmit:'Post',commentEmpty:'No comments yet',
-    commentDeleted:'Deleted',commentDeleteConfirm:'Delete this comment?',
-    justNow:'just now',mAgo:'m ago',hAgo:'h ago',
-  }
-};
-function tr(k){return(I18N[lang]||I18N.ja)[k]||I18N.ja[k]||k;}
-function applyLang(){
-  document.getElementById('logo-sub').textContent=tr('logoSub');
-  document.getElementById('back-btn').textContent=tr('backBtn');
-  document.getElementById('lang-label').textContent=tr('langLabel');
-}
+function tr(k){return({
+  ja:{logoSub:'ペダルボード投稿&データベース',backBtn:'← ホーム',langLabel:'EN',loading:'読み込み中...',notFound:'機材が見つかりませんでした',backHome:'← ホームに戻る',labelBrand:'ブランド',labelDate:'購入日',labelPrice:'購入金額',empty:'—',pedalLinkLabel:'🎛 図鑑で見る',pedalLinkArrow:'詳細ページへ →',postedBy:'投稿者',viewProfile:'プロフィールを見る →',likeBtn:'いいね'},
+  en:{logoSub:'Pedalboard Posts & Database',backBtn:'← Home',langLabel:'JA',loading:'Loading...',notFound:'Gear not found',backHome:'← Back to Home',labelBrand:'Brand',labelDate:'Purchased',labelPrice:'Price',empty:'—',pedalLinkLabel:'🎛 View in Database',pedalLinkArrow:'View pedal page →',postedBy:'Posted by',viewProfile:'View profile →',likeBtn:'Like'}
+}[lang]||{})[k]||k;}
+function applyLang(){document.getElementById('logo-sub').textContent=tr('logoSub');document.getElementById('back-btn').textContent=tr('backBtn');document.getElementById('lang-label').textContent=tr('langLabel');}
 function toggleLang(){lang=lang==='ja'?'en':'ja';localStorage.setItem('mgmb_lang',lang);applyLang();loadGear();}
 function escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
-function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(d>=86400){const dt=new Date(ts);return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');}if(d<60)return tr('justNow');if(d<3600)return Math.floor(d/60)+tr('mAgo');return Math.floor(d/3600)+tr('hAgo');}
+function timeAgo(ts){const d=Math.floor((Date.now()-new Date(ts))/1000);if(d>=86400){const dt=new Date(ts);return dt.getFullYear()+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.'+String(dt.getDate()).padStart(2,'0');}if(lang==='en'){if(d<60)return'just now';if(d<3600)return Math.floor(d/60)+'m ago';return Math.floor(d/3600)+'h ago';}if(d<60)return'たった今';if(d<3600)return Math.floor(d/60)+'分前';return Math.floor(d/3600)+'時間前';}
 function getSessionId(){let s=localStorage.getItem('mgmb_sid');if(!s){s='sid_'+Math.random().toString(36).slice(2)+Date.now();localStorage.setItem('mgmb_sid',s);}return s;}
-
-let GEAR_ID=null;let _liked=false;let _likeCount=0;let _currentUser=null;let _imgUrls=[];let _imgIdx=0;
-
+let GEAR_ID=null;let _liked=false;let _likeCount=0;let _imgUrls=[];let _imgIdx=0;
+let currentCommentUserId=null;let currentCommentUserInfo=null;let allComments=[];
 function openLightbox(url){document.getElementById('lightbox-img').src=url;document.getElementById('lightbox').classList.add('show');document.addEventListener('keydown',escLb);}
 function closeLightbox(){document.getElementById('lightbox').classList.remove('show');document.removeEventListener('keydown',escLb);}
 function escLb(e){if(e.key==='Escape')closeLightbox();}
-
-// ── Image swipe ──
 function initImageSwipe(urls){
   _imgUrls=urls;_imgIdx=0;
   const wrap=document.getElementById('gear-images-wrap');if(!wrap)return;
   const track=document.getElementById('gear-images-track');
   track.innerHTML=urls.map((u,i)=>`<div class="gear-image-slide" onclick="openLightbox('${escHtml(u)}')"><img src="${escHtml(u)}" loading="${i===0?'eager':'lazy'}"></div>`).join('');
   const dots=document.getElementById('gear-img-dots');
-  if(urls.length>1){
-    dots.innerHTML=urls.map((_,i)=>`<div class="gear-img-dot${i===0?' on':''}"></div>`).join('');
-    dots.style.display='flex';
-  }else{dots.style.display='none';}
+  if(urls.length>1){dots.innerHTML=urls.map((_,i)=>`<div class="gear-img-dot${i===0?' on':''}"></div>`).join('');dots.style.display='flex';}
+  else{dots.style.display='none';}
   let startX=0;
   wrap.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
-  wrap.addEventListener('touchend',e=>{
-    const dx=e.changedTouches[0].clientX-startX;
-    if(Math.abs(dx)>40){dx<0?gotoImg(_imgIdx+1):gotoImg(_imgIdx-1);}
-  });
+  wrap.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(Math.abs(dx)>40){dx<0?gotoImg(_imgIdx+1):gotoImg(_imgIdx-1);}});
 }
-function gotoImg(idx){
-  if(idx<0||idx>=_imgUrls.length)return;
-  _imgIdx=idx;
-  document.getElementById('gear-images-track').style.transform=`translateX(-${idx*100}%)`;
-  document.querySelectorAll('.gear-img-dot').forEach((d,i)=>d.classList.toggle('on',i===idx));
-}
-
+function gotoImg(idx){if(idx<0||idx>=_imgUrls.length)return;_imgIdx=idx;document.getElementById('gear-images-track').style.transform=`translateX(-${idx*100}%)`;document.querySelectorAll('.gear-img-dot').forEach((d,i)=>d.classList.toggle('on',i===idx));}
 async function loadGear(){
   const params=new URLSearchParams(window.location.search);
-  const id=params.get('id');
-  if(!id){showError(tr('notFound'));return;}
+  const id=params.get('id');if(!id){showError(tr('notFound'));return;}
   GEAR_ID=id;
   const SID=getSessionId();
-  const{data:{session}}=await sb.auth.getSession();
-  _currentUser=session?.user||null;
-
-  const[gearRes,userRes,likeRes,commentCountRes]=await Promise.all([
+  const[gearRes,likeRes,commentCountRes]=await Promise.all([
     sb.from('user_gear').select('*').eq('id',id).maybeSingle(),
-    null,
     sb.from('gear_likes').select('id').eq('gear_id',id).eq('session_id',SID).maybeSingle(),
     sb.from('gear_comments').select('id',{count:'exact',head:true}).eq('gear_id',id).is('deleted_at',null),
   ]);
-  const gear=gearRes.data;
-  if(!gear){showError(tr('notFound'));return;}
-
+  const gear=gearRes.data;if(!gear){showError(tr('notFound'));return;}
   const{data:user}=await sb.from('users').select('id,username,avatar_url').eq('id',gear.user_id).maybeSingle();
   let pedal=null;
   if(gear.pedal_slug){const{data:p}=await sb.from('pedals').select('full_name,slug,brand').eq('slug',gear.pedal_slug).maybeSingle();pedal=p||null;}
-
-  _liked=!!likeRes.data;
-  _likeCount=gear.likes||0;
-  const commentCount=commentCountRes.count||0;
-
+  _liked=!!likeRes.data;_likeCount=gear.likes||0;
   document.title=`${gear.name} — My Gear My Board`;
-  renderGear(gear,user,pedal,commentCount);
+  renderGear(gear,user,pedal,commentCountRes.count||0);
   loadComments();
 }
-
 function renderGear(gear,user,pedal,commentCount){
   const dispBrand=gear.brand||'';
   const dispModel=(dispBrand&&gear.name.startsWith(dispBrand))?gear.name.slice(dispBrand.length).trim():gear.name;
   const imgUrls=(gear.image_urls&&gear.image_urls.length)?gear.image_urls:(gear.image_url?[gear.image_url]:[]);
   const priceStr=gear.price?(gear.currency==='USD'?`$${gear.price.toLocaleString()}`:`¥${gear.price.toLocaleString()}`):null;
   const dateStr=gear.purchased_at?gear.purchased_at.split('T')[0]:null;
-
   const imageHtml=imgUrls.length
     ?`<div class="gear-images-wrap" id="gear-images-wrap"><div class="gear-images-track" id="gear-images-track"></div></div><div class="gear-img-dots" id="gear-img-dots"></div>`
     :`<div class="gear-images-wrap"><div class="no-image"><div class="no-image-icon">📷</div><div class="no-image-text">NO IMAGE</div></div></div>`;
-
-  const detailRows=[
-    {label:tr('labelBrand'),value:dispBrand||null},
-    {label:tr('labelDate'),value:dateStr},
-    {label:tr('labelPrice'),value:priceStr,cls:'price'},
-  ].filter(r=>r.value);
+  const detailRows=[{label:tr('labelBrand'),value:dispBrand||null},{label:tr('labelDate'),value:dateStr},{label:tr('labelPrice'),value:priceStr,cls:'price'}].filter(r=>r.value);
   const detailHtml=detailRows.length?`<div class="gear-detail-box">${detailRows.map(r=>`<div class="gear-detail-row"><span class="gear-detail-label">${escHtml(r.label)}</span><span class="gear-detail-value${r.cls?' '+r.cls:''}">${escHtml(r.value)}</span></div>`).join('')}</div>`:'';
-
   const avatarHtml=user?.avatar_url?`<img src="${escHtml(user.avatar_url)}" alt="">`:`<span>${(user?.username||'?')[0].toUpperCase()}</span>`;
   const userHtml=user?`<a class="gear-user-box" href="/user?username=${encodeURIComponent(user.username)}"><div class="gear-user-avatar">${avatarHtml}</div><div class="gear-user-info"><div class="gear-user-label">${tr('postedBy')}</div><div class="gear-user-name">${escHtml(user.username)}</div></div><div class="gear-user-arrow">${tr('viewProfile')}</div></a>`:'';
   const pedalHtml=pedal?`<a class="pedal-link-btn" href="/pedal?slug=${escHtml(pedal.slug)}"><div><div class="pedal-link-label">${tr('pedalLinkLabel')}</div><div class="pedal-link-name">${escHtml(pedal.full_name)}</div></div><div class="pedal-link-arrow">${tr('pedalLinkArrow')}</div></a>`:'';
-
+  const _cL=lang==='en'?'COMMENTS':'コメント';
+  const _cN=lang==='en'?'Name (optional)':'名前（任意）';
+  const _cP=lang==='en'?'Write a comment...':'コメントを入力...';
+  const _cB=lang==='en'?'POST':'コメントする';
   document.getElementById('content').innerHTML=`
     ${imageHtml}
     ${dispBrand?`<div class="gear-brand">${escHtml(dispBrand)}</div>`:''}
     <div class="gear-name">${escHtml(dispModel)}</div>
     ${gear.memo?`<div class="gear-desc">${escHtml(gear.memo)}</div>`:''}
     <div class="gear-actions">
-      <button class="gear-act-btn${_liked?' liked':''}" id="gear-like-btn" onclick="toggleLike()">
-        ${_liked?'❤️':'🤍'} ${tr('likeBtn')} <span id="gear-like-count">${_likeCount}</span>
-      </button>
-      <button class="gear-act-btn" onclick="document.getElementById('gear-comment-input').focus()">
-        💬 ${commentCount}
-      </button>
+      <button class="gear-act-btn${_liked?' liked':''}" id="gear-like-btn" onclick="toggleLike()">${_liked?'❤️':'🤍'} ${tr('likeBtn')} <span id="gear-like-count">${_likeCount}</span></button>
+      <button class="gear-act-btn" onclick="document.getElementById('comment-input').focus()">💬 <span id="gear-comment-count">${commentCount}</span></button>
     </div>
-    ${detailHtml}
-    ${pedalHtml}
-    ${userHtml}
-    <div class="comment-section">
-      <div class="comment-section-title">${tr('commentTitle')}</div>
+    ${detailHtml}${pedalHtml}${userHtml}
+    <div class="section" id="comment-section">
+      <div class="section-lbl">${_cL}</div>
       <div class="comment-input-wrap">
-        <input class="comment-name-input" id="gear-comment-name" type="text" placeholder="${tr('commentNamePh')}" maxlength="30">
-        <textarea class="comment-input" id="gear-comment-input" placeholder="${tr('commentPh')}" rows="2"></textarea>
-        <button class="comment-submit" id="gear-comment-submit" onclick="postGearComment()">${tr('commentSubmit')}</button>
+        <div class="comment-input-col">
+          <div id="comment-name-area"><input class="comment-name-input" id="comment-name" type="text" placeholder="${_cN}" maxlength="30" onfocus="maybeShowCommentLoginPromo()"></div>
+          <textarea class="comment-input" id="comment-input" placeholder="${_cP}" rows="2" onfocus="maybeShowCommentLoginPromo()"></textarea>
+        </div>
+        <button class="comment-submit" onclick="postComment(null)">${_cB}</button>
       </div>
-      <div id="gear-comments-list"></div>
+      <div id="comments-list"></div>
     </div>
-  `;
-
+    <div class="comment-login-promo" id="comment-login-promo" onclick="if(event.target===this)closeCommentLoginPromo()">
+      <div class="comment-login-promo-card">
+        <div class="comment-login-promo-title">${lang==='en'?'Want to comment with your account?':'マイアカウントでコメントしませんか？'}</div>
+        <div class="comment-login-promo-text">${lang==='en'?'Log in or sign up to comment with your name and avatar. After logging in, you can also edit or delete your comments later. You can still comment anonymously without one.':'ログイン・登録すると、あなたの名前とアイコンでコメントできます。ログイン後のコメントは、後から再編集や削除が可能になります。もちろん匿名のままでもコメントできます。'}</div>
+        <div class="comment-login-promo-btns">
+          <a class="comment-login-promo-btn primary" href="/mypage">${lang==='en'?'Log in / Sign up':'ログイン・新規登録'}</a>
+          <div class="comment-login-promo-btn secondary" onclick="closeCommentLoginPromo()">${lang==='en'?'Continue anonymously':'このまま匿名で続ける'}</div>
+        </div>
+      </div>
+    </div>`;
   if(imgUrls.length)initImageSwipe(imgUrls);
 }
-
-// ── Like ──
 async function toggleLike(){
-  const SID=getSessionId();
-  const btn=document.getElementById('gear-like-btn');
-  const countEl=document.getElementById('gear-like-count');
-  if(!btn)return;
+  const SID=getSessionId();const btn=document.getElementById('gear-like-btn');if(!btn)return;
   if(_liked){
     _liked=false;_likeCount=Math.max(0,_likeCount-1);
     btn.className='gear-act-btn';btn.innerHTML=`🤍 ${tr('likeBtn')} <span id="gear-like-count">${_likeCount}</span>`;
@@ -321,58 +280,103 @@ async function toggleLike(){
     await sb.from('user_gear').update({likes:_likeCount}).eq('id',GEAR_ID);
   }
 }
-
-// ── Comments ──
 async function loadComments(){
-  const{data:comments}=await sb.from('gear_comments').select('*').eq('gear_id',GEAR_ID).is('deleted_at',null).order('created_at',{ascending:true});
-  const el=document.getElementById('gear-comments-list');if(!el)return;
-  if(!comments||!comments.length){el.innerHTML=`<div class="comment-empty">${tr('commentEmpty')}</div>`;return;}
-  el.innerHTML=comments.map(c=>{
-    const avatarHtml=c.avatar_url?`<img src="${escHtml(c.avatar_url)}" alt="">`:`<span>${(c.username||'?')[0].toUpperCase()}</span>`;
-    const canDelete=_currentUser&&c.user_id===_currentUser.id;
-    return`<div class="comment-item" id="comment-${c.id}">
-      <div class="comment-header">
-        <div class="comment-avatar">${avatarHtml}</div>
-        <div class="comment-name">${escHtml(c.username||'匿名')}</div>
-        <div class="comment-time">${timeAgo(c.created_at)}${canDelete?`<span class="comment-del-btn" onclick="deleteGearComment('${c.id}')">🗑</span>`:''}</div>
-      </div>
-      <div class="comment-body">${escHtml(c.body||c.content||'')}</div>
-    </div>`;
-  }).join('');
-}
-
-async function postGearComment(){
-  const body=document.getElementById('gear-comment-input')?.value.trim();
-  if(!body)return;
-  const name=document.getElementById('gear-comment-name')?.value.trim()||null;
-  const btn=document.getElementById('gear-comment-submit');
-  btn.disabled=true;
-  const SID=getSessionId();
   const{data:{session}}=await sb.auth.getSession();
-  const user=session?.user||null;
-  let username=name;let avatar_url=null;let user_id=null;
-  if(user){
-    const{data:u}=await sb.from('users').select('username,avatar_url').eq('id',user.id).maybeSingle();
-    if(u){username=u.username;avatar_url=u.avatar_url;user_id=user.id;}
-  }
-  await sb.from('gear_comments').insert({gear_id:GEAR_ID,user_id,username:username||'匿名',avatar_url,content:body});
-  const count=document.querySelector('.gear-actions .gear-act-btn:last-child');
-  if(count){const n=parseInt(count.textContent.replace(/[^0-9]/g,''))||0;count.innerHTML=`💬 ${n+1}`;}
-  document.getElementById('gear-comment-input').value='';
-  btn.disabled=false;
-  await loadComments();
+  currentCommentUserId=session?session.user.id:null;
+  if(currentCommentUserId){const{data:u}=await sb.from('users').select('username,avatar_url').eq('id',currentCommentUserId).single();currentCommentUserInfo=u||null;}
+  else{currentCommentUserInfo=null;}
+  updateCommentNameArea();
+  const{data}=await sb.from('gear_comments').select('*,users(username,avatar_url)').eq('gear_id',GEAR_ID).order('created_at',{ascending:true});
+  allComments=data||[];renderComments();
 }
-
-async function deleteGearComment(id){
-  if(!confirm(tr('commentDeleteConfirm')))return;
-  await sb.from('gear_comments').update({deleted_at:new Date().toISOString()}).eq('id',id);
-  await loadComments();
+function updateCommentNameArea(){
+  const area=document.getElementById('comment-name-area');if(!area)return;
+  if(!currentCommentUserInfo){area.innerHTML='<input class="comment-name-input" id="comment-name" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30" onfocus="maybeShowCommentLoginPromo()">';return;}
+  const avatarHtml=currentCommentUserInfo.avatar_url?'<img src="'+currentCommentUserInfo.avatar_url+'" alt="">':'<div class="av-fallback">'+((currentCommentUserInfo.username||'U')[0].toUpperCase())+'</div>';
+  area.innerHTML='<div class="comment-login-badge">'+avatarHtml+'<span>'+(lang==='en'?'Commenting as ':'コメント投稿者: ')+'<b style="color:var(--tx)">'+(currentCommentUserInfo.username||'')+'</b></span></div>';
 }
-
+function maybeShowCommentLoginPromo(){
+  if(currentCommentUserId)return;
+  if(sessionStorage.getItem('mgmb_comment_promo_dismissed'))return;
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  setTimeout(()=>{const el=document.getElementById('comment-login-promo');if(el)el.classList.add('open');},150);
+}
+function closeCommentLoginPromo(){sessionStorage.setItem('mgmb_comment_promo_dismissed','1');const el=document.getElementById('comment-login-promo');if(el)el.classList.remove('open');}
+function renderComments(){
+  const el=document.getElementById('comments-list');if(!el)return;
+  const roots=allComments.filter(c=>!c.parent_id);
+  if(!roots.length){el.innerHTML='<div style="font-size:13px;color:var(--td);padding:16px 0">'+(lang==='en'?'No comments yet. Be the first!':'まだコメントはありません。最初のコメントを書いてみましょう！')+'</div>';return;}
+  el.innerHTML=roots.map(c=>renderComment(c,0)).join('');
+  const countEl=document.getElementById('gear-comment-count');
+  if(countEl)countEl.textContent=allComments.filter(c=>!c.deleted_at).length;
+}
+function renderComment(c,depth){
+  const isDeleted=!!c.deleted_at;
+  const isMine=!!(currentCommentUserId&&c.user_id&&c.user_id===currentCommentUserId);
+  const init=(c.username||'匿')[0].toUpperCase();
+  const avatarUrl=c.users?.avatar_url||null;
+  const linkUsername=c.user_id&&c.users?.username?c.users.username:null;
+  const avHtml=avatarUrl
+    ?'<div class="c-av" style="padding:0;overflow:hidden'+(linkUsername?';cursor:pointer':'')+'"'+(linkUsername?' onclick="location.href=\'/user?username='+encodeURIComponent(linkUsername)+'\'"':'')+'><img src="'+avatarUrl+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>'
+    :'<div class="c-av"'+(linkUsername?' style="cursor:pointer" onclick="location.href=\'/user?username='+encodeURIComponent(linkUsername)+'\'"':'')+'>'+init+'</div>';
+  const nameHtml=linkUsername
+    ?'<div class="c-name" style="cursor:pointer" onclick="location.href=\'/user?username='+encodeURIComponent(linkUsername)+'\'">'+(c.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div>'
+    :'<div class="c-name">'+(c.username||(lang==='en'?'Anonymous':'匿名ユーザー'))+'</div>';
+  const children=allComments.filter(x=>x.parent_id===c.id);
+  const mention=c.reply_to_name?'<span class="c-mention">@'+c.reply_to_name+'</span> ':'';
+  const editedBadge=(c.edited_at&&!isDeleted)?'<span class="c-edited">（'+(lang==='en'?'edited':'編集済み')+'）</span>':'';
+  const bodyHtml=isDeleted
+    ?'<div class="c-body c-body-deleted" id="cb-'+c.id+'">'+(lang==='en'?'[This comment has been deleted]':'[削除されたコメントです]')+'</div>'
+    :'<div class="c-body" id="cb-'+c.id+'">'+mention+escHtml(c.content)+editedBadge+'</div>';
+  const replyBtn=isDeleted?'':'<span class="c-reply-btn" onclick="openReply(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">↩ '+(lang==='en'?'Reply':'返信')+'</span>';
+  const ownerBtns=(isMine&&!isDeleted)?'<span class="c-reply-btn" onclick="startEditComment(\''+c.id+'\')">✎ '+(lang==='en'?'Edit':'編集')+'</span><span class="c-reply-btn c-delete-btn" onclick="deleteComment(\''+c.id+'\')">🗑 '+(lang==='en'?'Delete':'削除')+'</span>':'';
+  const replyNameAreaHtml=currentCommentUserInfo
+    ?'<div class="reply-login-badge">'+(currentCommentUserInfo.avatar_url?'<img src="'+currentCommentUserInfo.avatar_url+'" alt="">':'<div class="av-fallback">'+((currentCommentUserInfo.username||'U')[0].toUpperCase())+'</div>')+'<span>'+(lang==='en'?'Replying as ':'返信者: ')+'<b style="color:var(--tx)">'+(currentCommentUserInfo.username||'')+'</b></span></div>'
+    :'<input class="reply-name-input" id="rn-'+c.id+'" type="text" placeholder="'+(lang==='en'?'Name (optional)':'名前（任意）')+'" maxlength="30">';
+  let html='<div class="comment" id="c-'+c.id+'"><div class="c-head">'+avHtml+nameHtml+'<div class="c-time">'+timeAgo(c.created_at)+'</div></div>'+bodyHtml+replyBtn+ownerBtns+'<div class="reply-form" id="rf-'+c.id+'">'+replyNameAreaHtml+'<div class="reply-row"><textarea class="reply-input" id="ri-'+c.id+'" placeholder="@'+(c.username||'匿名')+'への返信..." rows="1" oninput="autoResize(this)"></textarea><button class="reply-submit" onclick="postComment(\''+c.id+'\',\''+escHtml(c.username||'匿名')+'\')">'+(lang==='en'?'Post':'投稿')+'</button></div></div>';
+  if(children.length){html+='<div class="reply-indent">'+children.map(ch=>renderComment(ch,depth+1)).join('')+'</div>';}
+  html+='</div>';return html;
+}
+function startEditComment(id){
+  const c=allComments.find(x=>x.id===id);if(!c)return;
+  const bodyEl=document.getElementById('cb-'+id);if(!bodyEl)return;
+  bodyEl.outerHTML='<div class="c-edit-form" id="cb-'+id+'"><textarea class="reply-input" id="ce-input-'+id+'" rows="2" oninput="autoResize(this)">'+escHtml(c.content||'')+'</textarea><div class="reply-row" style="margin-top:6px;justify-content:flex-end;gap:8px"><span class="c-reply-btn" onclick="cancelEditComment(\''+id+'\')">'+(lang==='en'?'Cancel':'キャンセル')+'</span><button class="reply-submit" onclick="saveEditComment(\''+id+'\')">'+(lang==='en'?'Save':'保存')+'</button></div></div>';
+  const ta=document.getElementById('ce-input-'+id);if(ta){ta.focus();autoResize(ta);}
+}
+function cancelEditComment(id){renderComments();}
+async function saveEditComment(id){
+  const ta=document.getElementById('ce-input-'+id);if(!ta)return;
+  const newContent=ta.value.trim();
+  if(!newContent){showToast(lang==='en'?'❌ Please enter a comment':'❌ コメントを入力してください');return;}
+  const{error}=await sb.from('gear_comments').update({content:newContent,edited_at:new Date().toISOString()}).eq('id',id).eq('user_id',currentCommentUserId);
+  if(error){showToast(lang==='en'?'❌ Failed to update':'❌ 更新に失敗しました');return;}
+  showToast(lang==='en'?'✅ Comment updated':'✅ コメントを更新しました');await loadComments();
+}
+async function deleteComment(id){
+  const ok=confirm(lang==='en'?'Delete this comment? This cannot be undone.':'このコメントを削除しますか？元に戻せません。');
+  if(!ok)return;
+  const{error}=await sb.from('gear_comments').update({deleted_at:new Date().toISOString()}).eq('id',id).eq('user_id',currentCommentUserId);
+  if(error){showToast(lang==='en'?'❌ Failed to delete':'❌ 削除に失敗しました');return;}
+  showToast(lang==='en'?'🗑 Comment deleted':'🗑 コメントを削除しました');await loadComments();
+}
+function openReply(parentId,name){document.querySelectorAll('.reply-form').forEach(f=>f.classList.remove('open'));const form=document.getElementById('rf-'+parentId);if(form){form.classList.add('open');const nameInput=document.getElementById('rn-'+parentId);const target=nameInput||document.getElementById('ri-'+parentId);if(target)target.focus();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';}
+async function postComment(parentId,replyToName){
+  const nameEl=parentId?document.getElementById('rn-'+parentId):document.getElementById('comment-name');
+  const inputEl=parentId?document.getElementById('ri-'+parentId):document.getElementById('comment-input');
+  const content=inputEl.value.trim();
+  if(!content){showToast(lang==='en'?'❌ Please enter a comment':'❌ コメントを入力してください');return;}
+  const{data:{session}}=await sb.auth.getSession();
+  let username=nameEl?nameEl.value.trim()||null:null;let userId=null;
+  if(session){userId=session.user.id;const{data:u}=await sb.from('users').select('username').eq('id',userId).single();if(u?.username)username=u.username;}
+  const{error}=await sb.from('gear_comments').insert({gear_id:GEAR_ID,parent_id:parentId||null,username,user_id:userId,content,reply_to_name:replyToName||null});
+  if(error){showToast(lang==='en'?'❌ Failed to post':'❌ 投稿に失敗しました');console.error(error);return;}
+  inputEl.value='';inputEl.style.height='';if(nameEl)nameEl.value='';
+  if(parentId){const form=document.getElementById('rf-'+parentId);if(form)form.classList.remove('open');}
+  showToast(lang==='en'?'💬 Comment posted':'💬 コメントしました');await loadComments();
+}
 function showError(msg){document.getElementById('content').innerHTML=`<div class="error-box"><p>${msg}</p><a href="/" style="color:var(--ac);display:block;margin-top:16px">${tr('backHome')}</a></div>`;}
-
-applyLang();
-loadGear();
+applyLang();loadGear();
 </script>
 </body>
 </html>
