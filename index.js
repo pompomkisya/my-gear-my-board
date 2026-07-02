@@ -776,16 +776,29 @@ function setTab(el,tab){
 }
 function updateBanner(tab){
   const isGear=tab==='gear';
-  const boardText='<strong>'+(isGear?'':'🎸 ')+'あなたのエフェクターボードを投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。';
-  const gearText='<strong>🎸 マイギアを投稿しよう！</strong><br>アカウント登録が必要です。';
-  const boardBtnHtml=`<button class="pb-btn board" onclick="openPost('board')">エフェクターボードを投稿</button>`;
-  const gearBtnHtml=`<button class="pb-btn board" onclick="location.href='/mypage'">マイギアを投稿（要登録）</button>`;
-  const txt=isGear?gearText:boardText;
-  const btn=isGear?gearBtnHtml:boardBtnHtml;
-  const mobTxt=document.getElementById('mob-banner-text');if(mobTxt)mobTxt.innerHTML=txt;
-  const mobBtn=document.getElementById('mob-banner-btn');if(mobBtn)mobBtn.outerHTML=btn;
-  const pcTxt=document.getElementById('pc-banner-text');if(pcTxt)pcTxt.innerHTML=(isGear?'':'🎸 ')+txt.replace('<strong>','<strong>');
-  const pcBtn=document.getElementById('pc-banner-btn');if(pcBtn)pcBtn.outerHTML=btn;
+  const mobBanner=document.getElementById('mob-banner');
+  const pcBanner=document.getElementById('pc-banner');
+  const mobTxt=document.getElementById('mob-banner-text');
+  const pcTxt=document.getElementById('pc-banner-text');
+  const mobBtn=document.getElementById('mob-banner-btn');
+  const pcBtn=document.getElementById('pc-banner-btn');
+  if(isGear){
+    [mobBanner,pcBanner].forEach(el=>{if(el){el.classList.remove('banner-board');el.classList.add('banner-gear');}});
+    const txt='<strong>🎸 '+(lang==='en'?'Post your gear!':'使っている機材を投稿しよう！')+'</strong><br>'+(lang==='en'?'Account required.':'アカウント登録が必要です。');
+    const btnTxt=lang==='en'?'Post Gear (Sign up)':'マイギアを投稿（要登録）';
+    if(mobTxt)mobTxt.innerHTML=txt;
+    if(pcTxt)pcTxt.innerHTML=txt;
+    if(mobBtn){mobBtn.textContent=btnTxt;mobBtn.className='pb-btn gear-b';mobBtn.onclick=()=>location.href='/mypage';}
+    if(pcBtn){pcBtn.textContent=btnTxt;pcBtn.className='pb-btn gear-b';pcBtn.onclick=()=>location.href='/mypage';}
+  }else{
+    [mobBanner,pcBanner].forEach(el=>{if(el){el.classList.remove('banner-gear');el.classList.add('banner-board');}});
+    const txt='<strong>📸 '+(lang==='en'?'Show us your board!':'あなたのボードを見せよう！')+'</strong><br>'+(lang==='en'?'No sign-up needed.':'登録不要・匿名OK。写真1枚から投稿できます。');
+    const btnTxt=lang==='en'?'Post a Pedalboard':'エフェクターボードを投稿';
+    if(mobTxt)mobTxt.innerHTML=txt;
+    if(pcTxt)pcTxt.innerHTML=txt;
+    if(mobBtn){mobBtn.textContent=btnTxt;mobBtn.className='pb-btn board';mobBtn.onclick=()=>openPost('board');}
+    if(pcBtn){pcBtn.textContent=btnTxt;pcBtn.className='pb-btn board';pcBtn.onclick=()=>openPost('board');}
+  }
 }
 async function loadGearTab(){
   try{
