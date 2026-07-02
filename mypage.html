@@ -865,7 +865,7 @@ async function loadMyPosts(){
   if(!currentUser)return;const el=document.getElementById('my-panel-posts');
   el.innerHTML=`<div class="empty-msg">${tr('loading')}</div>`;
   const{data}=await sb.from('posts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
-  const postBtn=`<a class="tab-action-btn" href="/" onclick="setTimeout(()=>document.querySelector('.h-btn')?.click(),500);return false;">＋ ${lang==='en'?'Post a Board':'ボードを投稿する'}</a>`;
+  const postBtn=`<a class="tab-action-btn" href="/?post=board">＋ ${lang==='en'?'Post a Board':'ボードを投稿する'}</a>`;
   if(!data||!data.length){el.innerHTML=postBtn+`<div class="empty-msg">${tr('emptyPosts')}</div>`;return;}
   el.innerHTML=postBtn+data.map(p=>postItemHTML(p)).join('');
 }
