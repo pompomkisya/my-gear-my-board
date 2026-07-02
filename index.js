@@ -507,50 +507,24 @@ function updateLoadMoreBtn(hasMore,isMax=false){
 }
 
 async function loadAllPostsBackground(){
-  const[postsResult,ccResult,ugResult]=await Promise.all([
+  const[postsResult,ccResult]=await Promise.all([
     sb.from('posts').select('*,users(avatar_url)').order('created_at',{ascending:false}),
     sb.from('comments').select('post_id'),
-    sb.from('user_gear').select('id,name,brand,image_url,image_urls,memo,likes,comments_count,user_id,updated_at,created_at').order('updated_at',{ascending:false,nullsFirst:false}),
   ]);
   if(postsResult.error){console.error(postsResult.error);return;}
   const posts=postsResult.data||[];
   const cm={};
   if(ccResult.data)ccResult.data.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  // user_gearのuser_id→username/avatar_url取得
-  const ugData=ugResult.data||[];
-  const userIds=[...new Set(ugData.map(g=>g.user_id).filter(Boolean))];
-  let usersMap={};
-  if(userIds.length){
-    const{data:users}=await sb.from('users').select('id,username,avatar_url').in('id',userIds);
-    (users||[]).forEach(u=>{usersMap[u.id]=u;});
-  }
-  // user_gearをpostsと同じフォーマットに変換
-  const ugPosts=ugData.map(g=>({
-    id:g.id,
-    post_type:'user_gear',
-    title:g.name||'',
-    brand:g.brand||'',
-    image_urls:g.image_urls&&g.image_urls.length?g.image_urls:(g.image_url?[g.image_url]:[]),
-    description:g.memo||null,
-    likes:g.likes||0,
-    comment_count:g.comments_count||0,
-    username:usersMap[g.user_id]?.username||null,
-    users:{avatar_url:usersMap[g.user_id]?.avatar_url||null},
-    created_at:g.updated_at||g.created_at,
-    gear_list:[],
-    _gearUrl:'/gear?id='+g.id,
-  }));
-  allDBPosts=[...posts.map(p=>({
+  allDBPosts=posts.map(p=>({
     ...p,
     comment_count:cm[p.id]||0,
     gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
       ...g,
       types:pedalTypesMap[g.name]||[]
     }))
-  })),...ugPosts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  }));
   _allPostsLoaded=true;
-  // GEARタブ以外は現在の表示件数を維持してapplyFilter
-  if(currentTab!=='gear'){
+  if(currentTab!=='gear'&&currentTab!=='all'){
     const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter||currentFxFilter||currentSearchQuery;
     const hasMore=!isFiltered&&currentSort!=='likes'&&allDBPosts.length>_postsOffset;
     applyFilter();
@@ -758,7 +732,39 @@ function setSort(el,sort){
 function filterFx(el,fx){document.querySelectorAll('.sl .tag').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentFxFilter=fx;currentBrandFilter=null;currentGenreFilter='ALL';applyFilter();}
 let _gearTabData=null;let _gearTabLoaded=false;
 let _gearOffset=0;const _gearPerPage=8;
+let _allTabUGLoaded=false;
 function _escHtml(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+async function loadAllTabUserGear(){
+  try{
+    const ugRes=await sb.from('user_gear').select('id,name,brand,image_url,image_urls,memo,likes,comments_count,user_id,updated_at,created_at').order('updated_at',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false});
+    const ugData=ugRes.data||[];
+    const userIds=[...new Set(ugData.map(g=>g.user_id).filter(Boolean))];
+    let usersMap={};
+    if(userIds.length){
+      const{data:users}=await sb.from('users').select('id,username,avatar_url').in('id',userIds);
+      (users||[]).forEach(u=>{usersMap[u.id]=u;});
+    }
+    const ugPosts=ugData.map(g=>({
+      id:g.id,post_type:'user_gear',
+      title:g.name||'',brand:g.brand||'',
+      image_urls:g.image_urls&&g.image_urls.length?g.image_urls:(g.image_url?[g.image_url]:[]),
+      description:g.memo||null,likes:g.likes||0,comment_count:g.comments_count||0,
+      username:usersMap[g.user_id]?.username||null,
+      users:{avatar_url:usersMap[g.user_id]?.avatar_url||null},
+      created_at:g.updated_at||g.created_at,
+      gear_list:[],_gearUrl:'/gear?id='+g.id,
+    }));
+    // 既存のallDBPosts（postsのみ）にuser_gearをマージ
+    allDBPosts=[...allDBPosts,...ugPosts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    _allTabUGLoaded=true;
+    if(currentTab==='all')applyFilter();
+  }catch(e){
+    console.error('loadAllTabUserGear error',e);
+    _allTabUGLoaded=true;
+    if(currentTab==='all')applyFilter();
+  }
+}
 
 function setTab(el,tab){
   document.querySelectorAll('.feed-tab').forEach(t2=>t2.classList.remove('on'));el.classList.add('on');currentTab=tab;
@@ -770,6 +776,9 @@ function setTab(el,tab){
   if(tab==='gear'){
     if(_gearTabLoaded){renderGearTab(_gearTabData);}
     else{showSkeletonCards(6);loadGearTab();}
+  }else if(tab==='all'){
+    if(_allTabUGLoaded){applyFilter();}
+    else{showSkeletonCards(6);loadAllTabUserGear();}
   }else{
     applyFilter();
   }
