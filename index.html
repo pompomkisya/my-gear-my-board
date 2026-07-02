@@ -96,10 +96,11 @@ header{position:sticky;top:0;z-index:300;height:58px;display:flex;align-items:ce
 .pb-btn.board:hover{background:#cf4c26}
 .pb-btn.gear-b{background-color:rgba(232,85,45,.45);color:#fff}
 .pb-btn.gear-b:hover{background-color:rgba(232,85,45,.6)}
-.feed-tabs{display:flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden;margin-bottom:14px}
-.feed-tab{flex:1;padding:7px;font-family:Noto Sans JP,sans-serif;font-size:12px;font-weight:500;color:#8a8880;cursor:pointer;border-right:1px solid var(--bd);transition:all .15s;text-align:center;touch-action:manipulation}
+.feed-tabs{display:flex;border:1px solid var(--bd);border-radius:6px;overflow:hidden;margin-bottom:14px;background:var(--sf)}
+.feed-tab{flex:1;padding:9px 7px;font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:600;color:var(--td);cursor:pointer;border-right:1px solid var(--bd);transition:all .2s;text-align:center;touch-action:manipulation;letter-spacing:.5px}
 .feed-tab:last-child{border-right:none}
-.feed-tab.on{background:var(--sf2);color:var(--tx)}
+.feed-tab:hover:not(.on){color:var(--tm);background:rgba(255,255,255,.03)}
+.feed-tab.on{background:var(--sf2);color:var(--ac);box-shadow:inset 0 -2px 0 var(--ac)}
 .gacha-feed-wrap{display:grid;grid-template-columns:1fr 1fr;gap:13px;align-items:start}
 .gacha-grid-card{background:var(--sf);border:1px solid rgba(232,85,45,.3);border-radius:6px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;display:flex;flex-direction:column;text-align:center}
 @keyframes gPulseCard{0%,100%{box-shadow:0 0 0 0 rgba(232,85,45,0)}50%{box-shadow:0 0 14px 3px rgba(232,85,45,.2)}}
@@ -568,9 +569,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
     <div class="swipe-panel" id="mob-feed-panel">
       <div class="mob-feed-inner">
         <div class="post-banner">
-          <div class="post-banner-text"><strong>あなたのエフェクターボードを投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。</div>
+          <div class="post-banner-text" id="mob-banner-text"><strong>あなたのエフェクターボードを投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。</div>
           <div class="post-banner-btns">
-            <button class="pb-btn board" onclick="openPost('board')">エフェクターボードを投稿</button>
+            <button class="pb-btn board" id="mob-banner-btn" onclick="openPost('board')">エフェクターボードを投稿</button>
           </div>
         </div>
         <div id="mob-filter-clear-bar" style="display:none;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(232,85,45,.1);border:1px solid rgba(232,85,45,.3);border-radius:4px;margin-bottom:8px">
@@ -754,9 +755,9 @@ footer{padding:20px 14px;flex-direction:column;align-items:flex-start;gap:10px;d
 </aside>
 <main class="feed">
   <div class="post-banner">
-    <div class="post-banner-text"><strong>🎸 あなたのエフェクターボードを投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。</div>
+    <div class="post-banner-text" id="pc-banner-text"><strong>🎸 あなたのエフェクターボードを投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。</div>
     <div class="post-banner-btns">
-      <button class="pb-btn board" onclick="openPost('board')">エフェクターボードを投稿</button>
+      <button class="pb-btn board" id="pc-banner-btn" onclick="openPost('board')">エフェクターボードを投稿</button>
     </div>
   </div>
   <div class="feed-top">
