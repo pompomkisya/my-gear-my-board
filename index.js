@@ -1582,10 +1582,9 @@ function renderGearWidgetMob(posts){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeGearReportModal();}});
 document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();loadPedalDataBackground();loadKanaAliases();updateStepUI();loadNewsWidget();initPCScrollSync();applyLangUI();
-  // URLパラメータで投稿フォームを自動オープン (?post=board)
-  const urlParams=new URLSearchParams(window.location.search);
-  const postType=urlParams.get('post');
-  if(postType==='board'){setTimeout(()=>openPost('board'),800);}
+  // ローカルストレージのフラグで投稿フォームを自動オープン
+  const autoPost=localStorage.getItem('mgmb_auto_post');
+  if(autoPost){localStorage.removeItem('mgmb_auto_post');openPost(autoPost);}
 });
 // ★ iOS Safari の bfcache（戻る/進むキャッシュ）対策。
 // ページがJS再実行なしで「凍結復元」された場合、画面幅の判定や言語設定が古いまま固まることがあるため、
