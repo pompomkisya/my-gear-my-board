@@ -438,7 +438,7 @@ function showSkeletonCards(count){
 }
 
 // ★ 修正: 先行8件表示 → バックグラウンドで全件取得
-let _postsOffset=0;const _postsPerPage=8;const _postsMax=40;
+let _postsOffset=0;const _postsPerPage=8;const _postsMax=40;let _allPostsLoaded=false;
 async function loadPostsFromDB(){
   _postsOffset=0;
   showSkeletonCards(6);
@@ -468,21 +468,24 @@ async function loadMorePosts(){
     return;
   }
   const btn=document.getElementById('load-more-btn');if(btn){btn.disabled=true;btn.textContent=lang==='en'?'Loading...':'読み込み中...';}
-  // range(from,to)は両端込みなので_postsPerPage件取るにはto=from+_postsPerPage-1
-  // +1件余分に取ってhasMoreを判定する
+  // 全件ロード済みならoffsetを増やして再描画
+  if(_allPostsLoaded){
+    _postsOffset=Math.min(_postsOffset+_postsPerPage,allDBPosts.length);
+    applyFilter();
+    return;
+  }
   const{data:batch}=await sb.from('posts').select('*,users(avatar_url)').order('created_at',{ascending:false}).range(_postsOffset,_postsOffset+_postsPerPage);
   if(!batch||!batch.length){updateLoadMoreBtn(false);return;}
   const hasMore=batch.length>_postsPerPage;
   const actualBatch=batch.slice(0,_postsPerPage);
   const newPosts=actualBatch.map(p=>({
-    ...p,
-    comment_count:0,
-    gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
-      ...g,
-      types:pedalTypesMap[g.name]||[]
-    }))
+    ...p,comment_count:0,
+    gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({...g,types:pedalTypesMap[g.name]||[]}))
   }));
-  allDBPosts=[...allDBPosts,...newPosts];
+  // 重複を防ぐためIDチェック
+  const existingIds=new Set(allDBPosts.map(p=>p.id));
+  const uniqueNew=newPosts.filter(p=>!existingIds.has(p.id));
+  allDBPosts=[...allDBPosts,...uniqueNew];
   _postsOffset=allDBPosts.length;
   applyFilter();
   updateLoadMoreBtn(hasMore&&allDBPosts.length<_postsMax,allDBPosts.length>=_postsMax);
@@ -545,6 +548,7 @@ async function loadAllPostsBackground(){
       types:pedalTypesMap[g.name]||[]
     }))
   })),...ugPosts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  _allPostsLoaded=true;
   // GEARタブ以外は現在の表示件数を維持してapplyFilter
   if(currentTab!=='gear'){
     const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter||currentFxFilter||currentSearchQuery;
@@ -648,8 +652,15 @@ function applyFilter(){
   if(currentSort==='likes')posts.sort((a,b)=>(b.likes||0)-(a.likes||0));
   // フィルターなし・新着ソートの時はページネーション件数で制限
   const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter||currentFxFilter||currentSearchQuery;
-  const displayPosts=(!isFiltered&&currentSort!=='likes')?posts.slice(0,_postsOffset):posts;
+  const isLikes=currentSort==='likes';
+  const displayPosts=(!isFiltered&&!isLikes)?posts.slice(0,_postsOffset):posts;
   renderDBPosts(displayPosts);
+  // さらに読み込むボタンの状態更新
+  if(!isFiltered&&!isLikes){
+    updateLoadMoreBtn(posts.length>_postsOffset);
+  }else{
+    updateLoadMoreBtn(false);
+  }
 }
 function timeAgo(ts){
   const d=Math.floor((Date.now()-new Date(ts))/1000);
@@ -754,12 +765,27 @@ function setTab(el,tab){
   const headingText=tab==='gear'?'GEAR':(tab==='board'?'PEDALBOARDS':'ALL');
   const fh=document.getElementById('feed-heading');if(fh)fh.textContent=headingText;
   const fhm=document.getElementById('feed-heading-mob');if(fhm)fhm.textContent=headingText;
+  // バナーの切り替え
+  updateBanner(tab);
   if(tab==='gear'){
     if(_gearTabLoaded){renderGearTab(_gearTabData);}
     else{showSkeletonCards(6);loadGearTab();}
   }else{
     applyFilter();
   }
+}
+function updateBanner(tab){
+  const isGear=tab==='gear';
+  const boardText='<strong>'+(isGear?'':'🎸 ')+'あなたのエフェクターボードを投稿しよう！</strong><br>登録不要・匿名OK。写真1枚から投稿できます。';
+  const gearText='<strong>🎸 マイギアを投稿しよう！</strong><br>アカウント登録が必要です。';
+  const boardBtnHtml=`<button class="pb-btn board" onclick="openPost('board')">エフェクターボードを投稿</button>`;
+  const gearBtnHtml=`<button class="pb-btn board" onclick="location.href='/mypage'">マイギアを投稿（要登録）</button>`;
+  const txt=isGear?gearText:boardText;
+  const btn=isGear?gearBtnHtml:boardBtnHtml;
+  const mobTxt=document.getElementById('mob-banner-text');if(mobTxt)mobTxt.innerHTML=txt;
+  const mobBtn=document.getElementById('mob-banner-btn');if(mobBtn)mobBtn.outerHTML=btn;
+  const pcTxt=document.getElementById('pc-banner-text');if(pcTxt)pcTxt.innerHTML=(isGear?'':'🎸 ')+txt.replace('<strong>','<strong>');
+  const pcBtn=document.getElementById('pc-banner-btn');if(pcBtn)pcBtn.outerHTML=btn;
 }
 async function loadGearTab(){
   try{
@@ -1555,7 +1581,12 @@ function renderGearWidgetMob(posts){
   el.innerHTML=sorted.map(([n,c])=>renderGearWidgetHTML(n,c)).join('');
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeGearReportModal();}});
-document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();loadPedalDataBackground();loadKanaAliases();updateStepUI();loadNewsWidget();initPCScrollSync();applyLangUI();});
+document.addEventListener('DOMContentLoaded',()=>{checkMobile();initSwipe();loadPostsFromDB();loadPedalDataBackground();loadKanaAliases();updateStepUI();loadNewsWidget();initPCScrollSync();applyLangUI();
+  // URLパラメータで投稿フォームを自動オープン (?post=board)
+  const urlParams=new URLSearchParams(window.location.search);
+  const postType=urlParams.get('post');
+  if(postType==='board'){setTimeout(()=>openPost('board'),800);}
+});
 // ★ iOS Safari の bfcache（戻る/進むキャッシュ）対策。
 // ページがJS再実行なしで「凍結復元」された場合、画面幅の判定や言語設定が古いまま固まることがあるため、
 // 復元を検知したら明示的に再同期する。通常の新規読み込みには一切影響しない（persistedがtrueの時だけ動く）。
