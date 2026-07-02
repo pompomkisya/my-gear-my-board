@@ -439,6 +439,7 @@ function showSkeletonCards(count){
 
 // ★ 修正: 先行8件表示 → バックグラウンドで全件取得
 let _postsOffset=0;const _postsPerPage=8;const _postsMax=40;let _allPostsLoaded=false;
+let _allDBPostsOnly=[];let _allTabLoaded=false;let _allTabUGLoaded=false;
 async function loadPostsFromDB(){
   _postsOffset=0;
   showSkeletonCards(6);
@@ -507,58 +508,37 @@ function updateLoadMoreBtn(hasMore,isMax=false){
 }
 
 async function loadAllPostsBackground(){
-  const[postsResult,ccResult,ugResult]=await Promise.all([
+  const[postsResult,ccResult]=await Promise.all([
     sb.from('posts').select('*,users(avatar_url)').order('created_at',{ascending:false}),
     sb.from('comments').select('post_id'),
-    sb.from('user_gear').select('id,name,brand,image_url,image_urls,memo,likes,comments_count,user_id,updated_at,created_at').order('updated_at',{ascending:false,nullsFirst:false}),
   ]);
   if(postsResult.error){console.error(postsResult.error);return;}
   const posts=postsResult.data||[];
   const cm={};
   if(ccResult.data)ccResult.data.forEach(c=>{cm[c.post_id]=(cm[c.post_id]||0)+1;});
-  // user_gearのuser_id→username/avatar_url取得
-  const ugData=ugResult.data||[];
-  const userIds=[...new Set(ugData.map(g=>g.user_id).filter(Boolean))];
-  let usersMap={};
-  if(userIds.length){
-    const{data:users}=await sb.from('users').select('id,username,avatar_url').in('id',userIds);
-    (users||[]).forEach(u=>{usersMap[u.id]=u;});
-  }
-  // user_gearをpostsと同じフォーマットに変換
-  const ugPosts=ugData.map(g=>({
-    id:g.id,
-    post_type:'user_gear',
-    title:g.name||'',
-    brand:g.brand||'',
-    image_urls:g.image_urls&&g.image_urls.length?g.image_urls:(g.image_url?[g.image_url]:[]),
-    description:g.memo||null,
-    likes:g.likes||0,
-    comment_count:g.comments_count||0,
-    username:usersMap[g.user_id]?.username||null,
-    users:{avatar_url:usersMap[g.user_id]?.avatar_url||null},
-    created_at:g.updated_at||g.created_at,
-    gear_list:[],
-    _gearUrl:'/gear?id='+g.id,
-  }));
-  allDBPosts=[...posts.map(p=>({
+  _allDBPostsOnly=posts.map(p=>({
     ...p,
     comment_count:cm[p.id]||0,
     gear_list:(Array.isArray(p.gear_list)?p.gear_list:[]).map(g=>({
       ...g,
       types:pedalTypesMap[g.name]||[]
     }))
-  })),...ugPosts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  }));
+  allDBPosts=[..._allDBPostsOnly];
   _allPostsLoaded=true;
-  // GEARタブ以外は現在の表示件数を維持してapplyFilter
-  if(currentTab!=='gear'){
+  if(currentTab!=='gear'&&currentTab!=='all'){
     const isFiltered=currentGenreFilter!=='ALL'||currentBrandFilter||currentFxFilter||currentSearchQuery;
     const hasMore=!isFiltered&&currentSort!=='likes'&&allDBPosts.length>_postsOffset;
     applyFilter();
     updateLoadMoreBtn(hasMore);
+  }else if(currentTab==='all'&&_allTabLoaded){
+    mergeUserGearToAll();
+  }else if(currentTab==='board'){
+    applyFilter();
   }
-  buildTicker(allDBPosts);
-  renderRankingWidget(allDBPosts);renderGearWidget(allDBPosts);
-  renderRankingWidgetMob(allDBPosts);renderGearWidgetMob(allDBPosts);
+  buildTicker(_allDBPostsOnly);
+  renderRankingWidget(_allDBPostsOnly);renderGearWidget(_allDBPostsOnly);
+  renderRankingWidgetMob(_allDBPostsOnly);renderGearWidgetMob(_allDBPostsOnly);
   loadPedalDataBackground(posts,cm);
 }
 
@@ -622,8 +602,14 @@ function translateGenre(g){
 function applyFilter(){
   // GEARタブはrenderGearTabが管理するのでスキップ
   if(currentTab==='gear')return;
-  let posts=[...allDBPosts];
-  if(currentTab==='board')posts=posts.filter(p=>!p.post_type||p.post_type==='board');
+  // BOARDタブはpostsのみ、ALLタブはuser_gearも含む
+  let posts;
+  if(currentTab==='board'){
+    posts=_allDBPostsOnly.filter(p=>!p.post_type||p.post_type==='board');
+  }else{
+    // ALL：allDBPostsを使う（user_gear含む）
+    posts=[...allDBPosts];
+  }
   if(currentGenreFilter!=='ALL')posts=posts.filter(p=>genreMatches(p,currentGenreFilter));
   if(currentBrandFilter){
     posts=posts.filter(p=>{
@@ -770,11 +756,50 @@ function setTab(el,tab){
   if(tab==='gear'){
     if(_gearTabLoaded){renderGearTab(_gearTabData);}
     else{showSkeletonCards(6);loadGearTab();}
+  }else if(tab==='all'){
+    _allTabLoaded=true;
+    if(_allTabUGLoaded){applyFilter();}
+    else{showSkeletonCards(6);loadAllTabUserGear();}
   }else{
     applyFilter();
   }
 }
-function updateBanner(tab){
+async function loadAllTabUserGear(){
+  try{
+    const ugRes=await sb.from('user_gear').select('id,name,brand,image_url,image_urls,memo,likes,comments_count,user_id,updated_at,created_at').order('updated_at',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false});
+    const ugData=ugRes.data||[];
+    const userIds=[...new Set(ugData.map(g=>g.user_id).filter(Boolean))];
+    let usersMap={};
+    if(userIds.length){
+      const{data:users}=await sb.from('users').select('id,username,avatar_url').in('id',userIds);
+      (users||[]).forEach(u=>{usersMap[u.id]=u;});
+    }
+    const ugPosts=ugData.map(g=>({
+      id:g.id,post_type:'user_gear',
+      title:g.name||'',brand:g.brand||'',
+      image_urls:g.image_urls&&g.image_urls.length?g.image_urls:(g.image_url?[g.image_url]:[]),
+      description:g.memo||null,likes:g.likes||0,comment_count:g.comments_count||0,
+      username:usersMap[g.user_id]?.username||null,
+      users:{avatar_url:usersMap[g.user_id]?.avatar_url||null},
+      created_at:g.updated_at||g.created_at,
+      gear_list:[],_gearUrl:'/gear?id='+g.id,
+    }));
+    // postsのみのデータにマージ
+    allDBPosts=[..._allDBPostsOnly,...ugPosts].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    _allTabUGLoaded=true;
+    if(currentTab==='all')applyFilter();
+  }catch(e){
+    console.error('loadAllTabUserGear error',e);
+    _allTabUGLoaded=true;
+    if(currentTab==='all')applyFilter();
+  }
+}
+function mergeUserGearToAll(){
+  // バックグラウンド取得完了後にALLタブが既にUGロード済みなら何もしない
+  // そうでなければallDBPostsを更新
+  if(!_allTabUGLoaded)return;
+  applyFilter();
+}
   const isGear=tab==='gear';
   const mobBanner=document.getElementById('mob-banner');
   const pcBanner=document.getElementById('pc-banner');
@@ -839,7 +864,8 @@ async function loadGearTab(){
     renderGearTab(_gearTabData,true);
   }catch(e){
     console.error('loadGearTab error',e);
-    const msg='<div style="grid-column:1/-1;text-align:center;padding:40px;font-size:11px;color:var(--td)">読み込みに失敗しました</div>';
+    _gearTabLoaded=false;
+    const msg='<div style="grid-column:1/-1;text-align:center;padding:40px;font-size:11px;color:var(--td)">読み込みに失敗しました。タブを開き直してください。</div>';
     const grid=document.getElementById('card-grid');const gridMob=document.getElementById('card-grid-mob');
     if(grid)grid.innerHTML=msg;if(gridMob)gridMob.innerHTML=msg;
   }
